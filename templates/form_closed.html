@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Form Closed — BCA Admissions{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem">&#128274;</div>
+    <h2 class="auth-title">Applications Closed</h2>
+    {% if settings.message %}
+      <p class="auth-sub">{{ settings.message }}</p>
+    {% else %}
+      <p class="auth-sub">The application form is currently closed. Please check back later.</p>
+    {% endif %}
+    {% if settings.open_from %}<p class="text-muted" style="margin-top:1rem">Opens: {{ settings.open_from.strftime('%d %B %Y, %I:%M %p') }} UTC</p>{% endif %}
+    {% if settings.open_until %}<p class="text-muted">Closes: {{ settings.open_until.strftime('%d %B %Y, %I:%M %p') }} UTC</p>{% endif %}
+    <a href="{{ url_for('main.index') }}" class="btn btn-outline" style="margin-top:1.5rem">Back to Home</a>
+  </div>
+</div>
+{% endblock %}

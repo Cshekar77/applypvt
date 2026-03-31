@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login — BCA Admissions{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h2 class="auth-title">Admin Login</h2>
+    <p class="auth-sub">Admissions office access only.</p>
+    <form method="POST" class="auth-form">
+      <div class="field">
+        <label>Username <span class="req">*</span></label>
+        <input type="text" name="username" required placeholder="Admin username">
+      </div>
+      <div class="field">
+        <label>Password <span class="req">*</span></label>
+        <input type="password" name="password" required placeholder="Admin password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Login as Admin</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

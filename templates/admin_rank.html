@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Rank Management — Admin{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2>Rank Management</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+  </div>
+  <p class="text-muted" style="margin-bottom:1.5rem">Students sorted by Grade 12 percentage (highest first). Assign ranks and save.</p>
+  <form method="POST" action="{{ url_for('main.save_ranks') }}">
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Name</th><th>Email</th><th>12%</th><th>10%</th><th>Stream</th><th>Assign Rank</th></tr></thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td>{{ s.full_name }}</td><td>{{ s.email }}</td>
+            <td><strong>{{ s.percent_12 }}%</strong></td><td>{{ s.percent_10 }}%</td><td>{{ s.stream_12 }}</td>
+            <td><input type="number" name="rank_{{ s.id }}" value="{{ s.rank or '' }}" placeholder="e.g. 1" min="1" style="width:80px;padding:6px 8px"></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" style="text-align:center;color:#888">No verified students to rank.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if students %}<button type="submit" class="btn btn-primary" style="margin-top:1.25rem">Save Ranks</button>{% endif %}
+  </form>
+</div>
+{% endblock %}

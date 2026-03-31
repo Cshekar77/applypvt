@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}Apply — BCA Admissions 2026–2027{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-hero">
+    <div class="form-hero-inner">
+      <div class="uni-name">[University Name]</div>
+      <div class="header-divider"></div>
+      <div class="year-badge">Admissions 2026–2027</div>
+      <h1>BCA Application Form</h1>
+      <p>Bachelor of Computer Applications &mdash; fill in all required fields and upload your marksheets as PDF.</p>
+    </div>
+  </div>
+  <div class="prog-bar-wrap">
+    <div class="prog-dot done">1</div><span class="prog-lbl done">Personal Info</span>
+    <div class="prog-line done"></div>
+    <div class="prog-dot done">2</div><span class="prog-lbl done">Education</span>
+    <div class="prog-line done"></div>
+    <div class="prog-dot done">3</div><span class="prog-lbl done">Programme</span>
+  </div>
+  <form method="POST" enctype="multipart/form-data" class="app-form" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-card">
+      <div class="sec-head">
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="sec-title">Personal Information</div>
+      </div>
+      <div class="grid-2">
+        <div class="field {% if form.first_name.errors %}has-error{% endif %}">
+          <label>{{ form.first_name.label.text }} <span class="req">*</span></label>
+          {{ form.first_name(placeholder='e.g. Priya') }}
+          {% for e in form.first_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="field {% if form.last_name.errors %}has-error{% endif %}">
+          <label>{{ form.last_name.label.text }} <span class="req">*</span></label>
+          {{ form.last_name(placeholder='e.g. Sharma') }}
+          {% for e in form.last_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field {% if form.dob.errors %}has-error{% endif %}">
+          <label>Date of birth <span class="req">*</span></label>
+          {{ form.dob(type='date') }}
+          {% for e in form.dob.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="field"><label>Gender</label>{{ form.gender() }}</div>
+      </div>
+      <div class="field {% if form.nationality.errors %}has-error{% endif %}">
+        <label>{{ form.nationality.label.text }} <span class="req">*</span></label>
+        {{ form.nationality(placeholder='e.g. Indian') }}
+        {% for e in form.nationality.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
+      <hr class="divider">
+      <div class="grid-2">
+        <div class="field {% if form.email.errors %}has-error{% endif %}">
+          <label>{{ form.email.label.text }} <span class="req">*</span></label>
+          {{ form.email(placeholder='you@example.com') }}
+          {% for e in form.email.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="field {% if form.phone.errors %}has-error{% endif %}">
+          <label>{{ form.phone.label.text }} <span class="req">*</span></label>
+          {{ form.phone(placeholder='+91 98765 43210') }}
+          {% for e in form.phone.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="field"><label>Residential address</label>{{ form.address(placeholder='Street, City, State, PIN code') }}</div>
+    </div>
+
+    <div class="form-card">
+      <div class="sec-head">
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="sec-title">Education Background</div>
+      </div>
+      <div class="edu-entry">
+        <div class="entry-label">Secondary Education — Grade 10</div>
+        <div class="grid-2">
+          <div class="field {% if form.school_10.errors %}has-error{% endif %}">
+            <label>School name <span class="req">*</span></label>
+            {{ form.school_10(placeholder='School name') }}
+            {% for e in form.school_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.board_10.errors %}has-error{% endif %}">
+            <label>Board <span class="req">*</span></label>
+            {{ form.board_10(onchange='toggleOther(this,"ob10")') }}
+            <div class="other-board" id="ob10" style="display:none;margin-top:.5rem">
+              {{ form.board_10_other(placeholder='Please specify your board name') }}
+            </div>
+            {% for e in form.board_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+        <div class="grid-4">
+          <div class="field {% if form.year_10.errors %}has-error{% endif %}">
+            <label>Year of passing <span class="req">*</span></label>
+            {{ form.year_10(type='number', placeholder='e.g. 2022', min='2000', max='2026') }}
+            {% for e in form.year_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.total_10.errors %}has-error{% endif %}">
+            <label>Total marks <span class="req">*</span></label>
+            {{ form.total_10(id='t10', placeholder='e.g. 500', oninput="calcPct('t10','o10','p10')") }}
+            {% for e in form.total_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.obtained_10.errors %}has-error{% endif %}">
+            <label>Marks obtained <span class="req">*</span></label>
+            {{ form.obtained_10(id='o10', placeholder='e.g. 450', oninput="calcPct('t10','o10','p10')") }}
+            {% for e in form.obtained_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field">
+            <label>Percentage <span class="opt">(auto)</span></label>
+            <div class="pct-display" id="p10">—</div>
+          </div>
+        </div>
+        <div class="field {% if form.marksheet_10.errors %}has-error{% endif %}">
+          <label>Grade 10 marksheet <span class="req">*</span></label>
+          <div class="upload-area" id="ua10" onclick="document.getElementById('marksheet_10').click()">
+            <div class="upload-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+            <div class="upload-text-wrap">
+              <p>Upload original marksheet (PDF)</p>
+              <span>Click to browse &mdash; max 5 MB</span>
+              <div class="upload-filename" id="fn10"></div>
+            </div>
+          </div>
+          {{ form.marksheet_10(id='marksheet_10', onchange="handleUpload(this,'ua10','fn10')") }}
+          {% for e in form.marksheet_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+      </div>
+
+      <div class="edu-entry">
+        <div class="entry-label">Senior Secondary Education — Grade 12</div>
+        <div class="grid-2">
+          <div class="field {% if form.school_12.errors %}has-error{% endif %}">
+            <label>School / College name <span class="req">*</span></label>
+            {{ form.school_12(placeholder='School or college name') }}
+            {% for e in form.school_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.board_12.errors %}has-error{% endif %}">
+            <label>Board <span class="req">*</span></label>
+            {{ form.board_12(onchange='toggleOther(this,"ob12")') }}
+            <div class="other-board" id="ob12" style="display:none;margin-top:.5rem">
+              {{ form.board_12_other(placeholder='Please specify your board name') }}
+            </div>
+            {% for e in form.board_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+        <div class="field {% if form.stream_12.errors %}has-error{% endif %}">
+          <label>Stream <span class="req">*</span></label>
+          {{ form.stream_12() }}
+          {% for e in form.stream_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="grid-4">
+          <div class="field">
+            <label>Year of passing</label>
+            {{ form.year_12(type='number', placeholder='e.g. 2024', min='2000', max='2026') }}
+          </div>
+          <div class="field {% if form.total_12.errors %}has-error{% endif %}">
+            <label>Total marks <span class="req">*</span></label>
+            {{ form.total_12(id='t12', placeholder='e.g. 500', oninput="calcPct('t12','o12','p12')") }}
+            {% for e in form.total_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.obtained_12.errors %}has-error{% endif %}">
+            <label>Marks obtained <span class="req">*</span></label>
+            {{ form.obtained_12(id='o12', placeholder='e.g. 430', oninput="calcPct('t12','o12','p12')") }}
+            {% for e in form.obtained_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field">
+            <label>Percentage <span class="opt">(auto)</span></label>
+            <div class="pct-display" id="p12">—</div>
+          </div>
+        </div>
+        <div class="field {% if form.marksheet_12.errors %}has-error{% endif %}">
+          <label>Grade 12 marksheet <span class="req">*</span></label>
+          <div class="upload-area" id="ua12" onclick="document.getElementById('marksheet_12').click()">
+            <div class="upload-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+            <div class="upload-text-wrap">
+              <p>Upload original marksheet (PDF)</p>
+              <span>Click to browse &mdash; max 5 MB</span>
+              <div class="upload-filename" id="fn12"></div>
+            </div>
+          </div>
+          {{ form.marksheet_12(id='marksheet_12', onchange="handleUpload(this,'ua12','fn12')") }}
+          {% for e in form.marksheet_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="sec-head">
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div class="sec-title">Programme Details</div>
+      </div>
+      <div class="field">
+        <label>Programme <span class="req">*</span></label>
+        <input type="text" value="Bachelor of Computer Applications (BCA)" readonly>
+      </div>
+      <div class="field">
+        <label>Why do you want to pursue BCA? <span class="opt">(optional)</span></label>
+        {{ form.why_bca(placeholder='Briefly describe your interest in computer applications and your career goals...') }}
+      </div>
+    </div>
+
+    <div class="form-footer-row">
+      <p class="footer-note">All fields marked <span class="req">*</span> are required.</p>
+      <button type="submit" class="btn btn-primary">Submit Application &rarr;</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

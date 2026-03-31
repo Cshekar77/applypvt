@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Pending Verification — Admin{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2>Pending Verification</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+  </div>
+  {% if not students %}<div class="empty-state">All applications have been verified.</div>{% endif %}
+  {% for s in students %}
+  <div class="verify-card">
+    <div class="verify-header">
+      <div><strong>{{ s.full_name }}</strong><span class="text-muted" style="margin-left:.75rem">{{ s.email }} &bull; {{ s.phone }}</span></div>
+      <span class="badge badge-warning">Pending</span>
+    </div>
+    <div class="verify-grid">
+      <div><span>DOB</span><strong>{{ s.dob }}</strong></div>
+      <div><span>Gender</span><strong>{{ s.gender or '—' }}</strong></div>
+      <div><span>Nationality</span><strong>{{ s.nationality }}</strong></div>
+      <div><span>Stream (12)</span><strong>{{ s.stream_12 }}</strong></div>
+      <div><span>Board (10)</span><strong>{{ s.board_10_display }}</strong></div>
+      <div><span>Board (12)</span><strong>{{ s.board_12_display }}</strong></div>
+      <div><span>School (10)</span><strong>{{ s.school_10 }}</strong></div>
+      <div><span>College (12)</span><strong>{{ s.school_12 }}</strong></div>
+      <div><span>Marks 10</span><strong>{{ s.obtained_10|int }}/{{ s.total_10|int }} ({{ s.percent_10 }}%)</strong></div>
+      <div><span>Marks 12</span><strong>{{ s.obtained_12|int }}/{{ s.total_12|int }} ({{ s.percent_12 }}%)</strong></div>
+    </div>
+    <div style="display:flex;gap:1rem;margin-top:.75rem">
+      {% if s.marksheet_10 %}<a href="{{ url_for('static', filename='uploads/' + s.marksheet_10) }}" target="_blank" class="btn btn-outline btn-sm">View Marksheet 10</a>{% endif %}
+      {% if s.marksheet_12 %}<a href="{{ url_for('static', filename='uploads/' + s.marksheet_12) }}" target="_blank" class="btn btn-outline btn-sm">View Marksheet 12</a>{% endif %}
+    </div>
+    {% if s.why_bca %}<p class="sop-text" style="margin-top:.75rem"><em>{{ s.why_bca }}</em></p>{% endif %}
+    <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}" style="margin-top:1rem">
+      <div class="field">
+        <label>Admin notes (optional)</label>
+        <input type="text" name="notes" placeholder="Any notes about this applicant...">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Mark as Verified</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

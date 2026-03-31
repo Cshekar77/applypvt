@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — BCA Admissions{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2>Admin Dashboard</h2>
+    <p class="text-muted">BCA Admissions 2026–2027 &mdash; <a href="{{ url_for('main.admin_logout') }}">Logout</a></p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">{{ reg_users }}</div><div class="stat-lbl">Registered Users</div></div>
+    <div class="stat-card"><div class="stat-num">{{ total }}</div><div class="stat-lbl">Total Applications</div></div>
+    <div class="stat-card stat-gold"><div class="stat-num">{{ verified }}</div><div class="stat-lbl">Verified</div></div>
+    <div class="stat-card stat-warn"><div class="stat-num">{{ pending }}</div><div class="stat-lbl">Pending</div></div>
+    <div class="stat-card stat-navy"><div class="stat-num">{{ ranked }}</div><div class="stat-lbl">Ranked</div></div>
+  </div>
+  <div class="admin-nav-grid">
+    <a href="{{ url_for('main.admin_students') }}" class="admin-nav-card"><div class="anc-icon">&#128101;</div><strong>All Students</strong><p>View and search all submitted applications</p></a>
+    <a href="{{ url_for('main.admin_verification') }}" class="admin-nav-card"><div class="anc-icon">&#128196;</div><strong>Pending Verification</strong><p>Review and verify pending applications</p></a>
+    <a href="{{ url_for('main.admin_verified') }}" class="admin-nav-card"><div class="anc-icon">&#10003;</div><strong>Verified Students</strong><p>View all verified applicants</p></a>
+    <a href="{{ url_for('main.admin_rank') }}" class="admin-nav-card"><div class="anc-icon">&#127942;</div><strong>Rank Management</strong><p>Assign ranks to verified students</p></a>
+    <a href="{{ url_for('main.admin_form_control') }}" class="admin-nav-card"><div class="anc-icon">&#9881;</div><strong>Form Control</strong><p>Open/close form and set timing</p></a>
+    <a href="{{ url_for('main.export_all') }}" class="admin-nav-card"><div class="anc-icon">&#128229;</div><strong>Export All (Excel)</strong><p>Download all applications as .xlsx</p></a>
+  </div>
+  <div class="form-status-bar {% if settings.is_open %}open{% else %}closed{% endif %}">
+    Form is currently <strong>{% if settings.is_open %}OPEN{% else %}CLOSED{% endif %}</strong>
+    &mdash; <a href="{{ url_for('main.admin_form_control') }}">Change</a>
+  </div>
+</div>
+{% endblock %}

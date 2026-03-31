@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Verified Students — Admin{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2>Verified Students</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+  </div>
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead><tr><th>Rank</th><th>Name</th><th>Email</th><th>10%</th><th>12%</th><th>Stream</th><th>Verified On</th><th>Notes</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{% if s.rank %}<span class="badge badge-gold">#{{ s.rank }}</span>{% else %}—{% endif %}</td>
+          <td>{{ s.full_name }}</td><td>{{ s.email }}</td>
+          <td>{{ s.percent_10 }}%</td><td>{{ s.percent_12 }}%</td><td>{{ s.stream_12 }}</td>
+          <td>{{ s.verified_at.strftime('%d-%m-%Y') if s.verified_at else '—' }}</td>
+          <td>{{ s.admin_notes or '—' }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('main.unverify_student', app_id=s.id) }}" onsubmit="return confirm('Move back to pending?')">
+              <button type="submit" class="btn btn-outline btn-sm" style="color:#c0392b;border-color:#c0392b">Unverify</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" style="text-align:center;color:#888">No verified students yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:1.5rem">
+    <a href="{{ url_for('main.export_verified') }}" class="btn btn-outline btn-sm">Export Verified (Excel)</a>
+  </div>
+</div>
+{% endblock %}

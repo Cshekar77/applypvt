@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Register — BCA Admissions{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-sub">Register to begin your BCA application. An OTP will be sent to your email.</p>
+    <form method="POST" class="auth-form">
+      <div class="field">
+        <label>Full name <span class="req">*</span></label>
+        <input type="text" name="full_name" required placeholder="e.g. Priya Sharma">
+      </div>
+      <div class="field">
+        <label>Email address <span class="req">*</span></label>
+        <input type="email" name="email" required placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Password <span class="req">*</span></label>
+        <input type="password" name="password" required placeholder="Min. 8 characters">
+      </div>
+      <div class="field">
+        <label>Confirm password <span class="req">*</span></label>
+        <input type="password" name="confirm_password" required placeholder="Re-enter password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Register &amp; Get OTP</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="{{ url_for('main.login') }}">Login</a></p>
+  </div>
+</div>
+{% endblock %}

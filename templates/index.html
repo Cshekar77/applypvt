@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% block title %}Home — BCA Admissions 2026–2027{% endblock %}
+{% block content %}
+<style>
+  .hero {
+    background: linear-gradient(135deg, #0a1f44 0%, #0e2a5a 100%);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-badge {
+    display: inline-block;
+    background: rgba(201, 160, 61, 0.2);
+    color: #c9a03d;
+    padding: 0.5rem 1rem;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  
+  .hero-sub {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 0.8rem 1.8rem;
+    border-radius: 40px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  .btn-primary {
+    background: #c9a03d;
+    color: #0a1f44;
+  }
+  
+  .btn-primary:hover {
+    background: #b58c2e;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid #c9a03d;
+  }
+  
+  .btn-outline:hover {
+    background: #c9a03d;
+    color: #0a1f44;
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary {
+    background: #2c3e66;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background: #1e2a4a;
+    transform: translateY(-2px);
+  }
+  
+  .info-section {
+    margin-top: 2rem;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+    border: 1px solid #eef2f8;
+  }
+  
+  .info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  .info-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .info-card h3 {
+    font-family: 'Playfair Display', serif;
+    color: #0a1f44;
+    margin-bottom: 0.8rem;
+    font-size: 1.3rem;
+  }
+  
+  .info-card p {
+    color: #5a6e82;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      padding: 2rem 1.5rem;
+    }
+    
+    .hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .hero-sub {
+      font-size: 1rem;
+    }
+    
+    .btn {
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .info-card {
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hero-actions {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  
+  /* Dark theme support */
+  body.dark .info-card {
+    background: #1a2538;
+    border-color: #2d3e54;
+  }
+  
+  body.dark .info-card h3 {
+    color: #eef2ff;
+  }
+  
+  body.dark .info-card p {
+    color: #b9c8e8;
+  }
+</style>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <i class="fas fa-calendar-alt"></i> Admissions 2026–2027
+    </div>
+    <h1 class="hero-title">Bachelor of Computer<br>Applications</h1>
+    <p class="hero-sub">Apply online for BCA admission. Fill in your personal and academic details, upload your marksheets, and submit — all in one place.</p>
+    <div class="hero-actions">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.apply') }}" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Apply Now
+        </a>
+        <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-outline">
+          <i class="fas fa-tachometer-alt"></i> My Dashboard
+        </a>
+      {% else %}
+        <a href="{{ url_for('main.register') }}" class="btn btn-primary">
+          <i class="fas fa-user-plus"></i> Create Account
+        </a>
+        <a href="{{ url_for('main.login') }}" class="btn btn-outline">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="info-section">
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-file-alt" style="color: #c9a03d;"></i>
+      </div>
+      <h3>Online Application</h3>
+      <p>Fill in the application form and upload your Grade 10 and Grade 12 marksheets as PDFs.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-check-circle" style="color: #c9a03d;"></i>
+      </div>
+      <h3>Verification</h3>
+      <p>Our admissions team will review and verify your documents after submission.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">
+        <i class="fas fa-chart-line" style="color: #c9a03d;"></i>
+      </div>
+      <h3>Merit Ranking</h3>
+      <p>Shortlisted candidates will be ranked based on Grade 12 percentage and other criteria.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}My Application — BCA Admissions{% endblock %}
+{% block content %}
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2>My Application</h2>
+    <p class="text-muted">Submitted on {{ appl.submitted_at.strftime('%d %B %Y, %I:%M %p') }}</p>
+    {% if appl.is_verified %}
+      <span class="badge badge-success">Verified</span>
+      {% if appl.rank %}<span class="badge badge-gold">Rank #{{ appl.rank }}</span>{% endif %}
+    {% else %}
+      <span class="badge badge-warning">Pending Verification</span>
+    {% endif %}
+  </div>
+  <div class="view-card">
+    <div class="view-section-title">Personal Information</div>
+    <div class="view-grid">
+      <div class="view-field"><span>Name</span><strong>{{ appl.full_name }}</strong></div>
+      <div class="view-field"><span>Date of Birth</span><strong>{{ appl.dob }}</strong></div>
+      <div class="view-field"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
+      <div class="view-field"><span>Nationality</span><strong>{{ appl.nationality }}</strong></div>
+      <div class="view-field"><span>Email</span><strong>{{ appl.email }}</strong></div>
+      <div class="view-field"><span>Phone</span><strong>{{ appl.phone }}</strong></div>
+    </div>
+    {% if appl.address %}<div class="view-field full"><span>Address</span><strong>{{ appl.address }}</strong></div>{% endif %}
+  </div>
+  <div class="view-card">
+    <div class="view-section-title">Grade 10 Details</div>
+    <div class="view-grid">
+      <div class="view-field"><span>School</span><strong>{{ appl.school_10 }}</strong></div>
+      <div class="view-field"><span>Board</span><strong>{{ appl.board_10_display }}</strong></div>
+      <div class="view-field"><span>Year</span><strong>{{ appl.year_10 }}</strong></div>
+      <div class="view-field"><span>Total Marks</span><strong>{{ appl.total_10|int }}</strong></div>
+      <div class="view-field"><span>Marks Obtained</span><strong>{{ appl.obtained_10|int }}</strong></div>
+      <div class="view-field"><span>Percentage</span><strong>{{ appl.percent_10 }}%</strong></div>
+    </div>
+    {% if appl.marksheet_10 %}<a href="{{ url_for('static', filename='uploads/' + appl.marksheet_10) }}" target="_blank" class="btn btn-outline btn-sm">View Marksheet (10)</a>{% endif %}
+  </div>
+  <div class="view-card">
+    <div class="view-section-title">Grade 12 Details</div>
+    <div class="view-grid">
+      <div class="view-field"><span>School / College</span><strong>{{ appl.school_12 }}</strong></div>
+      <div class="view-field"><span>Board</span><strong>{{ appl.board_12_display }}</strong></div>
+      <div class="view-field"><span>Stream</span><strong>{{ appl.stream_12 }}</strong></div>
+      <div class="view-field"><span>Year</span><strong>{{ appl.year_12 or '—' }}</strong></div>
+      <div class="view-field"><span>Total Marks</span><strong>{{ appl.total_12|int }}</strong></div>
+      <div class="view-field"><span>Marks Obtained</span><strong>{{ appl.obtained_12|int }}</strong></div>
+      <div class="view-field"><span>Percentage</span><strong>{{ appl.percent_12 }}%</strong></div>
+    </div>
+    {% if appl.marksheet_12 %}<a href="{{ url_for('static', filename='uploads/' + appl.marksheet_12) }}" target="_blank" class="btn btn-outline btn-sm">View Marksheet (12)</a>{% endif %}
+  </div>
+  {% if appl.why_bca %}
+  <div class="view-card">
+    <div class="view-section-title">Statement of Purpose</div>
+    <p class="sop-text">{{ appl.why_bca }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
