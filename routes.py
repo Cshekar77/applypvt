@@ -37,7 +37,7 @@ def index():
 
 
 # ─────────────────────────────────────────
-#  Registration + OTP
+#  Registration + OTP (Account created ONLY after OTP verification)
 # ─────────────────────────────────────────
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -59,76 +59,90 @@ def register():
         elif User.query.filter_by(email=email).first():
             flash('An account with that email already exists.', 'danger')
         else:
-            otp  = generate_otp()
-            exp  = datetime.utcnow() + timedelta(minutes=10)
-            user = User(
-                full_name     = name,
-                email         = email,
-                password_hash = generate_password_hash(password),
-                is_verified   = False,
-                otp_code      = otp,
-                otp_expires_at= exp,
-            )
-            db.session.add(user)
-            db.session.commit()
-
+            # Generate OTP but DON'T create account yet
+            otp = generate_otp()
+            
+            # Send OTP first
             ok, err = send_otp_email(email, name, otp)
+            
             if ok:
-                flash('Account created! A 6-digit OTP has been sent to your email. Enter it below to verify.', 'success')
+                # Store registration data in session temporarily
+                session['temp_registration'] = {
+                    'name': name,
+                    'email': email,
+                    'password': password,
+                    'otp': otp,
+                    'otp_expiry': (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                }
+                flash('A 6-digit OTP has been sent to your email. Enter it below to verify.', 'success')
+                return redirect(url_for('main.verify_otp'))
             else:
-                # still allow verification flow; show OTP in flash for dev/testing
-                flash(f'Account created but email could not be sent ({err}). '
-                      f'[DEV MODE] Your OTP is: {otp}', 'warning')
-
-            session['pending_verify_email'] = email
-            return redirect(url_for('main.verify_otp'))
+                flash(f'Could not send OTP. Please try again. Error: {err}', 'danger')
+                return redirect(url_for('main.register'))
 
     return render_template('register.html')
 
 
 @main.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
-    email = session.get('pending_verify_email')
-    if not email:
+    # Get temp registration data from session
+    temp_data = session.get('temp_registration')
+    if not temp_data:
+        flash('No pending registration found. Please register again.', 'warning')
         return redirect(url_for('main.register'))
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return redirect(url_for('main.register'))
-
-    if user.is_verified:
-        session.pop('pending_verify_email', None)
-        flash('Email already verified. Please log in.', 'info')
+    email = temp_data['email']
+    
+    # Check if user already exists (shouldn't happen with this flow)
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        session.pop('temp_registration', None)
+        flash('Account already exists. Please login.', 'info')
         return redirect(url_for('main.login'))
 
     if request.method == 'POST':
         action = request.form.get('action')
 
         if action == 'resend':
-            otp = generate_otp()
-            user.otp_code       = otp
-            user.otp_expires_at = datetime.utcnow() + timedelta(minutes=10)
-            db.session.commit()
-            ok, err = send_otp_email(email, user.full_name, otp)
+            # Generate new OTP
+            new_otp = generate_otp()
+            ok, err = send_otp_email(email, temp_data['name'], new_otp)
+            
             if ok:
+                # Update session with new OTP
+                temp_data['otp'] = new_otp
+                temp_data['otp_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                session['temp_registration'] = temp_data
                 flash('A new OTP has been sent to your email.', 'success')
             else:
-                flash(f'Could not send email. [DEV MODE] OTP: {otp}', 'warning')
+                flash(f'Could not send email. Please try again.', 'warning')
             return redirect(url_for('main.verify_otp'))
 
         entered = request.form.get('otp', '').strip()
+        stored_otp = temp_data.get('otp')
+        expiry = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
+        
         if not entered:
             flash('Please enter the OTP.', 'danger')
-        elif datetime.utcnow() > user.otp_expires_at:
+        elif expiry and datetime.utcnow() > expiry:
             flash('OTP has expired. Please request a new one.', 'danger')
-        elif entered != user.otp_code:
+        elif entered != stored_otp:
             flash('Incorrect OTP. Please try again.', 'danger')
         else:
-            user.is_verified   = True
-            user.otp_code      = None
-            user.otp_expires_at = None
+            # OTP verified - NOW create the account
+            user = User(
+                full_name     = temp_data['name'],
+                email         = email,
+                password_hash = generate_password_hash(temp_data['password']),
+                is_verified   = True,  # Already verified via OTP
+                otp_code      = None,
+                otp_expires_at = None,
+            )
+            db.session.add(user)
             db.session.commit()
-            session.pop('pending_verify_email', None)
+            
+            # Clear temp data
+            session.pop('temp_registration', None)
             flash('Email verified successfully! You can now log in.', 'success')
             return redirect(url_for('main.login'))
 
