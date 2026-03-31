@@ -2,13 +2,13 @@ import os
 import uuid
 import random
 import string
-import requests  # Add this import
+import requests
 from datetime import datetime, timedelta
 from flask import current_app
 from werkzeug.utils import secure_filename
 
-# Add your Google Apps Script URL here
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwE_2hkZS9H9-5-vycM3e869864NdMLvgG61sD7uqsnv8_lWflk0CtqAafklrsjgYxP/exec"  # Replace with your URL
+# Your Google Apps Script URL - REPLACE WITH YOUR ACTUAL URL
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwE_2hkZS9H9-5-vycM3e869864NdMLvgG61sD7uqsnv8_lWflk0CtqAafklrsjgYxP/exec"  # <-- PUT YOUR REAL URL HERE
 
 
 def allowed_file(filename):
@@ -46,13 +46,13 @@ def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
 
-def send_otp_email(mail, user_email, user_name, otp_code):
+def send_otp_email(user_email, user_name, otp_code):
     """
     Send OTP verification email using Google Apps Script.
     Returns (success: bool, error: str|None).
     """
     try:
-        # Call Google Apps Script instead of Flask-Mail
+        # Call Google Apps Script
         response = requests.post(
             APPS_SCRIPT_URL,
             data={
