@@ -8,7 +8,7 @@ from flask import current_app
 from werkzeug.utils import secure_filename
 
 # Your Google Apps Script URL - REPLACE WITH YOUR ACTUAL URL
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwE_2hkZS9H9-5-vycM3e869864NdMLvgG61sD7uqsnv8_lWflk0CtqAafklrsjgYxP/exec"  # <-- PUT YOUR REAL URL HERE
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwckpJunT6CZt0CNpLEL68cfnQK8EZ3n-9rbMzDOSMkNljpyuoCye0uYqptTt07kiYm/exec"  # <-- PUT YOUR REAL URL HERE
 
 
 def allowed_file(filename):
