@@ -1,30 +1,335 @@
 {% extends 'base.html' %}
 {% block title %}Rank Management — Admin{% endblock %}
 {% block content %}
+<style>
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .admin-table th {
+    background: #0a1f44;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  
+  .admin-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #eef2f8;
+    color: #1a2c3e;
+    vertical-align: middle;
+  }
+  
+  .admin-table tr:hover {
+    background: #f8f9fa;
+  }
+  
+  .specialization-badge {
+    background: #eef2ff;
+    color: #0a1f44;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  
+  .category-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  
+  .rank-input {
+    width: 80px;
+    padding: 8px 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .rank-input:focus {
+    outline: none;
+    border-color: #c9a03d;
+  }
+  
+  .rank-input::placeholder {
+    color: #aaa;
+    font-weight: normal;
+  }
+  
+  .percent-highlight {
+    font-weight: 700;
+    color: #c9a03d;
+    font-size: 1.1rem;
+  }
+  
+  .btn-primary {
+    background: #c9a03d;
+    color: #0a1f44;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .btn-primary:hover {
+    background: #b58c2e;
+    transform: translateY(-2px);
+  }
+  
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #c9a03d;
+    color: #c9a03d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .btn-outline:hover {
+    background: #c9a03d;
+    color: white;
+  }
+  
+  .btn-sm {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+  }
+  
+  .page-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #0a1f44;
+    margin: 0;
+  }
+  
+  .text-muted {
+    color: #5a6e82;
+    margin-bottom: 1.5rem;
+  }
+  
+  .rank-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  
+  .auto-rank-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .auto-rank-btn:hover {
+    background: #218838;
+  }
+  
+  .table-wrap {
+    overflow-x: auto;
+  }
+  
+  body.dark .admin-table {
+    background: #1a2538;
+  }
+  
+  body.dark .admin-table td {
+    color: #eef2ff;
+    border-bottom-color: #2d3e54;
+  }
+  
+  body.dark .admin-table tr:hover {
+    background: #2d3e54;
+  }
+  
+  body.dark .specialization-badge {
+    background: #2d3e54;
+    color: #eef2ff;
+  }
+  
+  body.dark .category-badge {
+    background: #1e3a2f;
+    color: #81c784;
+  }
+  
+  body.dark .rank-input {
+    background: #0f1a24;
+    border-color: #2d3e54;
+    color: #eef2ff;
+  }
+  
+  body.dark .text-muted {
+    color: #b9c8e8;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-table th, .admin-table td {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+    }
+    
+    .specialization-badge, .category-badge {
+      font-size: 0.65rem;
+      white-space: normal;
+    }
+    
+    .rank-input {
+      width: 65px;
+      padding: 5px;
+    }
+  }
+</style>
+
 <div class="page-wrap">
   <div class="page-header-inner">
-    <h2>Rank Management</h2>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+    <h2><i class="fas fa-chart-line"></i> Rank Management</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
   </div>
-  <p class="text-muted" style="margin-bottom:1.5rem">Students sorted by Grade 12 percentage (highest first). Assign ranks and save.</p>
+  
+  <p class="text-muted">
+    <i class="fas fa-info-circle"></i> Students sorted by Grade 12 percentage (highest first). 
+    Assign ranks and save. Ranks determine counselling priority.
+  </p>
+  
   <form method="POST" action="{{ url_for('main.save_ranks') }}">
     <div class="table-wrap">
       <table class="admin-table">
-        <thead><tr><th>Name</th><th>Email</th><th>12%</th><th>10%</th><th>Stream</th><th>Assign Rank</th></tr></thead>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>12%</th>
+            <th>10%</th>
+            <th>Stream</th>
+            <th>Specialization</th>
+            <th>Category</th>
+            <th>Assign Rank</th>
+          </tr>
+        </thead>
         <tbody>
           {% for s in students %}
           <tr>
-            <td>{{ s.full_name }}</td><td>{{ s.email }}</td>
-            <td><strong>{{ s.percent_12 }}%</strong></td><td>{{ s.percent_10 }}%</td><td>{{ s.stream_12 }}</td>
-            <td><input type="number" name="rank_{{ s.id }}" value="{{ s.rank or '' }}" placeholder="e.g. 1" min="1" style="width:80px;padding:6px 8px"></td>
+            <td>{{ loop.index }}</td>
+            <td><strong>{{ s.full_name }}</strong></td>
+            <td>{{ s.email }}</td>
+            <td class="percent-highlight">{{ "%.2f"|format(s.percent_12) if s.percent_12 else '—' }}%</td>
+            <td>{{ "%.2f"|format(s.percent_10) if s.percent_10 else '—' }}%</td>
+            <td>{{ s.stream_12 or '—' }}</td>
+            <td>
+              {% if s.specialization %}
+                {% if s.specialization == 'Other' and s.specialization_other %}
+                  <span class="specialization-badge" title="{{ s.specialization_other }}">
+                    <i class="fas fa-code"></i> {{ s.specialization_other[:25] }}{% if s.specialization_other|length > 25 %}...{% endif %}
+                  </span>
+                {% else %}
+                  <span class="specialization-badge">
+                    <i class="fas fa-code"></i> {{ s.specialization }}
+                  </span>
+                {% endif %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              {% if s.category %}
+                <span class="category-badge">
+                  <i class="fas fa-tag"></i> {{ s.category.name }}
+                </span>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>
+              <input type="number" 
+                     name="rank_{{ s.id }}" 
+                     value="{{ s.rank or '' }}" 
+                     placeholder="Rank" 
+                     min="1" 
+                     class="rank-input">
+            </td>
           </tr>
           {% else %}
-          <tr><td colspan="6" style="text-align:center;color:#888">No verified students to rank.</td></tr>
+          <tr>
+            <td colspan="9" style="text-align:center; padding: 3rem; color:#888;">
+              <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+              No verified students to rank. Please verify students first.
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    {% if students %}<button type="submit" class="btn btn-primary" style="margin-top:1.25rem">Save Ranks</button>{% endif %}
+    
+    {% if students %}
+    <div class="rank-actions">
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i> Save Ranks
+      </button>
+      <button type="button" class="auto-rank-btn" onclick="autoAssignRanks()">
+        <i class="fas fa-magic"></i> Auto-Assign by 12th %
+      </button>
+      <a href="{{ url_for('main.admin_verified') }}" class="btn-outline btn-sm">
+        <i class="fas fa-users"></i> View Verified Students
+      </a>
+    </div>
+    {% endif %}
   </form>
 </div>
+
+<script>
+  function autoAssignRanks() {
+    if (confirm('Auto-assign ranks based on 12th percentage? This will overwrite existing ranks.')) {
+      const rows = document.querySelectorAll('.admin-table tbody tr');
+      let ranks = [];
+      
+      // Collect rank inputs
+      rows.forEach((row, index) => {
+        const rankInput = row.querySelector('input[name^="rank_"]');
+        if (rankInput) {
+          // Auto-assign based on order (already sorted by 12th % from backend)
+          rankInput.value = index + 1;
+        }
+      });
+      
+      alert('Ranks auto-assigned! Click "Save Ranks" to confirm.');
+    }
+  }
+</script>
 {% endblock %}

@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
 from database import db
-from models import User, FormSettings, StudentApplication
+from models import User, FormSettings, StudentApplication, ApplicationCategory  # Added ApplicationCategory
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel
@@ -210,16 +210,35 @@ def apply():
         return render_template('form_closed.html', settings=settings)
 
     form = ApplicationForm()
+    
+    # Get categories for dropdown
+    categories = ApplicationCategory.query.filter_by(is_active=True).all()
+    
+    if request.method == 'GET':
+        # Pass categories to template
+        return render_template('application_form.html', form=form, categories=categories)
+    
     if form.validate_on_submit():
         p10  = calc_percent(form.total_10.data, form.obtained_10.data)
         p12  = calc_percent(form.total_12.data, form.obtained_12.data)
-        ms10 = save_pdf(form.marksheet_10.data)
-        ms12 = save_pdf(form.marksheet_12.data)
-
-        if not ms10 or not ms12:
-            flash('PDF upload failed. Ensure files are valid PDFs under 5 MB.', 'danger')
-            return render_template('application_form.html', form=form)
-
+        
+        # Handle specialization
+        specialization = form.specialization.data
+        specialization_other = None
+        if specialization == 'Other':
+            specialization_other = form.specialization_other.data
+            specialization = 'Other'
+        
+        # Get category ID from form
+        category_id = request.form.get('category_id')
+        if not category_id:
+            flash('Please select a category.', 'danger')
+            return render_template('application_form.html', form=form, categories=categories)
+        
+        # PDF uploads disabled for testing
+        ms10 = None
+        ms12 = None
+        
         appl = StudentApplication(
             user_id        = current_user.id,
             first_name     = form.first_name.data,
@@ -247,14 +266,18 @@ def apply():
             obtained_12    = form.obtained_12.data,
             percent_12     = p12,
             marksheet_12   = ms12,
-            why_bca        = form.why_bca.data,
+            # New fields
+            specialization      = specialization,
+            specialization_other = specialization_other,
+            category_id         = int(category_id),
         )
         db.session.add(appl)
         db.session.commit()
         flash('Application submitted successfully!', 'success')
         return redirect(url_for('main.my_application'))
 
-    return render_template('application_form.html', form=form)
+    # If form validation fails
+    return render_template('application_form.html', form=form, categories=categories)
 
 
 @main.route('/my-application')

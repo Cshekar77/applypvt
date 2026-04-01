@@ -1,11 +1,184 @@
 {% extends 'base.html' %}
 {% block title %}Admin Dashboard — BCA Admissions{% endblock %}
 {% block content %}
+<style>
+  .admin-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  
+  .admin-nav-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid #eef2f8;
+    display: block;
+  }
+  
+  .admin-nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: #c9a03d;
+  }
+  
+  .anc-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .admin-nav-card strong {
+    display: block;
+    font-size: 1.1rem;
+    color: #0a1f44;
+    margin-bottom: 0.5rem;
+  }
+  
+  .admin-nav-card p {
+    color: #5a6e82;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #c9a03d;
+  }
+  
+  .stat-num {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0a1f44;
+  }
+  
+  .stat-lbl {
+    color: #5a6e82;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+  
+  .stat-gold {
+    border-left-color: #c9a03d;
+  }
+  
+  .stat-warn {
+    border-left-color: #ffc107;
+  }
+  
+  .stat-navy {
+    border-left-color: #0a1f44;
+  }
+  
+  .form-status-bar {
+    background: #eef2f8;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .form-status-bar.open {
+    background: #d4edda;
+    color: #155724;
+  }
+  
+  .form-status-bar.closed {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .form-status-bar a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  
+  .page-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #0a1f44;
+    margin: 0;
+  }
+  
+  .text-muted {
+    color: #5a6e82;
+  }
+  
+  .text-muted a {
+    color: #c9a03d;
+    text-decoration: none;
+  }
+  
+  body.dark .admin-nav-card {
+    background: #1a2538;
+    border-color: #2d3e54;
+  }
+  
+  body.dark .admin-nav-card strong {
+    color: #eef2ff;
+  }
+  
+  body.dark .admin-nav-card p {
+    color: #b9c8e8;
+  }
+  
+  body.dark .stat-card {
+    background: #1a2538;
+  }
+  
+  body.dark .stat-num {
+    color: #eef2ff;
+  }
+  
+  body.dark .stat-lbl {
+    color: #b9c8e8;
+  }
+  
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .admin-nav-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
 <div class="page-wrap">
   <div class="page-header-inner">
     <h2>Admin Dashboard</h2>
     <p class="text-muted">BCA Admissions 2026–2027 &mdash; <a href="{{ url_for('main.admin_logout') }}">Logout</a></p>
   </div>
+  
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-num">{{ reg_users }}</div><div class="stat-lbl">Registered Users</div></div>
     <div class="stat-card"><div class="stat-num">{{ total }}</div><div class="stat-lbl">Total Applications</div></div>
@@ -13,16 +186,60 @@
     <div class="stat-card stat-warn"><div class="stat-num">{{ pending }}</div><div class="stat-lbl">Pending</div></div>
     <div class="stat-card stat-navy"><div class="stat-num">{{ ranked }}</div><div class="stat-lbl">Ranked</div></div>
   </div>
+  
   <div class="admin-nav-grid">
-    <a href="{{ url_for('main.admin_students') }}" class="admin-nav-card"><div class="anc-icon">&#128101;</div><strong>All Students</strong><p>View and search all submitted applications</p></a>
-    <a href="{{ url_for('main.admin_verification') }}" class="admin-nav-card"><div class="anc-icon">&#128196;</div><strong>Pending Verification</strong><p>Review and verify pending applications</p></a>
-    <a href="{{ url_for('main.admin_verified') }}" class="admin-nav-card"><div class="anc-icon">&#10003;</div><strong>Verified Students</strong><p>View all verified applicants</p></a>
-    <a href="{{ url_for('main.admin_rank') }}" class="admin-nav-card"><div class="anc-icon">&#127942;</div><strong>Rank Management</strong><p>Assign ranks to verified students</p></a>
-    <a href="{{ url_for('main.admin_form_control') }}" class="admin-nav-card"><div class="anc-icon">&#9881;</div><strong>Form Control</strong><p>Open/close form and set timing</p></a>
-    <a href="{{ url_for('main.export_all') }}" class="admin-nav-card"><div class="anc-icon">&#128229;</div><strong>Export All (Excel)</strong><p>Download all applications as .xlsx</p></a>
+    <a href="{{ url_for('main.admin_students') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-users"></i></div>
+      <strong>All Students</strong>
+      <p>View and search all submitted applications</p>
+    </a>
+    
+    <a href="{{ url_for('main.admin_verification') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-clock"></i></div>
+      <strong>Pending Verification</strong>
+      <p>Review and verify pending applications</p>
+    </a>
+    
+    <a href="{{ url_for('main.admin_verified') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-check-circle"></i></div>
+      <strong>Verified Students</strong>
+      <p>View all verified applicants</p>
+    </a>
+    
+    <a href="{{ url_for('main.admin_rank') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-chart-line"></i></div>
+      <strong>Rank Management</strong>
+      <p>Assign ranks to verified students</p>
+    </a>
+    
+    <a href="{{ url_for('main.admin_form_control') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-sliders-h"></i></div>
+      <strong>Form Control</strong>
+      <p>Open/close form and set timing</p>
+    </a>
+    
+    <!-- NEW: Category Management Link -->
+    <a href="{{ url_for('main.admin_categories') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-tags"></i></div>
+      <strong>Category Management</strong>
+      <p>Add/Edit/Delete application categories</p>
+    </a>
+    
+    <a href="{{ url_for('main.export_all') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-file-excel"></i></div>
+      <strong>Export All (Excel)</strong>
+      <p>Download all applications as .xlsx</p>
+    </a>
+    
+    <a href="{{ url_for('main.export_verified') }}" class="admin-nav-card">
+      <div class="anc-icon"><i class="fas fa-file-pdf"></i></div>
+      <strong>Export Verified (Excel)</strong>
+      <p>Download verified students list</p>
+    </a>
   </div>
+  
   <div class="form-status-bar {% if settings.is_open %}open{% else %}closed{% endif %}">
-    Form is currently <strong>{% if settings.is_open %}OPEN{% else %}CLOSED{% endif %}</strong>
+    <i class="fas fa-info-circle"></i> Form is currently <strong>{% if settings.is_open %}OPEN{% else %}CLOSED{% endif %}</strong>
     &mdash; <a href="{{ url_for('main.admin_form_control') }}">Change</a>
   </div>
 </div>

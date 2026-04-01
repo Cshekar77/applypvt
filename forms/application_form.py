@@ -31,6 +31,15 @@ GENDERS = [('', 'Select'), ('Male', 'Male'), ('Female', 'Female'),
 STREAMS = [('', 'Select stream'), ('Science', 'Science'),
            ('Commerce', 'Commerce'), ('Arts / Humanities', 'Arts / Humanities'), ('Other', 'Other')]
 
+# Specialization choices (hardcoded for now)
+SPECIALIZATIONS = [
+    ('', 'Select specialization'),
+    ('AI/ML', 'AI/ML'),
+    ('Data Science', 'Data Science'),
+    ('Full Stack Development', 'Full Stack Development'),
+    ('Other', 'Other'),
+]
+
 
 class ApplicationForm(FlaskForm):
     # Personal
@@ -50,8 +59,9 @@ class ApplicationForm(FlaskForm):
     year_10        = StringField('Year of passing', validators=[DataRequired()])
     total_10       = FloatField('Total marks',      validators=[DataRequired(), NumberRange(min=1)])
     obtained_10    = FloatField('Marks obtained',   validators=[DataRequired(), NumberRange(min=0)])
-    marksheet_10   = FileField('Grade 10 marksheet',
-                               validators=[FileRequired(), FileAllowed(['pdf'], 'PDF only')])
+    # PDF upload REMOVED for testing
+    # marksheet_10   = FileField('Grade 10 marksheet',
+    #                            validators=[FileRequired(), FileAllowed(['pdf'], 'PDF only')])
 
     # Grade 12
     school_12      = StringField('School/College name', validators=[DataRequired()])
@@ -61,8 +71,15 @@ class ApplicationForm(FlaskForm):
     year_12        = StringField('Year of passing',     validators=[Optional()])
     total_12       = FloatField('Total marks',          validators=[DataRequired(), NumberRange(min=1)])
     obtained_12    = FloatField('Marks obtained',       validators=[DataRequired(), NumberRange(min=0)])
-    marksheet_12   = FileField('Grade 12 marksheet',
-                               validators=[FileRequired(), FileAllowed(['pdf'], 'PDF only')])
+    # PDF upload REMOVED for testing
+    # marksheet_12   = FileField('Grade 12 marksheet',
+    #                            validators=[FileRequired(), FileAllowed(['pdf'], 'PDF only')])
 
-    # Programme
-    why_bca = TextAreaField('Why BCA?', validators=[Optional(), Length(max=2000)])
+    # Programme - UPDATED: removed why_bca, added specialization and category
+    # why_bca = TextAreaField('Why BCA?', validators=[Optional(), Length(max=2000)])  # REMOVED
+    
+    specialization = SelectField('Specialization', choices=SPECIALIZATIONS, validators=[DataRequired()])
+    specialization_other = StringField('Specify Specialization', validators=[Optional(), Length(max=200)])
+    
+    # Category will be populated dynamically from database in routes.py
+    # We'll add category_id as a SelectField in the route

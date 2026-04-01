@@ -8,7 +8,7 @@
       <div class="header-divider"></div>
       <div class="year-badge">Admissions 2026–2027</div>
       <h1>BCA Application Form</h1>
-      <p>Bachelor of Computer Applications &mdash; fill in all required fields and upload your marksheets as PDF.</p>
+      <p>Bachelor of Computer Applications &mdash; fill in all required fields to apply.</p>
     </div>
   </div>
   <div class="prog-bar-wrap">
@@ -109,19 +109,7 @@
             <div class="pct-display" id="p10">—</div>
           </div>
         </div>
-        <div class="field {% if form.marksheet_10.errors %}has-error{% endif %}">
-          <label>Grade 10 marksheet <span class="req">*</span></label>
-          <div class="upload-area" id="ua10" onclick="document.getElementById('marksheet_10').click()">
-            <div class="upload-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-            <div class="upload-text-wrap">
-              <p>Upload original marksheet (PDF)</p>
-              <span>Click to browse &mdash; max 5 MB</span>
-              <div class="upload-filename" id="fn10"></div>
-            </div>
-          </div>
-          {{ form.marksheet_10(id='marksheet_10', onchange="handleUpload(this,'ua10','fn10')") }}
-          {% for e in form.marksheet_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-        </div>
+        <!-- PDF UPLOAD REMOVED -->
       </div>
 
       <div class="edu-entry">
@@ -166,19 +154,7 @@
             <div class="pct-display" id="p12">—</div>
           </div>
         </div>
-        <div class="field {% if form.marksheet_12.errors %}has-error{% endif %}">
-          <label>Grade 12 marksheet <span class="req">*</span></label>
-          <div class="upload-area" id="ua12" onclick="document.getElementById('marksheet_12').click()">
-            <div class="upload-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
-            <div class="upload-text-wrap">
-              <p>Upload original marksheet (PDF)</p>
-              <span>Click to browse &mdash; max 5 MB</span>
-              <div class="upload-filename" id="fn12"></div>
-            </div>
-          </div>
-          {{ form.marksheet_12(id='marksheet_12', onchange="handleUpload(this,'ua12','fn12')") }}
-          {% for e in form.marksheet_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-        </div>
+        <!-- PDF UPLOAD REMOVED -->
       </div>
     </div>
 
@@ -191,9 +167,34 @@
         <label>Programme <span class="req">*</span></label>
         <input type="text" value="Bachelor of Computer Applications (BCA)" readonly>
       </div>
-      <div class="field">
-        <label>Why do you want to pursue BCA? <span class="opt">(optional)</span></label>
-        {{ form.why_bca(placeholder='Briefly describe your interest in computer applications and your career goals...') }}
+      
+      <!-- NEW: Specialization Field -->
+      <div class="field {% if form.specialization.errors %}has-error{% endif %}">
+        <label>Which specialization are you interested in? <span class="req">*</span></label>
+        {{ form.specialization(id='specialization', onchange='toggleOtherSpecialization()') }}
+        {% for e in form.specialization.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
+      
+      <!-- NEW: Other Specialization Text Field (hidden by default) -->
+      <div id="otherSpecializationDiv" style="display:none; margin-top: 0.5rem;">
+        <div class="field">
+          <label>Please specify your specialization <span class="req">*</span></label>
+          {{ form.specialization_other(placeholder='e.g. Cloud Computing, Cyber Security, etc.') }}
+        </div>
+      </div>
+      
+      <!-- NEW: Category Field (populated from database) -->
+      <div class="field {% if category_errors %}has-error{% endif %}">
+        <label>Under which category are you applying? <span class="req">*</span></label>
+        <select name="category_id" id="category_id" required>
+          <option value="">Select category</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+        {% if category_errors %}
+          {% for e in category_errors %}<span class="err">{{ e }}</span>{% endfor %}
+        {% endif %}
       </div>
     </div>
 
@@ -203,4 +204,46 @@
     </div>
   </form>
 </div>
+
+<script>
+  // Function to show/hide "Other Specialization" text field
+  function toggleOtherSpecialization() {
+    const specSelect = document.getElementById('specialization');
+    const otherDiv = document.getElementById('otherSpecializationDiv');
+    if (specSelect.value === 'Other') {
+      otherDiv.style.display = 'block';
+    } else {
+      otherDiv.style.display = 'none';
+      document.getElementById('specialization_other').value = '';
+    }
+  }
+  
+  // Function to toggle "Other Board" fields
+  function toggleOther(selectElement, divId) {
+    const otherDiv = document.getElementById(divId);
+    if (selectElement.value === 'Other') {
+      otherDiv.style.display = 'block';
+    } else {
+      otherDiv.style.display = 'none';
+      const input = otherDiv.querySelector('input');
+      if (input) input.value = '';
+    }
+  }
+  
+  // Function to calculate percentage
+  function calcPct(totalId, obtainedId, displayId) {
+    const total = document.getElementById(totalId);
+    const obtained = document.getElementById(obtainedId);
+    const display = document.getElementById(displayId);
+    if (total && obtained && display) {
+      const t = parseFloat(total.value);
+      const o = parseFloat(obtained.value);
+      if (!isNaN(t) && !isNaN(o) && t > 0 && o >= 0) {
+        display.innerText = ((o / t) * 100).toFixed(2) + '%';
+      } else {
+        display.innerText = '—';
+      }
+    }
+  }
+</script>
 {% endblock %}

@@ -34,6 +34,18 @@ class FormSettings(db.Model):
         return s
 
 
+# NEW MODEL: Application Categories (Admin manages these)
+class ApplicationCategory(db.Model):
+    __tablename__ = 'application_category'
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.String(100), unique=True, nullable=False)
+    is_active   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Category {self.name}>'
+
+
 class StudentApplication(db.Model):
     __tablename__ = 'student_applications'
     id              = db.Column(db.Integer, primary_key=True)
@@ -71,8 +83,12 @@ class StudentApplication(db.Model):
     percent_12      = db.Column(db.Float)
     marksheet_12    = db.Column(db.String(200))
 
-    # Programme
-    why_bca         = db.Column(db.Text)
+    # Programme (UPDATED: removed why_bca, added specialization and category)
+    # why_bca         = db.Column(db.Text)  # REMOVED - no longer needed
+    specialization      = db.Column(db.String(100))  # AI/ML, Data Science, Full Stack, Other
+    specialization_other = db.Column(db.String(200))  # If Other selected
+    category_id         = db.Column(db.Integer, db.ForeignKey('application_category.id'))
+    category            = db.relationship('ApplicationCategory', backref='applications')
 
     # Admin fields
     is_verified     = db.Column(db.Boolean, default=False)
@@ -91,3 +107,15 @@ class StudentApplication(db.Model):
     @property
     def board_12_display(self):
         return self.board_12_other if self.board_12 == 'Other' else self.board_12
+    
+    @property
+    def specialization_display(self):
+        """Return the specialization with 'Other' text if applicable"""
+        if self.specialization == 'Other' and self.specialization_other:
+            return self.specialization_other
+        return self.specialization
+    
+    @property
+    def category_name(self):
+        """Return category name"""
+        return self.category.name if self.category else None

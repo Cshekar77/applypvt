@@ -1,32 +1,308 @@
 {% extends 'base.html' %}
 {% block title %}Form Control — Admin{% endblock %}
 {% block content %}
+<style>
+  .form-control-card {
+    max-width: 600px;
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 1rem;
+  }
+  
+  .toggle-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #0a1f44;
+  }
+  
+  .toggle-label i {
+    font-size: 1.2rem;
+  }
+  
+  .toggle-switch input[type="checkbox"] {
+    width: 50px;
+    height: 26px;
+    appearance: none;
+    background: #ccc;
+    border-radius: 26px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .toggle-switch input[type="checkbox"]:checked {
+    background: #c9a03d;
+  }
+  
+  .toggle-switch input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 3px;
+    transition: transform 0.3s;
+  }
+  
+  .toggle-switch input[type="checkbox"]:checked::before {
+    transform: translateX(24px);
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .status-open {
+    background: #d4edda;
+    color: #155724;
+  }
+  
+  .status-closed {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    color: #0a1f44;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .form-group label i {
+    color: #c9a03d;
+    margin-right: 0.5rem;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #c9a03d;
+    box-shadow: 0 0 0 3px rgba(201, 160, 61, 0.1);
+  }
+  
+  .form-group small {
+    display: block;
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+  }
+  
+  .btn-primary {
+    background: #c9a03d;
+    color: #0a1f44;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background: #b58c2e;
+    transform: translateY(-2px);
+  }
+  
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #c9a03d;
+    color: #c9a03d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .btn-outline:hover {
+    background: #c9a03d;
+    color: white;
+  }
+  
+  .btn-sm {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+  }
+  
+  .page-header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #0a1f44;
+    margin: 0;
+  }
+  
+  .current-status {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #eef2f8;
+    border-radius: 12px;
+    text-align: center;
+  }
+  
+  body.dark .form-control-card {
+    background: #1a2538;
+  }
+  
+  body.dark .toggle-switch {
+    background: #0f1a24;
+  }
+  
+  body.dark .toggle-label {
+    color: #eef2ff;
+  }
+  
+  body.dark .form-group label {
+    color: #eef2ff;
+  }
+  
+  body.dark .form-group input,
+  body.dark .form-group textarea {
+    background: #0f1a24;
+    border-color: #2d3e54;
+    color: #eef2ff;
+  }
+  
+  body.dark .current-status {
+    background: #0f1a24;
+  }
+  
+  body.dark .form-group small {
+    color: #b9c8e8;
+  }
+  
+  @media (max-width: 768px) {
+    .form-control-card {
+      padding: 1.5rem;
+    }
+    
+    .toggle-switch {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
 <div class="page-wrap">
   <div class="page-header-inner">
-    <h2>Form Control</h2>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">&larr; Dashboard</a>
+    <h2><i class="fas fa-sliders-h"></i> Form Control</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
   </div>
-  <div class="form-card" style="max-width:560px">
+  
+  <div class="form-control-card">
+    <div class="current-status">
+      <i class="fas fa-info-circle"></i> Current Form Status:
+      {% if settings.is_open %}
+        <span class="status-badge status-open"><i class="fas fa-check-circle"></i> OPEN</span>
+        {% if settings.open_until %}
+          <span style="margin-left: 0.5rem;">(Closes: {{ settings.open_until.strftime('%d-%m-%Y %H:%M') if settings.open_until else 'Not set' }})</span>
+        {% endif %}
+      {% else %}
+        <span class="status-badge status-closed"><i class="fas fa-times-circle"></i> CLOSED</span>
+        {% if settings.open_from %}
+          <span style="margin-left: 0.5rem;">(Opens: {{ settings.open_from.strftime('%d-%m-%Y %H:%M') if settings.open_from else 'Not set' }})</span>
+        {% endif %}
+      {% endif %}
+    </div>
+    
     <form method="POST">
-      <div class="field" style="flex-direction:row;align-items:center;gap:1rem">
-        <input type="checkbox" name="is_open" id="is_open" {% if settings.is_open %}checked{% endif %} style="width:20px;height:20px;accent-color:#0f1e3c">
-        <label for="is_open" style="font-size:1rem;font-weight:500;color:#0f1e3c;cursor:pointer">Form is Open</label>
+      <div class="toggle-switch">
+        <div class="toggle-label">
+          <i class="fas fa-door-open"></i> Form Status
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span>Closed</span>
+          <input type="checkbox" name="is_open" id="is_open" {% if settings.is_open %}checked{% endif %}>
+          <span>Open</span>
+        </div>
       </div>
-      <div class="field" style="margin-top:1rem">
-        <label>Open from (optional)</label>
-        <input type="datetime-local" name="open_from" value="{{ settings.open_from.strftime('%Y-%m-%dT%H:%M') if settings.open_from else '' }}">
-        <small style="color:#888">Leave blank to ignore timing</small>
+      
+      <div class="form-group">
+        <label><i class="fas fa-calendar-alt"></i> Open From (optional)</label>
+        <input type="datetime-local" name="open_from" 
+               value="{{ settings.open_from.strftime('%Y-%m-%dT%H:%M') if settings.open_from else '' }}">
+        <small>Leave blank to ignore start date</small>
       </div>
-      <div class="field">
-        <label>Open until (optional)</label>
-        <input type="datetime-local" name="open_until" value="{{ settings.open_until.strftime('%Y-%m-%dT%H:%M') if settings.open_until else '' }}">
+      
+      <div class="form-group">
+        <label><i class="fas fa-calendar-times"></i> Open Until (optional)</label>
+        <input type="datetime-local" name="open_until" 
+               value="{{ settings.open_until.strftime('%Y-%m-%dT%H:%M') if settings.open_until else '' }}">
+        <small>Leave blank for no deadline</small>
       </div>
-      <div class="field">
-        <label>Message to applicants (shown when closed)</label>
-        <textarea name="message" rows="3" placeholder="e.g. Applications for 2026–27 are now closed.">{{ settings.message or '' }}</textarea>
+      
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> Message to Applicants</label>
+        <textarea name="message" rows="4" placeholder="This message will be shown to students when the form is closed.">{{ settings.message or '' }}</textarea>
+        <small>This message appears on the form closed page and student dashboard</small>
       </div>
-      <button type="submit" class="btn btn-primary">Save Settings</button>
+      
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i> Save Settings
+      </button>
     </form>
+  </div>
+  
+  <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 12px;">
+    <h4 style="color: #0a1f44; margin-bottom: 0.5rem;"><i class="fas fa-lightbulb"></i> Quick Tips</h4>
+    <ul style="color: #5a6e82; font-size: 0.85rem; margin: 0; padding-left: 1.2rem;">
+      <li>When form is <strong>CLOSED</strong>, students cannot register or submit applications</li>
+      <li>Use <strong>Open From / Open Until</strong> to automatically control application period</li>
+      <li>The <strong>Message</strong> appears when form is closed to inform applicants</li>
+      <li>Students can still view their dashboard when form is closed</li>
+    </ul>
   </div>
 </div>
 {% endblock %}
