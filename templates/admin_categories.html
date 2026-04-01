@@ -1,82 +1,356 @@
-# ─────────────────────────────────────────
-#  Category Management (Admin)
-# ─────────────────────────────────────────
-@main.route('/admin/categories')
-@admin_required
-def admin_categories():
-    categories = ApplicationCategory.query.order_by(ApplicationCategory.id).all()
-    return render_template('admin_categories.html', categories=categories)
-
-
-@main.route('/admin/categories/add', methods=['POST'])
-@admin_required
-def admin_category_add():
-    name = request.form.get('category_name', '').strip()
-    if not name:
-        flash('Category name is required.', 'danger')
-        return redirect(url_for('main.admin_categories'))
+{% extends 'base.html' %}
+{% block title %}Category Management — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .admin-header h1 {
+    font-family: 'Playfair Display', serif;
+    color: #0a1f44;
+    margin: 0;
+  }
+  
+  .btn-add {
+    background: #c9a03d;
+    color: #0a1f44;
+    padding: 0.8rem 1.5rem;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn-add:hover {
+    background: #b58c2e;
+    transform: translateY(-2px);
+  }
+  
+  .categories-table {
+    width: 100%;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .categories-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .categories-table th {
+    background: #0a1f44;
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+  
+  .categories-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eef2f8;
+    color: #1a2c3e;
+  }
+  
+  .categories-table tr:hover {
+    background: #f8f9fa;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .status-active {
+    background: #d4edda;
+    color: #155724;
+  }
+  
+  .status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  
+  .btn-edit {
+    background: #eef2ff;
+    color: #0a1f44;
+  }
+  
+  .btn-edit:hover {
+    background: #c9a03d;
+    color: white;
+  }
+  
+  .btn-toggle {
+    background: #fff3cd;
+    color: #856404;
+  }
+  
+  .btn-toggle:hover {
+    background: #c9a03d;
+    color: white;
+  }
+  
+  .btn-delete {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .btn-delete:hover {
+    background: #dc3545;
+    color: white;
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal.active {
+    display: flex;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-content h3 {
+    font-family: 'Playfair Display', serif;
+    color: #0a1f44;
+    margin-bottom: 1rem;
+  }
+  
+  .modal-content input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    margin: 1rem 0;
+    font-size: 1rem;
+  }
+  
+  .modal-content input:focus {
+    outline: none;
+    border-color: #c9a03d;
+  }
+  
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+  
+  .btn-modal-cancel {
+    background: #eef2f8;
+    color: #1a2c3e;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn-modal-save {
+    background: #c9a03d;
+    color: #0a1f44;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+  }
+  
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+    }
     
-    # Check if category already exists
-    existing = ApplicationCategory.query.filter_by(name=name).first()
-    if existing:
-        flash(f'Category "{name}" already exists.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    
-    category = ApplicationCategory(name=name, is_active=True)
-    db.session.add(category)
-    db.session.commit()
-    flash(f'Category "{name}" added successfully!', 'success')
-    return redirect(url_for('main.admin_categories'))
+    .categories-table {
+      overflow-x: auto;
+    }
+  }
+  
+  body.dark .categories-table {
+    background: #1a2538;
+  }
+  
+  body.dark .categories-table td {
+    color: #eef2ff;
+    border-bottom-color: #2d3e54;
+  }
+  
+  body.dark .categories-table tr:hover {
+    background: #2d3e54;
+  }
+  
+  body.dark .modal-content {
+    background: #1a2538;
+  }
+  
+  body.dark .modal-content h3 {
+    color: #eef2ff;
+  }
+</style>
 
+<div class="admin-header">
+  <h1><i class="fas fa-tags"></i> Category Management</h1>
+  <button class="btn-add" onclick="openAddModal()">
+    <i class="fas fa-plus"></i> Add New Category
+  </button>
+</div>
 
-@main.route('/admin/categories/edit/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_edit(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
-    new_name = request.form.get('category_name', '').strip()
-    
-    if not new_name:
-        flash('Category name is required.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    
-    # Check if another category with same name exists
-    existing = ApplicationCategory.query.filter_by(name=new_name).first()
-    if existing and existing.id != cat_id:
-        flash(f'Category "{new_name}" already exists.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    
-    category.name = new_name
-    db.session.commit()
-    flash(f'Category updated to "{new_name}"!', 'success')
-    return redirect(url_for('main.admin_categories'))
+<div class="categories-table">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Category Name</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cat in categories %}
+      <tr>
+        <td>{{ cat.id }}</td>
+        <td>{{ cat.name }}</td>
+        <td>
+          {% if cat.is_active %}
+            <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
+          {% else %}
+            <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon btn-edit" onclick="openEditModal({{ cat.id }}, '{{ cat.name }}')" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display: inline;">
+              <button type="submit" class="btn-icon btn-toggle" title="Toggle Active/Inactive">
+                <i class="fas fa-power-off"></i>
+              </button>
+            </form>
+            <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete category \"{{ cat.name }}\"? This will NOT delete student applications but may affect them.');">
+              <button type="submit" class="btn-icon btn-delete" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4" class="empty-state">
+          <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+          No categories found. Click "Add New Category" to create one.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
+<!-- Add Category Modal -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
+    <form action="{{ url_for('main.admin_category_add') }}" method="POST">
+      <input type="text" name="category_name" placeholder="Enter category name (e.g., General, OBC, SC, ST, EWS, PWD)" required>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeModal('addModal')">Cancel</button>
+        <button type="submit" class="btn-modal-save">Add Category</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-@main.route('/admin/categories/delete/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_delete(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
-    name = category.name
-    
-    # Check if any applications use this category
-    from models import StudentApplication
-    apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
-    
-    if apps_count > 0:
-        flash(f'Cannot delete "{name}" - {apps_count} student(s) are using this category.', 'danger')
-    else:
-        db.session.delete(category)
-        db.session.commit()
-        flash(f'Category "{name}" deleted successfully!', 'success')
-    
-    return redirect(url_for('main.admin_categories'))
+<!-- Edit Category Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3><i class="fas fa-edit"></i> Edit Category</h3>
+    <form id="editForm" method="POST">
+      <input type="text" name="category_name" id="editCategoryName" placeholder="Category name" required>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">Cancel</button>
+        <button type="submit" class="btn-modal-save">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-
-@main.route('/admin/categories/toggle/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_toggle(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
-    category.is_active = not category.is_active
-    db.session.commit()
-    status = "activated" if category.is_active else "deactivated"
-    flash(f'Category "{category.name}" {status}!', 'success')
-    return redirect(url_for('main.admin_categories'))
+<script>
+  function openAddModal() {
+    document.getElementById('addModal').classList.add('active');
+  }
+  
+  function openEditModal(catId, catName) {
+    const modal = document.getElementById('editModal');
+    const form = document.getElementById('editForm');
+    const input = document.getElementById('editCategoryName');
+    
+    form.action = "{{ url_for('main.admin_category_edit', cat_id=0) }}".replace('0', catId);
+    input.value = catName;
+    modal.classList.add('active');
+  }
+  
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+  
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+      event.target.classList.remove('active');
+    }
+  }
+</script>
+{% endblock %}
