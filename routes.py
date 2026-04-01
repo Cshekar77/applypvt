@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 
 from database import db
-from models import User, FormSettings, StudentApplication, ApplicationCategory  # Added ApplicationCategory
+from models import User, FormSettings, StudentApplication, ApplicationCategory
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel
@@ -214,10 +214,6 @@ def apply():
     # Get categories for dropdown
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
     
-    if request.method == 'GET':
-        # Pass categories to template
-        return render_template('application_form.html', form=form, categories=categories)
-    
     if form.validate_on_submit():
         p10  = calc_percent(form.total_10.data, form.obtained_10.data)
         p12  = calc_percent(form.total_12.data, form.obtained_12.data)
@@ -276,7 +272,6 @@ def apply():
         flash('Application submitted successfully!', 'success')
         return redirect(url_for('main.my_application'))
 
-    # If form validation fails
     return render_template('application_form.html', form=form, categories=categories)
 
 
@@ -424,6 +419,89 @@ def admin_form_control():
         flash('Form settings updated.', 'success')
         return redirect(url_for('main.admin_form_control'))
     return render_template('admin_form_control.html', settings=settings)
+
+
+# ─────────────────────────────────────────
+#  Category Management (Admin)
+# ─────────────────────────────────────────
+@main.route('/admin/categories')
+@admin_required
+def admin_categories():
+    categories = ApplicationCategory.query.order_by(ApplicationCategory.id).all()
+    return render_template('admin_categories.html', categories=categories)
+
+
+@main.route('/admin/categories/add', methods=['POST'])
+@admin_required
+def admin_category_add():
+    name = request.form.get('category_name', '').strip()
+    if not name:
+        flash('Category name is required.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    
+    # Check if category already exists
+    existing = ApplicationCategory.query.filter_by(name=name).first()
+    if existing:
+        flash(f'Category "{name}" already exists.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    
+    category = ApplicationCategory(name=name, is_active=True)
+    db.session.add(category)
+    db.session.commit()
+    flash(f'Category "{name}" added successfully!', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/edit/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_edit(cat_id):
+    category = ApplicationCategory.query.get_or_404(cat_id)
+    new_name = request.form.get('category_name', '').strip()
+    
+    if not new_name:
+        flash('Category name is required.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    
+    # Check if another category with same name exists
+    existing = ApplicationCategory.query.filter_by(name=new_name).first()
+    if existing and existing.id != cat_id:
+        flash(f'Category "{new_name}" already exists.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    
+    category.name = new_name
+    db.session.commit()
+    flash(f'Category updated to "{new_name}"!', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/delete/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_delete(cat_id):
+    category = ApplicationCategory.query.get_or_404(cat_id)
+    name = category.name
+    
+    # Check if any applications use this category
+    apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
+    
+    if apps_count > 0:
+        flash(f'Cannot delete "{name}" - {apps_count} student(s) are using this category.', 'danger')
+    else:
+        db.session.delete(category)
+        db.session.commit()
+        flash(f'Category "{name}" deleted successfully!', 'success')
+    
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/toggle/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_toggle(cat_id):
+    category = ApplicationCategory.query.get_or_404(cat_id)
+    category.is_active = not category.is_active
+    db.session.commit()
+    status = "activated" if category.is_active else "deactivated"
+    flash(f'Category "{category.name}" {status}!', 'success')
+    return redirect(url_for('main.admin_categories'))
 
 
 @main.route('/admin/export/all')
