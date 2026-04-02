@@ -61,10 +61,10 @@ def register():
         else:
             # Generate OTP but DON'T create account yet
             otp = generate_otp()
-            
+
             # Send OTP first
             ok, err = send_otp_email(email, name, otp)
-            
+
             if ok:
                 # Store registration data in session temporarily
                 session['temp_registration'] = {
@@ -92,7 +92,7 @@ def verify_otp():
         return redirect(url_for('main.register'))
 
     email = temp_data['email']
-    
+
     # Check if user already exists (shouldn't happen with this flow)
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
@@ -107,7 +107,7 @@ def verify_otp():
             # Generate new OTP
             new_otp = generate_otp()
             ok, err = send_otp_email(email, temp_data['name'], new_otp)
-            
+
             if ok:
                 # Update session with new OTP
                 temp_data['otp'] = new_otp
@@ -121,7 +121,7 @@ def verify_otp():
         entered = request.form.get('otp', '').strip()
         stored_otp = temp_data.get('otp')
         expiry = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
-        
+
         if not entered:
             flash('Please enter the OTP.', 'danger')
         elif expiry and datetime.utcnow() > expiry:
@@ -131,16 +131,16 @@ def verify_otp():
         else:
             # OTP verified - NOW create the account
             user = User(
-                full_name     = temp_data['name'],
-                email         = email,
-                password_hash = generate_password_hash(temp_data['password']),
-                is_verified   = True,  # Already verified via OTP
-                otp_code      = None,
+                full_name      = temp_data['name'],
+                email          = email,
+                password_hash  = generate_password_hash(temp_data['password']),
+                is_verified    = True,
+                otp_code       = None,
                 otp_expires_at = None,
             )
             db.session.add(user)
             db.session.commit()
-            
+
             # Clear temp data
             session.pop('temp_registration', None)
             flash('Email verified successfully! You can now log in.', 'success')
@@ -184,6 +184,103 @@ def logout():
 
 
 # ─────────────────────────────────────────
+#  Forgot Password
+# ─────────────────────────────────────────
+@main.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            flash('No account found with that email.', 'danger')
+        else:
+            otp = generate_otp()
+            ok, err = send_otp_email(email, user.full_name, otp)
+            if ok:
+                session['reset_password'] = {
+                    'email': email,
+                    'otp': otp,
+                    'otp_expiry': (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                }
+                flash('A 6-digit OTP has been sent to your email.', 'success')
+                return redirect(url_for('main.verify_reset_otp'))
+            else:
+                flash('Could not send OTP. Please try again.', 'danger')
+
+    return render_template('forgot_password.html')
+
+
+@main.route('/verify-reset-otp', methods=['GET', 'POST'])
+def verify_reset_otp():
+    reset_data = session.get('reset_password')
+    if not reset_data:
+        flash('No password reset request found. Please try again.', 'warning')
+        return redirect(url_for('main.forgot_password'))
+
+    email = reset_data['email']
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'resend':
+            user = User.query.filter_by(email=email).first()
+            new_otp = generate_otp()
+            ok, err = send_otp_email(email, user.full_name, new_otp)
+            if ok:
+                reset_data['otp'] = new_otp
+                reset_data['otp_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                session['reset_password'] = reset_data
+                flash('A new OTP has been sent to your email.', 'success')
+            else:
+                flash('Could not send OTP. Please try again.', 'warning')
+            return redirect(url_for('main.verify_reset_otp'))
+
+        entered = request.form.get('otp', '').strip()
+        stored_otp = reset_data.get('otp')
+        expiry = datetime.fromisoformat(reset_data.get('otp_expiry'))
+
+        if not entered:
+            flash('Please enter the OTP.', 'danger')
+        elif datetime.utcnow() > expiry:
+            flash('OTP has expired. Please request a new one.', 'danger')
+        elif entered != stored_otp:
+            flash('Incorrect OTP. Please try again.', 'danger')
+        else:
+            session['reset_verified'] = email
+            session.pop('reset_password', None)
+            return redirect(url_for('main.reset_password'))
+
+    return render_template('verify_reset_otp.html', email=email)
+
+
+@main.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_verified')
+    if not email:
+        flash('Unauthorized access. Please start again.', 'warning')
+        return redirect(url_for('main.forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        confirm  = request.form.get('confirm_password', '')
+
+        if len(password) < 8:
+            flash('Password must be at least 8 characters.', 'danger')
+        elif password != confirm:
+            flash('Passwords do not match.', 'danger')
+        else:
+            user = User.query.filter_by(email=email).first()
+            user.password_hash = generate_password_hash(password)
+            db.session.commit()
+            session.pop('reset_verified', None)
+            flash('Password reset successfully! Please log in.', 'success')
+            return redirect(url_for('main.login'))
+
+    return render_template('reset_password.html')
+
+
+# ─────────────────────────────────────────
 #  Student
 # ─────────────────────────────────────────
 @main.route('/dashboard')
@@ -210,31 +307,31 @@ def apply():
         return render_template('form_closed.html', settings=settings)
 
     form = ApplicationForm()
-    
+
     # Get categories for dropdown
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
-    
+
     if form.validate_on_submit():
         p10  = calc_percent(form.total_10.data, form.obtained_10.data)
         p12  = calc_percent(form.total_12.data, form.obtained_12.data)
-        
+
         # Handle specialization
         specialization = form.specialization.data
         specialization_other = None
         if specialization == 'Other':
             specialization_other = form.specialization_other.data
             specialization = 'Other'
-        
+
         # Get category ID from form
         category_id = request.form.get('category_id')
         if not category_id:
             flash('Please select a category.', 'danger')
             return render_template('application_form.html', form=form, categories=categories)
-        
-        # PDF uploads disabled for testing
+
+        # PDF uploads disabled
         ms10 = None
         ms12 = None
-        
+
         appl = StudentApplication(
             user_id        = current_user.id,
             first_name     = form.first_name.data,
@@ -262,10 +359,9 @@ def apply():
             obtained_12    = form.obtained_12.data,
             percent_12     = p12,
             marksheet_12   = ms12,
-            # New fields
-            specialization      = specialization,
+            specialization       = specialization,
             specialization_other = specialization_other,
-            category_id         = int(category_id),
+            category_id          = int(category_id),
         )
         db.session.add(appl)
         db.session.commit()
@@ -438,13 +534,12 @@ def admin_category_add():
     if not name:
         flash('Category name is required.', 'danger')
         return redirect(url_for('main.admin_categories'))
-    
-    # Check if category already exists
+
     existing = ApplicationCategory.query.filter_by(name=name).first()
     if existing:
         flash(f'Category "{name}" already exists.', 'danger')
         return redirect(url_for('main.admin_categories'))
-    
+
     category = ApplicationCategory(name=name, is_active=True)
     db.session.add(category)
     db.session.commit()
@@ -457,17 +552,16 @@ def admin_category_add():
 def admin_category_edit(cat_id):
     category = ApplicationCategory.query.get_or_404(cat_id)
     new_name = request.form.get('category_name', '').strip()
-    
+
     if not new_name:
         flash('Category name is required.', 'danger')
         return redirect(url_for('main.admin_categories'))
-    
-    # Check if another category with same name exists
+
     existing = ApplicationCategory.query.filter_by(name=new_name).first()
     if existing and existing.id != cat_id:
         flash(f'Category "{new_name}" already exists.', 'danger')
         return redirect(url_for('main.admin_categories'))
-    
+
     category.name = new_name
     db.session.commit()
     flash(f'Category updated to "{new_name}"!', 'success')
@@ -479,17 +573,15 @@ def admin_category_edit(cat_id):
 def admin_category_delete(cat_id):
     category = ApplicationCategory.query.get_or_404(cat_id)
     name = category.name
-    
-    # Check if any applications use this category
+
     apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
-    
     if apps_count > 0:
         flash(f'Cannot delete "{name}" - {apps_count} student(s) are using this category.', 'danger')
     else:
         db.session.delete(category)
         db.session.commit()
         flash(f'Category "{name}" deleted successfully!', 'success')
-    
+
     return redirect(url_for('main.admin_categories'))
 
 

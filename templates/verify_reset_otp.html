@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Login — BCA Admissions{% endblock %}
+{% block title %}Verify OTP — BCA Admissions{% endblock %}
 {% block content %}
 <style>
   .auth-wrap {
@@ -28,7 +28,7 @@
   
   .auth-title {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: #0a1f44;
     margin-bottom: 0.5rem;
@@ -67,17 +67,19 @@
     font-size: 1rem;
   }
   
-  .field input {
+  .otp-input {
     padding: 0.9rem 1rem;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5rem;
+    font-family: 'DM Sans', monospace;
     transition: all 0.3s ease;
-    font-family: 'DM Sans', sans-serif;
     background: #fff;
   }
   
-  .field input:focus {
+  .otp-input:focus {
     outline: none;
     border-color: #c9a03d;
     box-shadow: 0 0 0 3px rgba(201, 160, 61, 0.1);
@@ -91,49 +93,47 @@
     font-weight: 600;
   }
   
-  .forgot-password {
+  .resend-btn {
     text-align: center;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
   }
   
-  .forgot-password a {
+  .resend-btn button {
+    background: none;
+    border: none;
+    color: #c9a03d;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+  }
+  
+  .resend-btn button:hover {
+    color: #b58c2e;
+    text-decoration: underline;
+  }
+  
+  .back-link {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eef2f8;
+  }
+  
+  .back-link a {
     color: #c9a03d;
     text-decoration: none;
     font-size: 0.85rem;
     transition: color 0.3s ease;
   }
   
-  .forgot-password a:hover {
+  .back-link a:hover {
     color: #b58c2e;
     text-decoration: underline;
   }
   
-  .auth-switch {
-    text-align: center;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eef2f8;
-    color: #5a6e82;
-    font-size: 0.9rem;
-  }
-  
-  .auth-switch a {
+  .email-highlight {
     color: #c9a03d;
-    text-decoration: none;
     font-weight: 600;
-    transition: color 0.3s ease;
-  }
-  
-  .auth-switch a:hover {
-    color: #b58c2e;
-    text-decoration: underline;
-  }
-  
-  /* Password hint */
-  .password-hint {
-    font-size: 0.75rem;
-    color: #8a92a0;
-    margin-top: 0.25rem;
   }
   
   /* Dark theme support */
@@ -154,24 +154,19 @@
     color: #c9a03d;
   }
   
-  body.dark .field input {
+  body.dark .otp-input {
     background: #0f1a24;
     border-color: #2d3e54;
     color: #eef2ff;
   }
   
-  body.dark .field input:focus {
+  body.dark .otp-input:focus {
     border-color: #c9a03d;
     box-shadow: 0 0 0 3px rgba(201, 160, 61, 0.2);
   }
   
-  body.dark .forgot-password a {
-    color: #c9a03d;
-  }
-  
-  body.dark .auth-switch {
+  body.dark .back-link {
     border-top-color: #2d3e54;
-    color: #b9c8e8;
   }
   
   @media (max-width: 480px) {
@@ -180,11 +175,12 @@
     }
     
     .auth-title {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
     }
     
-    .field input {
-      padding: 0.8rem;
+    .otp-input {
+      font-size: 1.2rem;
+      letter-spacing: 0.3rem;
     }
   }
 </style>
@@ -192,42 +188,36 @@
 <div class="auth-wrap">
   <div class="auth-card">
     <div class="auth-title">
-      <i class="fas fa-graduation-cap" style="color: #c9a03d; font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
-      Student Login
+      <i class="fas fa-shield-alt" style="color: #c9a03d; font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
+      Verify OTP
     </div>
-    <p class="auth-sub">Welcome back! Log in to continue your application</p>
+    <p class="auth-sub">
+      Enter the 6-digit OTP sent to <span class="email-highlight">{{ email }}</span>
+    </p>
     
     <form method="POST" class="auth-form">
       <div class="field">
-        <label><i class="fas fa-envelope"></i> Email address <span class="req">*</span></label>
-        <input type="email" name="email" required placeholder="you@example.com" autocomplete="email">
-      </div>
-      
-      <div class="field">
-        <label><i class="fas fa-lock"></i> Password <span class="req">*</span></label>
-        <input type="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
-        <div class="password-hint">
-          <i class="fas fa-info-circle"></i> Minimum 8 characters
-        </div>
+        <label><i class="fas fa-lock"></i> OTP <span class="req">*</span></label>
+        <input type="text" name="otp" class="otp-input" maxlength="6" placeholder="_ _ _ _ _ _" required autocomplete="off">
       </div>
       
       <button type="submit" class="btn btn-primary btn-full">
-        <i class="fas fa-sign-in-alt"></i> Login
+        <i class="fas fa-check-circle"></i> Verify OTP
       </button>
-      
-      <!-- Forgot Password Link -->
-      <div class="forgot-password">
-        <a href="{{ url_for('main.forgot_password') }}">
-          <i class="fas fa-key"></i> Forgot Password?
-        </a>
-      </div>
     </form>
     
-    <p class="auth-switch">
-      Don't have an account? <a href="{{ url_for('main.register') }}">
-        <i class="fas fa-user-plus"></i> Create Account
+    <form method="POST" class="resend-btn">
+      <input type="hidden" name="action" value="resend">
+      <button type="submit">
+        <i class="fas fa-redo-alt"></i> Resend OTP
+      </button>
+    </form>
+    
+    <div class="back-link">
+      <a href="{{ url_for('main.forgot_password') }}">
+        <i class="fas fa-arrow-left"></i> Back
       </a>
-    </p>
+    </div>
   </div>
 </div>
 {% endblock %}
