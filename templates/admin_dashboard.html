@@ -8,7 +8,7 @@
     gap: 1.5rem;
     margin: 2rem 0;
   }
-  
+
   .admin-nav-card {
     background: white;
     border-radius: 20px;
@@ -18,139 +18,115 @@
     border: 1px solid #eef2f8;
     display: block;
   }
-  
+
   .admin-nav-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     border-color: #c9a03d;
   }
 
+  /* WhatsApp card */
   .admin-nav-card.whatsapp-card {
     border-color: #25D366;
     position: relative;
     overflow: hidden;
   }
-
   .admin-nav-card.whatsapp-card:hover {
     border-color: #128C7E;
     box-shadow: 0 10px 25px rgba(37, 211, 102, 0.15);
   }
-
   .whatsapp-status-dot {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #25D366;
+    position: absolute; top: 1rem; right: 1rem;
+    width: 10px; height: 10px; border-radius: 50%; background: #25D366;
   }
-
-  .whatsapp-status-dot.inactive {
-    background: #ccc;
-  }
-
-  .whatsapp-status-dot.active {
-    animation: pulse-green 2s infinite;
-  }
-
+  .whatsapp-status-dot.inactive { background: #ccc; }
+  .whatsapp-status-dot.active { animation: pulse-green 2s infinite; }
   @keyframes pulse-green {
     0%   { box-shadow: 0 0 0 0 rgba(37,211,102,0.5); }
     70%  { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
     100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
   }
-  
-  .anc-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+
+  /* Counselling card */
+  .admin-nav-card.counselling-card {
+    border-color: #e8d5a0;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fffdf5, #fff8e8);
   }
-  
-  .admin-nav-card strong {
-    display: block;
-    font-size: 1.1rem;
-    color: #0a1f44;
-    margin-bottom: 0.5rem;
+  .admin-nav-card.counselling-card:hover {
+    border-color: #c9a03d;
+    box-shadow: 0 10px 25px rgba(201,160,61,0.18);
   }
-  
-  .admin-nav-card p {
-    color: #5a6e82;
-    font-size: 0.85rem;
-    margin: 0;
+  .counselling-status-dot {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 10px; height: 10px; border-radius: 50%;
   }
-  
+  .counselling-status-dot.running  { background: #25c26e; animation: pulse-green 2s infinite; }
+  .counselling-status-dot.paused   { background: #f0c040; }
+  .counselling-status-dot.stopped  { background: #ccc; }
+
+  .counsel-badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
+  }
+  .counsel-badge.running  { background: #d4edda; color: #155724; }
+  .counsel-badge.paused   { background: #fff3cd; color: #856404; }
+  .counsel-badge.stopped  { background: #f5f7fa; color: #5a6e82; }
+
+  .anc-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .admin-nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
+  .admin-nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
+
   .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem; margin-bottom: 2rem;
   }
-  
   .stat-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: white; border-radius: 20px; padding: 1.5rem;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.05);
     border-left: 4px solid #c9a03d;
   }
-  
   .stat-num { font-size: 2.5rem; font-weight: 700; color: #0a1f44; }
-  .stat-lbl { color: #5a6e82; font-size: 0.85rem; margin-top: 0.5rem; }
+  .stat-lbl { color: #5a6e82; font-size: .85rem; margin-top: .5rem; }
   .stat-gold  { border-left-color: #c9a03d; }
   .stat-warn  { border-left-color: #ffc107; }
   .stat-navy  { border-left-color: #0a1f44; }
-  
+
   .form-status-bar {
-    background: #eef2f8;
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    margin-top: 2rem;
+    background: #eef2f8; padding: 1rem; border-radius: 12px;
+    text-align: center; margin-top: 2rem;
   }
   .form-status-bar.open   { background: #d4edda; color: #155724; }
   .form-status-bar.closed { background: #f8d7da; color: #721c24; }
   .form-status-bar a      { color: inherit; text-decoration: underline; }
-  
+
   .page-header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
   }
   .page-header-inner h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #0a1f44;
-    margin: 0;
+    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
   }
   .text-muted   { color: #5a6e82; }
   .text-muted a { color: #c9a03d; text-decoration: none; }
 
   .wa-badge {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    margin-top: 0.4rem;
-    background: #d4edda;
-    color: #155724;
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
+    background: #d4edda; color: #155724;
   }
-  .wa-badge.inactive {
-    background: #f8d7da;
-    color: #721c24;
-  }
-  
+  .wa-badge.inactive { background: #f8d7da; color: #721c24; }
+
   body.dark .admin-nav-card        { background: #1a2538; border-color: #2d3e54; }
   body.dark .admin-nav-card strong { color: #eef2ff; }
   body.dark .admin-nav-card p      { color: #b9c8e8; }
-  body.dark .admin-nav-card.whatsapp-card { border-color: #25D366; }
-  body.dark .stat-card             { background: #1a2538; }
-  body.dark .stat-num              { color: #eef2ff; }
-  body.dark .stat-lbl              { color: #b9c8e8; }
-  
+  body.dark .admin-nav-card.whatsapp-card    { border-color: #25D366; }
+  body.dark .admin-nav-card.counselling-card { background: #1a2030; border-color: #c9a03d; }
+  body.dark .stat-card  { background: #1a2538; }
+  body.dark .stat-num   { color: #eef2ff; }
+  body.dark .stat-lbl   { color: #b9c8e8; }
+
   @media (max-width: 768px) {
     .stats-grid     { grid-template-columns: repeat(2, 1fr); }
     .admin-nav-grid { grid-template-columns: 1fr; }
@@ -205,6 +181,19 @@
       <div class="anc-icon"><i class="fas fa-chart-line"></i></div>
       <strong>Rank Management</strong>
       <p>Assign ranks to verified students</p>
+    </a>
+
+    {# ── Counselling ── #}
+    <a href="{{ url_for('main.admin_counselling') }}" class="admin-nav-card counselling-card">
+      <div class="counselling-status-dot {{ counselling.status }}"></div>
+      <div class="anc-icon" style="color:#c9a03d"><i class="fas fa-chalkboard-teacher"></i></div>
+      <strong>Counselling</strong>
+      <p>Start/Stop counselling, update live rank, allot seats to students</p>
+      <span class="counsel-badge {{ counselling.status }}">
+        {% if counselling.is_running %}● Live — Rank #{{ counselling.current_rank or '—' }}
+        {% elif counselling.is_paused %}⏸ Paused
+        {% else %}● Not Started{% endif %}
+      </span>
     </a>
 
     <a href="{{ url_for('main.admin_form_control') }}" class="admin-nav-card">

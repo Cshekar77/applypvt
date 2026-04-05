@@ -10,39 +10,85 @@
   }
 
   .btn-whatsapp {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    display: inline-flex; align-items: center; gap: .5rem;
     background: linear-gradient(135deg, #25D366, #128C7E);
-    color: white;
-    text-decoration: none;
-    padding: 0.75rem 1.4rem;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: all 0.25s;
-    box-shadow: 0 3px 10px rgba(37,211,102,0.25);
+    color: white; text-decoration: none;
+    padding: .75rem 1.4rem; border-radius: 12px;
+    font-size: .95rem; font-weight: 600;
+    transition: all .25s;
+    box-shadow: 0 3px 10px rgba(37,211,102,.25);
     position: relative;
   }
-
   .btn-whatsapp:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(37,211,102,0.35);
+    box-shadow: 0 6px 18px rgba(37,211,102,.35);
     color: white;
   }
 
   .wa-live-dot {
-    width: 7px;
-    height: 7px;
-    background: white;
-    border-radius: 50%;
-    animation: blink 1.5s infinite;
+    width: 7px; height: 7px; background: white;
+    border-radius: 50%; animation: blink 1.5s infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: .3; }
   }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
+  /* Counselling button */
+  .btn-counselling {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: linear-gradient(135deg, #0a1f44, #1e3a60);
+    color: white; text-decoration: none;
+    padding: .75rem 1.4rem; border-radius: 12px;
+    font-size: .95rem; font-weight: 600;
+    transition: all .25s;
+    box-shadow: 0 3px 10px rgba(10,31,68,.2);
+    position: relative;
   }
+  .btn-counselling:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10,31,68,.3);
+    color: white;
+  }
+  .btn-counselling.live {
+    background: linear-gradient(135deg, #1a5c3a, #25c26e);
+    box-shadow: 0 3px 10px rgba(37,194,110,.25);
+  }
+  .btn-counselling.live:hover {
+    box-shadow: 0 6px 18px rgba(37,194,110,.35);
+  }
+  .counsel-live-dot {
+    width: 7px; height: 7px; background: white;
+    border-radius: 50%; animation: blink 1.2s infinite;
+  }
+
+  /* Counselling live mini-card on dashboard */
+  .counsel-mini-card {
+    background: linear-gradient(135deg, #edf9f2, #f5fdf8);
+    border: 1.5px solid #25c26e;
+    border-radius: 14px; padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+    display: flex; align-items: center; gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .counsel-mini-card .cmc-rank {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 700; color: #1a5c3a; line-height: 1;
+  }
+  .counsel-mini-card .cmc-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #2e7d52; }
+  .counsel-mini-card .cmc-divider { width: 1px; height: 36px; background: #a8dfc0; flex-shrink: 0; }
+  .counsel-mini-card .cmc-info { flex: 1; }
+  .counsel-mini-card .cmc-info strong { font-size: .88rem; color: #0a1f44; display: block; }
+  .counsel-mini-card .cmc-info span   { font-size: .78rem; color: #5a6e82; }
+
+  /* Your turn highlight */
+  .your-turn-dash {
+    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
+    border: 1.5px solid #25c26e; border-radius: 14px;
+    padding: 1rem 1.25rem; margin-top: 1.25rem;
+    display: flex; align-items: center; gap: .85rem;
+  }
+  .your-turn-dash .yt-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .your-turn-dash p { margin: 0; font-size: .88rem; color: #1a5c3a; font-weight: 600; }
 </style>
 
 <div class="page-wrap">
@@ -78,7 +124,47 @@
     <a href="{{ url_for('main.apply') }}" class="btn btn-primary">Start Application &rarr;</a>
   {% endif %}
 
+  {# ── Counselling live mini-card (shown when running) ── #}
+  {% if counselling.is_running %}
+    {% if application and application.rank and counselling.current_rank and application.rank == counselling.current_rank %}
+      <div class="your-turn-dash">
+        <div class="yt-icon">🔔</div>
+        <p>It's your turn! Rank #{{ application.rank }} is currently being called. Please report to the counselling desk.</p>
+      </div>
+    {% elif counselling.current_rank %}
+      <div class="counsel-mini-card">
+        <div>
+          <div class="cmc-label">Now Calling</div>
+          <div class="cmc-rank">#{{ counselling.current_rank }}</div>
+        </div>
+        <div class="cmc-divider"></div>
+        <div class="cmc-info">
+          <strong>Counselling is Live</strong>
+          <span>
+            {% if application and application.rank %}
+              Your rank is #{{ application.rank }}
+              {% if application.rank > counselling.current_rank %}
+                — {{ application.rank - counselling.current_rank }} rank(s) ahead of you
+              {% endif %}
+            {% else %}
+              Visit the counselling tracker for details
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+
   <div class="dash-actions">
+
+    {# Counselling button #}
+    <a href="{{ url_for('main.student_counselling') }}"
+       class="btn-counselling {% if counselling.is_running %}live{% endif %}">
+      <i class="fas fa-chalkboard-teacher"></i>
+      Counselling
+      {% if counselling.is_running %}<span class="counsel-live-dot"></span>{% endif %}
+    </a>
+
     {# WhatsApp Group button #}
     <a href="{{ url_for('main.student_whatsapp') }}" class="btn-whatsapp">
       <i class="fab fa-whatsapp"></i>

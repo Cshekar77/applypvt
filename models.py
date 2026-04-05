@@ -52,18 +52,107 @@ class WhatsAppSettings(db.Model):
         return s
 
 
-# NEW MODEL: Application Categories (Admin manages these)
+# ─────────────────────────────────────────
+#  Application Categories
+# ─────────────────────────────────────────
 class ApplicationCategory(db.Model):
     __tablename__ = 'application_category'
     id          = db.Column(db.Integer, primary_key=True)
     name        = db.Column(db.String(100), unique=True, nullable=False)
     is_active   = db.Column(db.Boolean, default=True)
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     def __repr__(self):
         return f'<Category {self.name}>'
 
 
+# ─────────────────────────────────────────
+#  Counselling Settings  (singleton)
+# ─────────────────────────────────────────
+class CounsellingSettings(db.Model):
+    __tablename__ = 'counselling_settings'
+    id              = db.Column(db.Integer, primary_key=True)
+
+    # Status: 'stopped' | 'running' | 'paused'
+    status          = db.Column(db.String(20), default='stopped')
+
+    # Current rank being called live
+    current_rank    = db.Column(db.Integer, nullable=True)
+
+    # Optional message admin can broadcast to students
+    message         = db.Column(db.Text, nullable=True)
+
+    started_at      = db.Column(db.DateTime, nullable=True)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get():
+        s = CounsellingSettings.query.first()
+        if not s:
+            s = CounsellingSettings(status='stopped', current_rank=None, message=None)
+            db.session.add(s)
+            db.session.commit()
+        return s
+
+    @property
+    def is_running(self):
+        return self.status == 'running'
+
+    @property
+    def is_paused(self):
+        return self.status == 'paused'
+
+    @property
+    def is_stopped(self):
+        return self.status == 'stopped'
+
+
+# ─────────────────────────────────────────
+#  Category Seats  (total + filled per category)
+# ─────────────────────────────────────────
+class CategorySeats(db.Model):
+    __tablename__ = 'category_seats'
+    id              = db.Column(db.Integer, primary_key=True)
+    category_id     = db.Column(db.Integer, db.ForeignKey('application_category.id'), unique=True)
+    total_seats     = db.Column(db.Integer, default=0)
+    filled_seats    = db.Column(db.Integer, default=0)
+    category        = db.relationship('ApplicationCategory', backref='seats')
+
+    @property
+    def remaining_seats(self):
+        return max(0, self.total_seats - self.filled_seats)
+
+    @staticmethod
+    def get_for_category(category_id):
+        s = CategorySeats.query.filter_by(category_id=category_id).first()
+        if not s:
+            s = CategorySeats(category_id=category_id, total_seats=0, filled_seats=0)
+            db.session.add(s)
+            db.session.commit()
+        return s
+
+
+# ─────────────────────────────────────────
+#  Seat Allotment  (one per student)
+# ─────────────────────────────────────────
+class SeatAllotment(db.Model):
+    __tablename__ = 'seat_allotment'
+    id              = db.Column(db.Integer, primary_key=True)
+    application_id  = db.Column(db.Integer, db.ForeignKey('student_applications.id'), unique=True)
+    category_id     = db.Column(db.Integer, db.ForeignKey('application_category.id'))
+
+    # 'government' or 'management'
+    quota           = db.Column(db.String(20), nullable=False)
+
+    allotted_at     = db.Column(db.DateTime, default=datetime.utcnow)
+
+    application     = db.relationship('StudentApplication', backref='allotment')
+    category        = db.relationship('ApplicationCategory', backref='allotments')
+
+
+# ─────────────────────────────────────────
+#  Student Application
+# ─────────────────────────────────────────
 class StudentApplication(db.Model):
     __tablename__ = 'student_applications'
     id              = db.Column(db.Integer, primary_key=True)
@@ -124,13 +213,13 @@ class StudentApplication(db.Model):
     @property
     def board_12_display(self):
         return self.board_12_other if self.board_12 == 'Other' else self.board_12
-    
+
     @property
     def specialization_display(self):
         if self.specialization == 'Other' and self.specialization_other:
             return self.specialization_other
         return self.specialization
-    
+
     @property
     def category_name(self):
         return self.category.name if self.category else None

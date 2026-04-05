@@ -1,0 +1,393 @@
+{% extends 'base.html' %}
+{% block title %}Live Counselling — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .sc-page { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+  .btn-back {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: #5a6e82; text-decoration: none; font-size: .88rem; margin-bottom: 1.5rem;
+    transition: color .2s;
+  }
+  .btn-back:hover { color: #0a1f44; }
+
+  .sc-header { margin-bottom: 1.75rem; }
+  .sc-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.85rem; color: #0a1f44; margin: 0 0 .3rem 0;
+  }
+  .sc-header p { color: #5a6e82; font-size: .88rem; margin: 0; }
+
+  /* Live indicator */
+  .live-chip {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #25c26e;
+    background: #edf9f2; border: 1px solid #a8dfc0;
+    padding: .28rem .85rem; border-radius: 20px;
+    margin-bottom: 1.25rem;
+  }
+  .live-dot {
+    width: 7px; height: 7px; background: #25c26e;
+    border-radius: 50%; animation: live-pulse 1.4s infinite;
+  }
+  @keyframes live-pulse {
+    0%,100% { opacity: 1; } 50% { opacity: .3; }
+  }
+  .live-chip.paused  { color: #856404; background: #fffbea; border-color: #f0d97a; }
+  .live-chip.paused .live-dot { background: #f0c040; animation: none; }
+  .live-chip.stopped { color: #5a6e82; background: #f5f7fa; border-color: #dde3ed; }
+  .live-chip.stopped .live-dot { background: #b0bac8; animation: none; }
+
+  /* Cards */
+  .sc-card {
+    background: white; border-radius: 18px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    padding: 1.5rem; margin-bottom: 1.25rem;
+    transition: box-shadow .2s;
+  }
+  .sc-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.08); }
+
+  /* Current rank big display */
+  .rank-display-wrap { text-align: center; padding: .5rem 0 1rem; }
+  .rank-label { font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+                text-transform: uppercase; color: #8a9ab0; margin-bottom: .5rem; }
+  .rank-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem; font-weight: 700; color: #0a1f44; line-height: 1;
+    transition: all .4s;
+  }
+  .rank-number.highlight { color: #25c26e; transform: scale(1.06); }
+  .rank-subtext { font-size: .85rem; color: #5a6e82; margin-top: .5rem; }
+
+  /* My rank vs current */
+  .rank-comparison {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem;
+  }
+  .rank-box {
+    background: #f5f7fa; border-radius: 12px; padding: 1rem; text-align: center;
+  }
+  .rank-box .rb-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: #8a9ab0; }
+  .rank-box .rb-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 700; color: #0a1f44; line-height: 1.1;
+  }
+  .rank-box.my-rank { background: #eef3ff; }
+  .rank-box.my-rank .rb-val { color: #0a1f44; }
+  .rank-box.called   { background: #edf9f2; }
+  .rank-box.called   .rb-val { color: #25c26e; }
+
+  /* Your turn alert */
+  .your-turn-alert {
+    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
+    border: 1.5px solid #25c26e;
+    border-radius: 14px; padding: 1.25rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.25rem;
+    animation: pop-in .4s cubic-bezier(.22,.68,0,1.2) both;
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .your-turn-icon { font-size: 2rem; flex-shrink: 0; }
+  .your-turn-text h4 { font-size: 1rem; font-weight: 700; color: #1a5c3a; margin: 0 0 .2rem; }
+  .your-turn-text p  { font-size: .83rem; color: #2e7d52; margin: 0; }
+
+  /* Seat availability */
+  .seats-wrap { display: flex; flex-direction: column; gap: .85rem; }
+  .seat-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .75rem 1rem; background: #f5f7fa; border-radius: 10px;
+  }
+  .seat-row .sr-cat { font-weight: 600; color: #0a1f44; font-size: .9rem; flex: 1; }
+  .seat-row .sr-nums { font-size: .82rem; color: #5a6e82; white-space: nowrap; }
+  .seat-row .sr-remaining {
+    font-weight: 700; font-size: .95rem;
+    color: #25c26e; min-width: 40px; text-align: right;
+  }
+  .seat-row .sr-remaining.zero { color: #dc3545; }
+  .bar-wrap { flex: 1; background: #e2e8f0; border-radius: 20px; height: 5px; overflow: hidden; }
+  .bar-fill { background: linear-gradient(90deg,#0a1f44,#c9a03d); height: 100%; border-radius: 20px; transition: width .5s; }
+
+  /* Allotment card */
+  .allotted-card {
+    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
+    border: 1.5px solid #25c26e; border-radius: 16px; padding: 1.5rem;
+    display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+  }
+  .allotted-card .ac-icon { font-size: 2.2rem; flex-shrink: 0; }
+  .allotted-card h4 { font-size: 1rem; font-weight: 700; color: #1a5c3a; margin: 0 0 .2rem; }
+  .allotted-card p  { font-size: .82rem; color: #2e7d52; margin: 0; }
+
+  /* Message box */
+  .admin-msg {
+    background: #fffbea; border: 1px solid #f0d97a;
+    border-radius: 12px; padding: 1rem 1.25rem;
+    font-size: .85rem; color: #7a5c00; margin-bottom: 1.25rem;
+  }
+
+  /* Stopped state */
+  .stopped-card {
+    text-align: center; padding: 2.5rem; color: #8a9ab0;
+    background: white; border-radius: 18px;
+    border: 1.5px dashed #dde3ed;
+  }
+  .stopped-card i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+  .refresh-note {
+    text-align: center; font-size: .75rem; color: #b0bac8;
+    margin-top: 1.5rem;
+  }
+  .refresh-note span { color: #0a1f44; font-weight: 600; }
+</style>
+
+<div class="sc-page">
+  <a href="{{ url_for('main.student_dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <div class="sc-header">
+    <h2>Live Counselling Tracker</h2>
+    <p>BCA Admissions 2026–2027 — updates automatically every 10 seconds</p>
+  </div>
+
+  {# Live status chip #}
+  <div class="live-chip {% if counselling.status == 'paused' %}paused{% elif counselling.status == 'stopped' %}stopped{% endif %}"
+       id="live-chip">
+    <div class="live-dot"></div>
+    <span id="chip-text">
+      {% if counselling.is_running %}Live — Counselling In Progress
+      {% elif counselling.is_paused %}Paused
+      {% else %}Not Started{% endif %}
+    </span>
+  </div>
+
+  {# ── Seat allotted confirmation ── #}
+  {% if allotment %}
+  <div class="allotted-card" id="allotted-card">
+    <div class="ac-icon">🎉</div>
+    <div>
+      <h4>Your Seat Has Been Allotted!</h4>
+      <p>
+        Quota: <strong>{{ allotment.quota|title }}</strong> &nbsp;·&nbsp;
+        Allotted on {{ allotment.allotted_at.strftime('%d %b %Y, %I:%M %p') }}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── Admin message ── #}
+  {% if counselling.message %}
+  <div class="admin-msg" id="admin-msg">
+    <i class="fas fa-bullhorn"></i> <strong>Notice:</strong> {{ counselling.message }}
+  </div>
+  {% endif %}
+
+  {# ── Main content ── #}
+  {% if counselling.is_stopped and not allotment %}
+  <div class="stopped-card" id="main-content">
+    <i class="fas fa-hourglass-start"></i>
+    <strong>Counselling has not started yet</strong>
+    <p style="margin:.5rem 0 0;font-size:.85rem;">
+      Check back here when counselling begins. This page refreshes automatically.
+    </p>
+  </div>
+
+  {% else %}
+  <div id="main-content">
+
+    {# "Your turn" alert #}
+    {% if appl and appl.rank and counselling.current_rank and appl.rank == counselling.current_rank %}
+    <div class="your-turn-alert" id="your-turn-alert">
+      <div class="your-turn-icon">🔔</div>
+      <div class="your-turn-text">
+        <h4>It's Your Turn! Please Report Now.</h4>
+        <p>Rank #{{ appl.rank }} is currently being called. Please proceed to the counselling desk.</p>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Current rank display #}
+    <div class="sc-card">
+      <div class="rank-display-wrap">
+        <div class="rank-label">Currently Calling Rank</div>
+        <div class="rank-number {% if appl and appl.rank and counselling.current_rank and appl.rank == counselling.current_rank %}highlight{% endif %}"
+             id="current-rank-display">
+          {% if counselling.current_rank %}#{{ counselling.current_rank }}{% else %}—{% endif %}
+        </div>
+        <div class="rank-subtext" id="rank-subtext">
+          {% if counselling.is_paused %}Counselling is currently paused
+          {% elif not counselling.current_rank %}Waiting for first rank to be called
+          {% else %}Rank is being called at the counselling desk{% endif %}
+        </div>
+      </div>
+
+      {% if appl and appl.rank %}
+      <div class="rank-comparison">
+        <div class="rank-box my-rank">
+          <div class="rb-label">Your Rank</div>
+          <div class="rb-val" id="my-rank-display">#{{ appl.rank }}</div>
+        </div>
+        <div class="rank-box called">
+          <div class="rb-label">Current Call</div>
+          <div class="rb-val" id="current-rank-box">
+            {% if counselling.current_rank %}#{{ counselling.current_rank }}{% else %}—{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    {# Seat availability for student's own category #}
+    {% if cat_seats %}
+    <div class="sc-card">
+      <div class="rank-label" style="margin-bottom:.85rem;">
+        <i class="fas fa-chair"></i> Seats — {{ appl.category_name }}
+      </div>
+      <div class="seats-wrap" id="seats-wrap">
+        <div class="seat-row">
+          <div class="sr-cat">{{ appl.category_name }}</div>
+          <div class="bar-wrap">
+            <div class="bar-fill" id="seat-bar"
+                 style="width:{% if cat_seats.total_seats > 0 %}{{ ((cat_seats.filled_seats / cat_seats.total_seats)*100)|int }}{% else %}0{% endif %}%">
+            </div>
+          </div>
+          <div class="sr-nums" id="seat-nums">{{ cat_seats.filled_seats }}/{{ cat_seats.total_seats }}</div>
+          <div class="sr-remaining {% if cat_seats.remaining_seats == 0 %}zero{% endif %}"
+               id="seat-remaining">
+            {{ cat_seats.remaining_seats }} left
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  {% endif %}
+
+  <div class="refresh-note">
+    Auto-refreshing every <span>10 seconds</span> &nbsp;·&nbsp;
+    Last updated: <span id="last-updated">just now</span>
+  </div>
+</div>
+
+<script>
+  const MY_RANK = {{ appl.rank if appl and appl.rank else 'null' }};
+
+  function timeSince(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 10) return 'just now';
+    if (seconds < 60) return seconds + 's ago';
+    return Math.floor(seconds / 60) + 'm ago';
+  }
+
+  let lastUpdated = new Date();
+
+  function updateLastUpdated() {
+    document.getElementById('last-updated').textContent = timeSince(lastUpdated);
+  }
+  setInterval(updateLastUpdated, 5000);
+
+  async function fetchStatus() {
+    try {
+      const res  = await fetch('{{ url_for("main.counselling_status_api") }}');
+      const data = await res.json();
+
+      lastUpdated = new Date();
+
+      // Update chip
+      const chip     = document.getElementById('live-chip');
+      const chipText = document.getElementById('chip-text');
+      chip.className = 'live-chip';
+      if (data.status === 'paused')  { chip.classList.add('paused');  chipText.textContent = 'Paused'; }
+      else if (data.status === 'stopped') { chip.classList.add('stopped'); chipText.textContent = 'Not Started'; }
+      else { chipText.textContent = 'Live — Counselling In Progress'; }
+
+      // Update current rank display
+      const rankDisplay = document.getElementById('current-rank-display');
+      const rankBox     = document.getElementById('current-rank-box');
+      const rankSubtext = document.getElementById('rank-subtext');
+
+      if (rankDisplay) {
+        const newRank = data.current_rank ? '#' + data.current_rank : '—';
+        if (rankDisplay.textContent.trim() !== newRank) {
+          rankDisplay.classList.add('highlight');
+          setTimeout(() => rankDisplay.classList.remove('highlight'), 1200);
+        }
+        rankDisplay.textContent = newRank;
+      }
+      if (rankBox) rankBox.textContent = data.current_rank ? '#' + data.current_rank : '—';
+      if (rankSubtext) {
+        if (data.status === 'paused') rankSubtext.textContent = 'Counselling is currently paused';
+        else if (!data.current_rank)  rankSubtext.textContent = 'Waiting for first rank to be called';
+        else rankSubtext.textContent = 'Rank is being called at the counselling desk';
+      }
+
+      // Admin message
+      const msgEl = document.getElementById('admin-msg');
+      if (data.message) {
+        if (msgEl) msgEl.innerHTML = '<i class="fas fa-bullhorn"></i> <strong>Notice:</strong> ' + data.message;
+        else {
+          const d = document.createElement('div');
+          d.id = 'admin-msg';
+          d.className = 'admin-msg';
+          d.innerHTML = '<i class="fas fa-bullhorn"></i> <strong>Notice:</strong> ' + data.message;
+          document.querySelector('.sc-page').insertBefore(d, document.getElementById('main-content'));
+        }
+      } else if (msgEl) msgEl.remove();
+
+      // Seat info
+      if (data.cat_seats) {
+        const pct     = data.cat_seats.total > 0 ? Math.round((data.cat_seats.filled / data.cat_seats.total) * 100) : 0;
+        const barEl   = document.getElementById('seat-bar');
+        const numsEl  = document.getElementById('seat-nums');
+        const remEl   = document.getElementById('seat-remaining');
+        if (barEl)  barEl.style.width  = pct + '%';
+        if (numsEl) numsEl.textContent = data.cat_seats.filled + '/' + data.cat_seats.total;
+        if (remEl) {
+          remEl.textContent = data.cat_seats.remaining + ' left';
+          remEl.className   = 'sr-remaining' + (data.cat_seats.remaining === 0 ? ' zero' : '');
+        }
+      }
+
+      // Allotment
+      if (data.allotment && !document.getElementById('allotted-card')) {
+        const card = document.createElement('div');
+        card.id        = 'allotted-card';
+        card.className = 'allotted-card';
+        card.innerHTML = `<div class="ac-icon">🎉</div>
+          <div><h4>Your Seat Has Been Allotted!</h4>
+          <p>Quota: <strong>${data.allotment.quota.charAt(0).toUpperCase()+data.allotment.quota.slice(1)}</strong>
+          &nbsp;·&nbsp; Allotted on ${data.allotment.allotted_at}</p></div>`;
+        document.querySelector('.sc-header').insertAdjacentElement('afterend', card);
+      }
+
+      // Your turn alert
+      const turnAlert = document.getElementById('your-turn-alert');
+      if (MY_RANK && data.current_rank && MY_RANK === data.current_rank) {
+        if (!turnAlert) {
+          const alert = document.createElement('div');
+          alert.id        = 'your-turn-alert';
+          alert.className = 'your-turn-alert';
+          alert.innerHTML = `<div class="your-turn-icon">🔔</div>
+            <div class="your-turn-text">
+              <h4>It's Your Turn! Please Report Now.</h4>
+              <p>Rank #${MY_RANK} is currently being called.</p>
+            </div>`;
+          document.getElementById('main-content').prepend(alert);
+        }
+      } else if (turnAlert) {
+        turnAlert.remove();
+      }
+
+    } catch(e) {
+      console.error('Status fetch failed:', e);
+    }
+  }
+
+  // Poll every 10 seconds
+  setInterval(fetchStatus, 10000);
+</script>
+{% endblock %}

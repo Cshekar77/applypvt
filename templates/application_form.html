@@ -28,42 +28,50 @@
       <div class="grid-2">
         <div class="field {% if form.first_name.errors %}has-error{% endif %}">
           <label>{{ form.first_name.label.text }} <span class="req">*</span></label>
-          {{ form.first_name(placeholder='e.g. Priya') }}
+          {{ form.first_name(placeholder='e.g. Priya', required=True) }}
           {% for e in form.first_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
         <div class="field {% if form.last_name.errors %}has-error{% endif %}">
           <label>{{ form.last_name.label.text }} <span class="req">*</span></label>
-          {{ form.last_name(placeholder='e.g. Sharma') }}
+          {{ form.last_name(placeholder='e.g. Sharma', required=True) }}
           {% for e in form.last_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
       <div class="grid-2">
         <div class="field {% if form.dob.errors %}has-error{% endif %}">
           <label>Date of birth <span class="req">*</span></label>
-          {{ form.dob(type='date') }}
+          {{ form.dob(type='date', required=True) }}
           {% for e in form.dob.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
-        <div class="field"><label>Gender</label>{{ form.gender() }}</div>
+        <div class="field {% if form.gender.errors %}has-error{% endif %}">
+          <label>Gender <span class="req">*</span></label>
+          {{ form.gender(required=True) }}
+          {% for e in form.gender.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
       </div>
       <div class="field {% if form.nationality.errors %}has-error{% endif %}">
         <label>{{ form.nationality.label.text }} <span class="req">*</span></label>
-        {{ form.nationality(placeholder='e.g. Indian') }}
+        {{ form.nationality(placeholder='e.g. Indian', required=True) }}
         {% for e in form.nationality.errors %}<span class="err">{{ e }}</span>{% endfor %}
       </div>
       <hr class="divider">
       <div class="grid-2">
         <div class="field {% if form.email.errors %}has-error{% endif %}">
           <label>{{ form.email.label.text }} <span class="req">*</span></label>
-          {{ form.email(placeholder='you@example.com') }}
+          {{ form.email(placeholder='you@example.com', required=True) }}
           {% for e in form.email.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
         <div class="field {% if form.phone.errors %}has-error{% endif %}">
           <label>{{ form.phone.label.text }} <span class="req">*</span></label>
-          {{ form.phone(placeholder='+91 98765 43210') }}
+          {{ form.phone(placeholder='+91 98765 43210', required=True) }}
           {% for e in form.phone.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
-      <div class="field"><label>Residential address</label>{{ form.address(placeholder='Street, City, State, PIN code') }}</div>
+      <div class="field {% if form.address.errors %}has-error{% endif %}">
+        <label>Residential address <span class="req">*</span></label>
+        {{ form.address(placeholder='Street, City, State, PIN code', required=True) }}
+        {% for e in form.address.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
     </div>
 
     <div class="form-card">
@@ -76,12 +84,12 @@
         <div class="grid-2">
           <div class="field {% if form.school_10.errors %}has-error{% endif %}">
             <label>School name <span class="req">*</span></label>
-            {{ form.school_10(placeholder='School name') }}
+            {{ form.school_10(placeholder='School name', required=True) }}
             {% for e in form.school_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.board_10.errors %}has-error{% endif %}">
             <label>Board <span class="req">*</span></label>
-            {{ form.board_10(onchange='toggleOther(this,"ob10")') }}
+            {{ form.board_10(onchange='toggleOther(this,"ob10")', required=True) }}
             <div class="other-board" id="ob10" style="display:none;margin-top:.5rem">
               {{ form.board_10_other(placeholder='Please specify your board name') }}
             </div>
@@ -91,17 +99,17 @@
         <div class="grid-4">
           <div class="field {% if form.year_10.errors %}has-error{% endif %}">
             <label>Year of passing <span class="req">*</span></label>
-            {{ form.year_10(type='number', placeholder='e.g. 2022', min='2000', max='2026') }}
+            {{ form.year_10(type='number', placeholder='e.g. 2022', min='2000', max='2026', required=True) }}
             {% for e in form.year_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.total_10.errors %}has-error{% endif %}">
             <label>Total marks <span class="req">*</span></label>
-            {{ form.total_10(id='t10', placeholder='e.g. 500', oninput="calcPct('t10','o10','p10')") }}
+            {{ form.total_10(id='t10', placeholder='e.g. 500', oninput="calcPct('t10','o10','p10')", required=True) }}
             {% for e in form.total_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.obtained_10.errors %}has-error{% endif %}">
             <label>Marks obtained <span class="req">*</span></label>
-            {{ form.obtained_10(id='o10', placeholder='e.g. 450', oninput="calcPct('t10','o10','p10')") }}
+            {{ form.obtained_10(id='o10', placeholder='e.g. 450', oninput="calcPct('t10','o10','p10')", required=True) }}
             {% for e in form.obtained_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field">
@@ -109,7 +117,6 @@
             <div class="pct-display" id="p10">—</div>
           </div>
         </div>
-        <!-- PDF UPLOAD REMOVED -->
       </div>
 
       <div class="edu-entry">
@@ -117,12 +124,12 @@
         <div class="grid-2">
           <div class="field {% if form.school_12.errors %}has-error{% endif %}">
             <label>School / College name <span class="req">*</span></label>
-            {{ form.school_12(placeholder='School or college name') }}
+            {{ form.school_12(placeholder='School or college name', required=True) }}
             {% for e in form.school_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.board_12.errors %}has-error{% endif %}">
             <label>Board <span class="req">*</span></label>
-            {{ form.board_12(onchange='toggleOther(this,"ob12")') }}
+            {{ form.board_12(onchange='toggleOther(this,"ob12")', required=True) }}
             <div class="other-board" id="ob12" style="display:none;margin-top:.5rem">
               {{ form.board_12_other(placeholder='Please specify your board name') }}
             </div>
@@ -131,22 +138,23 @@
         </div>
         <div class="field {% if form.stream_12.errors %}has-error{% endif %}">
           <label>Stream <span class="req">*</span></label>
-          {{ form.stream_12() }}
+          {{ form.stream_12(required=True) }}
           {% for e in form.stream_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
         <div class="grid-4">
-          <div class="field">
-            <label>Year of passing</label>
-            {{ form.year_12(type='number', placeholder='e.g. 2024', min='2000', max='2026') }}
+          <div class="field {% if form.year_12.errors %}has-error{% endif %}">
+            <label>Year of passing <span class="req">*</span></label>
+            {{ form.year_12(type='number', placeholder='e.g. 2024', min='2000', max='2026', required=True) }}
+            {% for e in form.year_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.total_12.errors %}has-error{% endif %}">
             <label>Total marks <span class="req">*</span></label>
-            {{ form.total_12(id='t12', placeholder='e.g. 500', oninput="calcPct('t12','o12','p12')") }}
+            {{ form.total_12(id='t12', placeholder='e.g. 500', oninput="calcPct('t12','o12','p12')", required=True) }}
             {% for e in form.total_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field {% if form.obtained_12.errors %}has-error{% endif %}">
             <label>Marks obtained <span class="req">*</span></label>
-            {{ form.obtained_12(id='o12', placeholder='e.g. 430', oninput="calcPct('t12','o12','p12')") }}
+            {{ form.obtained_12(id='o12', placeholder='e.g. 430', oninput="calcPct('t12','o12','p12')", required=True) }}
             {% for e in form.obtained_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
           </div>
           <div class="field">
@@ -154,7 +162,6 @@
             <div class="pct-display" id="p12">—</div>
           </div>
         </div>
-        <!-- PDF UPLOAD REMOVED -->
       </div>
     </div>
 
@@ -167,24 +174,21 @@
         <label>Programme <span class="req">*</span></label>
         <input type="text" value="Bachelor of Computer Applications (BCA)" readonly>
       </div>
-      
-      <!-- NEW: Specialization Field -->
+
       <div class="field {% if form.specialization.errors %}has-error{% endif %}">
         <label>Which specialization are you interested in? <span class="req">*</span></label>
-        {{ form.specialization(id='specialization', onchange='toggleOtherSpecialization()') }}
+        {{ form.specialization(id='specialization', onchange='toggleOtherSpecialization()', required=True) }}
         {% for e in form.specialization.errors %}<span class="err">{{ e }}</span>{% endfor %}
       </div>
-      
-      <!-- NEW: Other Specialization Text Field (hidden by default) -->
+
       <div id="otherSpecializationDiv" style="display:none; margin-top: 0.5rem;">
         <div class="field">
           <label>Please specify your specialization <span class="req">*</span></label>
-          {{ form.specialization_other(placeholder='e.g. Cloud Computing, Cyber Security, etc.') }}
+          {{ form.specialization_other(placeholder='e.g. Cloud Computing, Cyber Security, etc.', id='specialization_other') }}
         </div>
       </div>
-      
-      <!-- NEW: Category Field (populated from database) -->
-      <div class="field {% if category_errors %}has-error{% endif %}">
+
+      <div class="field">
         <label>Under which category are you applying? <span class="req">*</span></label>
         <select name="category_id" id="category_id" required>
           <option value="">Select category</option>
@@ -192,9 +196,6 @@
             <option value="{{ cat.id }}">{{ cat.name }}</option>
           {% endfor %}
         </select>
-        {% if category_errors %}
-          {% for e in category_errors %}<span class="err">{{ e }}</span>{% endfor %}
-        {% endif %}
       </div>
     </div>
 
@@ -206,31 +207,32 @@
 </div>
 
 <script>
-  // Function to show/hide "Other Specialization" text field
   function toggleOtherSpecialization() {
     const specSelect = document.getElementById('specialization');
     const otherDiv = document.getElementById('otherSpecializationDiv');
+    const otherInput = document.getElementById('specialization_other');
     if (specSelect.value === 'Other') {
       otherDiv.style.display = 'block';
+      otherInput.required = true;
     } else {
       otherDiv.style.display = 'none';
-      document.getElementById('specialization_other').value = '';
+      otherInput.required = false;
+      otherInput.value = '';
     }
   }
-  
-  // Function to toggle "Other Board" fields
+
   function toggleOther(selectElement, divId) {
     const otherDiv = document.getElementById(divId);
+    const input = otherDiv.querySelector('input');
     if (selectElement.value === 'Other') {
       otherDiv.style.display = 'block';
+      if (input) input.required = true;
     } else {
       otherDiv.style.display = 'none';
-      const input = otherDiv.querySelector('input');
-      if (input) input.value = '';
+      if (input) { input.required = false; input.value = ''; }
     }
   }
-  
-  // Function to calculate percentage
+
   function calcPct(totalId, obtainedId, displayId) {
     const total = document.getElementById(totalId);
     const obtained = document.getElementById(obtainedId);

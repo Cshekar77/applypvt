@@ -10,13 +10,13 @@
     flex-wrap: wrap;
     gap: 1rem;
   }
-  
+
   .admin-header h1 {
     font-family: 'Playfair Display', serif;
     color: #0a1f44;
     margin: 0;
   }
-  
+
   .btn-add {
     background: #c9a03d;
     color: #0a1f44;
@@ -29,13 +29,14 @@
     gap: 0.5rem;
     border: none;
     cursor: pointer;
+    transition: all 0.2s;
   }
-  
+
   .btn-add:hover {
     background: #b58c2e;
     transform: translateY(-2px);
   }
-  
+
   .categories-table {
     width: 100%;
     background: white;
@@ -43,12 +44,12 @@
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
-  
+
   .categories-table table {
     width: 100%;
     border-collapse: collapse;
   }
-  
+
   .categories-table th {
     background: #0a1f44;
     color: white;
@@ -56,17 +57,18 @@
     text-align: left;
     font-weight: 600;
   }
-  
+
   .categories-table td {
     padding: 1rem;
     border-bottom: 1px solid #eef2f8;
     color: #1a2c3e;
+    vertical-align: middle;
   }
-  
+
   .categories-table tr:hover {
     background: #f8f9fa;
   }
-  
+
   .status-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -74,95 +76,155 @@
     font-size: 0.8rem;
     font-weight: 600;
   }
-  
+
   .status-active {
     background: #d4edda;
     color: #155724;
   }
-  
+
   .status-inactive {
     background: #f8d7da;
     color: #721c24;
   }
-  
+
   .action-buttons {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+    align-items: center;
   }
-  
+
   .btn-icon {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0.3rem 0.6rem;
-    border-radius: 6px;
-    font-size: 1rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
   }
-  
+
   .btn-edit {
     background: #eef2ff;
     color: #0a1f44;
   }
-  
   .btn-edit:hover {
     background: #c9a03d;
     color: white;
   }
-  
+
   .btn-toggle {
     background: #fff3cd;
     color: #856404;
   }
-  
   .btn-toggle:hover {
     background: #c9a03d;
     color: white;
   }
-  
+
   .btn-delete {
     background: #f8d7da;
     color: #721c24;
   }
-  
   .btn-delete:hover {
     background: #dc3545;
     color: white;
   }
-  
+
+  /* Inline edit row */
+  .inline-edit-row { display: none; }
+  .inline-edit-row td {
+    background: #f0f4ff;
+    border-bottom: 2px solid #c9a03d;
+  }
+  .inline-edit-row.active { display: table-row; }
+
+  .inline-edit-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.25rem 0;
+  }
+
+  .inline-edit-form input {
+    padding: 0.55rem 0.9rem;
+    border: 2px solid #c9a03d;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    flex: 1;
+    min-width: 180px;
+    outline: none;
+    color: #0a1f44;
+  }
+
+  .inline-edit-form input:focus {
+    box-shadow: 0 0 0 3px rgba(201,160,61,0.15);
+  }
+
+  .btn-save {
+    background: #0a1f44;
+    color: white;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.2s;
+  }
+  .btn-save:hover { background: #1e3a60; }
+
+  .btn-cancel-inline {
+    background: #eef2f8;
+    color: #5a6e82;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.2s;
+  }
+  .btn-cancel-inline:hover { background: #dce3ed; }
+
+  /* Modal */
   .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
     z-index: 1000;
     align-items: center;
     justify-content: center;
   }
-  
-  .modal.active {
-    display: flex;
-  }
-  
+  .modal.active { display: flex; }
   .modal-content {
     background: white;
     border-radius: 24px;
     padding: 2rem;
     max-width: 500px;
     width: 90%;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
-  
   .modal-content h3 {
     font-family: 'Playfair Display', serif;
     color: #0a1f44;
     margin-bottom: 1rem;
   }
-  
   .modal-content input {
     width: 100%;
     padding: 0.8rem;
@@ -171,18 +233,15 @@
     margin: 1rem 0;
     font-size: 1rem;
   }
-  
   .modal-content input:focus {
     outline: none;
     border-color: #c9a03d;
   }
-  
   .modal-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
   }
-  
   .btn-modal-cancel {
     background: #eef2f8;
     color: #1a2c3e;
@@ -191,7 +250,6 @@
     border: none;
     cursor: pointer;
   }
-  
   .btn-modal-save {
     background: #c9a03d;
     color: #0a1f44;
@@ -201,7 +259,7 @@
     cursor: pointer;
     font-weight: 600;
   }
-  
+
   .empty-state {
     text-align: center;
     padding: 3rem;
@@ -209,8 +267,10 @@
   }
 
   @media (max-width: 768px) {
-    .action-buttons { flex-direction: column; }
+    .action-buttons { flex-direction: column; align-items: flex-start; }
     .categories-table { overflow-x: auto; }
+    .inline-edit-form { flex-direction: column; align-items: flex-start; }
+    .inline-edit-form input { width: 100%; }
   }
 </style>
 
@@ -233,9 +293,10 @@
     </thead>
     <tbody>
       {% for cat in categories %}
-      <tr>
+      {# Main row #}
+      <tr id="row-{{ cat.id }}">
         <td>{{ cat.id }}</td>
-        <td>{{ cat.name }}</td>
+        <td><strong>{{ cat.name }}</strong></td>
         <td>
           {% if cat.is_active %}
             <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
@@ -245,28 +306,52 @@
         </td>
         <td>
           <div class="action-buttons">
-            <button class="btn-icon btn-edit" onclick="openEditModal({{ cat.id }}, '{{ cat.name }}')" title="Edit">
-              <i class="fas fa-edit"></i>
+            {# Edit button — toggles inline edit row #}
+            <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit">
+              <i class="fas fa-edit"></i> Edit
             </button>
-            <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display: inline;">
+
+            {# Toggle active/inactive #}
+            <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display:inline;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
               <button type="submit" class="btn-icon btn-toggle" title="Toggle Active/Inactive">
                 <i class="fas fa-power-off"></i>
+                {% if cat.is_active %}Deactivate{% else %}Activate{% endif %}
               </button>
             </form>
-            <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete category \"{{ cat.name }}\"? This will NOT delete student applications but may affect them.');">
+
+            {# Delete button #}
+            <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display:inline;"
+                  onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;? This cannot be undone.');">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
               <button type="submit" class="btn-icon btn-delete" title="Delete">
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-trash-alt"></i> Delete
               </button>
             </form>
           </div>
         </td>
       </tr>
+
+      {# Inline edit row — hidden by default, shown on Edit click #}
+      <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
+        <td colspan="4">
+          <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+            <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
+                   value="{{ cat.name }}" placeholder="Category name" required>
+            <button type="submit" class="btn-save">
+              <i class="fas fa-check"></i> Update
+            </button>
+            <button type="button" class="btn-cancel-inline" onclick="cancelInlineEdit({{ cat.id }})">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </form>
+        </td>
+      </tr>
       {% else %}
       <tr>
         <td colspan="4" class="empty-state">
-          <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+          <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
           No categories found. Click "Add New Category" to create one.
         </td>
       </tr>
@@ -281,7 +366,7 @@
     <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
     <form action="{{ url_for('main.admin_category_add') }}" method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <input type="text" name="category_name" placeholder="Enter category name (e.g., General, OBC, SC, ST, EWS, PWD)" required>
+      <input type="text" name="category_name" placeholder="e.g. General, OBC, SC, ST, EWS, PWD" required>
       <div class="modal-actions">
         <button type="button" class="btn-modal-cancel" onclick="closeModal('addModal')">Cancel</button>
         <button type="submit" class="btn-modal-save">Add Category</button>
@@ -290,7 +375,7 @@
   </div>
 </div>
 
-<!-- Edit Category Modal -->
+<!-- Edit Category Modal (kept for compatibility) -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <h3><i class="fas fa-edit"></i> Edit Category</h3>
@@ -306,23 +391,46 @@
 </div>
 
 <script>
+  // Inline edit toggle
+  function toggleInlineEdit(catId, catName) {
+    const editRow = document.getElementById('edit-row-' + catId);
+    const input   = document.getElementById('inline-input-' + catId);
+    const isOpen  = editRow.classList.contains('active');
+
+    // Close all other open inline rows first
+    document.querySelectorAll('.inline-edit-row.active').forEach(row => {
+      row.classList.remove('active');
+    });
+
+    if (!isOpen) {
+      editRow.classList.add('active');
+      input.focus();
+      input.select();
+    }
+  }
+
+  function cancelInlineEdit(catId) {
+    document.getElementById('edit-row-' + catId).classList.remove('active');
+  }
+
+  // Modal functions
   function openAddModal() {
     document.getElementById('addModal').classList.add('active');
   }
-  
+
   function openEditModal(catId, catName) {
     const modal = document.getElementById('editModal');
-    const form = document.getElementById('editForm');
+    const form  = document.getElementById('editForm');
     const input = document.getElementById('editCategoryName');
     form.action = "{{ url_for('main.admin_category_edit', cat_id=0) }}".replace('0', catId);
     input.value = catName;
     modal.classList.add('active');
   }
-  
+
   function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
   }
-  
+
   window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
       event.target.classList.remove('active');
