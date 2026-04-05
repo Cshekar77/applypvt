@@ -469,13 +469,13 @@ def admin_whatsapp():
     wa = WhatsAppSettings.get()
     if request.method == 'POST':
         action = request.form.get('action')
-        if action == 'delete':
+        if action in ('delete', 'clear_all'):
             wa.link        = None
             wa.description = None
             wa.is_active   = False
             wa.updated_at  = datetime.utcnow()
             db.session.commit()
-            flash('WhatsApp group link removed.', 'info')
+            flash('WhatsApp group link and description cleared.', 'info')
         else:
             link = request.form.get('link', '').strip()
             desc = request.form.get('description', '').strip()
