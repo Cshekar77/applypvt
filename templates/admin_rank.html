@@ -196,6 +196,39 @@
       padding: 5px;
     }
   }
+  
+  body.dark .admin-table {
+    background: #1a2538;
+  }
+  
+  body.dark .admin-table td {
+    color: #eef2ff;
+    border-bottom-color: #2d3e54;
+  }
+  
+  body.dark .admin-table tr:hover {
+    background: #2d3e54;
+  }
+  
+  body.dark .specialization-badge {
+    background: #2d3e54;
+    color: #eef2ff;
+  }
+  
+  body.dark .category-badge {
+    background: #1e3a2f;
+    color: #81c784;
+  }
+  
+  body.dark .rank-input {
+    background: #0f1a24;
+    border-color: #2d3e54;
+    color: #eef2ff;
+  }
+  
+  body.dark .text-muted {
+    color: #b9c8e8;
+  }
 </style>
 
 <div class="page-wrap">
@@ -303,18 +336,34 @@
     if (!confirm('Auto-generate ranks based on 12th percentage (highest = Rank 1)? This will overwrite existing ranks.')) return;
 
     const tbody = document.querySelector('#rank-table tbody');
-    const rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
+    const rows = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
 
     // Sort rows by 12th % descending
-    rows.sort((a, b) => parseFloat(b.dataset.percent12) - parseFloat(a.dataset.percent12));
-
-    // Assign ranks in sorted order
-    rows.forEach((row, i) => {
-      const input = row.querySelector('input[name^="rank_"]');
-      if (input) input.value = i + 1;
+    rows.sort((a, b) => {
+      const aPercent = parseFloat(a.dataset.percent12) || 0;
+      const bPercent = parseFloat(b.dataset.percent12) || 0;
+      return bPercent - aPercent;
     });
 
-    alert('Ranks auto-generated! Click "Save Ranks" to save them.');
+    // Clear tbody and append sorted rows
+    tbody.innerHTML = '';
+    rows.forEach((row, index) => {
+      // Update the # column
+      const firstCell = row.querySelector('td:first-child');
+      if (firstCell) {
+        firstCell.textContent = index + 1;
+      }
+      
+      // Update the rank input value
+      const rankInput = row.querySelector('input[name^="rank_"]');
+      if (rankInput) {
+        rankInput.value = index + 1;
+      }
+      
+      tbody.appendChild(row);
+    });
+
+    alert('Ranks auto-generated and table sorted! Click "Save Ranks" to save them.');
   }
 </script>
 {% endblock %}
