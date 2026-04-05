@@ -378,7 +378,6 @@ def my_application():
 
 # ─────────────────────────────────────────
 #  Student — Change Password
-#  URL: /change-password
 # ─────────────────────────────────────────
 @main.route('/change-password', methods=['GET', 'POST'])
 @login_required
@@ -423,7 +422,6 @@ def admin_login():
         if (u == current_app.config['ADMIN_USERNAME'] and
                 p == current_app.config['ADMIN_PASSWORD']):
             session['admin_logged_in'] = True
-            # Store admin credentials in session for change password
             session['admin_username'] = u
             session['admin_password_hash'] = generate_password_hash(p)
             return redirect(url_for('main.admin_dashboard'))
@@ -456,13 +454,6 @@ def admin_dashboard():
 
 # ─────────────────────────────────────────
 #  Admin — Change Password
-#  URL: /admin/change-password
-#
-#  NOTE: Since admin credentials come from
-#  config (not DB), this updates app.config
-#  + session for the current server session.
-#  For permanent change, update your .env /
-#  config file manually too.
 # ─────────────────────────────────────────
 @main.route('/admin/change-password', methods=['GET', 'POST'])
 @admin_required
@@ -483,7 +474,6 @@ def admin_change_password():
         elif new_password == current_pw:
             flash('New password cannot be the same as the current password.', 'warning')
         else:
-            # Update in-memory config for this session
             current_app.config['ADMIN_PASSWORD'] = new_password
             flash('Password updated successfully! Remember to update your config/.env file too.', 'success')
             return redirect(url_for('main.admin_dashboard'))
@@ -552,11 +542,15 @@ def admin_verified():
     return render_template('admin_verified.html', students=students)
 
 
+# ─────────────────────────────────────────
+#  Admin — Rank Management (FIXED: shows in submission order, not sorted by %)
+# ─────────────────────────────────────────
 @main.route('/admin/rank')
 @admin_required
 def admin_rank():
+    # Display verified students in submission order (not sorted by percentage)
     students = StudentApplication.query.filter_by(is_verified=True)\
-                 .order_by(StudentApplication.percent_12.desc()).all()
+                 .order_by(StudentApplication.submitted_at).all()
     return render_template('admin_rank.html', students=students)
 
 
