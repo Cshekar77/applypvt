@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}WhatsApp Group — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .wa-student-page {
+    max-width: 580px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+    text-align: center;
+  }
+
+  .wa-blob {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    color: white;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 8px 24px rgba(37,211,102,0.3);
+    animation: wa-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  @keyframes wa-pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .wa-student-page h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #0a1f44;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .wa-student-page .subtitle {
+    color: #5a6e82;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  .wa-active-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 2px solid #25D366;
+    text-align: left;
+    animation: fade-up 0.4s ease both;
+    animation-delay: 0.15s;
+  }
+
+  @keyframes fade-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .wa-active-card .desc {
+    color: #334155;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f0fdf4;
+    border-radius: 12px;
+    border-left: 4px solid #25D366;
+  }
+
+  .btn-join {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+    width: 100%;
+  }
+
+  .btn-join:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(37,211,102,0.4);
+    color: white;
+  }
+
+  .btn-join i { font-size: 1.2rem; }
+
+  .wa-note {
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: #8a9aad;
+    text-align: center;
+  }
+
+  .wa-inactive-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1.5px solid #eef2f8;
+    animation: fade-up 0.4s ease both;
+    animation-delay: 0.15s;
+  }
+
+  .wa-inactive-card .emoji { font-size: 3rem; margin-bottom: 1rem; }
+
+  .wa-inactive-card h3 {
+    font-size: 1.2rem;
+    color: #0a1f44;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .wa-inactive-card p {
+    color: #5a6e82;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+    color: #5a6e82;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: #0a1f44; }
+
+  body.dark .wa-student-page h2    { color: #eef2ff; }
+  body.dark .wa-active-card        { background: #1a2538; border-color: #25D366; }
+  body.dark .wa-active-card .desc  { background: #0f2318; color: #b9c8e8; border-color: #25D366; }
+  body.dark .wa-inactive-card      { background: #1a2538; border-color: #2d3e54; }
+  body.dark .wa-inactive-card h3   { color: #eef2ff; }
+  body.dark .wa-inactive-card p    { color: #b9c8e8; }
+</style>
+
+<div class="wa-student-page">
+  <div class="wa-blob"><i class="fab fa-whatsapp"></i></div>
+  <h2>WhatsApp Group</h2>
+  <p class="subtitle">BCA Admissions 2026–27 · Official Student Community</p>
+
+  {% if whatsapp.is_active and whatsapp.link %}
+    <div class="wa-active-card">
+      {% if whatsapp.description %}
+        <div class="desc">{{ whatsapp.description }}</div>
+      {% endif %}
+
+      <a href="{{ whatsapp.link }}" target="_blank" class="btn-join">
+        <i class="fab fa-whatsapp"></i> Join WhatsApp Group
+      </a>
+      <p class="wa-note">
+        <i class="fas fa-shield-alt"></i>
+        This is the official group link shared by the admissions office.
+        Only use this link to join.
+      </p>
+    </div>
+
+  {% else %}
+    <div class="wa-inactive-card">
+      <div class="emoji">⏳</div>
+      <h3>Group link not available yet</h3>
+      <p>The admissions office hasn't shared the WhatsApp group link yet. Please check back soon — it will appear here once it's ready.</p>
+    </div>
+  {% endif %}
+
+  <a href="{{ url_for('main.student_dashboard') }}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+</div>
+{% endblock %}

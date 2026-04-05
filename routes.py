@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
 
 from database import db
-from models import User, FormSettings, StudentApplication, ApplicationCategory
+from models import User, FormSettings, StudentApplication, ApplicationCategory, WhatsAppSettings
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel, export_verified_excel
@@ -16,11 +16,9 @@ main = Blueprint('main', __name__)
 IST = timezone(timedelta(hours=5, minutes=30))
 
 def now_ist():
-    """Return current datetime in Indian Standard Time."""
     return datetime.now(IST)
 
 def utc_to_ist(dt):
-    """Convert a naive UTC datetime to IST datetime."""
     if dt is None:
         return None
     if dt.tzinfo is None:
@@ -123,9 +121,9 @@ def verify_otp():
                 flash('Could not send email. Please try again.', 'warning')
             return redirect(url_for('main.verify_otp'))
 
-        entered   = request.form.get('otp', '').strip()
+        entered    = request.form.get('otp', '').strip()
         stored_otp = temp_data.get('otp')
-        expiry    = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
+        expiry     = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
 
         if not entered:
             flash('Please enter the OTP.', 'danger')
@@ -237,9 +235,9 @@ def verify_reset_otp():
                 flash('Could not send OTP. Please try again.', 'warning')
             return redirect(url_for('main.verify_reset_otp'))
 
-        entered   = request.form.get('otp', '').strip()
+        entered    = request.form.get('otp', '').strip()
         stored_otp = reset_data.get('otp')
-        expiry    = datetime.fromisoformat(reset_data.get('otp_expiry'))
+        expiry     = datetime.fromisoformat(reset_data.get('otp_expiry'))
 
         if not entered:
             flash('Please enter the OTP.', 'danger')
@@ -287,9 +285,17 @@ def reset_password():
 @main.route('/dashboard')
 @login_required
 def student_dashboard():
-    appl     = StudentApplication.query.filter_by(user_id=current_user.id).first()
-    settings = FormSettings.get()
-    return render_template('student_dashboard.html', application=appl, settings=settings)
+    appl      = StudentApplication.query.filter_by(user_id=current_user.id).first()
+    settings  = FormSettings.get()
+    whatsapp  = WhatsAppSettings.get()
+    return render_template('student_dashboard.html', application=appl, settings=settings, whatsapp=whatsapp)
+
+
+@main.route('/whatsapp-group')
+@login_required
+def student_whatsapp():
+    whatsapp = WhatsAppSettings.get()
+    return render_template('student_whatsapp.html', whatsapp=whatsapp)
 
 
 @main.route('/apply', methods=['GET', 'POST'])
@@ -446,10 +452,47 @@ def admin_dashboard():
     ranked    = StudentApplication.query.filter(StudentApplication.rank.isnot(None)).count()
     reg_users = User.query.count()
     settings  = FormSettings.get()
+    whatsapp  = WhatsAppSettings.get()
     return render_template('admin_dashboard.html',
                            total=total, verified=verified,
                            pending=pending, ranked=ranked,
-                           reg_users=reg_users, settings=settings)
+                           reg_users=reg_users, settings=settings,
+                           whatsapp=whatsapp)
+
+
+# ─────────────────────────────────────────
+#  Admin — WhatsApp Group Management
+# ─────────────────────────────────────────
+@main.route('/admin/whatsapp', methods=['GET', 'POST'])
+@admin_required
+def admin_whatsapp():
+    wa = WhatsAppSettings.get()
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'delete':
+            wa.link        = None
+            wa.description = None
+            wa.is_active   = False
+            wa.updated_at  = datetime.utcnow()
+            db.session.commit()
+            flash('WhatsApp group link removed.', 'info')
+        else:
+            link = request.form.get('link', '').strip()
+            desc = request.form.get('description', '').strip()
+            if not link:
+                flash('Please enter a WhatsApp group link.', 'danger')
+                return render_template('admin_whatsapp.html', wa=wa)
+            if not link.startswith('https://chat.whatsapp.com/'):
+                flash('Please enter a valid WhatsApp group invite link (starts with https://chat.whatsapp.com/).', 'danger')
+                return render_template('admin_whatsapp.html', wa=wa)
+            wa.link        = link
+            wa.description = desc
+            wa.is_active   = True
+            wa.updated_at  = datetime.utcnow()
+            db.session.commit()
+            flash('WhatsApp group link updated successfully!', 'success')
+        return redirect(url_for('main.admin_whatsapp'))
+    return render_template('admin_whatsapp.html', wa=wa)
 
 
 # ─────────────────────────────────────────
@@ -522,21 +565,15 @@ def verify_student(app_id):
     return redirect(url_for('main.admin_verification'))
 
 
-# ─────────────────────────────────────────
-#  Admin — Verify All Students (Bulk verification)
-# ─────────────────────────────────────────
 @main.route('/admin/verify-all', methods=['POST'])
 @admin_required
 def verify_all_students():
-    # Get all pending students
     pending_students = StudentApplication.query.filter_by(is_verified=False).all()
-    
     count = 0
     for student in pending_students:
         student.is_verified = True
         student.verified_at = datetime.utcnow()
         count += 1
-    
     db.session.commit()
     flash(f'Successfully verified {count} student(s)!', 'success')
     return redirect(url_for('main.admin_verification'))
@@ -562,26 +599,17 @@ def admin_verified():
     return render_template('admin_verified.html', students=students)
 
 
-# ─────────────────────────────────────────
-#  Admin — Rank Management
-#  Shows unsorted when no ranks exist, sorted by rank after ranks are saved
-# ─────────────────────────────────────────
 @main.route('/admin/rank')
 @admin_required
 def admin_rank():
-    # Check if any verified student has a rank assigned
     has_ranks = StudentApplication.query.filter_by(is_verified=True)\
                  .filter(StudentApplication.rank.isnot(None)).first()
-    
     if has_ranks:
-        # If ranks exist, show sorted by rank
         students = StudentApplication.query.filter_by(is_verified=True)\
                      .order_by(StudentApplication.rank.asc()).all()
     else:
-        # If no ranks exist, show unsorted (by submission order)
         students = StudentApplication.query.filter_by(is_verified=True)\
                      .order_by(StudentApplication.submitted_at).all()
-    
     return render_template('admin_rank.html', students=students)
 
 
@@ -668,8 +696,8 @@ def admin_category_edit(cat_id):
 @main.route('/admin/categories/delete/<int:cat_id>', methods=['POST'])
 @admin_required
 def admin_category_delete(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
-    name     = category.name
+    category  = ApplicationCategory.query.get_or_404(cat_id)
+    name      = category.name
     apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
     if apps_count > 0:
         flash(f'Cannot delete "{name}" - {apps_count} student(s) are using this category.', 'danger')

@@ -1,6 +1,50 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard — BCA Admissions{% endblock %}
 {% block content %}
+<style>
+  .dash-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.4rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.25s;
+    box-shadow: 0 3px 10px rgba(37,211,102,0.25);
+    position: relative;
+  }
+
+  .btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(37,211,102,0.35);
+    color: white;
+  }
+
+  .wa-live-dot {
+    width: 7px;
+    height: 7px;
+    background: white;
+    border-radius: 50%;
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+</style>
+
 <div class="page-wrap">
   <div class="page-header-inner">
     <h2>Welcome, {{ current_user.full_name }}</h2>
@@ -34,8 +78,17 @@
     <a href="{{ url_for('main.apply') }}" class="btn btn-primary">Start Application &rarr;</a>
   {% endif %}
 
-  {# Change Password button #}
-  <div style="margin-top: 1.5rem;">
+  <div class="dash-actions">
+    {# WhatsApp Group button #}
+    <a href="{{ url_for('main.student_whatsapp') }}" class="btn-whatsapp">
+      <i class="fab fa-whatsapp"></i>
+      WhatsApp Group
+      {% if whatsapp.is_active and whatsapp.link %}
+        <span class="wa-live-dot"></span>
+      {% endif %}
+    </a>
+
+    {# Change Password button #}
     <a href="{{ url_for('main.student_change_password') }}" class="btn btn-outline-secondary">
       🔒 Change Password
     </a>

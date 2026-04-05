@@ -34,6 +34,24 @@ class FormSettings(db.Model):
         return s
 
 
+class WhatsAppSettings(db.Model):
+    __tablename__ = 'whatsapp_settings'
+    id          = db.Column(db.Integer, primary_key=True)
+    link        = db.Column(db.String(500), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    is_active   = db.Column(db.Boolean, default=True)
+    updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get():
+        s = WhatsAppSettings.query.first()
+        if not s:
+            s = WhatsAppSettings(link=None, description=None, is_active=False)
+            db.session.add(s)
+            db.session.commit()
+        return s
+
+
 # NEW MODEL: Application Categories (Admin manages these)
 class ApplicationCategory(db.Model):
     __tablename__ = 'application_category'
@@ -83,12 +101,11 @@ class StudentApplication(db.Model):
     percent_12      = db.Column(db.Float)
     marksheet_12    = db.Column(db.String(200))
 
-    # Programme (UPDATED: removed why_bca, added specialization and category)
-    # why_bca         = db.Column(db.Text)  # REMOVED - no longer needed
-    specialization      = db.Column(db.String(100))  # AI/ML, Data Science, Full Stack, Other
-    specialization_other = db.Column(db.String(200))  # If Other selected
-    category_id         = db.Column(db.Integer, db.ForeignKey('application_category.id'))
-    category            = db.relationship('ApplicationCategory', backref='applications')
+    # Programme
+    specialization       = db.Column(db.String(100))
+    specialization_other = db.Column(db.String(200))
+    category_id          = db.Column(db.Integer, db.ForeignKey('application_category.id'))
+    category             = db.relationship('ApplicationCategory', backref='applications')
 
     # Admin fields
     is_verified     = db.Column(db.Boolean, default=False)
@@ -110,12 +127,10 @@ class StudentApplication(db.Model):
     
     @property
     def specialization_display(self):
-        """Return the specialization with 'Other' text if applicable"""
         if self.specialization == 'Other' and self.specialization_other:
             return self.specialization_other
         return self.specialization
     
     @property
     def category_name(self):
-        """Return category name"""
         return self.category.name if self.category else None

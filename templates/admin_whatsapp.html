@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% block title %}WhatsApp Group — Admin{% endblock %}
+{% block content %}
+<style>
+  .wa-page { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; }
+
+  .wa-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .wa-header-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .wa-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #0a1f44;
+    margin: 0 0 0.2rem 0;
+  }
+
+  .wa-header p { color: #5a6e82; margin: 0; font-size: 0.9rem; }
+
+  .wa-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1px solid #eef2f8;
+    margin-bottom: 1.5rem;
+  }
+
+  .wa-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0a1f44;
+    margin: 0 0 1.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .current-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem;
+    border-radius: 14px;
+    background: #f8fffe;
+    border: 1.5px solid #25D366;
+    margin-bottom: 1.5rem;
+  }
+
+  .current-status.no-link {
+    background: #fafafa;
+    border-color: #e2e8f0;
+  }
+
+  .status-icon-wa {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .current-status h4 { margin: 0 0 0.3rem 0; font-size: 0.95rem; color: #0a1f44; }
+  .current-status p  { margin: 0; font-size: 0.85rem; color: #5a6e82; word-break: break-all; }
+
+  .wa-link-preview {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #25D366;
+    font-size: 0.85rem;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .wa-link-preview:hover { text-decoration: underline; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4a627a;
+  }
+
+  .field input, .field textarea {
+    padding: 0.85rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    background: #fff;
+    resize: vertical;
+  }
+
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: #25D366;
+    box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
+  }
+
+  .field .hint {
+    font-size: 0.78rem;
+    color: #8a9aad;
+  }
+
+  .btn-wa {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    border: none;
+    padding: 0.85rem 1.8rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-wa:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37,211,102,0.3); }
+
+  .btn-delete {
+    background: white;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    padding: 0.75rem 1.4rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-delete:hover { background: #dc3545; color: white; }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #5a6e82;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+  }
+  .btn-back:hover { color: #0a1f44; }
+
+  .action-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .tip-box {
+    background: #fffbea;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-top: 1rem;
+  }
+
+  body.dark .wa-card          { background: #1a2538; border-color: #2d3e54; }
+  body.dark .wa-card h3       { color: #eef2ff; }
+  body.dark .wa-header h2     { color: #eef2ff; }
+  body.dark .current-status   { background: #0f1e2d; border-color: #25D366; }
+  body.dark .current-status.no-link { background: #16202c; border-color: #2d3e54; }
+  body.dark .current-status h4 { color: #eef2ff; }
+  body.dark .field input, body.dark .field textarea {
+    background: #0f1a24; border-color: #2d3e54; color: #eef2ff;
+  }
+  body.dark .field input:focus, body.dark .field textarea:focus {
+    border-color: #25D366;
+  }
+  body.dark .btn-delete { background: #1a2538; }
+</style>
+
+<div class="wa-page">
+  <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <div class="wa-header">
+    <div class="wa-header-icon"><i class="fab fa-whatsapp"></i></div>
+    <div>
+      <h2>WhatsApp Group Link</h2>
+      <p>Set the invite link students will see on their dashboard</p>
+    </div>
+  </div>
+
+  {# Current status #}
+  <div class="current-status {% if not wa.link %}no-link{% endif %}">
+    <div class="status-icon-wa">
+      {% if wa.link and wa.is_active %}🟢{% else %}⚪{% endif %}
+    </div>
+    <div>
+      {% if wa.link and wa.is_active %}
+        <h4>Group link is active</h4>
+        <p>{{ wa.description or 'No description set.' }}</p>
+        <a href="{{ wa.link }}" target="_blank" class="wa-link-preview">
+          <i class="fas fa-external-link-alt"></i> {{ wa.link }}
+        </a>
+        {% if wa.updated_at %}
+          <p style="margin-top:0.4rem; font-size:0.78rem; color:#8a9aad;">
+            Last updated: {{ wa.updated_at.strftime('%d %b %Y, %I:%M %p') }}
+          </p>
+        {% endif %}
+      {% else %}
+        <h4>No group link set</h4>
+        <p>Students will see a "coming soon" message until you add a link.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Edit / Set form #}
+  <div class="wa-card">
+    <h3><i class="fas fa-edit" style="color:#25D366"></i> {{ 'Update' if wa.link else 'Set' }} Group Link</h3>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+      <input type="hidden" name="action" value="save"/>
+
+      <div class="field">
+        <label>WhatsApp Invite Link <span style="color:#dc3545">*</span></label>
+        <input type="url" name="link" value="{{ wa.link or '' }}"
+               placeholder="https://chat.whatsapp.com/XXXXXXXXXXXXXX" required>
+        <span class="hint">Copy the invite link from WhatsApp → Group Info → Invite via Link</span>
+      </div>
+
+      <div class="field">
+        <label>Description (shown to students)</label>
+        <textarea name="description" rows="3"
+                  placeholder="e.g. Join our official BCA 2026–27 student WhatsApp group for updates, announcements and peer support.">{{ wa.description or '' }}</textarea>
+      </div>
+
+      <div class="tip-box">
+        <i class="fas fa-lightbulb"></i>
+        <strong>Tip:</strong> In WhatsApp, open the group → tap the group name → <em>Invite via Link</em> → Copy Link.
+        The link looks like <code>https://chat.whatsapp.com/AbCdEfGhIjKlM</code>
+      </div>
+
+      <div class="action-row">
+        <button type="submit" class="btn-wa">
+          <i class="fab fa-whatsapp"></i>
+          {{ 'Update Link' if wa.link else 'Save Link' }}
+        </button>
+
+        {% if wa.link %}
+        <form method="POST" style="margin:0" onsubmit="return confirm('Remove the WhatsApp group link? Students will no longer see it.')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+          <input type="hidden" name="action" value="delete"/>
+          <button type="submit" class="btn-delete">
+            <i class="fas fa-trash-alt"></i> Remove Link
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
