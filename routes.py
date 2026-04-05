@@ -673,8 +673,7 @@ def admin_category_toggle(cat_id):
 @admin_required
 def export_all():
     apps = StudentApplication.query.order_by(StudentApplication.submitted_at).all()
-    return export_excel(apps, 'all_applications.xlsx', mode='all')
-
+    return export_excel(apps, 'all_applications.xlsx')
 
 @main.route('/admin/export/verified')
 @admin_required
