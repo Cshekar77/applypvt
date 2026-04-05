@@ -31,6 +31,27 @@
     background: #f8f9fa;
   }
   
+  .rank-badge {
+    background: #c9a03d;
+    color: #0a1f44;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-block;
+    text-align: center;
+    min-width: 40px;
+  }
+  
+  .rank-badge-empty {
+    background: #eef2f8;
+    color: #8a92a0;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    display: inline-block;
+  }
+  
   .specialization-badge {
     background: #eef2ff;
     color: #0a1f44;
@@ -210,6 +231,16 @@
     background: #2d3e54;
   }
   
+  body.dark .rank-badge {
+    background: #c9a03d;
+    color: #0a1f44;
+  }
+  
+  body.dark .rank-badge-empty {
+    background: #2d3e54;
+    color: #b9c8e8;
+  }
+  
   body.dark .specialization-badge {
     background: #2d3e54;
     color: #eef2ff;
@@ -234,13 +265,18 @@
 <div class="page-wrap">
   <div class="page-header-inner">
     <h2><i class="fas fa-chart-line"></i> Rank Management</h2>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm">
       <i class="fas fa-arrow-left"></i> Dashboard
     </a>
   </div>
   
   <p class="text-muted">
-    <i class="fas fa-info-circle"></i> Assign ranks manually, or use the HOD button to auto-generate ranks based on Grade 12 percentage.
+    <i class="fas fa-info-circle"></i> 
+    {% if students and students[0].rank %}
+      Currently sorted by rank. Use HOD button to reorder by 12th percentage.
+    {% else %}
+      Click HOD button to auto-generate ranks based on Grade 12 percentage.
+    {% endif %}
   </p>
   
   <form method="POST" action="{{ url_for('main.save_ranks') }}">
@@ -249,7 +285,7 @@
       <table class="admin-table" id="rank-table">
         <thead>
           <tr>
-            <th>#</th>
+            <th>Current Rank</th>
             <th>Name</th>
             <th>Email</th>
             <th>12%</th>
@@ -257,13 +293,19 @@
             <th>Stream</th>
             <th>Specialization</th>
             <th>Category</th>
-            <th>Assign Rank</th>
+            <th>Assign New Rank</th>
           </tr>
         </thead>
         <tbody>
           {% for s in students %}
           <tr data-percent12="{{ s.percent_12 or 0 }}" data-id="{{ s.id }}">
-            <td>{{ loop.index }}</td>
+            <td>
+              {% if s.rank %}
+                <span class="rank-badge">#{{ s.rank }}</span>
+              {% else %}
+                <span class="rank-badge-empty">Not ranked</span>
+              {% endif %}
+            </td>
             <td><strong>{{ s.full_name }}</strong></td>
             <td>{{ s.email }}</td>
             <td class="percent-highlight">{{ "%.2f"|format(s.percent_12) if s.percent_12 else '—' }}%</td>
@@ -348,13 +390,7 @@
     // Clear tbody and append sorted rows
     tbody.innerHTML = '';
     rows.forEach((row, index) => {
-      // Update the # column
-      const firstCell = row.querySelector('td:first-child');
-      if (firstCell) {
-        firstCell.textContent = index + 1;
-      }
-      
-      // Update the rank input value
+      // Update the rank input value (Assign New Rank column)
       const rankInput = row.querySelector('input[name^="rank_"]');
       if (rankInput) {
         rankInput.value = index + 1;
@@ -363,7 +399,7 @@
       tbody.appendChild(row);
     });
 
-    alert('Ranks auto-generated and table sorted! Click "Save Ranks" to save them.');
+    alert('Ranks auto-generated! Click "Save Ranks" to save them.');
   }
 </script>
 {% endblock %}

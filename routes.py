@@ -537,20 +537,31 @@ def unverify_student(app_id):
 @admin_required
 def admin_verified():
     students = StudentApplication.query.filter_by(is_verified=True)\
-                 .order_by(StudentApplication.rank.nullslast(),
+                 .order_by(StudentApplication.rank.asc().nullslast(),
                            StudentApplication.verified_at).all()
     return render_template('admin_verified.html', students=students)
 
 
 # ─────────────────────────────────────────
-#  Admin — Rank Management (FIXED: shows in submission order, not sorted by %)
+#  Admin — Rank Management
+#  Shows unsorted when no ranks exist, sorted by rank after ranks are saved
 # ─────────────────────────────────────────
 @main.route('/admin/rank')
 @admin_required
 def admin_rank():
-    # Display verified students in submission order (not sorted by percentage)
-    students = StudentApplication.query.filter_by(is_verified=True)\
-                 .order_by(StudentApplication.submitted_at).all()
+    # Check if any verified student has a rank assigned
+    has_ranks = StudentApplication.query.filter_by(is_verified=True)\
+                 .filter(StudentApplication.rank.isnot(None)).first()
+    
+    if has_ranks:
+        # If ranks exist, show sorted by rank
+        students = StudentApplication.query.filter_by(is_verified=True)\
+                     .order_by(StudentApplication.rank.asc()).all()
+    else:
+        # If no ranks exist, show unsorted (by submission order)
+        students = StudentApplication.query.filter_by(is_verified=True)\
+                     .order_by(StudentApplication.submitted_at).all()
+    
     return render_template('admin_rank.html', students=students)
 
 
@@ -673,5 +684,5 @@ def export_all():
 @admin_required
 def export_verified():
     apps = StudentApplication.query.filter_by(is_verified=True)\
-             .order_by(StudentApplication.rank.nullslast()).all()
+             .order_by(StudentApplication.rank.asc().nullslast()).all()
     return export_verified_excel(apps, 'verified_students.xlsx')
