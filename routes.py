@@ -1,16 +1,31 @@
 from flask import (Blueprint, render_template, redirect, url_for,
-                   flash, request, session, current_app, abort)
+                   flash, request, session, current_app, abort, send_file)
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from database import db
 from models import User, FormSettings, StudentApplication, ApplicationCategory
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
-from utils.exports import export_excel
+from utils.exports import export_excel, export_verified_excel
 
 main = Blueprint('main', __name__)
+
+# IST timezone helper
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def now_ist():
+    """Return current datetime in Indian Standard Time."""
+    return datetime.now(IST)
+
+def utc_to_ist(dt):
+    """Convert a naive UTC datetime to IST datetime."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(IST)
 
 
 # ─────────────────────────────────────────
@@ -37,7 +52,7 @@ def index():
 
 
 # ─────────────────────────────────────────
-#  Registration + OTP (Account created ONLY after OTP verification)
+#  Registration + OTP
 # ─────────────────────────────────────────
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -59,14 +74,9 @@ def register():
         elif User.query.filter_by(email=email).first():
             flash('An account with that email already exists.', 'danger')
         else:
-            # Generate OTP but DON'T create account yet
             otp = generate_otp()
-
-            # Send OTP first
             ok, err = send_otp_email(email, name, otp)
-
             if ok:
-                # Store registration data in session temporarily
                 session['temp_registration'] = {
                     'name': name,
                     'email': email,
@@ -85,7 +95,6 @@ def register():
 
 @main.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
-    # Get temp registration data from session
     temp_data = session.get('temp_registration')
     if not temp_data:
         flash('No pending registration found. Please register again.', 'warning')
@@ -93,7 +102,6 @@ def verify_otp():
 
     email = temp_data['email']
 
-    # Check if user already exists (shouldn't happen with this flow)
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         session.pop('temp_registration', None)
@@ -104,23 +112,20 @@ def verify_otp():
         action = request.form.get('action')
 
         if action == 'resend':
-            # Generate new OTP
             new_otp = generate_otp()
             ok, err = send_otp_email(email, temp_data['name'], new_otp)
-
             if ok:
-                # Update session with new OTP
                 temp_data['otp'] = new_otp
                 temp_data['otp_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
                 session['temp_registration'] = temp_data
                 flash('A new OTP has been sent to your email.', 'success')
             else:
-                flash(f'Could not send email. Please try again.', 'warning')
+                flash('Could not send email. Please try again.', 'warning')
             return redirect(url_for('main.verify_otp'))
 
-        entered = request.form.get('otp', '').strip()
+        entered   = request.form.get('otp', '').strip()
         stored_otp = temp_data.get('otp')
-        expiry = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
+        expiry    = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
 
         if not entered:
             flash('Please enter the OTP.', 'danger')
@@ -129,7 +134,6 @@ def verify_otp():
         elif entered != stored_otp:
             flash('Incorrect OTP. Please try again.', 'danger')
         else:
-            # OTP verified - NOW create the account
             user = User(
                 full_name      = temp_data['name'],
                 email          = email,
@@ -140,8 +144,6 @@ def verify_otp():
             )
             db.session.add(user)
             db.session.commit()
-
-            # Clear temp data
             session.pop('temp_registration', None)
             flash('Email verified successfully! You can now log in.', 'success')
             return redirect(url_for('main.login'))
@@ -190,8 +192,7 @@ def logout():
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
-        user = User.query.filter_by(email=email).first()
-
+        user  = User.query.filter_by(email=email).first()
         if not user:
             flash('No account found with that email.', 'danger')
         else:
@@ -236,9 +237,9 @@ def verify_reset_otp():
                 flash('Could not send OTP. Please try again.', 'warning')
             return redirect(url_for('main.verify_reset_otp'))
 
-        entered = request.form.get('otp', '').strip()
+        entered   = request.form.get('otp', '').strip()
         stored_otp = reset_data.get('otp')
-        expiry = datetime.fromisoformat(reset_data.get('otp_expiry'))
+        expiry    = datetime.fromisoformat(reset_data.get('otp_expiry'))
 
         if not entered:
             flash('Please enter the OTP.', 'danger')
@@ -286,7 +287,7 @@ def reset_password():
 @main.route('/dashboard')
 @login_required
 def student_dashboard():
-    appl = StudentApplication.query.filter_by(user_id=current_user.id).first()
+    appl     = StudentApplication.query.filter_by(user_id=current_user.id).first()
     settings = FormSettings.get()
     return render_template('student_dashboard.html', application=appl, settings=settings)
 
@@ -298,37 +299,32 @@ def apply():
         flash('You have already submitted your application.', 'info')
         return redirect(url_for('main.my_application'))
 
-    settings = FormSettings.get()
-    now      = datetime.utcnow()
+    settings  = FormSettings.get()
+    now       = datetime.utcnow()
     form_open = settings.is_open
     if settings.open_from  and now < settings.open_from:  form_open = False
     if settings.open_until and now > settings.open_until: form_open = False
     if not form_open:
         return render_template('form_closed.html', settings=settings)
 
-    form = ApplicationForm()
-
-    # Get categories for dropdown
+    form       = ApplicationForm()
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
 
     if form.validate_on_submit():
-        p10  = calc_percent(form.total_10.data, form.obtained_10.data)
-        p12  = calc_percent(form.total_12.data, form.obtained_12.data)
+        p10 = calc_percent(form.total_10.data, form.obtained_10.data)
+        p12 = calc_percent(form.total_12.data, form.obtained_12.data)
 
-        # Handle specialization
-        specialization = form.specialization.data
+        specialization       = form.specialization.data
         specialization_other = None
         if specialization == 'Other':
             specialization_other = form.specialization_other.data
-            specialization = 'Other'
+            specialization       = 'Other'
 
-        # Get category ID from form
         category_id = request.form.get('category_id')
         if not category_id:
             flash('Please select a category.', 'danger')
             return render_template('application_form.html', form=form, categories=categories)
 
-        # PDF uploads disabled
         ms10 = None
         ms12 = None
 
@@ -381,6 +377,40 @@ def my_application():
 
 
 # ─────────────────────────────────────────
+#  Student — Change Password
+#  URL: /change-password
+# ─────────────────────────────────────────
+@main.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def student_change_password():
+    if request.method == 'POST':
+        old_password     = request.form.get('old_password', '').strip()
+        new_password     = request.form.get('new_password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+
+        if not check_password_hash(current_user.password_hash, old_password):
+            flash('Current password is incorrect.', 'danger')
+        elif len(new_password) < 8:
+            flash('New password must be at least 8 characters.', 'warning')
+        elif new_password != confirm_password:
+            flash('New passwords do not match.', 'danger')
+        elif check_password_hash(current_user.password_hash, new_password):
+            flash('New password cannot be the same as the current password.', 'warning')
+        else:
+            current_user.password_hash = generate_password_hash(new_password)
+            db.session.commit()
+            flash('Password updated successfully!', 'success')
+            return redirect(url_for('main.student_dashboard'))
+
+    return render_template(
+        'change_password.html',
+        role='student',
+        username=current_user.full_name,
+        back_url=url_for('main.student_dashboard')
+    )
+
+
+# ─────────────────────────────────────────
 #  Admin
 # ─────────────────────────────────────────
 @main.route('/admin/login', methods=['GET', 'POST'])
@@ -393,6 +423,9 @@ def admin_login():
         if (u == current_app.config['ADMIN_USERNAME'] and
                 p == current_app.config['ADMIN_PASSWORD']):
             session['admin_logged_in'] = True
+            # Store admin credentials in session for change password
+            session['admin_username'] = u
+            session['admin_password_hash'] = generate_password_hash(p)
             return redirect(url_for('main.admin_dashboard'))
         flash('Invalid admin credentials.', 'danger')
     return render_template('admin_login.html')
@@ -401,22 +434,66 @@ def admin_login():
 @main.route('/admin/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
+    session.pop('admin_username', None)
+    session.pop('admin_password_hash', None)
     return redirect(url_for('main.admin_login'))
 
 
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
-    total    = StudentApplication.query.count()
-    verified = StudentApplication.query.filter_by(is_verified=True).count()
-    pending  = total - verified
-    ranked   = StudentApplication.query.filter(StudentApplication.rank.isnot(None)).count()
+    total     = StudentApplication.query.count()
+    verified  = StudentApplication.query.filter_by(is_verified=True).count()
+    pending   = total - verified
+    ranked    = StudentApplication.query.filter(StudentApplication.rank.isnot(None)).count()
     reg_users = User.query.count()
-    settings = FormSettings.get()
+    settings  = FormSettings.get()
     return render_template('admin_dashboard.html',
                            total=total, verified=verified,
                            pending=pending, ranked=ranked,
                            reg_users=reg_users, settings=settings)
+
+
+# ─────────────────────────────────────────
+#  Admin — Change Password
+#  URL: /admin/change-password
+#
+#  NOTE: Since admin credentials come from
+#  config (not DB), this updates app.config
+#  + session for the current server session.
+#  For permanent change, update your .env /
+#  config file manually too.
+# ─────────────────────────────────────────
+@main.route('/admin/change-password', methods=['GET', 'POST'])
+@admin_required
+def admin_change_password():
+    if request.method == 'POST':
+        old_password     = request.form.get('old_password', '').strip()
+        new_password     = request.form.get('new_password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+
+        current_pw = current_app.config.get('ADMIN_PASSWORD', '')
+
+        if old_password != current_pw:
+            flash('Current password is incorrect.', 'danger')
+        elif len(new_password) < 8:
+            flash('New password must be at least 8 characters.', 'warning')
+        elif new_password != confirm_password:
+            flash('New passwords do not match.', 'danger')
+        elif new_password == current_pw:
+            flash('New password cannot be the same as the current password.', 'warning')
+        else:
+            # Update in-memory config for this session
+            current_app.config['ADMIN_PASSWORD'] = new_password
+            flash('Password updated successfully! Remember to update your config/.env file too.', 'success')
+            return redirect(url_for('main.admin_dashboard'))
+
+    return render_template(
+        'change_password.html',
+        role='admin',
+        username=current_app.config.get('ADMIN_USERNAME', 'Admin'),
+        back_url=url_for('main.admin_dashboard')
+    )
 
 
 @main.route('/admin/students')
@@ -534,12 +611,10 @@ def admin_category_add():
     if not name:
         flash('Category name is required.', 'danger')
         return redirect(url_for('main.admin_categories'))
-
     existing = ApplicationCategory.query.filter_by(name=name).first()
     if existing:
         flash(f'Category "{name}" already exists.', 'danger')
         return redirect(url_for('main.admin_categories'))
-
     category = ApplicationCategory(name=name, is_active=True)
     db.session.add(category)
     db.session.commit()
@@ -552,16 +627,13 @@ def admin_category_add():
 def admin_category_edit(cat_id):
     category = ApplicationCategory.query.get_or_404(cat_id)
     new_name = request.form.get('category_name', '').strip()
-
     if not new_name:
         flash('Category name is required.', 'danger')
         return redirect(url_for('main.admin_categories'))
-
     existing = ApplicationCategory.query.filter_by(name=new_name).first()
     if existing and existing.id != cat_id:
         flash(f'Category "{new_name}" already exists.', 'danger')
         return redirect(url_for('main.admin_categories'))
-
     category.name = new_name
     db.session.commit()
     flash(f'Category updated to "{new_name}"!', 'success')
@@ -572,8 +644,7 @@ def admin_category_edit(cat_id):
 @admin_required
 def admin_category_delete(cat_id):
     category = ApplicationCategory.query.get_or_404(cat_id)
-    name = category.name
-
+    name     = category.name
     apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
     if apps_count > 0:
         flash(f'Cannot delete "{name}" - {apps_count} student(s) are using this category.', 'danger')
@@ -581,7 +652,6 @@ def admin_category_delete(cat_id):
         db.session.delete(category)
         db.session.commit()
         flash(f'Category "{name}" deleted successfully!', 'success')
-
     return redirect(url_for('main.admin_categories'))
 
 
@@ -596,11 +666,14 @@ def admin_category_toggle(cat_id):
     return redirect(url_for('main.admin_categories'))
 
 
+# ─────────────────────────────────────────
+#  Exports
+# ─────────────────────────────────────────
 @main.route('/admin/export/all')
 @admin_required
 def export_all():
     apps = StudentApplication.query.order_by(StudentApplication.submitted_at).all()
-    return export_excel(apps, 'all_applications.xlsx')
+    return export_excel(apps, 'all_applications.xlsx', mode='all')
 
 
 @main.route('/admin/export/verified')
@@ -608,4 +681,4 @@ def export_all():
 def export_verified():
     apps = StudentApplication.query.filter_by(is_verified=True)\
              .order_by(StudentApplication.rank.nullslast()).all()
-    return export_excel(apps, 'verified_students.xlsx')
+    return export_verified_excel(apps, 'verified_students.xlsx')
