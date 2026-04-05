@@ -1,8 +1,11 @@
 import os
 from flask import Flask
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from database import init_db, db
 from models import User
+
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
@@ -23,6 +26,9 @@ def create_app():
 
     # Initialize database
     init_db(app)
+
+    # Initialize CSRF protection
+    csrf.init_app(app)
 
     # Initialize Login Manager
     login_manager = LoginManager(app)
