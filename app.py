@@ -17,6 +17,9 @@ def create_app():
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
     app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 
+    # Disable default CSRF check (we add tokens manually in templates)
+    app.config['WTF_CSRF_CHECK_DEFAULT'] = False
+
     # Admin credentials
     app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME', 'admin')
     app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'admin@bca2026')
