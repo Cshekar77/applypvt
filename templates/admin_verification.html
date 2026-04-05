@@ -31,6 +31,7 @@
     </div>
     {% if s.why_bca %}<p class="sop-text" style="margin-top:.75rem"><em>{{ s.why_bca }}</em></p>{% endif %}
     <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}" style="margin-top:1rem">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
       <div class="field">
         <label>Admin notes (optional)</label>
         <input type="text" name="notes" placeholder="Any notes about this applicant...">

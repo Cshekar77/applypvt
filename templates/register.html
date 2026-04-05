@@ -6,6 +6,7 @@
     <h2 class="auth-title">Create Account</h2>
     <p class="auth-sub">Register to begin your BCA application. An OTP will be sent to your email.</p>
     <form method="POST" class="auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
       <div class="field">
         <label>Full name <span class="req">*</span></label>
         <input type="text" name="full_name" required placeholder="e.g. Priya Sharma">

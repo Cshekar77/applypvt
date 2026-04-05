@@ -1,205 +1,29 @@
 {% extends 'base.html' %}
 {% block title %}Home — BCA Admissions 2026–2027{% endblock %}
 {% block content %}
-<style>
-  .hero {
-    background: linear-gradient(135deg, #0a1f44 0%, #0e2a5a 100%);
-    border-radius: 24px;
-    padding: 3rem 2rem;
-    margin-bottom: 2rem;
-    color: white;
-    text-align: center;
-  }
-  
-  .hero-badge {
-    display: inline-block;
-    background: rgba(201, 160, 61, 0.2);
-    color: #c9a03d;
-    padding: 0.5rem 1rem;
-    border-radius: 40px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-  }
-  
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-  
-  .hero-sub {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    line-height: 1.6;
-  }
-  
-  .hero-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .btn {
-    display: inline-block;
-    padding: 0.8rem 1.8rem;
-    border-radius: 40px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    font-size: 1rem;
-  }
-  
-  .btn-primary {
-    background: #c9a03d;
-    color: #0a1f44;
-  }
-  
-  .btn-primary:hover {
-    background: #b58c2e;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .btn-outline {
-    background: transparent;
-    color: white;
-    border: 2px solid #c9a03d;
-  }
-  
-  .btn-outline:hover {
-    background: #c9a03d;
-    color: #0a1f44;
-    transform: translateY(-2px);
-  }
-  
-  .btn-secondary {
-    background: #2c3e66;
-    color: white;
-  }
-  
-  .btn-secondary:hover {
-    background: #1e2a4a;
-    transform: translateY(-2px);
-  }
-  
-  .info-section {
-    margin-top: 2rem;
-  }
-  
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .info-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease;
-    border: 1px solid #eef2f8;
-  }
-  
-  .info-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  }
-  
-  .info-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .info-card h3 {
-    font-family: 'Playfair Display', serif;
-    color: #0a1f44;
-    margin-bottom: 0.8rem;
-    font-size: 1.3rem;
-  }
-  
-  .info-card p {
-    color: #5a6e82;
-    line-height: 1.6;
-    font-size: 0.95rem;
-  }
-  
-  @media (max-width: 768px) {
-    .hero {
-      padding: 2rem 1.5rem;
-    }
-    
-    .hero-title {
-      font-size: 1.8rem;
-    }
-    
-    .hero-sub {
-      font-size: 1rem;
-    }
-    
-    .btn {
-      padding: 0.7rem 1.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .info-card {
-      padding: 1.5rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .hero-actions {
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-    
-    .btn {
-      width: 100%;
-      text-align: center;
-    }
-  }
-  
-  /* Dark theme support */
-  body.dark .info-card {
-    background: #1a2538;
-    border-color: #2d3e54;
-  }
-  
-  body.dark .info-card h3 {
-    color: #eef2ff;
-  }
-  
-  body.dark .info-card p {
-    color: #b9c8e8;
-  }
-</style>
 
+<!-- ── HERO ── -->
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-badge">
-      <i class="fas fa-calendar-alt"></i> Admissions 2026–2027
+      <span>&#127775;</span> Admissions Open — 2026–2027
     </div>
-    <h1 class="hero-title">Bachelor of Computer<br>Applications</h1>
-    <p class="hero-sub">Apply online for BCA admission. Fill in your personal and academic details, upload your marksheets, and submit — all in one place.</p>
+    <h1 class="hero-title">
+      Bachelor of<br><em>Computer Applications</em>
+    </h1>
+    <p class="hero-sub">
+      Apply online in minutes. Submit your academic details, upload marksheets, and track your application status — all from one place.
+    </p>
     <div class="hero-actions">
       {% if current_user.is_authenticated %}
-        <a href="{{ url_for('main.apply') }}" class="btn btn-primary">
+        <a href="{{ url_for('main.apply') }}" class="btn btn-gold">
           <i class="fas fa-paper-plane"></i> Apply Now
         </a>
         <a href="{{ url_for('main.student_dashboard') }}" class="btn btn-outline">
           <i class="fas fa-tachometer-alt"></i> My Dashboard
         </a>
       {% else %}
-        <a href="{{ url_for('main.register') }}" class="btn btn-primary">
+        <a href="{{ url_for('main.register') }}" class="btn btn-gold">
           <i class="fas fa-user-plus"></i> Create Account
         </a>
         <a href="{{ url_for('main.login') }}" class="btn btn-outline">
@@ -210,29 +34,209 @@
   </div>
 </div>
 
-<div class="info-section">
-  <div class="info-grid">
-    <div class="info-card">
-      <div class="info-icon">
-        <i class="fas fa-file-alt" style="color: #c9a03d;"></i>
-      </div>
-      <h3>Online Application</h3>
-      <p>Fill in the application form and upload your Grade 10 and Grade 12 marksheets as PDFs.</p>
+<!-- ── STATS STRIP ── -->
+<div class="stats-strip">
+  <div class="strip-inner">
+    <div class="strip-item">
+      <span class="strip-num">3 Years</span>
+      <span class="strip-lbl">Full-time Programme</span>
     </div>
-    <div class="info-card">
-      <div class="info-icon">
-        <i class="fas fa-check-circle" style="color: #c9a03d;"></i>
-      </div>
-      <h3>Verification</h3>
-      <p>Our admissions team will review and verify your documents after submission.</p>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
+      <span class="strip-num">100%</span>
+      <span class="strip-lbl">Online Application</span>
     </div>
-    <div class="info-card">
-      <div class="info-icon">
-        <i class="fas fa-chart-line" style="color: #c9a03d;"></i>
-      </div>
-      <h3>Merit Ranking</h3>
-      <p>Shortlisted candidates will be ranked based on Grade 12 percentage and other criteria.</p>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
+      <span class="strip-num">Merit</span>
+      <span class="strip-lbl">Based Admission</span>
+    </div>
+    <div class="strip-divider"></div>
+    <div class="strip-item">
+      <span class="strip-num">2026</span>
+      <span class="strip-lbl">Batch Starting</span>
     </div>
   </div>
 </div>
+
+<!-- ── HOW IT WORKS ── -->
+<div class="info-section">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">Three simple steps to apply</h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+      <h3>Register</h3>
+      <p>Create your account with your email address and verify it with an OTP.</p>
+    </div>
+    <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+      <h3>Fill Application</h3>
+      <p>Enter your personal details, academic marks, and select your preferred specialization.</p>
+    </div>
+    <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-icon"><i class="fas fa-chart-line"></i></div>
+      <h3>Track Status</h3>
+      <p>Monitor verification status and merit rank from your personal dashboard.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── INFO CARDS ── -->
+<div class="info-section" style="margin-top:1rem">
+  <div class="section-label">Why Apply Here</div>
+  <h2 class="section-title">Everything in one place</h2>
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">&#128187;</div>
+      <h3>Online Application</h3>
+      <p>Fill in the application form and submit your Grade 10 and Grade 12 academic details digitally — no paperwork needed.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">&#9989;</div>
+      <h3>Fast Verification</h3>
+      <p>Our admissions team reviews and verifies your documents promptly. You'll be notified once your application is processed.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">&#127942;</div>
+      <h3>Merit Ranking</h3>
+      <p>Shortlisted candidates are ranked based on Grade 12 percentage. View your rank directly from your dashboard.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── CTA BANNER ── -->
+{% if not current_user.is_authenticated %}
+<div class="cta-banner">
+  <div class="cta-inner">
+    <h2>Ready to apply?</h2>
+    <p>Create your account today and start your BCA journey.</p>
+    <a href="{{ url_for('main.register') }}" class="btn btn-gold">
+      <i class="fas fa-arrow-right"></i> Get Started
+    </a>
+  </div>
+</div>
+{% endif %}
+
+<style>
+/* ── Stats Strip ── */
+.stats-strip {
+  background: var(--navy);
+  border-top: 1px solid rgba(201,168,76,.15);
+  border-bottom: 1px solid rgba(201,168,76,.15);
+  padding: 1.4rem 1.75rem;
+  margin-bottom: 3rem;
+}
+.strip-inner {
+  max-width: 960px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; flex-wrap: wrap;
+}
+.strip-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0.5rem 2.5rem; gap: 0.2rem;
+}
+.strip-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 700; color: var(--gold);
+  line-height: 1;
+}
+.strip-lbl { font-size: 0.72rem; color: rgba(255,255,255,.5); letter-spacing: .05em; text-transform: uppercase; }
+.strip-divider { width: 1px; height: 40px; background: rgba(201,168,76,.2); }
+
+/* ── Section Labels ── */
+.section-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: .6rem;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.85rem; color: var(--navy); font-weight: 600;
+  margin-bottom: 2rem; letter-spacing: -.01em;
+}
+
+/* ── Steps Grid ── */
+.steps-grid {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 3rem; flex-wrap: wrap;
+}
+.step-card {
+  flex: 1; min-width: 200px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 2rem 1.5rem;
+  box-shadow: var(--shadow-sm); position: relative;
+  transition: transform .25s, box-shadow .25s;
+  text-align: center;
+}
+.step-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.step-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem; font-weight: 700;
+  color: var(--gold-pale); line-height: 1;
+  position: absolute; top: 1rem; right: 1.2rem;
+  letter-spacing: -.02em;
+}
+.step-icon {
+  width: 52px; height: 52px; margin: 0 auto 1rem;
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(11,27,58,.2);
+}
+.step-icon i { color: var(--gold); font-size: 1.2rem; }
+.step-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem; color: var(--navy); font-weight: 600;
+  margin-bottom: .5rem;
+}
+.step-card p { font-size: .84rem; color: var(--text-muted); line-height: 1.6; }
+.step-connector {
+  color: var(--gold); font-size: 1.1rem;
+  padding: 0 .75rem; flex-shrink: 0;
+  opacity: .5;
+}
+
+/* ── CTA Banner ── */
+.cta-banner {
+  background: var(--navy);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-top: 3rem;
+  position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(201,168,76,.1) 0%, transparent 70%);
+}
+.cta-inner { position: relative; z-index: 1; }
+.cta-banner h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; color: var(--white); font-weight: 600;
+  margin-bottom: .5rem;
+}
+.cta-banner p { color: rgba(255,255,255,.55); margin-bottom: 1.5rem; font-size: .95rem; }
+
+/* ── Info Section wrapper ── */
+.info-section { max-width: 960px; margin: 0 auto 2rem; padding: 0 1.75rem; }
+
+@media (max-width: 768px) {
+  .strip-item { padding: 0.5rem 1.2rem; }
+  .steps-grid { flex-direction: column; }
+  .step-connector { transform: rotate(90deg); padding: .4rem 0; }
+  .section-title { font-size: 1.5rem; }
+}
+@media (max-width: 480px) {
+  .strip-divider { display: none; }
+  .strip-inner { gap: 0.5rem; }
+  .strip-item { padding: 0.4rem 1rem; }
+}
+</style>
 {% endblock %}

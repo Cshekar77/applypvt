@@ -6,6 +6,7 @@
     <h2 class="auth-title">Admin Login</h2>
     <p class="auth-sub">Admissions office access only.</p>
     <form method="POST" class="auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
       <div class="field">
         <label>Username <span class="req">*</span></label>
         <input type="text" name="username" required placeholder="Admin username">

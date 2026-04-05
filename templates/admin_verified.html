@@ -101,30 +101,7 @@
     color: #0a1f44;
     margin: 0;
   }
-  
-  body.dark .admin-table {
-    background: #1a2538;
-  }
-  
-  body.dark .admin-table td {
-    color: #eef2ff;
-    border-bottom-color: #2d3e54;
-  }
-  
-  body.dark .admin-table tr:hover {
-    background: #2d3e54;
-  }
-  
-  body.dark .specialization-badge {
-    background: #2d3e54;
-    color: #eef2ff;
-  }
-  
-  body.dark .category-badge {
-    background: #1e3a2f;
-    color: #81c784;
-  }
-  
+
   @media (max-width: 768px) {
     .admin-table th, .admin-table td {
       padding: 0.5rem;
@@ -199,6 +176,7 @@
           <td>{{ s.verified_at.strftime('%d-%m-%Y') if s.verified_at else '—' }}</td>
           <td>
             <form method="POST" action="{{ url_for('main.unverify_student', app_id=s.id) }}" onsubmit="return confirm('Move this student back to pending verification?')">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
               <button type="submit" class="btn btn-outline btn-sm" style="color:#c0392b;border-color:#c0392b">
                 <i class="fas fa-undo-alt"></i> Unverify
               </button>

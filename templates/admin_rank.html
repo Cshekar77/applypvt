@@ -145,55 +145,39 @@
     margin-top: 1rem;
   }
   
-  .auto-rank-btn {
-    background: #28a745;
+  .hod-btn {
+    background: #1a237e;
     color: white;
     border: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.7rem 1.4rem;
     border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s, transform 0.15s;
   }
   
-  .auto-rank-btn:hover {
-    background: #218838;
+  .hod-btn:hover {
+    background: #283593;
+    transform: translateY(-2px);
+  }
+
+  .hod-badge {
+    background: #c9a03d;
+    color: #0a1f44;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
   
   .table-wrap {
     overflow-x: auto;
-  }
-  
-  body.dark .admin-table {
-    background: #1a2538;
-  }
-  
-  body.dark .admin-table td {
-    color: #eef2ff;
-    border-bottom-color: #2d3e54;
-  }
-  
-  body.dark .admin-table tr:hover {
-    background: #2d3e54;
-  }
-  
-  body.dark .specialization-badge {
-    background: #2d3e54;
-    color: #eef2ff;
-  }
-  
-  body.dark .category-badge {
-    background: #1e3a2f;
-    color: #81c784;
-  }
-  
-  body.dark .rank-input {
-    background: #0f1a24;
-    border-color: #2d3e54;
-    color: #eef2ff;
-  }
-  
-  body.dark .text-muted {
-    color: #b9c8e8;
   }
   
   @media (max-width: 768px) {
@@ -223,13 +207,13 @@
   </div>
   
   <p class="text-muted">
-    <i class="fas fa-info-circle"></i> Students sorted by Grade 12 percentage (highest first). 
-    Assign ranks and save. Ranks determine counselling priority.
+    <i class="fas fa-info-circle"></i> Assign ranks manually, or use the HOD button to auto-generate ranks based on Grade 12 percentage.
   </p>
   
   <form method="POST" action="{{ url_for('main.save_ranks') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
     <div class="table-wrap">
-      <table class="admin-table">
+      <table class="admin-table" id="rank-table">
         <thead>
           <tr>
             <th>#</th>
@@ -245,7 +229,7 @@
         </thead>
         <tbody>
           {% for s in students %}
-          <tr>
+          <tr data-percent12="{{ s.percent_12 or 0 }}" data-id="{{ s.id }}">
             <td>{{ loop.index }}</td>
             <td><strong>{{ s.full_name }}</strong></td>
             <td>{{ s.email }}</td>
@@ -277,11 +261,11 @@
               {% endif %}
             </td>
             <td>
-              <input type="number" 
-                     name="rank_{{ s.id }}" 
-                     value="{{ s.rank or '' }}" 
-                     placeholder="Rank" 
-                     min="1" 
+              <input type="number"
+                     name="rank_{{ s.id }}"
+                     value="{{ s.rank or '' }}"
+                     placeholder="Rank"
+                     min="1"
                      class="rank-input">
             </td>
           </tr>
@@ -302,8 +286,9 @@
       <button type="submit" class="btn-primary">
         <i class="fas fa-save"></i> Save Ranks
       </button>
-      <button type="button" class="auto-rank-btn" onclick="autoAssignRanks()">
-        <i class="fas fa-magic"></i> Auto-Assign by 12th %
+      <button type="button" class="hod-btn" onclick="hodAutoRank()">
+        <i class="fas fa-magic"></i> Auto-Generate Ranks
+        <span class="hod-badge">HOD</span>
       </button>
       <a href="{{ url_for('main.admin_verified') }}" class="btn-outline btn-sm">
         <i class="fas fa-users"></i> View Verified Students
@@ -314,22 +299,22 @@
 </div>
 
 <script>
-  function autoAssignRanks() {
-    if (confirm('Auto-assign ranks based on 12th percentage? This will overwrite existing ranks.')) {
-      const rows = document.querySelectorAll('.admin-table tbody tr');
-      let ranks = [];
-      
-      // Collect rank inputs
-      rows.forEach((row, index) => {
-        const rankInput = row.querySelector('input[name^="rank_"]');
-        if (rankInput) {
-          // Auto-assign based on order (already sorted by 12th % from backend)
-          rankInput.value = index + 1;
-        }
-      });
-      
-      alert('Ranks auto-assigned! Click "Save Ranks" to confirm.');
-    }
+  function hodAutoRank() {
+    if (!confirm('Auto-generate ranks based on 12th percentage (highest = Rank 1)? This will overwrite existing ranks.')) return;
+
+    const tbody = document.querySelector('#rank-table tbody');
+    const rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
+
+    // Sort rows by 12th % descending
+    rows.sort((a, b) => parseFloat(b.dataset.percent12) - parseFloat(a.dataset.percent12));
+
+    // Assign ranks in sorted order
+    rows.forEach((row, i) => {
+      const input = row.querySelector('input[name^="rank_"]');
+      if (input) input.value = i + 1;
+    });
+
+    alert('Ranks auto-generated! Click "Save Ranks" to save them.');
   }
 </script>
 {% endblock %}

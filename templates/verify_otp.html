@@ -8,6 +8,7 @@
     <p class="auth-sub">We've sent a 6-digit OTP to <strong>{{ email }}</strong>.<br>Enter it below to activate your account.</p>
 
     <form method="POST" class="auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
       <input type="hidden" name="action" value="verify">
       <div class="field">
         <label>One-Time Password <span class="req">*</span></label>
@@ -20,6 +21,7 @@
     <div class="otp-resend">
       <p>Didn't receive it?</p>
       <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
         <input type="hidden" name="action" value="resend">
         <button type="submit" class="btn btn-outline btn-sm">Resend OTP</button>
       </form>
