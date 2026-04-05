@@ -522,6 +522,26 @@ def verify_student(app_id):
     return redirect(url_for('main.admin_verification'))
 
 
+# ─────────────────────────────────────────
+#  Admin — Verify All Students (Bulk verification)
+# ─────────────────────────────────────────
+@main.route('/admin/verify-all', methods=['POST'])
+@admin_required
+def verify_all_students():
+    # Get all pending students
+    pending_students = StudentApplication.query.filter_by(is_verified=False).all()
+    
+    count = 0
+    for student in pending_students:
+        student.is_verified = True
+        student.verified_at = datetime.utcnow()
+        count += 1
+    
+    db.session.commit()
+    flash(f'Successfully verified {count} student(s)!', 'success')
+    return redirect(url_for('main.admin_verification'))
+
+
 @main.route('/admin/unverify/<int:app_id>', methods=['POST'])
 @admin_required
 def unverify_student(app_id):
