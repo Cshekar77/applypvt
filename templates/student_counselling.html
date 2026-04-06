@@ -462,7 +462,7 @@
   /* ── Fetch all seats (first open) ── */
   async function fetchAllSeats() {
     try {
-      const res  = await fetch('{{ url_for("main.counselling_status_api") }}');
+      const res  = await fetch('/counselling/status');
       const data = await res.json();
       renderSeatsPanel(data);
     } catch(e) {
@@ -475,7 +475,7 @@
   /* ── Main 10-second status poll ── */
   async function fetchStatus() {
     try {
-      const res  = await fetch('{{ url_for("main.counselling_status_api") }}');
+      const res  = await fetch('/counselling/status');
       const data = await res.json();
 
       lastUpdated = new Date();
@@ -579,13 +579,17 @@
       } else if (turnAlert) { turnAlert.remove(); }
 
       /* --- Refresh seats panel if open --- */
-      if (panelOpen) renderSeatsPanel(data);
+      if (panelOpen && data.all_seats) {
+        renderSeatsPanel(data);
+      }
 
     } catch(e) {
       console.error('Status fetch failed:', e);
     }
   }
 
+  // Initial fetch
+  fetchStatus();
   setInterval(fetchStatus, 10000);
 </script>
 {% endblock %}

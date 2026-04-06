@@ -297,30 +297,49 @@ def counselling_status_api():
     """JSON endpoint polled every 10 seconds by student counselling page."""
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
-    cat_seats   = None
+    
+    # Get ALL seats for all categories (for Track Live Seats panel)
+    all_seats = []
+    categories = ApplicationCategory.query.filter_by(is_active=True).all()
+    for cat in categories:
+        cs = CategorySeats.get_for_category(cat.id)
+        all_seats.append({
+            'category': cat.name,
+            'govt_total': cs.govt_total,
+            'govt_filled': cs.govt_filled,
+            'govt_remaining': cs.govt_remaining,
+            'mgmt_total': cs.mgmt_total,
+            'mgmt_filled': cs.mgmt_filled,
+            'mgmt_remaining': cs.mgmt_remaining,
+        })
+    
+    cat_seats = None
     if appl and appl.category_id:
         cs = CategorySeats.get_for_category(appl.category_id)
         cat_seats = {
-            'category':       appl.category.name if appl.category else '',
-            'govt_total':     cs.govt_total,
-            'govt_filled':    cs.govt_filled,
+            'category': appl.category.name if appl.category else '',
+            'govt_total': cs.govt_total,
+            'govt_filled': cs.govt_filled,
             'govt_remaining': cs.govt_remaining,
-            'mgmt_total':     cs.mgmt_total,
-            'mgmt_filled':    cs.mgmt_filled,
+            'mgmt_total': cs.mgmt_total,
+            'mgmt_filled': cs.mgmt_filled,
             'mgmt_remaining': cs.mgmt_remaining,
         }
+    
     allotment = None
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
             allotment = {'quota': a.quota, 'allotted_at': a.allotted_at.strftime('%d %b %Y, %I:%M %p')}
+    
     return jsonify({
-        'status':       counselling.status,
+        'status': counselling.status,
         'current_rank': counselling.current_rank,
-        'message':      counselling.message,
-        'my_rank':      appl.rank if appl else None,
-        'cat_seats':    cat_seats,
-        'allotment':    allotment,
+        'message': counselling.message,
+        'my_rank': appl.rank if appl else None,
+        'all_seats': all_seats,
+        'cat_seats': cat_seats,
+        'allotment': allotment,
     })
 
 
