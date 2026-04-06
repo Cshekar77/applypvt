@@ -285,7 +285,14 @@ def student_counselling():
         cat_seats = CategorySeats.get_for_category(appl.category_id)
     allotment = None
     if appl:
-        allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+        a = SeatAllotment.query.filter_by(application_id=appl.id).first()
+        if a:
+            # Convert UTC to IST for display
+            allotted_ist = utc_to_ist(a.allotted_at)
+            allotment = {
+                'quota': a.quota,
+                'allotted_at': allotted_ist
+            }
     return render_template('student_counselling.html',
                            appl=appl, counselling=counselling,
                            cat_seats=cat_seats, allotment=allotment)
@@ -330,7 +337,12 @@ def counselling_status_api():
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
-            allotment = {'quota': a.quota, 'allotted_at': a.allotted_at.strftime('%d %b %Y, %I:%M %p')}
+            # Convert UTC to IST for API response
+            allotted_ist = utc_to_ist(a.allotted_at)
+            allotment = {
+                'quota': a.quota,
+                'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else None
+            }
     
     return jsonify({
         'status': counselling.status,
