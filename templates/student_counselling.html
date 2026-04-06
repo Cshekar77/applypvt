@@ -78,18 +78,6 @@
   .your-turn-text h4 { font-size: 1rem; font-weight: 700; color: #1a5c3a; margin: 0 0 .2rem; }
   .your-turn-text p  { font-size: .83rem; color: #2e7d52; margin: 0; }
 
-  .seats-wrap { display: flex; flex-direction: column; gap: .85rem; }
-  .seat-row {
-    display: flex; align-items: center; gap: 1rem;
-    padding: .75rem 1rem; background: #f5f7fa; border-radius: 10px;
-  }
-  .seat-row .sr-cat { font-weight: 600; color: #0a1f44; font-size: .9rem; flex: 1; }
-  .seat-row .sr-nums { font-size: .82rem; color: #5a6e82; white-space: nowrap; }
-  .seat-row .sr-remaining { font-weight: 700; font-size: .95rem; color: #25c26e; min-width: 40px; text-align: right; }
-  .seat-row .sr-remaining.zero { color: #dc3545; }
-  .bar-wrap { flex: 1; background: #e2e8f0; border-radius: 20px; height: 5px; overflow: hidden; }
-  .bar-fill { background: linear-gradient(90deg,#0a1f44,#c9a03d); height: 100%; border-radius: 20px; transition: width .5s; }
-
   .allotted-card {
     background: linear-gradient(135deg, #edf9f2, #d4f0e2);
     border: 1.5px solid #25c26e; border-radius: 16px; padding: 1.5rem;
@@ -314,30 +302,6 @@
       {% endif %}
     </div>
 
-    {# Seat availability — student's own category #}
-    {% if cat_seats %}
-    <div class="sc-card">
-      <div class="rank-label" style="margin-bottom:.85rem;">
-        <i class="fas fa-chair"></i> Seats — {{ appl.category_name }}
-      </div>
-      <div class="seats-wrap">
-        <div class="seat-row">
-          <div class="sr-cat">{{ appl.category_name }}</div>
-          <div class="bar-wrap">
-            <div class="bar-fill" id="seat-bar"
-                 style="width:{% if cat_seats.total_seats > 0 %}{{ ((cat_seats.filled_seats / cat_seats.total_seats)*100)|int }}{% else %}0{% endif %}%">
-            </div>
-          </div>
-          <div class="sr-nums" id="seat-nums">{{ cat_seats.filled_seats }}/{{ cat_seats.total_seats }}</div>
-          <div class="sr-remaining {% if cat_seats.remaining_seats == 0 %}zero{% endif %}"
-               id="seat-remaining">
-            {{ cat_seats.remaining_seats }} left
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-
   </div>
   {% endif %}
 
@@ -527,25 +491,6 @@
           document.querySelector('.sc-page').insertBefore(d, document.getElementById('main-content'));
         }
       } else if (msgEl) { msgEl.remove(); }
-
-      /* --- Own category seat bar --- */
-      if (data.cat_seats) {
-        const cs     = data.cat_seats;
-        const total  = (cs.total   != null) ? parseInt(cs.total)     : 0;
-        const filled = (cs.filled  != null) ? parseInt(cs.filled)    : 0;
-        const rem    = (cs.remaining != null) ? parseInt(cs.remaining) : Math.max(0, total - filled);
-        const pct    = total > 0 ? Math.round((filled / total) * 100) : 0;
-
-        const barEl  = document.getElementById('seat-bar');
-        const numsEl = document.getElementById('seat-nums');
-        const remEl  = document.getElementById('seat-remaining');
-        if (barEl)  barEl.style.width  = pct + '%';
-        if (numsEl) numsEl.textContent = filled + '/' + total;
-        if (remEl) {
-          remEl.textContent = rem + ' left';
-          remEl.className   = 'sr-remaining' + (rem === 0 ? ' zero' : '');
-        }
-      }
 
       /* --- Allotment card (IST) --- */
       if (data.allotment && !document.getElementById('allotted-card')) {
