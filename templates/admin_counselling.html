@@ -62,9 +62,14 @@
   }
   .btn-ctrl:hover { opacity: .88; transform: translateY(-1px); }
 
-  /* ── Grid layout ── */
-  .cl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-  @media(max-width:780px) { .cl-grid { grid-template-columns: 1fr; } }
+  /* ── Top grid: rank card + seat section ── */
+  .cl-top-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media(max-width: 860px) { .cl-top-grid { grid-template-columns: 1fr; } }
 
   .cl-card {
     background: white; border-radius: 18px;
@@ -100,31 +105,67 @@
   }
   .current-rank-display span { font-size: 1rem; color: #8a9ab0; font-family: 'Outfit', sans-serif; }
 
+  /* Next Rank button */
+  .btn-next-rank {
+    padding: .6rem 1.3rem; background: linear-gradient(135deg, #c9a03d, #e8c060);
+    color: white; border: none; border-radius: 10px;
+    font-size: .88rem; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: .4rem;
+    transition: all .2s; box-shadow: 0 3px 10px rgba(201,160,61,.3);
+  }
+  .btn-next-rank:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(201,160,61,.4); }
+
+  /* ── Seat tables section ── */
+  .seats-section { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .quota-table-card {
+    background: white; border-radius: 16px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    overflow: hidden;
+  }
+  .quota-table-header {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .9rem 1.25rem;
+    font-size: .78rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .quota-table-header.govt { background: #eef6ff; color: #004085; border-bottom: 1px solid #cce0ff; }
+  .quota-table-header.mgmt { background: #fffbea; color: #856404; border-bottom: 1px solid #ffe9a0; }
+
+  .quota-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .govt .quota-dot { background: #004085; }
+  .mgmt .quota-dot { background: #b8860b; }
+
   /* Seat table */
-  .seat-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  .seat-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
   .seat-table th {
-    text-align: left; padding: .6rem .75rem;
-    font-size: .72rem; font-weight: 600; letter-spacing: .05em;
+    text-align: left; padding: .55rem .9rem;
+    font-size: .7rem; font-weight: 600; letter-spacing: .05em;
     text-transform: uppercase; color: #8a9ab0;
+    background: #fafbfd;
     border-bottom: 1px solid #eef2f8;
   }
-  .seat-table td { padding: .65rem .75rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
+  .seat-table td { padding: .6rem .9rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
   .seat-table tr:last-child td { border-bottom: none; }
 
-  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 6px; margin-top: .3rem; overflow: hidden; }
-  .seats-bar      { background: linear-gradient(90deg, #0a1f44, #c9a03d); height: 100%; border-radius: 20px; transition: width .4s; }
+  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: .3rem; overflow: hidden; width: 80px; }
+  .seats-bar-govt { background: linear-gradient(90deg, #004085, #3a7bd5); height: 100%; border-radius: 20px; transition: width .4s; }
+  .seats-bar-mgmt { background: linear-gradient(90deg, #b8860b, #e8c060); height: 100%; border-radius: 20px; transition: width .4s; }
 
   .seat-input-inline {
-    display: flex; gap: .5rem; align-items: center; margin-top: .5rem;
+    display: flex; gap: .4rem; align-items: center;
   }
   .seat-input-inline input {
-    padding: .4rem .75rem; border: 1.5px solid #e2e8f0; border-radius: 8px;
-    font-size: .85rem; width: 80px; outline: none;
+    padding: .35rem .65rem; border: 1.5px solid #e2e8f0; border-radius: 7px;
+    font-size: .82rem; width: 72px; outline: none;
   }
   .seat-input-inline input:focus { border-color: #0a1f44; }
   .btn-sm-set {
-    padding: .4rem .9rem; background: #0a1f44; color: white;
-    border: none; border-radius: 8px; font-size: .8rem; font-weight: 600;
+    padding: .35rem .8rem; background: #0a1f44; color: white;
+    border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
     cursor: pointer; transition: background .2s;
   }
   .btn-sm-set:hover { background: #1e3a60; }
@@ -290,10 +331,10 @@
     </div>
   </div>
 
-  {# ── Top grid: Live Rank + Seat Management ── #}
-  <div class="cl-grid">
+  {# ── Top grid: Live Rank (left) + Seat Tables (right) ── #}
+  <div class="cl-top-grid">
 
-    {# Live Rank Update #}
+    {# ── Live Rank Update Card ── #}
     <div class="cl-card">
       <h3><i class="fas fa-broadcast-tower"></i> Update Live Rank</h3>
       <div class="current-rank-display">
@@ -303,6 +344,19 @@
       {% if cs.message %}
         <p style="font-size:.82rem;color:#5a6e82;margin:.4rem 0 1rem;">📢 {{ cs.message }}</p>
       {% endif %}
+
+      {# Next Rank — one-click increment #}
+      {% if cs.current_rank %}
+      <form method="POST" style="margin-bottom:.9rem;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+        <input type="hidden" name="action" value="next_rank"/>
+        <button type="submit" class="btn-next-rank">
+          <i class="fas fa-forward"></i> Next Rank &rarr; #{{ cs.current_rank + 1 }}
+        </button>
+      </form>
+      {% endif %}
+
+      {# Manual update form #}
       <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
         <input type="hidden" name="action" value="update_rank"/>
@@ -319,52 +373,113 @@
       </form>
     </div>
 
-    {# Seat Management #}
-    <div class="cl-card">
-      <h3><i class="fas fa-chair"></i> Seat Management by Category</h3>
-      <table class="seat-table">
-        <thead>
-          <tr>
-            <th>Category</th>
-            <th>Total</th>
-            <th>Filled</th>
-            <th>Left</th>
-            <th>Set Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for cat in categories %}
-          {% set s = cat_seats[cat.id] %}
-          <tr>
-            <td><strong>{{ cat.name }}</strong></td>
-            <td>{{ s.total_seats }}</td>
-            <td>{{ s.filled_seats }}</td>
-            <td>
-              <strong style="color:{% if s.remaining_seats == 0 %}#dc3545{% else %}#25c26e{% endif %}">
-                {{ s.remaining_seats }}
-              </strong>
-              <div class="seats-bar-wrap">
-                <div class="seats-bar"
-                     style="width:{% if s.total_seats > 0 %}{{ ((s.filled_seats / s.total_seats) * 100)|int }}{% else %}0{% endif %}%">
+    {# ── Seat Tables (Government + Management) ── #}
+    <div class="seats-section">
+
+      {# Government Quota Table #}
+      <div class="quota-table-card">
+        <div class="quota-table-header govt">
+          <span class="quota-dot"></span>
+          <i class="fas fa-landmark"></i>
+          Government Quota Seats
+        </div>
+        <table class="seat-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Total</th>
+              <th>Filled</th>
+              <th>Left</th>
+              <th>Set Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            {% set s = cat_seats[cat.id] %}
+            <tr>
+              <td><strong>{{ cat.name }}</strong></td>
+              <td>{{ s.govt_total }}</td>
+              <td>{{ s.govt_filled }}</td>
+              <td>
+                <strong style="color:{% if s.govt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                  {{ s.govt_remaining }}
+                </strong>
+                <div class="seats-bar-wrap">
+                  <div class="seats-bar-govt"
+                       style="width:{% if s.govt_total > 0 %}{{ ((s.govt_filled / s.govt_total) * 100)|int }}{% else %}0{% endif %}%">
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>
-              <form method="POST" class="seat-input-inline">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-                <input type="hidden" name="action" value="set_seats"/>
-                <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                <input type="number" name="total_seats" min="0"
-                       value="{{ s.total_seats }}" placeholder="0">
-                <button type="submit" class="btn-sm-set">Set</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+              </td>
+              <td>
+                <form method="POST" class="seat-input-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                  <input type="hidden" name="action" value="set_seats"/>
+                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                  <input type="hidden" name="quota" value="government"/>
+                  <input type="number" name="total_seats" min="0"
+                         value="{{ s.govt_total }}" placeholder="0">
+                  <button type="submit" class="btn-sm-set">Set</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {# Management Quota Table #}
+      <div class="quota-table-card">
+        <div class="quota-table-header mgmt">
+          <span class="quota-dot"></span>
+          <i class="fas fa-building"></i>
+          Management Quota Seats
+        </div>
+        <table class="seat-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Total</th>
+              <th>Filled</th>
+              <th>Left</th>
+              <th>Set Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            {% set s = cat_seats[cat.id] %}
+            <tr>
+              <td><strong>{{ cat.name }}</strong></td>
+              <td>{{ s.mgmt_total }}</td>
+              <td>{{ s.mgmt_filled }}</td>
+              <td>
+                <strong style="color:{% if s.mgmt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                  {{ s.mgmt_remaining }}
+                </strong>
+                <div class="seats-bar-wrap">
+                  <div class="seats-bar-mgmt"
+                       style="width:{% if s.mgmt_total > 0 %}{{ ((s.mgmt_filled / s.mgmt_total) * 100)|int }}{% else %}0{% endif %}%">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <form method="POST" class="seat-input-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                  <input type="hidden" name="action" value="set_seats"/>
+                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                  <input type="hidden" name="quota" value="management"/>
+                  <input type="number" name="total_seats" min="0"
+                         value="{{ s.mgmt_total }}" placeholder="0">
+                  <button type="submit" class="btn-sm-set">Set</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>{# end seats-section #}
+  </div>{# end cl-top-grid #}
 
   {# ── Students List ── #}
   <div class="students-section">

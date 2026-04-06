@@ -301,10 +301,13 @@ def counselling_status_api():
     if appl and appl.category_id:
         cs = CategorySeats.get_for_category(appl.category_id)
         cat_seats = {
-            'total':     cs.total_seats,
-            'filled':    cs.filled_seats,
-            'remaining': cs.remaining_seats,
-            'category':  appl.category.name if appl.category else ''
+            'category':       appl.category.name if appl.category else '',
+            'govt_total':     cs.govt_total,
+            'govt_filled':    cs.govt_filled,
+            'govt_remaining': cs.govt_remaining,
+            'mgmt_total':     cs.mgmt_total,
+            'mgmt_filled':    cs.mgmt_filled,
+            'mgmt_remaining': cs.mgmt_remaining,
         }
     allotment = None
     if appl:
@@ -502,12 +505,25 @@ def admin_counselling():
             cs.updated_at   = datetime.utcnow()
             db.session.commit(); flash('Live rank updated.', 'success')
 
+        elif action == 'next_rank':
+            # Auto-increment current rank by 1
+            cs.current_rank = (cs.current_rank or 0) + 1
+            cs.updated_at   = datetime.utcnow()
+            db.session.commit()
+            flash(f'Now calling Rank #{cs.current_rank}', 'success')
+
         elif action == 'set_seats':
+            # Expects: cat_id, quota ('government'/'management'), total_seats
             cat_id    = request.form.get('cat_id')
+            quota     = request.form.get('quota')        # 'government' or 'management'
             total_str = request.form.get('total_seats', '0').strip()
-            if cat_id:
+            if cat_id and quota:
                 seats = CategorySeats.get_for_category(int(cat_id))
-                seats.total_seats = int(total_str) if total_str.isdigit() else 0
+                val   = int(total_str) if total_str.isdigit() else 0
+                if quota == 'government':
+                    seats.govt_total = val
+                else:
+                    seats.mgmt_total = val
                 db.session.commit(); flash('Seats updated.', 'success')
 
         elif action == 'allot_seat':
@@ -522,15 +538,22 @@ def admin_counselling():
                 flash(f'Seat already allotted to {appl.full_name}.', 'warning')
             else:
                 seats = CategorySeats.get_for_category(appl.category_id)
-                if seats.remaining_seats <= 0:
-                    flash(f'No seats remaining in {appl.category_name}!', 'danger')
+                # Check quota-specific remaining seats
+                if quota == 'government' and seats.govt_remaining <= 0:
+                    flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
+                elif quota == 'management' and seats.mgmt_remaining <= 0:
+                    flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
                 else:
                     db.session.add(SeatAllotment(
                         application_id=appl.id,
                         category_id=appl.category_id,
                         quota=quota,
                     ))
-                    seats.filled_seats += 1
+                    # Increment correct quota filled count
+                    if quota == 'government':
+                        seats.govt_filled += 1
+                    else:
+                        seats.mgmt_filled += 1
                     db.session.commit()
                     flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota)!', 'success')
 
@@ -539,7 +562,11 @@ def admin_counselling():
             allotment = SeatAllotment.query.filter_by(application_id=int(app_id)).first()
             if allotment:
                 seats = CategorySeats.get_for_category(allotment.category_id)
-                seats.filled_seats = max(0, seats.filled_seats - 1)
+                # Decrement correct quota filled count
+                if allotment.quota == 'government':
+                    seats.govt_filled = max(0, seats.govt_filled - 1)
+                else:
+                    seats.mgmt_filled = max(0, seats.mgmt_filled - 1)
                 db.session.delete(allotment)
                 db.session.commit(); flash('Seat allotment revoked.', 'info')
 

@@ -108,25 +108,53 @@ class CounsellingSettings(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Category Seats  (total + filled per category)
+#  Category Seats
+#  Government Quota and Management Quota are tracked separately
 # ─────────────────────────────────────────
 class CategorySeats(db.Model):
     __tablename__ = 'category_seats'
     id              = db.Column(db.Integer, primary_key=True)
     category_id     = db.Column(db.Integer, db.ForeignKey('application_category.id'), unique=True)
-    total_seats     = db.Column(db.Integer, default=0)
-    filled_seats    = db.Column(db.Integer, default=0)
+
+    # Government Quota
+    govt_total      = db.Column(db.Integer, default=0)
+    govt_filled     = db.Column(db.Integer, default=0)
+
+    # Management Quota
+    mgmt_total      = db.Column(db.Integer, default=0)
+    mgmt_filled     = db.Column(db.Integer, default=0)
+
     category        = db.relationship('ApplicationCategory', backref='seats')
+
+    # ── Convenience properties ──────────────────
+    @property
+    def govt_remaining(self):
+        return max(0, self.govt_total - self.govt_filled)
+
+    @property
+    def mgmt_remaining(self):
+        return max(0, self.mgmt_total - self.mgmt_filled)
+
+    # Legacy helpers so old code that references total_seats / remaining_seats still works
+    @property
+    def total_seats(self):
+        return self.govt_total + self.mgmt_total
+
+    @property
+    def filled_seats(self):
+        return self.govt_filled + self.mgmt_filled
 
     @property
     def remaining_seats(self):
-        return max(0, self.total_seats - self.filled_seats)
+        return self.govt_remaining + self.mgmt_remaining
 
     @staticmethod
     def get_for_category(category_id):
         s = CategorySeats.query.filter_by(category_id=category_id).first()
         if not s:
-            s = CategorySeats(category_id=category_id, total_seats=0, filled_seats=0)
+            s = CategorySeats(category_id=category_id,
+                              govt_total=0, govt_filled=0,
+                              mgmt_total=0, mgmt_filled=0)
             db.session.add(s)
             db.session.commit()
         return s
