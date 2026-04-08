@@ -66,9 +66,6 @@
   position: relative;
 }
 .upload-zone:hover, .upload-zone.dragover { background: #fffdf5; }
-.upload-zone input[type=file] {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-}
 .upload-icon { font-size: 2.5rem; color: #c9a03d; margin-bottom: .75rem; }
 .upload-zone h4 { color: #0a1f44; margin-bottom: .4rem; }
 .upload-zone p  { font-size: .82rem; color: #5a6e82; margin: 0; }
@@ -198,8 +195,6 @@ body.dark .btn-outline  { background: #1a2538; color: #eef2ff; border-color: #2d
 body.dark .info-box     { background: #1e1a0a; border-color: #5a4a1a; color: #d4b866; }
 body.dark .field-name   { color: #eef2ff; }
 </style>
-
-{% block navbar_auth %}{% endblock %}
 
 <div class="imp-page">
 
@@ -408,10 +403,10 @@ body.dark .field-name   { color: #eef2ff; }
       <input type="hidden" name="action" value="upload">
 
       <div class="upload-zone" id="uploadZone">
-        <input type="file" name="excel_file" id="fileInput" accept=".xlsx,.xls" required>
         <div class="upload-icon"><i class="fas fa-file-excel"></i></div>
         <h4>Click to choose file or drag & drop</h4>
         <p>Supports .xlsx and .xls files</p>
+        <input type="file" name="excel_file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
         <div class="file-chosen" id="fileChosen">
           <i class="fas fa-check"></i> <span id="fileName"></span>
         </div>
@@ -445,24 +440,36 @@ body.dark .field-name   { color: #eef2ff; }
 </div>
 
 <script>
-// File input display
+// File input handling - FIXED FOR MOBILE
+const uploadZone = document.getElementById('uploadZone');
 const fileInput = document.getElementById('fileInput');
 const fileChosen = document.getElementById('fileChosen');
 const fileName = document.getElementById('fileName');
-const uploadZone = document.getElementById('uploadZone');
 
-if (fileInput) {
+if (uploadZone && fileInput) {
+  // Click on upload zone triggers file picker on both desktop AND mobile
+  uploadZone.addEventListener('click', (e) => {
+    // Don't trigger if clicking inside file-chosen area
+    if (e.target.closest('.file-chosen')) return;
+    fileInput.click();
+  });
+  
   fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
       fileName.textContent = fileInput.files[0].name;
       fileChosen.style.display = 'block';
+    } else {
+      fileChosen.style.display = 'none';
     }
   });
 }
 
 // Drag & drop
 if (uploadZone) {
-  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragover', e => { 
+    e.preventDefault(); 
+    uploadZone.classList.add('dragover'); 
+  });
   uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
   uploadZone.addEventListener('drop', e => {
     e.preventDefault();
