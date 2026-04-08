@@ -1,3 +1,9 @@
+import os
+import uuid
+import pandas as pd
+from werkzeug.utils import secure_filename
+
+
 from flask import (Blueprint, render_template, redirect, url_for,
                    flash, request, session, current_app, abort, send_file, jsonify)
 from flask_login import login_user, logout_user, login_required, current_user
@@ -869,3 +875,316 @@ def export_verified():
     apps = StudentApplication.query.filter_by(is_verified=True)\
              .order_by(StudentApplication.rank.asc().nullslast()).all()
     return export_verified_excel(apps, 'verified_students.xlsx')
+
+# ─────────────────────────────────────────
+#  Admin — Import Students from Excel
+#  Add this route to routes.py
+#  Also add these imports at the top of routes.py:
+#    import os, uuid, pandas as pd
+#    from werkzeug.utils import secure_filename
+# ─────────────────────────────────────────
+
+
+
+IMPORT_TMP_DIR = '/tmp/bca_imports'
+
+def _ensure_tmp():
+    os.makedirs(IMPORT_TMP_DIR, exist_ok=True)
+
+# ── helper: try to auto-map column names ──────────────────────────
+def _auto_map(columns):
+    """Returns {field_key: excel_column} guesses based on common names."""
+    mapping = {}
+    HINTS = {
+        'email':         ['email', 'mail', 'e-mail', 'email address', 'emailid'],
+        'full_name':     ['full name', 'fullname', 'name', 'student name', 'student_name'],
+        'first_name':    ['first name', 'firstname', 'fname', 'first'],
+        'last_name':     ['last name', 'lastname', 'lname', 'last', 'surname'],
+        'dob':           ['dob', 'date of birth', 'dateofbirth', 'birth date', 'birthdate', 'date_of_birth'],
+        'phone':         ['phone', 'mobile', 'contact', 'phone number', 'mobile number', 'contact number'],
+        'gender':        ['gender', 'sex'],
+        'address':       ['address', 'residential address', 'addr'],
+        'nationality':   ['nationality', 'nation'],
+        'category':      ['category', 'caste', 'cat', 'reservation'],
+        'school_10':     ['school 10', 'school10', '10th school', 'class 10 school', 'ssc school'],
+        'board_10':      ['board 10', 'board10', '10th board', 'class 10 board', 'ssc board'],
+        'year_10':       ['year 10', 'year10', '10th year', 'class 10 year', 'passing year 10'],
+        'total_10':      ['total 10', 'total10', '10th total', 'class 10 total', 'max marks 10'],
+        'obtained_10':   ['obtained 10', 'obtained10', '10th obtained', 'marks obtained 10'],
+        'percent_10':    ['percent 10', 'percentage 10', '10th percent', 'class 10 percentage', '%10'],
+        'school_12':     ['school 12', 'school12', '12th school', 'class 12 school', 'hsc school'],
+        'board_12':      ['board 12', 'board12', '12th board', 'class 12 board', 'hsc board'],
+        'stream_12':     ['stream', 'stream 12', '12th stream', 'class 12 stream'],
+        'year_12':       ['year 12', 'year12', '12th year', 'class 12 year', 'passing year 12'],
+        'total_12':      ['total 12', 'total12', '12th total', 'class 12 total', 'max marks 12'],
+        'obtained_12':   ['obtained 12', 'obtained12', '12th obtained', 'marks obtained 12'],
+        'percent_12':    ['percent 12', 'percentage 12', '12th percent', 'class 12 percentage', '%12'],
+        'specialization':['specialization', 'specialisation', 'spec', 'programme'],
+    }
+    col_lower = {c.lower().strip(): c for c in columns}
+    for field, hints in HINTS.items():
+        for hint in hints:
+            if hint in col_lower:
+                mapping[field] = col_lower[hint]
+                break
+    return mapping
+
+
+# ── helper: normalise DOB string → password ───────────────────────
+def _dob_to_password(dob_raw):
+    """Convert various DOB formats to dd-mm-yyyy password string."""
+    if not dob_raw or str(dob_raw).strip() in ('', 'nan', 'NaT'):
+        return None
+    dob_str = str(dob_raw).strip()
+    # Try pandas Timestamp (when Excel stores as date)
+    try:
+        ts = pd.Timestamp(dob_raw)
+        if not pd.isna(ts):
+            return ts.strftime('%d-%m-%Y')
+    except Exception:
+        pass
+    # Try common string formats
+    for fmt in ('%d-%m-%Y', '%d/%m/%Y', '%Y-%m-%d', '%d.%m.%Y', '%m/%d/%Y'):
+        try:
+            return datetime.strptime(dob_str, fmt).strftime('%d-%m-%Y')
+        except ValueError:
+            pass
+    # Return as-is if nothing matched (still usable as password)
+    return dob_str
+
+
+# ── helper: safe string from cell ─────────────────────────────────
+def _str(val, default=''):
+    if val is None or (isinstance(val, float) and pd.isna(val)):
+        return default
+    return str(val).strip()
+
+
+# ── helper: safe float from cell ──────────────────────────────────
+def _flt(val):
+    try:
+        v = float(val)
+        return None if pd.isna(v) else v
+    except (TypeError, ValueError):
+        return None
+
+
+@main.route('/admin/import', methods=['GET', 'POST'])
+@admin_required
+def admin_import():
+    _ensure_tmp()
+
+    # ── POST: upload file ──────────────────────────────────────────
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        # STEP 1 — receive file, read columns, show mapping UI
+        if action == 'upload':
+            f = request.files.get('excel_file')
+            if not f or not f.filename:
+                flash('Please select an Excel file.', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+            ext = os.path.splitext(f.filename)[1].lower()
+            if ext not in ('.xlsx', '.xls'):
+                flash('Only .xlsx and .xls files are supported.', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+            # Save to tmp with unique name
+            tmp_name  = f'{uuid.uuid4().hex}{ext}'
+            tmp_path  = os.path.join(IMPORT_TMP_DIR, tmp_name)
+            f.save(tmp_path)
+
+            try:
+                df = pd.read_excel(tmp_path, nrows=5)   # read just first 5 rows for preview
+                df_full = pd.read_excel(tmp_path)
+                columns = list(df.columns)
+                if not columns:
+                    flash('The Excel file appears to be empty.', 'danger')
+                    return redirect(url_for('main.admin_import'))
+
+                preview_rows = df.fillna('').astype(str).to_dict(orient='records')
+                auto_map     = _auto_map(columns)
+                total_rows   = len(df_full)
+
+                return render_template('admin_import.html',
+                                       columns=columns,
+                                       preview_rows=preview_rows,
+                                       auto_map=auto_map,
+                                       total_rows=total_rows,
+                                       session_file=tmp_name,
+                                       result=None)
+            except Exception as e:
+                flash(f'Could not read Excel file: {e}', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+        # STEP 2 — receive mapping, do import
+        elif action == 'import':
+            tmp_name = request.form.get('session_file', '')
+            tmp_path = os.path.join(IMPORT_TMP_DIR, tmp_name)
+
+            if not tmp_name or not os.path.exists(tmp_path):
+                flash('Session expired. Please upload the file again.', 'warning')
+                return redirect(url_for('main.admin_import'))
+
+            # Collect mapping from form: map_<field> → excel column name
+            field_map = {}
+            for key in request.form:
+                if key.startswith('map_') and request.form[key]:
+                    field = key[4:]   # strip 'map_'
+                    field_map[field] = request.form[key]
+
+            # Validate required fields
+            required = ['email', 'dob']
+            missing  = [r for r in required if r not in field_map]
+            # Need either full_name or first_name
+            if 'full_name' not in field_map and 'first_name' not in field_map:
+                missing.append('full_name or first_name')
+            if missing:
+                flash(f'Required fields not mapped: {", ".join(missing)}', 'danger')
+                # Re-render mapping page
+                df      = pd.read_excel(tmp_path, nrows=5)
+                df_full = pd.read_excel(tmp_path)
+                columns = list(df.columns)
+                return render_template('admin_import.html',
+                                       columns=columns,
+                                       preview_rows=df.fillna('').astype(str).to_dict(orient='records'),
+                                       auto_map=field_map,
+                                       total_rows=len(df_full),
+                                       session_file=tmp_name,
+                                       result=None)
+
+            # Read full file
+            try:
+                df = pd.read_excel(tmp_path)
+            except Exception as e:
+                flash(f'Could not read file: {e}', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+            # Fetch active categories for name→id lookup
+            categories   = ApplicationCategory.query.filter_by(is_active=True).all()
+            cat_name_map = {c.name.lower().strip(): c.id for c in categories}
+
+            created = 0
+            skipped = 0
+            errors  = []
+
+            for idx, row in df.iterrows():
+                row_num = idx + 2  # Excel row number (1-indexed + header)
+
+                # ── extract email ──────────────────────────────
+                email_raw = _str(row.get(field_map.get('email', ''), ''))
+                if not email_raw:
+                    errors.append({'row': row_num, 'msg': 'Email is empty'})
+                    continue
+                email = email_raw.lower()
+
+                # ── skip if already exists ─────────────────────
+                if User.query.filter_by(email=email).first():
+                    skipped += 1
+                    continue
+
+                # ── extract name ───────────────────────────────
+                if 'full_name' in field_map:
+                    full_name  = _str(row.get(field_map['full_name'], ''))
+                    parts      = full_name.split(' ', 1)
+                    first_name = parts[0]
+                    last_name  = parts[1] if len(parts) > 1 else ''
+                else:
+                    first_name = _str(row.get(field_map.get('first_name', ''), ''))
+                    last_name  = _str(row.get(field_map.get('last_name',  ''), ''))
+                    full_name  = f'{first_name} {last_name}'.strip()
+
+                if not full_name:
+                    errors.append({'row': row_num, 'msg': 'Name is empty'})
+                    continue
+
+                # ── extract DOB → password ─────────────────────
+                dob_raw  = row.get(field_map.get('dob', ''), None)
+                password = _dob_to_password(dob_raw)
+                dob_str  = password   # store same string in application.dob
+
+                if not password:
+                    errors.append({'row': row_num, 'msg': f'Could not parse DOB for {email}'})
+                    continue
+
+                # ── create User ────────────────────────────────
+                try:
+                    user = User(
+                        full_name     = full_name,
+                        email         = email,
+                        password_hash = generate_password_hash(password),
+                        is_verified   = True,
+                        otp_code      = None,
+                        otp_expires_at= None,
+                    )
+                    db.session.add(user)
+                    db.session.flush()   # get user.id without committing
+
+                    # ── category lookup ────────────────────────
+                    cat_id = None
+                    if 'category' in field_map:
+                        cat_raw = _str(row.get(field_map['category'], '')).lower()
+                        cat_id  = cat_name_map.get(cat_raw)
+
+                    # ── marks ──────────────────────────────────
+                    total_10    = _flt(row.get(field_map.get('total_10',   ''), None))
+                    obtained_10 = _flt(row.get(field_map.get('obtained_10',''), None))
+                    percent_10  = _flt(row.get(field_map.get('percent_10', ''), None))
+                    if total_10 and obtained_10 and not percent_10:
+                        percent_10 = round((obtained_10 / total_10) * 100, 2)
+
+                    total_12    = _flt(row.get(field_map.get('total_12',   ''), None))
+                    obtained_12 = _flt(row.get(field_map.get('obtained_12',''), None))
+                    percent_12  = _flt(row.get(field_map.get('percent_12', ''), None))
+                    if total_12 and obtained_12 and not percent_12:
+                        percent_12 = round((obtained_12 / total_12) * 100, 2)
+
+                    # ── create Application ──────────────────────
+                    appl = StudentApplication(
+                        user_id      = user.id,
+                        first_name   = first_name,
+                        last_name    = last_name,
+                        dob          = dob_str,
+                        email        = email,
+                        phone        = _str(row.get(field_map.get('phone',        ''), '')),
+                        gender       = _str(row.get(field_map.get('gender',       ''), '')),
+                        address      = _str(row.get(field_map.get('address',      ''), '')),
+                        nationality  = _str(row.get(field_map.get('nationality',  ''), ''), 'Indian'),
+                        category_id  = cat_id,
+                        school_10    = _str(row.get(field_map.get('school_10',    ''), '')),
+                        board_10     = _str(row.get(field_map.get('board_10',     ''), '')),
+                        year_10      = _str(row.get(field_map.get('year_10',      ''), '')),
+                        total_10     = total_10,
+                        obtained_10  = obtained_10,
+                        percent_10   = percent_10,
+                        school_12    = _str(row.get(field_map.get('school_12',    ''), '')),
+                        board_12     = _str(row.get(field_map.get('board_12',     ''), '')),
+                        stream_12    = _str(row.get(field_map.get('stream_12',    ''), '')),
+                        year_12      = _str(row.get(field_map.get('year_12',      ''), '')),
+                        total_12     = total_12,
+                        obtained_12  = obtained_12,
+                        percent_12   = percent_12,
+                        specialization = _str(row.get(field_map.get('specialization',''), '')),
+                        marksheet_10 = None,
+                        marksheet_12 = None,
+                    )
+                    db.session.add(appl)
+                    db.session.commit()
+                    created += 1
+
+                except Exception as e:
+                    db.session.rollback()
+                    errors.append({'row': row_num, 'msg': str(e)[:80]})
+
+            # Clean up tmp file
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+            result = {'created': created, 'skipped': skipped, 'errors': errors}
+            return render_template('admin_import.html', result=result, columns=None, preview_rows=None)
+
+    # GET — show upload page
+    return render_template('admin_import.html', columns=None, preview_rows=None, result=None)

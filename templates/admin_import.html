@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+{% block title %}Import Students — Admin{% endblock %}
+{% block content %}
+<style>
+.imp-page { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+.imp-header {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 2rem; flex-wrap: wrap;
+}
+.imp-header h2 {
+  font-family: 'Playfair Display', serif; font-size: 1.8rem;
+  color: #0a1f44; margin: 0; flex: 1;
+}
+.btn-back {
+  display: inline-flex; align-items: center; gap: .4rem;
+  color: #5a6e82; text-decoration: none; font-size: .88rem;
+  padding: .5rem .9rem; border-radius: 8px; border: 1px solid #dde3ed;
+  transition: all .2s;
+}
+.btn-back:hover { background: #f0f4fb; color: #0a1f44; text-decoration: none; }
+
+/* Steps indicator */
+.steps-bar {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 2.5rem; background: white;
+  border: 1px solid #eef2f8; border-radius: 14px;
+  padding: 1rem 1.5rem; overflow-x: auto;
+}
+.step-ind {
+  display: flex; align-items: center; gap: .6rem;
+  font-size: .82rem; font-weight: 600; color: #b0bec5;
+  white-space: nowrap; flex-shrink: 0;
+}
+.step-ind.active { color: #0a1f44; }
+.step-ind.done   { color: #25c26e; }
+.step-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #eef2f8; color: #b0bec5;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; flex-shrink: 0;
+}
+.step-ind.active .step-circle { background: #0a1f44; color: white; }
+.step-ind.done   .step-circle { background: #25c26e; color: white; }
+.step-arrow { color: #dde3ed; padding: 0 .75rem; font-size: .8rem; flex-shrink: 0; }
+
+/* Cards */
+.imp-card {
+  background: white; border-radius: 16px;
+  border: 1px solid #eef2f8; padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.04);
+}
+.imp-card h3 {
+  font-family: 'Playfair Display', serif; font-size: 1.2rem;
+  color: #0a1f44; margin: 0 0 .4rem;
+}
+.imp-card .sub { font-size: .84rem; color: #5a6e82; margin-bottom: 1.5rem; }
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed #c9a03d;
+  border-radius: 12px; padding: 3rem 2rem;
+  text-align: center; cursor: pointer;
+  transition: background .2s;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.dragover { background: #fffdf5; }
+.upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 2.5rem; color: #c9a03d; margin-bottom: .75rem; }
+.upload-zone h4 { color: #0a1f44; margin-bottom: .4rem; }
+.upload-zone p  { font-size: .82rem; color: #5a6e82; margin: 0; }
+.upload-zone .file-chosen {
+  display: none; margin-top: 1rem;
+  background: #d4edda; color: #155724;
+  padding: .5rem 1rem; border-radius: 8px;
+  font-size: .85rem; font-weight: 600;
+}
+
+/* Mapping table */
+.map-table { width: 100%; border-collapse: collapse; }
+.map-table th {
+  background: #f0f4fb; padding: .75rem 1rem;
+  font-size: .78rem; font-weight: 700; color: #5a6e82;
+  text-transform: uppercase; letter-spacing: .06em;
+  text-align: left; border-bottom: 1px solid #eef2f8;
+}
+.map-table td {
+  padding: .75rem 1rem; border-bottom: 1px solid #f5f7fa;
+  vertical-align: middle;
+}
+.map-table tr:last-child td { border-bottom: none; }
+.field-name {
+  font-weight: 600; color: #0a1f44; font-size: .88rem;
+}
+.field-req {
+  display: inline-block; font-size: .65rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 4px; margin-left: .4rem;
+  background: #fdecea; color: #c0392b;
+}
+.field-opt {
+  display: inline-block; font-size: .65rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 4px; margin-left: .4rem;
+  background: #eef2f8; color: #5a6e82;
+}
+.field-desc { font-size: .78rem; color: #5a6e82; margin-top: .15rem; }
+.map-select {
+  width: 100%; padding: .5rem .75rem;
+  border: 1px solid #dde3ed; border-radius: 8px;
+  font-size: .85rem; color: #0a1f44;
+  background: white; cursor: pointer;
+  transition: border-color .2s;
+}
+.map-select:focus { outline: none; border-color: #c9a03d; }
+
+/* Preview table */
+.preview-wrap { overflow-x: auto; }
+.preview-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.preview-table th {
+  background: #0a1f44; color: white; padding: .6rem .9rem;
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .05em;
+  white-space: nowrap;
+}
+.preview-table td {
+  padding: .55rem .9rem; border-bottom: 1px solid #f5f7fa;
+  color: #2d3e54; white-space: nowrap;
+}
+.preview-table tr:nth-child(even) td { background: #f8f9fc; }
+.preview-count {
+  font-size: .82rem; color: #5a6e82; margin-bottom: .75rem;
+}
+
+/* Result */
+.import-result {
+  border-radius: 12px; padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.import-result.success { background: #d4edda; border: 1px solid #c3e6cb; }
+.import-result.warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+.import-result h4 { margin: 0 0 .5rem; font-size: 1rem; }
+.import-result ul { margin: .5rem 0 0 1.2rem; font-size: .84rem; }
+.import-result li { margin-bottom: .25rem; }
+
+/* Buttons */
+.btn-gold {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: linear-gradient(135deg, #c9a03d, #a8872d);
+  color: white; font-weight: 600; font-size: .9rem;
+  padding: .75rem 1.75rem; border-radius: 10px; border: none;
+  cursor: pointer; text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 14px rgba(201,160,61,.3);
+}
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201,160,61,.4); color: white; text-decoration: none; }
+.btn-outline {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: white; color: #0a1f44; font-weight: 600; font-size: .9rem;
+  padding: .75rem 1.75rem; border-radius: 10px;
+  border: 1px solid #dde3ed; cursor: pointer;
+  transition: all .2s; text-decoration: none;
+}
+.btn-outline:hover { background: #f0f4fb; text-decoration: none; }
+
+.action-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1.5rem; }
+
+/* Info box */
+.info-box {
+  background: #fffdf5; border: 1px solid #e8d5a0;
+  border-radius: 10px; padding: 1rem 1.25rem;
+  font-size: .83rem; color: #5a4a1a; margin-bottom: 1.5rem;
+  display: flex; gap: .75rem; align-items: flex-start;
+}
+.info-box i { color: #c9a03d; margin-top: .1rem; flex-shrink: 0; }
+
+/* Section toggle */
+.section-hidden { display: none; }
+
+/* Loading spinner */
+.spinner {
+  display: none; width: 20px; height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+body.dark .imp-card     { background: #1a2538; border-color: #2d3e54; }
+body.dark .imp-card h3  { color: #eef2ff; }
+body.dark .imp-card .sub{ color: #b9c8e8; }
+body.dark .steps-bar    { background: #1a2538; border-color: #2d3e54; }
+body.dark .map-table th { background: #222f45; }
+body.dark .map-select   { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
+body.dark .preview-table td { color: #c8d8f0; }
+body.dark .preview-table tr:nth-child(even) td { background: #1f2e44; }
+body.dark .btn-outline  { background: #1a2538; color: #eef2ff; border-color: #2d3e54; }
+body.dark .info-box     { background: #1e1a0a; border-color: #5a4a1a; color: #d4b866; }
+body.dark .field-name   { color: #eef2ff; }
+</style>
+
+{% block navbar_auth %}{% endblock %}
+
+<div class="imp-page">
+
+  <div class="imp-header">
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <h2><i class="fas fa-file-import" style="color:#c9a03d;margin-right:.5rem"></i>Import Students from Excel</h2>
+  </div>
+
+  <!-- Steps bar -->
+  <div class="steps-bar">
+    <div class="step-ind active" id="step-ind-1">
+      <div class="step-circle">1</div> Upload File
+    </div>
+    <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+    <div class="step-ind" id="step-ind-2">
+      <div class="step-circle">2</div> Map Columns
+    </div>
+    <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+    <div class="step-ind" id="step-ind-3">
+      <div class="step-circle">3</div> Preview
+    </div>
+    <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+    <div class="step-ind" id="step-ind-4">
+      <div class="step-circle">4</div> Import
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'danger' if cat == 'danger' else ('warning' if cat == 'warning' else 'success') }}"
+             style="padding:.85rem 1.2rem;border-radius:10px;margin-bottom:1rem;font-size:.9rem">
+          {{ msg }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if result %}
+  <!-- Import Result -->
+  <div class="import-result {{ 'success' if result.created > 0 else 'warning' }}">
+    <h4><i class="fas fa-{{ 'check-circle' if result.created > 0 else 'exclamation-triangle' }}"></i>
+      Import Complete</h4>
+    <ul>
+      <li><strong>{{ result.created }}</strong> student account(s) created successfully</li>
+      <li><strong>{{ result.skipped }}</strong> row(s) skipped (email already exists)</li>
+      {% if result.errors %}
+      <li><strong>{{ result.errors|length }}</strong> error(s):
+        <ul>
+          {% for e in result.errors[:5] %}
+          <li>Row {{ e.row }}: {{ e.msg }}</li>
+          {% endfor %}
+          {% if result.errors|length > 5 %}
+          <li>...and {{ result.errors|length - 5 }} more</li>
+          {% endif %}
+        </ul>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+  <div class="action-row">
+    <a href="{{ url_for('main.admin_import') }}" class="btn-gold"><i class="fas fa-redo"></i> Import Another File</a>
+    <a href="{{ url_for('main.admin_students') }}" class="btn-outline"><i class="fas fa-users"></i> View All Students</a>
+  </div>
+
+  {% elif columns %}
+  <!-- STEP 2 & 3: Column Mapping + Preview -->
+  <div class="imp-card">
+    <h3><i class="fas fa-columns" style="color:#c9a03d;margin-right:.5rem"></i>Map Your Excel Columns</h3>
+    <p class="sub">Your file has these columns — match each one to the correct database field. Required fields must be mapped.</p>
+
+    <div class="info-box">
+      <i class="fas fa-lightbulb"></i>
+      <div>
+        <strong>Auto-detection:</strong> We've tried to auto-match columns by name. Please review and correct any mismatches.
+        <br>Password will be set to the student's <strong>Date of Birth</strong> (dd-mm-yyyy format). Email will be their username.
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('main.admin_import') }}" id="mapForm">
+      <input type="hidden" name="action" value="import">
+      <input type="hidden" name="session_file" value="{{ session_file }}">
+
+      <table class="map-table">
+        <thead>
+          <tr>
+            <th>Database Field</th>
+            <th>Your Excel Column</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set fields = [
+            ('email',        'Email Address',        True,  'Used as login username'),
+            ('full_name',    'Full Name',            True,  'Student full name (or use first+last name columns)'),
+            ('first_name',   'First Name',           False, 'If you have separate first/last name columns'),
+            ('last_name',    'Last Name',            False, 'If you have separate first/last name columns'),
+            ('dob',          'Date of Birth',        True,  'Used as password (format: dd-mm-yyyy or dd/mm/yyyy)'),
+            ('phone',        'Phone Number',         False, 'Mobile/contact number'),
+            ('gender',       'Gender',               False, 'Male / Female / Other'),
+            ('address',      'Address',              False, 'Residential address'),
+            ('nationality',  'Nationality',          False, 'Default: Indian'),
+            ('category',     'Category',             False, 'General / SC / ST / OBC / EWS / PWD'),
+            ('school_10',    'Class 10 School',      False, 'School/institution name'),
+            ('board_10',     'Class 10 Board',       False, 'e.g. CBSE, ICSE, State Board'),
+            ('year_10',      'Class 10 Year',        False, 'Passing year'),
+            ('total_10',     'Class 10 Total Marks', False, 'Maximum marks'),
+            ('obtained_10',  'Class 10 Obtained',    False, 'Marks obtained'),
+            ('percent_10',   'Class 10 Percentage',  False, 'Will be auto-calculated if total+obtained given'),
+            ('school_12',    'Class 12 School',      False, 'School/institution name'),
+            ('board_12',     'Class 12 Board',       False, 'e.g. CBSE, ICSE, State Board'),
+            ('stream_12',    'Class 12 Stream',      False, 'Science / Commerce / Arts'),
+            ('year_12',      'Class 12 Year',        False, 'Passing year'),
+            ('total_12',     'Class 12 Total Marks', False, 'Maximum marks'),
+            ('obtained_12',  'Class 12 Obtained',    False, 'Marks obtained'),
+            ('percent_12',   'Class 12 Percentage',  False, 'Will be auto-calculated if total+obtained given'),
+            ('specialization','Specialization',      False, 'BCA specialization preference'),
+          ] %}
+
+          {% for field_key, field_label, required, desc in fields %}
+          <tr>
+            <td>
+              <div class="field-name">
+                {{ field_label }}
+                {% if required %}<span class="field-req">Required</span>{% else %}<span class="field-opt">Optional</span>{% endif %}
+              </div>
+              <div class="field-desc">{{ desc }}</div>
+            </td>
+            <td>
+              <select name="map_{{ field_key }}" class="map-select">
+                <option value="">— Skip this field —</option>
+                {% for col in columns %}
+                <option value="{{ col }}"
+                  {% if auto_map and auto_map.get(field_key) == col %}selected{% endif %}>
+                  {{ col }}
+                </option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Preview section -->
+      {% if preview_rows %}
+      <div style="margin-top:2rem">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#0a1f44;margin-bottom:.5rem">
+          <i class="fas fa-eye" style="color:#c9a03d;margin-right:.5rem"></i>Data Preview (first 5 rows)
+        </h3>
+        <p class="preview-count">Showing {{ preview_rows|length }} of {{ total_rows }} total rows</p>
+        <div class="preview-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                {% for col in columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in preview_rows %}
+              <tr>
+                {% for col in columns %}
+                <td>{{ row.get(col, '') }}</td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="action-row">
+        <button type="submit" class="btn-gold" id="importBtn">
+          <i class="fas fa-file-import"></i>
+          Import {{ total_rows }} Student{{ 's' if total_rows != 1 else '' }}
+          <div class="spinner" id="importSpinner"></div>
+        </button>
+        <a href="{{ url_for('main.admin_import') }}" class="btn-outline">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  {% else %}
+  <!-- STEP 1: Upload -->
+  <div class="imp-card">
+    <h3><i class="fas fa-upload" style="color:#c9a03d;margin-right:.5rem"></i>Upload Excel File</h3>
+    <p class="sub">Upload your .xlsx or .xls file containing student data. We'll read the column headers and let you map them.</p>
+
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        <strong>How it works:</strong> Upload any Excel file → We detect your column names → You map them to our fields → We import the data and auto-create student accounts.
+        <br><strong>Password:</strong> Each student's password will be their Date of Birth (e.g. <code>15-08-2001</code>).
+        <strong>Username:</strong> Their email address.
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('main.admin_import') }}" enctype="multipart/form-data" id="uploadForm">
+      <input type="hidden" name="action" value="upload">
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" name="excel_file" id="fileInput" accept=".xlsx,.xls" required>
+        <div class="upload-icon"><i class="fas fa-file-excel"></i></div>
+        <h4>Click to choose file or drag & drop</h4>
+        <p>Supports .xlsx and .xls files</p>
+        <div class="file-chosen" id="fileChosen">
+          <i class="fas fa-check"></i> <span id="fileName"></span>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button type="submit" class="btn-gold" id="uploadBtn">
+          <i class="fas fa-arrow-right"></i> Read Columns
+          <div class="spinner" id="uploadSpinner"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tips card -->
+  <div class="imp-card">
+    <h3><i class="fas fa-lightbulb" style="color:#c9a03d;margin-right:.5rem"></i>Tips for a Smooth Import</h3>
+    <p class="sub">Follow these guidelines to avoid errors during import.</p>
+    <ul style="font-size:.87rem;color:#5a6e82;line-height:2;padding-left:1.2rem">
+      <li>Make sure the <strong>first row</strong> of your Excel file contains column headers</li>
+      <li>Each student must have a unique <strong>email address</strong></li>
+      <li>Date of birth should be in <strong>DD-MM-YYYY</strong> or <strong>DD/MM/YYYY</strong> format</li>
+      <li>Category names should match exactly: <strong>General, SC, ST, OBC, EWS, PWD</strong></li>
+      <li>Percentage can be auto-calculated if you provide Total Marks and Obtained Marks</li>
+      <li>Students already in the system (same email) will be <strong>skipped</strong>, not duplicated</li>
+      <li>All imported students will be marked as <strong>email-verified</strong> automatically</li>
+    </ul>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+// File input display
+const fileInput = document.getElementById('fileInput');
+const fileChosen = document.getElementById('fileChosen');
+const fileName = document.getElementById('fileName');
+const uploadZone = document.getElementById('uploadZone');
+
+if (fileInput) {
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileName.textContent = fileInput.files[0].name;
+      fileChosen.style.display = 'block';
+    }
+  });
+}
+
+// Drag & drop
+if (uploadZone) {
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      fileInput.files = e.dataTransfer.files;
+      fileName.textContent = e.dataTransfer.files[0].name;
+      fileChosen.style.display = 'block';
+    }
+  });
+}
+
+// Show spinner on submit
+const uploadForm = document.getElementById('uploadForm');
+const uploadBtn  = document.getElementById('uploadBtn');
+const uploadSpinner = document.getElementById('uploadSpinner');
+if (uploadForm) {
+  uploadForm.addEventListener('submit', () => {
+    if (uploadSpinner) uploadSpinner.style.display = 'block';
+    if (uploadBtn) uploadBtn.disabled = true;
+  });
+}
+
+const importForm = document.getElementById('mapForm');
+const importBtn  = document.getElementById('importBtn');
+const importSpinner = document.getElementById('importSpinner');
+if (importForm) {
+  importForm.addEventListener('submit', () => {
+    if (importSpinner) importSpinner.style.display = 'block';
+    if (importBtn) importBtn.disabled = true;
+  });
+}
+
+// Highlight active step
+const stepMap = { 1: 'step-ind-1', 2: 'step-ind-2', 3: 'step-ind-3', 4: 'step-ind-4' };
+const currentStep = {{ 3 if columns else (4 if result else 1) }};
+for (let i = 1; i <= 4; i++) {
+  const el = document.getElementById('step-ind-' + i);
+  if (!el) continue;
+  if (i < currentStep) el.classList.add('done');
+  else if (i === currentStep) el.classList.add('active');
+}
+</script>
+{% endblock %}

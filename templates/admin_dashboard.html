@@ -25,6 +25,22 @@
     border-color: #c9a03d;
   }
 
+  /* Import card */
+  .admin-nav-card.import-card {
+    border-color: #b8d4f0;
+    background: linear-gradient(135deg, #f5faff, #eef4fc);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.import-card:hover {
+    border-color: #2e86de;
+    box-shadow: 0 10px 25px rgba(46,134,222,0.15);
+  }
+  .import-badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
+    background: #dbeafe; color: #1e40af;
+  }
+
   /* WhatsApp card */
   .admin-nav-card.whatsapp-card {
     border-color: #25D366;
@@ -92,6 +108,7 @@
   .stat-gold  { border-left-color: #c9a03d; }
   .stat-warn  { border-left-color: #ffc107; }
   .stat-navy  { border-left-color: #0a1f44; }
+  .stat-blue  { border-left-color: #2e86de; }
 
   .form-status-bar {
     background: #eef2f8; padding: 1rem; border-radius: 12px;
@@ -123,6 +140,7 @@
   body.dark .admin-nav-card p      { color: #b9c8e8; }
   body.dark .admin-nav-card.whatsapp-card    { border-color: #25D366; }
   body.dark .admin-nav-card.counselling-card { background: #1a2030; border-color: #c9a03d; }
+  body.dark .admin-nav-card.import-card      { background: #131e2e; border-color: #2e5a8a; }
   body.dark .stat-card  { background: #1a2538; }
   body.dark .stat-num   { color: #eef2ff; }
   body.dark .stat-lbl   { color: #b9c8e8; }
@@ -149,11 +167,11 @@
 
   {# Stats #}
   <div class="stats-grid">
-    <div class="stat-card">          <div class="stat-num">{{ reg_users }}</div><div class="stat-lbl">Registered Users</div></div>
-    <div class="stat-card">          <div class="stat-num">{{ total }}</div>    <div class="stat-lbl">Total Applications</div></div>
-    <div class="stat-card stat-gold"><div class="stat-num">{{ verified }}</div> <div class="stat-lbl">Verified</div></div>
-    <div class="stat-card stat-warn"><div class="stat-num">{{ pending }}</div>  <div class="stat-lbl">Pending</div></div>
-    <div class="stat-card stat-navy"><div class="stat-num">{{ ranked }}</div>   <div class="stat-lbl">Ranked</div></div>
+    <div class="stat-card">           <div class="stat-num">{{ reg_users }}</div><div class="stat-lbl">Registered Users</div></div>
+    <div class="stat-card">           <div class="stat-num">{{ total }}</div>    <div class="stat-lbl">Total Applications</div></div>
+    <div class="stat-card stat-gold"> <div class="stat-num">{{ verified }}</div> <div class="stat-lbl">Verified</div></div>
+    <div class="stat-card stat-warn"> <div class="stat-num">{{ pending }}</div>  <div class="stat-lbl">Pending</div></div>
+    <div class="stat-card stat-navy"> <div class="stat-num">{{ ranked }}</div>   <div class="stat-lbl">Ranked</div></div>
   </div>
 
   {# Navigation cards #}
@@ -181,6 +199,14 @@
       <div class="anc-icon"><i class="fas fa-chart-line"></i></div>
       <strong>Rank Management</strong>
       <p>Assign ranks to verified students</p>
+    </a>
+
+    {# ── Import Students ── #}
+    <a href="{{ url_for('main.admin_import') }}" class="admin-nav-card import-card">
+      <div class="anc-icon" style="color:#2e86de"><i class="fas fa-file-import"></i></div>
+      <strong>Import Students</strong>
+      <p>Upload Excel file, map columns, and bulk-create student accounts</p>
+      <span class="import-badge"><i class="fas fa-magic"></i> Smart Column Mapping</span>
     </a>
 
     {# ── Counselling ── #}
