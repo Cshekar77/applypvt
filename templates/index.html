@@ -3,33 +3,67 @@
 {% block content %}
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --navy: #0b1b3a;
-  --navy-mid: #12285a;
-  --navy-light: #1a3570;
-  --gold: #c9a84c;
-  --gold-light: #e8c97a;
-  --gold-pale: rgba(201,168,76,.12);
+  --navy: #0c1a35;
+  --navy-mid: #112244;
+  --navy-light: #1a3464;
+  --gold: #c8963c;
+  --gold-light: #e8b86d;
+  --gold-pale: rgba(200,150,60,.10);
+  --gold-border: rgba(200,150,60,.22);
+  --cream: #faf7f2;
   --white: #ffffff;
-  --off-white: #f8f6f1;
+  --text: #1e2d45;
   --text-muted: #6b7a8d;
-  --border: rgba(201,168,76,.18);
-  --radius: 16px;
+  --radius: 14px;
+  --section-pad: 5rem 2rem;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--off-white);
-  color: var(--navy);
+  font-family: 'Outfit', sans-serif;
+  background: var(--cream);
+  color: var(--text);
   overflow-x: hidden;
 }
 
-/* ─── HERO ─── */
-.hero-wrap {
+/* ── LANG TOGGLE ── */
+.lang-toggle {
+  position: fixed;
+  top: 1.1rem;
+  right: 1.2rem;
+  z-index: 999;
+  display: flex;
+  background: rgba(12,26,53,.85);
+  border: 1px solid var(--gold-border);
+  border-radius: 100px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.lang-btn {
+  padding: .35rem .9rem;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,.45);
+  cursor: pointer;
+  transition: all .2s;
+}
+.lang-btn.active {
+  background: var(--gold);
+  color: var(--navy);
+  border-radius: 100px;
+}
+
+/* ── HERO ── */
+.hero {
   position: relative;
   min-height: 100vh;
   background: var(--navy);
@@ -39,112 +73,140 @@ body {
   overflow: hidden;
 }
 
-/* animated background grid */
-.hero-grid {
+.hero-bg {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(201,168,76,.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,.06) 1px, transparent 1px);
-  background-size: 60px 60px;
-  animation: gridPan 30s linear infinite;
+    linear-gradient(rgba(200,150,60,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,150,60,.05) 1px, transparent 1px);
+  background-size: 55px 55px;
+  animation: gridMove 35s linear infinite;
 }
-@keyframes gridPan {
+@keyframes gridMove {
   0% { background-position: 0 0; }
-  100% { background-position: 60px 60px; }
+  100% { background-position: 55px 55px; }
 }
 
-/* radial glow */
 .hero-glow {
   position: absolute;
-  width: 800px; height: 800px;
+  width: 900px; height: 900px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,168,76,.15) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(200,150,60,.12) 0%, transparent 65%);
   top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  animation: breathe 6s ease-in-out infinite;
+  transform: translate(-50%,-50%);
+  animation: breathe 7s ease-in-out infinite;
 }
 @keyframes breathe {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .8; }
-  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50% { transform: translate(-50%,-50%) scale(1.2); }
 }
 
-/* floating orbs */
-.orb {
+.orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .18; animation: floatOrb 14s ease-in-out infinite; }
+.orb-1 { width: 350px; height: 350px; background: var(--gold); top: 5%; left: -8%; }
+.orb-2 { width: 220px; height: 220px; background: #3a6ad4; bottom: 10%; right: -5%; animation-delay: -5s; }
+.orb-3 { width: 160px; height: 160px; background: var(--gold-light); top: 55%; left: 25%; animation-delay: -9s; }
+@keyframes floatOrb {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-28px); }
+}
+
+/* decorative arc */
+.hero-arc {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: .25;
-  animation: float 12s ease-in-out infinite;
-}
-.orb-1 { width: 300px; height: 300px; background: var(--gold); top: 10%; left: -5%; animation-delay: 0s; }
-.orb-2 { width: 200px; height: 200px; background: #4a7fd4; top: 60%; right: -3%; animation-delay: -4s; }
-.orb-3 { width: 150px; height: 150px; background: var(--gold-light); bottom: 15%; left: 30%; animation-delay: -8s; }
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-30px); }
+  bottom: -2px; left: 0; right: 0;
+  height: 80px;
+  background: var(--cream);
+  clip-path: ellipse(55% 100% at 50% 100%);
+  z-index: 3;
 }
 
-.hero-content {
+.hero-inner {
   position: relative;
   z-index: 2;
-  max-width: 900px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 6rem 2rem 4rem;
+  padding: 7rem 2rem 5rem;
   text-align: center;
+}
+
+/* university name — CHANGE THIS */
+.hero-univ {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(.85rem, 1.5vw, 1rem);
+  font-weight: 600;
+  color: var(--gold-light);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  opacity: .85;
+  animation: fadeUp .7s ease both;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  background: rgba(201,168,76,.15);
-  border: 1px solid rgba(201,168,76,.35);
+  background: rgba(200,150,60,.13);
+  border: 1px solid rgba(200,150,60,.3);
   color: var(--gold-light);
-  font-size: .75rem;
+  font-size: .72rem;
   font-weight: 600;
-  letter-spacing: .12em;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  padding: .45rem 1.2rem;
+  padding: .42rem 1.2rem;
   border-radius: 100px;
-  margin-bottom: 2rem;
-  animation: fadeSlideDown .8s ease both;
+  margin-bottom: 1.8rem;
+  animation: fadeUp .7s .15s ease both;
 }
-.badge-dot {
-  width: 6px; height: 6px;
-  background: var(--gold);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .5; transform: scale(1.4); }
-}
+.badge-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(1.5); } }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  font-weight: 900;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+  font-weight: 700;
   color: var(--white);
-  line-height: 1.0;
-  letter-spacing: -.02em;
-  margin-bottom: 1.5rem;
-  animation: fadeSlideDown .8s .2s ease both;
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  margin-bottom: 1rem;
+  animation: fadeUp .7s .3s ease both;
 }
-.hero-title em {
-  font-style: italic;
-  color: var(--gold);
-  display: block;
+.hero-title em { font-style: italic; color: var(--gold); display: block; }
+
+.hero-kannada {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255,255,255,.45);
+  margin-bottom: 1.25rem;
+  font-weight: 300;
+  animation: fadeUp .7s .45s ease both;
 }
 
 .hero-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,.6);
-  max-width: 560px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  color: rgba(255,255,255,.5);
+  max-width: 520px;
+  margin: 0 auto 1rem;
+  line-height: 1.8;
   font-weight: 300;
-  animation: fadeSlideDown .8s .4s ease both;
+  animation: fadeUp .7s .5s ease both;
+}
+
+.hero-spec-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  animation: fadeUp .7s .6s ease both;
+}
+.spec-tag {
+  background: rgba(200,150,60,.12);
+  border: 1px solid rgba(200,150,60,.28);
+  color: var(--gold-light);
+  font-size: .75rem;
+  font-weight: 500;
+  padding: .35rem 1rem;
+  border-radius: 100px;
 }
 
 .hero-actions {
@@ -152,786 +214,853 @@ body {
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
-  animation: fadeSlideDown .8s .6s ease both;
+  animation: fadeUp .7s .7s ease both;
 }
 
-.btn-hero-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  background: linear-gradient(135deg, var(--gold), #a8872d);
+.btn-primary {
+  display: inline-flex; align-items: center; gap: .55rem;
+  background: linear-gradient(135deg, var(--gold), #a8762a);
   color: var(--navy);
-  font-family: 'DM Sans', sans-serif;
-  font-size: .9rem;
-  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem; font-weight: 700;
   letter-spacing: .04em;
-  padding: .9rem 2.2rem;
+  padding: .85rem 2rem;
   border-radius: 100px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
+  text-decoration: none; border: none; cursor: pointer;
+  box-shadow: 0 8px 28px rgba(200,150,60,.38);
   transition: transform .2s, box-shadow .2s;
-  box-shadow: 0 8px 32px rgba(201,168,76,.4);
 }
-.btn-hero-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(201,168,76,.5);
-  color: var(--navy);
-  text-decoration: none;
-}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 38px rgba(200,150,60,.5); color: var(--navy); text-decoration: none; }
 
-.btn-hero-outline {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  background: transparent;
-  color: rgba(255,255,255,.85);
-  font-family: 'DM Sans', sans-serif;
-  font-size: .9rem;
-  font-weight: 500;
-  padding: .9rem 2.2rem;
+.btn-outline {
+  display: inline-flex; align-items: center; gap: .55rem;
+  background: transparent; color: rgba(255,255,255,.8);
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem; font-weight: 500;
+  padding: .85rem 2rem;
   border-radius: 100px;
-  border: 1px solid rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.18);
   text-decoration: none;
-  transition: border-color .2s, background .2s, color .2s;
+  transition: all .2s;
 }
-.btn-hero-outline:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: rgba(201,168,76,.08);
-  text-decoration: none;
-}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); background: rgba(200,150,60,.07); text-decoration: none; }
 
-/* scroll indicator */
 .scroll-hint {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .4rem;
-  color: rgba(255,255,255,.3);
-  font-size: .7rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  animation: fadeIn 1s 1.2s ease both;
-  z-index: 2;
+  position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .35rem;
+  color: rgba(255,255,255,.25); font-size: .65rem; letter-spacing: .1em;
+  text-transform: uppercase; z-index: 2; animation: fadeIn 1s 1.4s ease both;
 }
-.scroll-line {
-  width: 1px; height: 40px;
-  background: linear-gradient(to bottom, transparent, rgba(201,168,76,.5));
-  animation: scrollLine 2s ease-in-out infinite;
-}
-@keyframes scrollLine {
+.scroll-line { width: 1px; height: 36px; background: linear-gradient(to bottom, transparent, rgba(200,150,60,.5)); animation: scrollAnim 2s ease-in-out infinite; }
+@keyframes scrollAnim {
   0% { transform: scaleY(0); transform-origin: top; }
   50% { transform: scaleY(1); transform-origin: top; }
   51% { transform: scaleY(1); transform-origin: bottom; }
   100% { transform: scaleY(0); transform-origin: bottom; }
 }
 
-/* ─── STATS STRIP ─── */
+/* ── STATS STRIP ── */
 .stats-strip {
   background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
-  border-bottom: 1px solid var(--border);
-  padding: 0;
+  border-bottom: 1px solid var(--gold-border);
 }
 .stats-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  max-width: 1000px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4,1fr);
 }
 .stat-item {
-  padding: 2rem 1.5rem;
-  text-align: center;
-  border-right: 1px solid rgba(201,168,76,.12);
+  padding: 1.8rem 1rem; text-align: center;
+  border-right: 1px solid rgba(200,150,60,.1);
   transition: background .2s;
 }
 .stat-item:last-child { border-right: none; }
-.stat-item:hover { background: rgba(201,168,76,.06); }
-.stat-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--gold);
-  display: block;
-  line-height: 1;
-  margin-bottom: .3rem;
-}
-.stat-lbl {
-  font-size: .7rem;
-  color: rgba(255,255,255,.4);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
+.stat-item:hover { background: rgba(200,150,60,.05); }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: var(--gold); display: block; line-height: 1; margin-bottom: .3rem; }
+.stat-lbl { font-size: .68rem; color: rgba(255,255,255,.38); letter-spacing: .1em; text-transform: uppercase; }
 
-/* ─── SECTION COMMON ─── */
-.section {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 5rem 2rem;
-}
-.section-eyebrow {
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: .75rem;
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-}
-.section-eyebrow::after {
-  content: '';
-  flex: 1;
-  max-width: 40px;
-  height: 1px;
-  background: var(--gold);
-  opacity: .4;
-}
-.section-heading {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1.2;
-  margin-bottom: .75rem;
-}
-.section-sub {
-  font-size: .95rem;
-  color: var(--text-muted);
-  max-width: 480px;
-  line-height: 1.7;
-  margin-bottom: 3rem;
-}
+/* ── SECTION COMMON ── */
+.section { max-width: 1040px; margin: 0 auto; padding: var(--section-pad); }
+.section-eye { font-size: .68rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: .65rem; display: flex; align-items: center; gap: .6rem; }
+.section-eye::after { content:''; flex:1; max-width:36px; height:1px; background:var(--gold); opacity:.4; }
+.section-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.7rem,3.5vw,2.5rem); font-weight: 700; color: var(--navy); line-height: 1.2; margin-bottom: .6rem; }
+.section-sub { font-size: .9rem; color: var(--text-muted); max-width: 480px; line-height: 1.75; margin-bottom: 2.5rem; }
+.kannada-sub { font-size: .82rem; color: var(--text-muted); margin-bottom: 2.5rem; font-style: italic; display: block; }
 
-/* ─── PROCESS STEPS ─── */
-.process-wrap { position: relative; }
-
-.process-line {
-  position: absolute;
-  top: 48px;
-  left: 48px;
-  right: 48px;
-  height: 1px;
-  background: linear-gradient(to right, var(--gold) 0%, rgba(201,168,76,.2) 100%);
-  display: none;
+/* ── NOTICE BANNER ── */
+.notice-banner {
+  background: linear-gradient(135deg, #1a0a0a, #2d0e0e);
+  border: 1px solid rgba(220,60,60,.25);
+  border-left: 4px solid #e05050;
+  border-radius: var(--radius);
+  padding: 1.4rem 1.8rem;
+  margin-bottom: 2rem;
+  display: flex; gap: 1rem; align-items: flex-start;
 }
+.notice-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: .1rem; }
+.notice-text h4 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 700; color: #ff8080; margin-bottom: .4rem; }
+.notice-text p { font-size: .82rem; color: rgba(255,200,200,.65); line-height: 1.65; }
+.notice-text p strong { color: #ffaaaa; }
 
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  position: relative;
-}
-
-.step-card {
+/* ── CONTACT STRIP ── */
+.contact-strip {
   background: var(--white);
-  border: 1px solid var(--border);
+  border: 1px solid var(--gold-border);
   border-radius: var(--radius);
-  padding: 2rem 1.5rem;
-  position: relative;
-  overflow: hidden;
+  padding: 1.4rem 2rem;
+  display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,.05);
+}
+.contact-item { display: flex; align-items: center; gap: .7rem; font-size: .85rem; color: var(--text); }
+.contact-item i { color: var(--gold); width: 16px; }
+.contact-item strong { color: var(--navy); }
+
+/* ── SPECIALIZATIONS ── */
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1.25rem; }
+.spec-card {
+  background: var(--white);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  position: relative; overflow: hidden;
   transition: transform .3s, box-shadow .3s;
-  cursor: default;
 }
-.step-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--gold-pale), transparent);
-  opacity: 0;
-  transition: opacity .3s;
-}
-.step-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(11,27,58,.1); }
-.step-card:hover::before { opacity: 1; }
+.spec-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.spec-card:hover { transform: translateY(-5px); box-shadow: 0 18px 50px rgba(0,0,0,.1); }
+.spec-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; box-shadow: 0 6px 18px rgba(12,26,53,.25); }
+.spec-icon i { color: var(--gold); font-size: 1.2rem; }
+.spec-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: var(--navy); margin-bottom: .4rem; }
+.spec-card .spec-kn { font-size: .78rem; color: var(--text-muted); font-style: italic; margin-bottom: .7rem; display: block; }
+.spec-card p { font-size: .82rem; color: var(--text-muted); line-height: 1.65; }
 
-.step-number {
-  font-family: 'Playfair Display', serif;
-  font-size: 4rem;
-  font-weight: 900;
-  color: rgba(201,168,76,.1);
-  position: absolute;
-  top: -10px;
-  right: 1rem;
-  line-height: 1;
-  transition: color .3s;
+/* ── STEPS ── */
+.steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1.25rem; }
+.step-card {
+  background: var(--white); border: 1px solid var(--gold-border); border-radius: var(--radius);
+  padding: 1.75rem 1.5rem; position: relative; overflow: hidden;
+  transition: transform .3s, box-shadow .3s; cursor: default;
 }
-.step-card:hover .step-number { color: rgba(201,168,76,.2); }
+.step-card:hover { transform: translateY(-5px); box-shadow: 0 18px 50px rgba(0,0,0,.09); }
+.step-num-bg { font-family: 'Cormorant Garamond', serif; font-size: 4.5rem; font-weight: 700; color: rgba(200,150,60,.08); position: absolute; top: -12px; right: .8rem; line-height: 1; }
+.step-icon-box { width: 44px; height: 44px; background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; position: relative; z-index: 1; transition: transform .3s; }
+.step-card:hover .step-icon-box { transform: scale(1.08) rotate(-4deg); }
+.step-icon-box i { color: var(--gold); font-size: 1rem; }
+.step-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--navy); font-weight: 700; margin-bottom: .35rem; position: relative; z-index: 1; }
+.step-card p { font-size: .8rem; color: var(--text-muted); line-height: 1.65; position: relative; z-index: 1; }
 
-.step-icon-wrap {
-  width: 48px; height: 48px;
-  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.2rem;
-  box-shadow: 0 6px 20px rgba(11,27,58,.25);
-  position: relative;
-  z-index: 1;
-  transition: transform .3s;
-}
-.step-card:hover .step-icon-wrap { transform: scale(1.1) rotate(-5deg); }
-.step-icon-wrap i { color: var(--gold); font-size: 1.1rem; }
-
-.step-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  color: var(--navy);
-  font-weight: 700;
-  margin-bottom: .5rem;
-  position: relative; z-index: 1;
-}
-.step-card p {
-  font-size: .83rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-  position: relative; z-index: 1;
-}
-
-/* ─── FULL PROCEDURE ─── */
-.procedure-wrap {
-  background: var(--navy);
-  padding: 5rem 0;
-  position: relative;
-  overflow: hidden;
-}
-.procedure-wrap::before {
-  content: '';
-  position: absolute;
-  top: -100px; right: -100px;
-  width: 500px; height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,168,76,.08), transparent 70%);
-}
-.procedure-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-.procedure-inner .section-heading { color: var(--white); }
-.procedure-inner .section-sub { color: rgba(255,255,255,.45); }
-.procedure-inner .section-eyebrow { color: var(--gold-light); }
-
-.proc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-}
-
+/* ── PROCEDURE DARK ── */
+.proc-wrap { background: var(--navy); padding: 5rem 0; position: relative; overflow: hidden; }
+.proc-wrap::before { content:''; position:absolute; top:-80px; right:-80px; width:400px; height:400px; border-radius:50%; background:radial-gradient(circle, rgba(200,150,60,.08), transparent 70%); }
+.proc-inner { max-width: 1040px; margin: 0 auto; padding: 0 2rem; }
+.proc-inner .section-heading { color: var(--white); }
+.proc-inner .section-sub { color: rgba(255,255,255,.4); }
+.proc-inner .section-eye { color: var(--gold-light); }
+.proc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 1rem; }
 .proc-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(201,168,76,.12);
-  border-radius: var(--radius);
-  padding: 1.75rem;
-  display: flex;
-  gap: 1.2rem;
-  align-items: flex-start;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(200,150,60,.1);
+  border-radius: var(--radius); padding: 1.5rem 1.6rem;
+  display: flex; gap: 1rem; align-items: flex-start;
   transition: background .3s, border-color .3s, transform .3s;
 }
-.proc-card:hover {
-  background: rgba(201,168,76,.07);
-  border-color: rgba(201,168,76,.3);
-  transform: translateX(4px);
-}
+.proc-card:hover { background: rgba(200,150,60,.07); border-color: rgba(200,150,60,.28); transform: translateX(4px); }
+.proc-num { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--gold), #a87030); color: var(--navy); font-weight: 800; font-size: .82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.proc-text h4 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--white); font-weight: 700; margin-bottom: .3rem; }
+.proc-text p { font-size: .8rem; color: rgba(255,255,255,.4); line-height: 1.6; }
 
-.proc-step-num {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--gold), #a8872d);
-  color: var(--navy);
-  font-weight: 800;
-  font-size: .85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(201,168,76,.35);
-}
-
-.proc-text h4 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  color: var(--white);
-  font-weight: 700;
-  margin-bottom: .35rem;
-}
-.proc-text p {
-  font-size: .82rem;
-  color: rgba(255,255,255,.45);
-  line-height: 1.6;
-}
-
-/* ─── ELIGIBILITY ─── */
-.elig-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
+/* ── ELIGIBILITY ── */
+.elig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .elig-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
+  background: var(--white); border: 1px solid var(--gold-border);
+  border-radius: var(--radius); padding: 2rem;
+  position: relative; overflow: hidden;
 }
-.elig-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 4px; height: 100%;
-  background: linear-gradient(to bottom, var(--gold), var(--gold-light));
-  border-radius: 4px 0 0 4px;
-}
-.elig-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  color: var(--navy);
-  margin-bottom: 1rem;
-  font-weight: 700;
-}
-.elig-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: .6rem;
-}
-.elig-list li {
-  font-size: .84rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: flex-start;
-  gap: .6rem;
-  line-height: 1.5;
-}
-.elig-list li::before {
-  content: '✓';
-  color: var(--gold);
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: .05rem;
-}
+.elig-card::after { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background: linear-gradient(to bottom, var(--gold), var(--gold-light)); border-radius: 4px 0 0 4px; }
+.elig-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--navy); margin-bottom: 1rem; font-weight: 700; }
+.elig-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; }
+.elig-list li { font-size: .83rem; color: var(--text-muted); display: flex; align-items: flex-start; gap: .6rem; line-height: 1.55; }
+.elig-list li::before { content:'✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; margin-top: .05rem; }
+.elig-note { margin-top: 1rem; padding: .9rem 1rem; background: rgba(200,150,60,.06); border: 1px solid var(--gold-border); border-radius: 9px; font-size: .78rem; color: var(--text-muted); line-height: 1.6; }
+.elig-note strong { color: var(--navy); }
 
-/* ─── IMPORTANT DATES ─── */
-.dates-list {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
+/* ── SEAT MATRIX ── */
+.matrix-wrap { overflow-x: auto; }
+.matrix-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--white); border-radius: var(--radius);
+  overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.06);
+  font-size: .78rem;
 }
+.matrix-table thead tr { background: linear-gradient(135deg, var(--navy), var(--navy-light)); }
+.matrix-table thead th { color: var(--white); padding: .85rem .7rem; text-align: center; font-weight: 600; letter-spacing: .05em; border-right: 1px solid rgba(255,255,255,.07); white-space: nowrap; font-size: .72rem; }
+.matrix-table thead th:first-child { text-align: left; }
+.matrix-table tbody tr { border-bottom: 1px solid var(--gold-border); transition: background .15s; }
+.matrix-table tbody tr:hover { background: var(--gold-pale); }
+.matrix-table tbody td { padding: .75rem .7rem; text-align: center; color: var(--text); border-right: 1px solid rgba(200,150,60,.08); }
+.matrix-table tbody td:first-child { text-align: left; font-weight: 600; color: var(--navy); }
+.matrix-table tfoot tr { background: rgba(200,150,60,.08); }
+.matrix-table tfoot td { padding: .7rem; font-weight: 700; color: var(--navy); text-align: center; }
+.cat-th { background: rgba(200,150,60,.15) !important; color: var(--gold-light) !important; font-size: .65rem !important; }
+.total-cell { background: rgba(200,150,60,.1); font-weight: 700; color: var(--navy); }
+.matrix-note { margin-top: 1rem; padding: 1rem 1.25rem; background: var(--white); border: 1px solid var(--gold-border); border-radius: 10px; font-size: .78rem; color: var(--text-muted); line-height: 1.7; }
+.matrix-note strong { color: var(--navy); }
+
+/* ── FEE STRUCTURE ── */
+.fee-wrap { background: var(--navy); padding: 5rem 0; }
+.fee-inner { max-width: 1040px; margin: 0 auto; padding: 0 2rem; }
+.fee-inner .section-heading { color: var(--white); }
+.fee-inner .section-sub { color: rgba(255,255,255,.4); }
+.fee-inner .section-eye { color: var(--gold-light); }
+.fee-table {
+  width: 100%; border-collapse: collapse; font-size: .82rem;
+  background: rgba(255,255,255,.04); border-radius: var(--radius); overflow: hidden;
+}
+.fee-table thead tr { background: rgba(200,150,60,.15); }
+.fee-table thead th { color: var(--gold-light); padding: .9rem 1rem; text-align: center; font-weight: 600; border-right: 1px solid rgba(200,150,60,.1); }
+.fee-table thead th:first-child { text-align: left; }
+.fee-table tbody tr { border-bottom: 1px solid rgba(200,150,60,.07); transition: background .15s; }
+.fee-table tbody tr:hover { background: rgba(200,150,60,.05); }
+.fee-table tbody td { padding: .75rem 1rem; text-align: center; color: rgba(255,255,255,.7); border-right: 1px solid rgba(200,150,60,.07); }
+.fee-table tbody td:first-child { text-align: left; color: rgba(255,255,255,.85); }
+.fee-table tfoot tr { background: rgba(200,150,60,.12); }
+.fee-table tfoot td { padding: .85rem 1rem; font-weight: 700; color: var(--gold-light); text-align: center; }
+.fee-note { margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(255,255,255,.04); border: 1px solid rgba(200,150,60,.12); border-radius: 10px; font-size: .78rem; color: rgba(255,255,255,.45); line-height: 1.7; }
+.fee-note strong { color: var(--gold-light); }
+
+.exam-table {
+  width: 100%; border-collapse: collapse; font-size: .82rem;
+  background: rgba(255,255,255,.04); border-radius: var(--radius); overflow: hidden;
+  margin-top: 2rem;
+}
+.exam-table thead tr { background: rgba(200,150,60,.12); }
+.exam-table thead th { color: var(--gold-light); padding: .85rem 1rem; text-align: center; font-weight: 600; }
+.exam-table tbody tr { border-bottom: 1px solid rgba(200,150,60,.07); }
+.exam-table tbody tr:hover { background: rgba(200,150,60,.04); }
+.exam-table tbody td { padding: .7rem 1rem; text-align: center; color: rgba(255,255,255,.65); }
+
+.special-fees { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-top: 1.5rem; }
+.sfee-card { background: rgba(255,255,255,.04); border: 1px solid rgba(200,150,60,.12); border-radius: 10px; padding: 1.2rem 1.5rem; }
+.sfee-card h5 { font-size: .78rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: .1em; margin-bottom: .5rem; }
+.sfee-card p { font-size: .88rem; color: rgba(255,255,255,.7); font-weight: 600; }
+
+/* ── IMPORTANT DATES ── */
+.dates-list { display: flex; flex-direction: column; gap: .7rem; }
 .date-item {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.1rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  background: var(--white); border: 1px solid var(--gold-border); border-radius: 12px;
+  padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   transition: border-color .2s, transform .2s;
 }
-.date-item:hover {
-  border-color: var(--gold);
-  transform: translateX(4px);
-}
-.date-label {
-  font-size: .88rem;
-  font-weight: 600;
-  color: var(--navy);
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-}
+.date-item:hover { border-color: var(--gold); transform: translateX(4px); }
+.date-label { font-size: .86rem; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: .6rem; }
 .date-label i { color: var(--gold); width: 16px; }
-.date-val {
-  font-family: 'Playfair Display', serif;
-  font-size: .95rem;
-  color: var(--gold);
-  font-weight: 600;
-  white-space: nowrap;
-}
-.date-badge {
-  font-size: .65rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: .25rem .7rem;
-  border-radius: 100px;
-  background: rgba(201,168,76,.12);
-  color: var(--gold);
-  border: 1px solid rgba(201,168,76,.25);
-}
+.date-val { font-family: 'Cormorant Garamond', serif; font-size: .95rem; color: var(--gold); font-weight: 700; white-space: nowrap; }
+.date-badge { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .22rem .65rem; border-radius: 100px; background: rgba(200,150,60,.1); color: var(--gold); border: 1px solid rgba(200,150,60,.25); }
+.date-badge.urgent { background: rgba(220,60,60,.1); color: #e05050; border-color: rgba(220,60,60,.25); }
 
-/* ─── CTA ─── */
-.cta-section {
+/* ── HOSTEL / MISC INFO ── */
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 1.25rem; }
+.info-card {
+  background: var(--white); border: 1px solid var(--gold-border); border-radius: var(--radius);
+  padding: 1.75rem; display: flex; gap: 1rem; align-items: flex-start;
+}
+.info-icon { width: 42px; height: 42px; background: linear-gradient(135deg, var(--navy), var(--navy-light)); border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.info-icon i { color: var(--gold); font-size: 1rem; }
+.info-text h4 { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--navy); font-weight: 700; margin-bottom: .35rem; }
+.info-text p { font-size: .8rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ── SC/ST SCHOLARSHIP ── */
+.scholar-card {
+  background: linear-gradient(135deg, #0a1f0a, #0f2e0f);
+  border: 1px solid rgba(60,180,60,.2);
+  border-left: 4px solid #4caf50;
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.scholar-card h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: #80e080; margin-bottom: .75rem; font-weight: 700; }
+.scholar-card p { font-size: .82rem; color: rgba(180,240,180,.55); line-height: 1.7; }
+.scholar-card strong { color: #a0e8a0; }
+
+/* ── DOWNLOAD SECTION ── */
+.download-card {
   background: linear-gradient(135deg, var(--navy), var(--navy-light));
-  border-radius: 24px;
-  padding: 4rem 2.5rem;
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 2.5rem;
   text-align: center;
-  position: relative;
-  overflow: hidden;
-  margin: 0 2rem 4rem;
+  position: relative; overflow: hidden;
 }
-.cta-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(201,168,76,.1), transparent);
-}
-.cta-section::after {
-  content: '';
-  position: absolute;
-  top: -50%; right: -20%;
-  width: 400px; height: 400px;
-  border-radius: 50%;
-  border: 1px solid rgba(201,168,76,.08);
-}
-.cta-inner { position: relative; z-index: 1; }
-.cta-section h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  color: var(--white);
-  font-weight: 700;
-  margin-bottom: .75rem;
-}
-.cta-section p {
-  color: rgba(255,255,255,.5);
-  font-size: .95rem;
-  margin-bottom: 2rem;
-}
+.download-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 80% 80% at 50% 50%, rgba(200,150,60,.08), transparent); }
+.download-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--white); font-weight: 700; margin-bottom: .5rem; position: relative; z-index:1; }
+.download-card p { font-size: .85rem; color: rgba(255,255,255,.45); margin-bottom: 1.5rem; position: relative; z-index:1; }
 
-/* ─── ANIMATIONS ─── */
-@keyframes fadeSlideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity .7s ease, transform .7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.reveal { opacity:0; transform:translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
 
-/* ─── RESPONSIVE ─── */
+/* ── KANNADA TOGGLE ── */
+.en { display: block; }
+.kn { display: none; }
+body.kannada .en { display: none; }
+body.kannada .kn { display: block; }
+span.en, span.kn { display: inline; }
+body.kannada span.en { display: none; }
+body.kannada span.kn { display: inline; }
+
+/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .stats-inner { grid-template-columns: repeat(2,1fr); }
   .stat-item:nth-child(2) { border-right: none; }
   .elig-grid { grid-template-columns: 1fr; }
-  .hero-title { font-size: 3rem; }
-  .cta-section { margin: 0 1rem 3rem; border-radius: 16px; }
+  .contact-strip { flex-direction: column; gap: .8rem; }
+  .date-item { flex-wrap: wrap; }
 }
 @media (max-width: 480px) {
-  .stats-inner { grid-template-columns: repeat(2, 1fr); }
-  .steps-grid { grid-template-columns: 1fr; }
-  .proc-grid { grid-template-columns: 1fr; }
-  .date-item { flex-wrap: wrap; }
+  .stats-inner { grid-template-columns: repeat(2,1fr); }
+  .steps-grid, .proc-grid, .spec-grid, .info-grid { grid-template-columns: 1fr; }
 }
 </style>
 
+<!-- LANG TOGGLE -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btnEn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" id="btnKn" onclick="setLang('kn')">ಕನ್ನಡ</button>
+</div>
+
 <!-- ── HERO ── -->
-<div class="hero-wrap">
-  <div class="hero-grid"></div>
+<div class="hero">
+  <div class="hero-bg"></div>
   <div class="hero-glow"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <div class="hero-content">
+  <div class="hero-inner">
+    <!-- ★ CHANGE: Replace with your university name -->
+    <div class="hero-univ">
+      <span class="en">Bangalore University</span>
+      <span class="kn">[ನಿಮ್ಮ ವಿಶ್ವವಿದ್ಯಾಲಯದ ಹೆಸರು ಇಲ್ಲಿ]</span>
+    </div>
+
     <div class="hero-badge">
       <span class="badge-dot"></span>
-      Admissions Open — 2026–2027
+      <span class="en">Admissions Open — 2026–2027</span>
+      <span class="kn">ಪ್ರವೇಶ ತೆರೆದಿದೆ — 2026–2027</span>
     </div>
 
     <h1 class="hero-title">
-      Bachelor of
-      <em>Computer Applications</em>
+      <span class="en">Bachelor of <em>Computer Applications</em></span>
+      <span class="kn">ಕಂಪ್ಯೂಟರ್ <em>ಅಪ್ಲಿಕೇಶನ್ಸ್ ಪದವಿ</em></span>
     </h1>
 
-    <p class="hero-sub">
-      Apply online in minutes. Submit your academic details, get verified, and track your merit rank — all from one seamless portal.
+    <p class="hero-kannada">
+      <span class="en">ಬ್ಯಾಚುಲರ್ ಆಫ್ ಕಂಪ್ಯೂಟರ್ ಅಪ್ಲಿಕೇಶನ್ಸ್ — 3 ವರ್ಷಗಳ ಪದವಿ ಕಾರ್ಯಕ್ರಮ</span>
+      <span class="kn">Bachelor of Computer Applications — 3 Year Undergraduate Programme</span>
     </p>
+
+    <p class="hero-sub">
+      <span class="en">3-Year Undergraduate Programme with specializations in cutting-edge technologies. Merit-based admission through online counselling.</span>
+      <span class="kn">ಆಧುನಿಕ ತಂತ್ರಜ್ಞಾನದಲ್ಲಿ ವಿಶೇಷತೆಗಳೊಂದಿಗೆ 3 ವರ್ಷದ ಪದವಿ ಕಾರ್ಯಕ್ರಮ. ಅರ್ಹತೆ ಆಧಾರಿತ ಪ್ರವೇಶ.</span>
+    </p>
+
+    <div class="hero-spec-tags">
+      <span class="spec-tag">🤖 <span class="en">Machine Learning</span><span class="kn">ಮೆಷಿನ್ ಲರ್ನಿಂಗ್</span></span>
+      <span class="spec-tag">📊 <span class="en">Data Science</span><span class="kn">ಡೇಟಾ ಸೈನ್ಸ್</span></span>
+      <span class="spec-tag">💻 <span class="en">Full Stack Development</span><span class="kn">ಫುಲ್ ಸ್ಟಾಕ್ ಡೆವಲಪ್‌ಮೆಂಟ್</span></span>
+    </div>
 
     <div class="hero-actions">
       {% if current_user.is_authenticated %}
-        <a href="{{ url_for('main.apply') }}" class="btn-hero-primary">
-          <i class="fas fa-paper-plane"></i> Apply Now
-        </a>
-        <a href="{{ url_for('main.student_dashboard') }}" class="btn-hero-outline">
-          <i class="fas fa-tachometer-alt"></i> My Dashboard
-        </a>
-      {% else %}
-        <a href="{{ url_for('main.register') }}" class="btn-hero-primary">
-          <i class="fas fa-user-plus"></i> Create Account
-        </a>
-        <a href="{{ url_for('main.login') }}" class="btn-hero-outline">
-          <i class="fas fa-sign-in-alt"></i> Sign In
+        <a href="{{ url_for('main.student_dashboard') }}" class="btn-primary">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="en">My Dashboard</span><span class="kn">ನನ್ನ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</span>
         </a>
       {% endif %}
+      <a href="#procedure" class="btn-outline">
+        <i class="fas fa-info-circle"></i>
+        <span class="en">Admission Process</span><span class="kn">ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ</span>
+      </a>
+      <a href="#fees" class="btn-outline">
+        <i class="fas fa-rupee-sign"></i>
+        <span class="en">Fee Structure</span><span class="kn">ಶುಲ್ಕ ರಚನೆ</span>
+      </a>
     </div>
   </div>
 
   <div class="scroll-hint">
-    <span>Scroll</span>
+    <span class="en">Scroll</span><span class="kn">ಸ್ಕ್ರೋಲ್</span>
     <div class="scroll-line"></div>
   </div>
+  <div class="hero-arc"></div>
 </div>
 
 <!-- ── STATS ── -->
 <div class="stats-strip">
   <div class="stats-inner">
     <div class="stat-item reveal">
-      <span class="stat-num">3 Yrs</span>
-      <span class="stat-lbl">Full-time Programme</span>
+      <span class="stat-num">3 <span class="en">Yrs</span><span class="kn">ವರ್ಷ</span></span>
+      <span class="stat-lbl"><span class="en">Full-time Programme</span><span class="kn">ಪೂರ್ಣ ಸಮಯ ಕಾರ್ಯಕ್ರಮ</span></span>
     </div>
     <div class="stat-item reveal">
-      <span class="stat-num">100%</span>
-      <span class="stat-lbl">Online Application</span>
+      <span class="stat-num">180</span>
+      <span class="stat-lbl"><span class="en">Total Seats (3 Specs)</span><span class="kn">ಒಟ್ಟು ಸ್ಥಾನಗಳು</span></span>
     </div>
     <div class="stat-item reveal">
-      <span class="stat-num">Merit</span>
-      <span class="stat-lbl">Based Admission</span>
+      <span class="stat-num"><span class="en">Merit</span><span class="kn">ಅರ್ಹತೆ</span></span>
+      <span class="stat-lbl"><span class="en">Based Admission</span><span class="kn">ಆಧಾರಿತ ಪ್ರವೇಶ</span></span>
     </div>
     <div class="stat-item reveal">
       <span class="stat-num">2026</span>
-      <span class="stat-lbl">Batch Starting</span>
+      <span class="stat-lbl"><span class="en">Batch Starting</span><span class="kn">ಬ್ಯಾಚ್ ಆರಂಭ</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ── IMPORTANT NOTICE ── -->
+<div class="section" style="padding-bottom:0">
+  <div class="notice-banner reveal">
+    <span class="notice-icon">📋</span>
+    <div class="notice-text">
+      <h4>
+        <span class="en">Important Notice — Application Submission</span>
+        <span class="kn">ಮಹತ್ವದ ಸೂಚನೆ — ಅರ್ಜಿ ಸಲ್ಲಿಕೆ</span>
+      </h4>
+      <p class="en">
+        Candidates are requested to submit a <strong>hard copy of the application along with necessary documents</strong> to the Office of the Coordinator, UG Programme.
+        <!-- ★ CHANGE: Add full office address here -->
+        Address: <strong>RUSA Building, Jnanabharathi campus, Bangalore University, Bengaluru-56. </strong> |
+        Last date for submission: <strong>15.05.2025</strong> |
+        The application can be downloaded from the university official website.
+      </p>
+      <p class="kn">
+        ಅಭ್ಯರ್ಥಿಗಳು ಅಗತ್ಯ ದಾಖಲೆಗಳೊಂದಿಗೆ <strong>ಅರ್ಜಿಯ ಮುದ್ರಣ ಪ್ರತಿಯನ್ನು</strong> ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಬೇಕು.
+        ವಿಳಾಸ: <strong>[ಕಚೇರಿ ವಿಳಾಸ ಇಲ್ಲಿ]</strong> |
+        ಸಲ್ಲಿಕೆಯ ಕೊನೆಯ ದಿನಾಂಕ: <strong>15.05.2025</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- CONTACT STRIP -->
+  <div class="contact-strip reveal">
+    <!-- ★ CHANGE: Replace phone, email, and office hours -->
+    <div class="contact-item"><i class="fas fa-phone"></i> <span><strong><span class="en">Phone</span><span class="kn">ದೂರವಾಣಿ</span>:</strong> 8147147632  &nbsp;·&nbsp; <span class="en">Office Hours</span><span class="kn">ಕಚೇರಿ ಸಮಯ</span>: 10 A.M - 5.0 P.M </span></div>
+    <div class="contact-item"><i class="fas fa-envelope"></i> <span><strong>Email:</strong> bca@bub.ernet.in</span></div>
+    <!-- ★ CHANGE: Replace with official university website URL -->
+    <div class="contact-item"><i class="fas fa-globe"></i> <a href="https://bangaloreuniversity.karnataka.gov.in/" target="_blank" style="color:var(--gold)"><span class="en">Official Website</span><span class="kn">ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್</span></a></div>
+  </div>
+</div>
+
+<!-- ── SPECIALIZATIONS ── -->
+<div class="section">
+  <div class="section-eye reveal"><span class="en">Specializations</span><span class="kn">ವಿಶೇಷತೆಗಳು</span></div>
+  <h2 class="section-heading reveal"><span class="en">Choose Your Path</span><span class="kn">ನಿಮ್ಮ ಮಾರ್ಗ ಆರಿಸಿ</span></h2>
+  <p class="section-sub reveal"><span class="en">B.C.A. is offered with three industry-relevant specializations to prepare you for the modern tech landscape.</span><span class="kn">ಆಧುನಿಕ ತಂತ್ರಜ್ಞಾನ ಕ್ಷೇತ್ರಕ್ಕೆ ತಯಾರು ಮಾಡಲು ಮೂರು ಉದ್ಯಮ-ಸಂಬಂಧಿತ ವಿಶೇಷತೆಗಳು.</span></p>
+  <div class="spec-grid">
+    <div class="spec-card reveal">
+      <div class="spec-icon"><i class="fas fa-brain"></i></div>
+      <h3>Machine Learning</h3>
+      <span class="spec-kn">ಮೆಷಿನ್ ಲರ್ನಿಂಗ್</span>
+      <p><span class="en">Dive into AI algorithms, neural networks, and intelligent systems. Build models that learn and predict from data.</span><span class="kn">AI ಅಲ್ಗಾರಿದಮ್‌ಗಳು, ನ್ಯೂರಲ್ ನೆಟ್‌ವರ್ಕ್‌ಗಳು ಮತ್ತು ಬುದ್ಧಿವಂತ ವ್ಯವಸ್ಥೆಗಳನ್ನು ಅಧ್ಯಯನ ಮಾಡಿ.</span></p>
+    </div>
+    <div class="spec-card reveal">
+      <div class="spec-icon"><i class="fas fa-chart-bar"></i></div>
+      <h3>Data Science</h3>
+      <span class="spec-kn">ಡೇಟಾ ಸೈನ್ಸ್</span>
+      <p><span class="en">Master data analysis, visualization, and statistical modelling. Turn raw data into actionable business insights.</span><span class="kn">ಡೇಟಾ ವಿಶ್ಲೇಷಣೆ, ದೃಶ್ಯೀಕರಣ ಮತ್ತು ಸಂಖ್ಯಾಶಾಸ್ತ್ರೀಯ ಮಾದರಿಯನ್ನು ಕರಗತ ಮಾಡಿಕೊಳ್ಳಿ.</span></p>
+    </div>
+    <div class="spec-card reveal">
+      <div class="spec-icon"><i class="fas fa-code"></i></div>
+      <h3>Full Stack Development</h3>
+      <span class="spec-kn">ಫುಲ್ ಸ್ಟಾಕ್ ಡೆವಲಪ್‌ಮೆಂಟ್</span>
+      <p><span class="en">Build complete web applications from frontend to backend. Master modern frameworks and deployment pipelines.</span><span class="kn">ಫ್ರಂಟೆಂಡ್‌ನಿಂದ ಬ್ಯಾಕೆಂಡ್‌ವರೆಗೆ ಸಂಪೂರ್ಣ ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ನಿರ್ಮಿಸಿ.</span></p>
     </div>
   </div>
 </div>
 
 <!-- ── HOW IT WORKS ── -->
-<div class="section">
-  <div class="section-eyebrow reveal">How It Works</div>
-  <h2 class="section-heading reveal">Three simple steps to apply</h2>
-  <p class="section-sub reveal">From registration to counselling, the entire process is online. Here's what you need to do.</p>
-
-  <div class="steps-grid process-wrap">
+<div class="section" style="padding-top:0" id="procedure">
+  <div class="section-eye reveal"><span class="en">How It Works</span><span class="kn">ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ</span></div>
+  <h2 class="section-heading reveal"><span class="en">Admission at a Glance</span><span class="kn">ಪ್ರವೇಶ ಒಂದು ನೋಟದಲ್ಲಿ</span></h2>
+  <p class="section-sub reveal"><span class="en">From application to admission, everything is online and transparent.</span><span class="kn">ಅರ್ಜಿಯಿಂದ ಪ್ರವೇಶದವರೆಗೆ ಎಲ್ಲವೂ ಆನ್‌ಲೈನ್ ಮತ್ತು ಪಾರದರ್ಶಕ.</span></p>
+  <div class="steps-grid">
     <div class="step-card reveal">
-      <span class="step-number">01</span>
-      <div class="step-icon-wrap"><i class="fas fa-user-plus"></i></div>
-      <h3>Register</h3>
-      <p>Create your account using your email address. Verify it instantly with a one-time OTP sent to your inbox.</p>
+      <span class="step-num-bg">01</span>
+      <div class="step-icon-box"><i class="fas fa-download"></i></div>
+      <h3><span class="en">Download & Fill</span><span class="kn">ಡೌನ್‌ಲೋಡ್ ಮತ್ತು ಭರ್ತಿ</span></h3>
+      <p><span class="en">Download the application from the university website. Fill all details carefully.</span><span class="kn">ವಿಶ್ವವಿದ್ಯಾಲಯದ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.</span></p>
     </div>
     <div class="step-card reveal">
-      <span class="step-number">02</span>
-      <div class="step-icon-wrap"><i class="fas fa-file-alt"></i></div>
-      <h3>Fill Application</h3>
-      <p>Enter your personal details, Class 10 & 12 marks, and category. Submit your application before the deadline.</p>
+      <span class="step-num-bg">02</span>
+      <div class="step-icon-box"><i class="fas fa-file-upload"></i></div>
+      <h3><span class="en">Submit Hard Copy</span><span class="kn">ಮುದ್ರಣ ಪ್ರತಿ ಸಲ್ಲಿಸಿ</span></h3>
+      <p><span class="en">Submit the signed application with all documents to the UG Programme Coordinator's office.</span><span class="kn">ಎಲ್ಲಾ ದಾಖಲೆಗಳೊಂದಿಗೆ ಸ್ನಾತಕ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ.</span></p>
     </div>
     <div class="step-card reveal">
-      <span class="step-number">03</span>
-      <div class="step-icon-wrap"><i class="fas fa-check-shield"></i></div>
-      <h3>Verification</h3>
-      <p>The admin team reviews your submitted details. You'll be notified once your application is verified.</p>
+      <span class="step-num-bg">03</span>
+      <div class="step-icon-box"><i class="fas fa-check-circle"></i></div>
+      <h3><span class="en">Verification</span><span class="kn">ಪರಿಶೀಲನೆ</span></h3>
+      <p><span class="en">Admin team verifies your application and documents. Track status on this portal.</span><span class="kn">ನಿಮ್ಮ ಅರ್ಜಿ ಮತ್ತು ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗುವುದು.</span></p>
     </div>
     <div class="step-card reveal">
-      <span class="step-number">04</span>
-      <div class="step-icon-wrap"><i class="fas fa-sort-amount-up"></i></div>
-      <h3>Merit Rank</h3>
-      <p>After verification, merit ranks are assigned based on your Class 12 percentage. View your rank on the dashboard.</p>
+      <span class="step-num-bg">04</span>
+      <div class="step-icon-box"><i class="fas fa-sort-amount-up"></i></div>
+      <h3><span class="en">Merit Rank</span><span class="kn">ಅರ್ಹತಾ ಶ್ರೇಣಿ</span></h3>
+      <p><span class="en">Ranks assigned based on Class 12 percentage. View your rank on the student dashboard.</span><span class="kn">12ನೇ ತರಗತಿ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಶ್ರೇಣಿ ನೀಡಲಾಗುವುದು.</span></p>
     </div>
     <div class="step-card reveal">
-      <span class="step-number">05</span>
-      <div class="step-icon-wrap"><i class="fas fa-users"></i></div>
-      <h3>Counselling</h3>
-      <p>Attend the live counselling session. Seats are allotted by rank — Government and Management quota separately.</p>
+      <span class="step-num-bg">05</span>
+      <div class="step-icon-box"><i class="fas fa-users"></i></div>
+      <h3><span class="en">Counselling</span><span class="kn">ಕೌನ್ಸೆಲಿಂಗ್</span></h3>
+      <p><span class="en">Attend live counselling. Seats allotted by rank under Government and Management quota.</span><span class="kn">ಲೈವ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಹಾಜರಾಗಿ. ಸರ್ಕಾರಿ ಮತ್ತು ನಿರ್ವಹಣಾ ಕೋಟಾದಡಿ ಸ್ಥಾನ ಹಂಚಿಕೆ.</span></p>
     </div>
     <div class="step-card reveal">
-      <span class="step-number">06</span>
-      <div class="step-icon-wrap"><i class="fas fa-graduation-cap"></i></div>
-      <h3>Admission</h3>
-      <p>Once allotted, complete the fee payment and document submission to confirm your admission.</p>
+      <span class="step-num-bg">06</span>
+      <div class="step-icon-box"><i class="fas fa-graduation-cap"></i></div>
+      <h3><span class="en">Confirm Admission</span><span class="kn">ಪ್ರವೇಶ ದೃಢೀಕರಿಸಿ</span></h3>
+      <p><span class="en">Pay fees and submit original documents to complete your admission.</span><span class="kn">ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ಮೂಲ ದಾಖಲೆಗಳನ್ನು ಸಲ್ಲಿಸಿ.</span></p>
     </div>
   </div>
 </div>
 
 <!-- ── FULL PROCEDURE ── -->
-<div class="procedure-wrap">
-  <div class="procedure-inner">
-    <div class="section-eyebrow reveal" style="color:var(--gold-light)">Detailed Procedure</div>
-    <h2 class="section-heading reveal">Complete admission process</h2>
-    <p class="section-sub reveal">Everything you need to know before applying — step by step.</p>
-
+<div class="proc-wrap">
+  <div class="proc-inner">
+    <div class="section-eye reveal"><span class="en">Detailed Procedure</span><span class="kn">ವಿಸ್ತೃತ ಪ್ರಕ್ರಿಯೆ</span></div>
+    <h2 class="section-heading reveal"><span class="en">Complete Admission Process</span><span class="kn">ಸಂಪೂರ್ಣ ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ</span></h2>
+    <p class="section-sub reveal"><span class="en">Everything you need to know, step by step.</span><span class="kn">ಹಂತ ಹಂತವಾಗಿ ತಿಳಿಯಬೇಕಾದ ಎಲ್ಲವೂ.</span></p>
     <div class="proc-grid">
-      <div class="proc-card reveal">
-        <div class="proc-step-num">1</div>
-        <div class="proc-text">
-          <h4>Create Your Account</h4>
-          <p>Visit the portal and click "Create Account". Enter your full name, email, and set a password. Verify your email via OTP.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">2</div>
-        <div class="proc-text">
-          <h4>Login & Start Application</h4>
-          <p>Log in with your credentials and click "Apply Now" from your dashboard to open the application form.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">3</div>
-        <div class="proc-text">
-          <h4>Fill Personal Details</h4>
-          <p>Enter your full name, date of birth, gender, contact number, address, and category (General/SC/ST/OBC/EWS/PWD).</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">4</div>
-        <div class="proc-text">
-          <h4>Enter Academic Marks</h4>
-          <p>Provide your Class 10 and Class 12 board, school name, passing year, and percentage marks accurately.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">5</div>
-        <div class="proc-text">
-          <h4>Submit Application</h4>
-          <p>Review all details carefully before submitting. You can edit your application until the form closes.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">6</div>
-        <div class="proc-text">
-          <h4>Wait for Verification</h4>
-          <p>The admissions team will verify your application. Check your dashboard for status updates regularly.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">7</div>
-        <div class="proc-text">
-          <h4>Check Merit Rank</h4>
-          <p>Once verified, your merit rank will appear on your dashboard based on Class 12 percentage.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">8</div>
-        <div class="proc-text">
-          <h4>Attend Counselling</h4>
-          <p>Join the live counselling session on the scheduled date. When your rank is called, choose your quota and confirm the seat.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">9</div>
-        <div class="proc-text">
-          <h4>Seat Allotment</h4>
-          <p>Seats are allotted from Government and Management quota separately by category. Your allotment letter will be available to download.</p>
-        </div>
-      </div>
-      <div class="proc-card reveal">
-        <div class="proc-step-num">10</div>
-        <div class="proc-text">
-          <h4>Confirm Admission</h4>
-          <p>Complete the fee payment, submit original documents to the college, and confirm your admission before the deadline.</p>
-        </div>
-      </div>
+      <div class="proc-card reveal"><div class="proc-num">1</div><div class="proc-text"><h4><span class="en">Download Application</span><span class="kn">ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್</span></h4><p><span class="en">Download the application form from the official university website.</span><span class="kn">ವಿಶ್ವವಿದ್ಯಾಲಯದ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">2</div><div class="proc-text"><h4><span class="en">Fill Personal Details</span><span class="kn">ವೈಯಕ್ತಿಕ ವಿವರ ಭರ್ತಿ</span></h4><p><span class="en">Enter your full name, date of birth, gender, contact number, address, and category.</span><span class="kn">ಹೆಸರು, ಜನ್ಮ ದಿನಾಂಕ, ಲಿಂಗ, ಸಂಪರ್ಕ ಸಂಖ್ಯೆ, ವಿಳಾಸ ಮತ್ತು ವರ್ಗ ನಮೂದಿಸಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">3</div><div class="proc-text"><h4><span class="en">Enter Academic Marks</span><span class="kn">ಶೈಕ್ಷಣಿಕ ಅಂಕ ನಮೂದಿಸಿ</span></h4><p><span class="en">Provide Class 10 and Class 12 board, school name, passing year, and percentage marks accurately.</span><span class="kn">10ನೇ ಮತ್ತು 12ನೇ ತರಗತಿ ಅಂಕಗಳನ್ನು ನಿಖರವಾಗಿ ನಮೂದಿಸಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">4</div><div class="proc-text"><h4><span class="en">Attach Documents</span><span class="kn">ದಾಖಲೆಗಳನ್ನು ಲಗತ್ತಿಸಿ</span></h4><p><span class="en">Attach self-attested copies of all required documents along with the application.</span><span class="kn">ಎಲ್ಲಾ ಅಗತ್ಯ ದಾಖಲೆಗಳ ಸ್ವಯಂ-ಸಾಕ್ಷ್ಯಾಂಕಿತ ಪ್ರತಿಗಳನ್ನು ಲಗತ್ತಿಸಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">5</div><div class="proc-text"><h4><span class="en">Submit to Office</span><span class="kn">ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ</span></h4><p><span class="en">Submit the complete application to the Office of the UG Programme Coordinator before 15.05.2025.</span><span class="kn">15.05.2025 ರ ಒಳಗಾಗಿ ಸಂಪೂರ್ಣ ಅರ್ಜಿಯನ್ನು ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">6</div><div class="proc-text"><h4><span class="en">Verification Process</span><span class="kn">ಪರಿಶೀಲನಾ ಪ್ರಕ್ರಿಯೆ</span></h4><p><span class="en">The admissions team will verify your documents. Check this portal for status updates.</span><span class="kn">ಪ್ರವೇಶ ತಂಡ ನಿಮ್ಮ ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">7</div><div class="proc-text"><h4><span class="en">Merit List & Rank</span><span class="kn">ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಶ್ರೇಣಿ</span></h4><p><span class="en">Merit ranks based on qualifying exam score. Rank visible on student dashboard.</span><span class="kn">ಅರ್ಹತಾ ಪರೀಕ್ಷೆಯ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಅರ್ಹತಾ ಶ್ರೇಣಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">8</div><div class="proc-text"><h4><span class="en">Attend Live Counselling</span><span class="kn">ಲೈವ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಹಾಜರಾಗಿ</span></h4><p><span class="en">Join the live online counselling session on the scheduled date when your rank is called.</span><span class="kn">ನಿಗದಿತ ದಿನಾಂಕದಂದು ಲೈವ್ ಆನ್‌ಲೈನ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಸೇರಿ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">9</div><div class="proc-text"><h4><span class="en">Seat Allotment</span><span class="kn">ಸ್ಥಾನ ಹಂಚಿಕೆ</span></h4><p><span class="en">Seats allotted from Government and Management quota separately by category as per the seat matrix.</span><span class="kn">ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್‌ನಂತೆ ವರ್ಗವಾರು ಸ್ಥಾನ ಹಂಚಿಕೆ.</span></p></div></div>
+      <div class="proc-card reveal"><div class="proc-num">10</div><div class="proc-text"><h4><span class="en">Confirm & Pay Fees</span><span class="kn">ದೃಢೀಕರಿಸಿ ಮತ್ತು ಶುಲ್ಕ ಪಾವತಿಸಿ</span></h4><p><span class="en">Pay prescribed fees and submit original documents to confirm your admission.</span><span class="kn">ನಿಗದಿತ ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ಮೂಲ ದಾಖಲೆಗಳನ್ನು ಸಲ್ಲಿಸಿ.</span></p></div></div>
     </div>
   </div>
 </div>
 
 <!-- ── ELIGIBILITY ── -->
 <div class="section">
-  <div class="section-eyebrow reveal">Eligibility</div>
-  <h2 class="section-heading reveal">Who can apply?</h2>
-  <p class="section-sub reveal">Check the eligibility criteria before you start your application.</p>
+  <div class="section-eye reveal"><span class="en">Eligibility</span><span class="kn">ಅರ್ಹತೆ</span></div>
+  <h2 class="section-heading reveal"><span class="en">Who Can Apply?</span><span class="kn">ಯಾರು ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು?</span></h2>
+  <p class="section-sub reveal"><span class="en">Check all eligibility criteria before applying.</span><span class="kn">ಅರ್ಜಿ ಸಲ್ಲಿಸುವ ಮೊದಲು ಎಲ್ಲಾ ಅರ್ಹತಾ ಮಾನದಂಡಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.</span></p>
 
   <div class="elig-grid">
     <div class="elig-card reveal">
-      <h3><i class="fas fa-book" style="color:var(--gold);margin-right:.5rem"></i> Academic Requirements</h3>
+      <h3><i class="fas fa-graduation-cap" style="color:var(--gold);margin-right:.5rem"></i> <span class="en">Academic Requirements</span><span class="kn">ಶೈಕ್ಷಣಿಕ ಅವಶ್ಯಕತೆಗಳು</span></h3>
       <ul class="elig-list">
-        <li>Passed Class 12 (10+2) from a recognised board</li>
-        <li>Minimum 45% marks in Class 12 (40% for reserved categories)</li>
-        <li>Mathematics or Computer Science as a subject is preferred</li>
-        <li>Class 10 passing certificate required</li>
-        <li>Appearing candidates may apply provisionally</li>
+        <li><span class="en">Completed 2-year PUC or equivalent (Arts / Science / Commerce)</span><span class="kn">2 ವರ್ಷದ PUC ಅಥವಾ ಸಮಾನ (ಕಲೆ / ವಿಜ್ಞಾನ / ವಾಣಿಜ್ಯ)</span></li>
+        <li><span class="en">Minimum <strong>50% aggregate marks</strong> in Class 12</span><span class="kn">12ನೇ ತರಗತಿಯಲ್ಲಿ ಕನಿಷ್ಠ <strong>50% ಒಟ್ಟು ಅಂಕಗಳು</strong></span></li>
+        <li><span class="en"><strong>45% for SC/ST and Category-I</strong> candidates of Karnataka state domicile</span><span class="kn">ಕರ್ನಾಟಕ ರಾಜ್ಯ ನಿವಾಸಿ SC/ST ಮತ್ತು ವರ್ಗ-I ಅಭ್ಯರ್ಥಿಗಳಿಗೆ <strong>45%</strong></span></li>
+        <li><span class="en">Selection based on qualifying examination score</span><span class="kn">ಅರ್ಹತಾ ಪರೀಕ್ಷೆಯ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಆಯ್ಕೆ</span></li>
+        <li><span class="en">Arts / Science / Commerce with any optional subjects</span><span class="kn">ಯಾವುದೇ ಐಚ್ಛಿಕ ವಿಷಯಗಳೊಂದಿಗೆ ಕಲೆ / ವಿಜ್ಞಾನ / ವಾಣಿಜ್ಯ</span></li>
+        <li><span class="en"><strong>Local students will be preferred</strong></span><span class="kn"><strong>ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ</strong></span></li>
       </ul>
+      <div class="elig-note">
+        <strong><span class="en">Note:</span><span class="kn">ಸೂಚನೆ:</span></strong>
+        <span class="en"> Hostel facility is <strong>not available</strong> for UG programme students.</span>
+        <span class="kn"> UG ಕಾರ್ಯಕ್ರಮದ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ <strong>ಲಭ್ಯವಿಲ್ಲ</strong>.</span>
+      </div>
     </div>
     <div class="elig-card reveal">
-      <h3><i class="fas fa-id-card" style="color:var(--gold);margin-right:.5rem"></i> Documents Required</h3>
+      <h3><i class="fas fa-id-card" style="color:var(--gold);margin-right:.5rem"></i> <span class="en">Documents Required</span><span class="kn">ಅಗತ್ಯ ದಾಖಲೆಗಳು</span></h3>
       <ul class="elig-list">
-        <li>Class 10 marksheet & certificate</li>
-        <li>Class 12 marksheet & certificate</li>
-        <li>Category/Caste certificate (if applicable)</li>
-        <li>EWS / PWD certificate (if applicable)</li>
-        <li>Transfer certificate from last institution</li>
-        <li>Valid government photo ID proof</li>
+        <li><span class="en">Class 10 marksheet & passing certificate</span><span class="kn">10ನೇ ತರಗತಿ ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
+        <li><span class="en">Class 12 (PUC) marksheet & passing certificate</span><span class="kn">12ನೇ ತರಗತಿ (PUC) ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
+        <li><span class="en">Category / Caste certificate (SC/ST/OBC/EWS if applicable)</span><span class="kn">ಜಾತಿ / ವರ್ಗ ಪ್ರಮಾಣ ಪತ್ರ (해당 ಇದ್ದಲ್ಲಿ)</span></li>
+        <li><span class="en">Income certificate from Tahsildar (for fee concession)</span><span class="kn">ಶುಲ್ಕ ರಿಯಾಯಿತಿಗಾಗಿ ತಹಶೀಲ್ದಾರ್ ಆದಾಯ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
+        <li><span class="en">Transfer certificate from last institution</span><span class="kn">ಕೊನೆಯ ಸಂಸ್ಥೆಯ ವರ್ಗಾವಣೆ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
+        <li><span class="en">Valid government photo ID proof</span><span class="kn">ಮಾನ್ಯ ಸರ್ಕಾರಿ ಫೋಟೋ ಗುರುತಿನ ಪ್ರಮಾಣ</span></li>
+        <li><span class="en">HK / PWD / Kannada Medium / Rural certificate (if applicable)</span><span class="kn">HK / PWD / ಕನ್ನಡ ಮಾಧ್ಯಮ / ಗ್ರಾಮೀಣ ಪ್ರಮಾಣ ಪತ್ರ (ಅನ್ವಯವಾದಲ್ಲಿ)</span></li>
       </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEAT MATRIX ── -->
+<div class="section" style="padding-top:0">
+  <div class="section-eye reveal"><span class="en">Seat Matrix</span><span class="kn">ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್</span></div>
+  <h2 class="section-heading reveal"><span class="en">Provisional Seat Matrix 2026–27</span><span class="kn">ತಾತ್ಕಾಲಿಕ ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 2026–27</span></h2>
+  <p class="section-sub reveal"><span class="en">Category-wise seat distribution for all three B.C.A. specializations.</span><span class="kn">ಮೂರು B.C.A. ವಿಶೇಷತೆಗಳಿಗೆ ವರ್ಗವಾರು ಸ್ಥಾನ ವಿತರಣೆ.</span></p>
+
+  <div class="matrix-wrap reveal">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left;min-width:180px"><span class="en">Programme</span><span class="kn">ಕಾರ್ಯಕ್ರಮ</span></th>
+          <th rowspan="2"><span class="en">Category</span><span class="kn">ವರ್ಗ</span></th>
+          <th class="cat-th">GM<br><span style="font-size:.6rem;opacity:.7">44%</span></th>
+          <th class="cat-th">SC<br><span style="font-size:.6rem;opacity:.7">17%</span></th>
+          <th class="cat-th">ST<br><span style="font-size:.6rem;opacity:.7">7%</span></th>
+          <th class="cat-th">Cat-I<br><span style="font-size:.6rem;opacity:.7">4%</span></th>
+          <th class="cat-th">IIA<br><span style="font-size:.6rem;opacity:.7">15%</span></th>
+          <th class="cat-th">IIB<br><span style="font-size:.6rem;opacity:.7">4%</span></th>
+          <th class="cat-th">IIIA<br><span style="font-size:.6rem;opacity:.7">4%</span></th>
+          <th class="cat-th">IIIB<br><span style="font-size:.6rem;opacity:.7">5%</span></th>
+          <th class="cat-th">HK*<br><span style="font-size:.6rem;opacity:.7">8%</span></th>
+          <th class="cat-th">PWD*<br><span style="font-size:.6rem;opacity:.7">5%</span></th>
+          <th class="cat-th">KM</th>
+          <th class="cat-th">RL</th>
+          <th class="total-cell"><span class="en">Total</span><span class="kn">ಒಟ್ಟು</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td rowspan="2" style="text-align:left;vertical-align:middle"><strong>(a) Machine Learning<br>(b) Data Science<br>(c) Full Stack Dev</strong><br><small style="color:var(--text-muted)"><span class="en">Each Specialization</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ</span></small></td>
+          <td style="text-align:left;font-size:.75rem"><span class="en">Regular Fees</span><span class="kn">ನಿಯಮಿತ ಶುಲ್ಕ</span></td>
+          <td>33</td><td>3</td><td>13</td><td>5</td><td>3</td><td>11</td><td>3</td><td>3</td><td>7*</td><td>4*</td><td>2</td><td>2</td>
+          <td class="total-cell">90</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-size:.75rem"><span class="en">Payment Seats</span><span class="kn">ಪಾವತಿ ಸ್ಥಾನಗಳು</span></td>
+          <td>32</td><td>12</td><td>5</td><td>3</td><td>-</td><td>11</td><td>3</td><td>3</td><td>8*</td><td>5*</td><td>2</td><td>2</td>
+          <td class="total-cell">90</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2"><span class="en">Total per Specialization</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ ಒಟ್ಟು</span></td>
+          <td colspan="12" style="text-align:center">180 <span class="en">seats</span><span class="kn">ಸ್ಥಾನಗಳು</span> (90 <span class="en">Regular</span><span class="kn">ನಿಯಮಿತ</span> + 90 <span class="en">Payment</span><span class="kn">ಪಾವತಿ</span>)</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="matrix-note reveal">
+    <strong><span class="en">Abbreviations:</span><span class="kn">ಸಂಕ್ಷೇಪಣಗಳು:</span></strong>
+    <span class="en"> HK = Hyderabad Karnataka | RL = Rural | KM = Kannada Medium | PWD = Persons with Disabilities</span>
+    <span class="kn"> HK = ಹೈದರಾಬಾದ್ ಕರ್ನಾಟಕ | RL = ಗ್ರಾಮೀಣ | KM = ಕನ್ನಡ ಮಾಧ್ಯಮ | PWD = ವಿಕಲಾಂಗ ವ್ಯಕ್ತಿಗಳು</span>
+    <br><br>
+    <strong><span class="en">HK Distribution (Regular/Payment):</span><span class="kn">HK ವಿತರಣೆ:</span></strong>
+    <span class="en"> Regular: 7 seats (GM-3, SC-1, ST-1, IIA-1, IIB-1) | Payment: 8 seats (GM-4, SC-1, ST-1, IIA-1, IIB-1)</span>
+    <span class="kn"> ನಿಯಮಿತ: 7 ಸ್ಥಾನ | ಪಾವತಿ: 8 ಸ್ಥಾನ</span>
+    <br>
+    <strong><span class="en">PWD Distribution (Regular/Payment):</span><span class="kn">PWD ವಿತರಣೆ:</span></strong>
+    <span class="en"> Regular: 4 seats | Payment: 5 seats</span>
+    <span class="kn"> ನಿಯಮಿತ: 4 ಸ್ಥಾನ | ಪಾವತಿ: 5 ಸ್ಥಾನ</span>
+    <br><br>
+    <span class="en">Unfilled HK/PWD/Rural/Kannada Medium seats will be transferred and filled as per University norms. Where one seat is provided for two or more categories, preference order: SC → ST → Cat-I → IIA → IIB → IIIA → IIIB.</span>
+    <span class="kn">ಅಪೂರ್ಣ HK/PWD/ಗ್ರಾಮೀಣ/ಕನ್ನಡ ಮಾಧ್ಯಮ ಸ್ಥಾನಗಳನ್ನು ವಿಶ್ವವಿದ್ಯಾಲಯದ ನಿಯಮಗಳ ಪ್ರಕಾರ ವರ್ಗಾಯಿಸಲಾಗುವುದು.</span>
+  </div>
+</div>
+
+<!-- ── FEE STRUCTURE ── -->
+<div class="fee-wrap" id="fees">
+  <div class="fee-inner">
+    <div class="section-eye reveal"><span class="en">Fee Structure</span><span class="kn">ಶುಲ್ಕ ರಚನೆ</span></div>
+    <h2 class="section-heading reveal"><span class="en">Annual Fees — B.C.A. 2026–27</span><span class="kn">ವಾರ್ಷಿಕ ಶುಲ್ಕ — B.C.A. 2026–27</span></h2>
+    <p class="section-sub reveal">
+      <span class="en">Approved by the Hon'ble Vice-Chancellor vide approval dated: 08.04.2026</span>
+      <span class="kn">ಗೌರವಾನ್ವಿತ ಕುಲಪತಿಗಳ ಅನುಮೋದನೆ ದಿನಾಂಕ: 08.04.2026</span>
+    </p>
+
+    <div class="matrix-wrap reveal">
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;min-width:200px"><span class="en">Type of Fee</span><span class="kn">ಶುಲ್ಕದ ವಿಧ</span></th>
+            <th><span class="en">1st Year (2026–27)</span><span class="kn">1ನೇ ವರ್ಷ</span><br><small>₹</small></th>
+            <th><span class="en">2nd Year (2027–28)</span><span class="kn">2ನೇ ವರ್ಷ</span><br><small>₹</small></th>
+            <th><span class="en">3rd Year (2028–29)</span><span class="kn">3ನೇ ವರ್ಷ</span><br><small>₹</small></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="en">Registration Fee</span><span class="kn">ನೋಂದಣಿ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr>
+          <tr><td><span class="en">Admission Fee</span><span class="kn">ಪ್ರವೇಶ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr>
+          <tr><td><span class="en">Tuition Fee</span><span class="kn">ಬೋಧನಾ ಶುಲ್ಕ</span></td><td>24,700</td><td>24,700</td><td>24,700</td></tr>
+          <tr><td><span class="en">Laboratory Fee</span><span class="kn">ಪ್ರಯೋಗಾಲಯ ಶುಲ್ಕ</span></td><td>10,000</td><td>10,000</td><td>10,000</td></tr>
+          <tr><td><span class="en">Library Fee</span><span class="kn">ಗ್ರಂಥಾಲಯ ಶುಲ್ಕ</span></td><td>1,000</td><td>1,000</td><td>1,000</td></tr>
+          <tr><td><span class="en">Sports Development Fee</span><span class="kn">ಕ್ರೀಡಾ ಅಭಿವೃದ್ಧಿ ಶುಲ್ಕ</span></td><td>620</td><td>620</td><td>620</td></tr>
+          <tr><td><span class="en">Medical Examination Fee</span><span class="kn">ವೈದ್ಯಕೀಯ ಪರೀಕ್ಷೆ ಶುಲ್ಕ</span></td><td>200</td><td>200</td><td>200</td></tr>
+          <tr><td><span class="en">Student Activity Fee *</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>100</td><td>100</td><td>100</td></tr>
+          <tr><td><span class="en">Students Identity Card Fee</span><span class="kn">ಗುರುತಿನ ಚೀಟಿ ಶುಲ್ಕ</span></td><td>150</td><td>150</td><td>150</td></tr>
+          <tr><td><span class="en">Cultural Activity Fee *</span><span class="kn">ಸಾಂಸ್ಕೃತಿಕ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>200</td><td>200</td><td>200</td></tr>
+          <tr><td><span class="en">Twithers Benefit Fund</span><span class="kn">ಟ್ವಿದರ್ಸ್ ಬೆನಿಫಿಟ್ ಫಂಡ್</span></td><td>25</td><td>25</td><td>25</td></tr>
+          <tr><td><span class="en">Students Benefit Fund</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಲಾಭ ನಿಧಿ</span></td><td>25</td><td>25</td><td>25</td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td style="text-align:left"><span class="en">Total (Regular Category)</span><span class="kn">ಒಟ್ಟು (ನಿಯಮಿತ ವರ್ಗ)</span></td>
+            <td>₹ 39,020</td><td>₹ 37,020</td><td>₹ 37,020</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="fee-note reveal">
+      * <span class="en"><strong>Fee not entitled for reimbursement</strong> from Social Welfare Department to SC/ST candidates: Cultural Activity (₹200) + Student Activity Fee (₹100).</span>
+      <span class="kn">SC/ST ಅಭ್ಯರ್ಥಿಗಳಿಗೆ ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆಯಿಂದ ಮರುಪಾವತಿಗೆ ಅರ್ಹವಲ್ಲದ ಶುಲ್ಕ.</span>
+    </div>
+
+    <div class="special-fees reveal">
+      <div class="sfee-card">
+        <h5><span class="en">Eligibility Fee — Non-Karnataka</span><span class="kn">ಅರ್ಹತಾ ಶುಲ್ಕ — ಕರ್ನಾಟಕೇತರ</span></h5>
+        <p>₹ 2,000</p>
+      </div>
+      <div class="sfee-card">
+        <h5><span class="en">Eligibility Fee — NRI Student</span><span class="kn">ಅರ್ಹತಾ ಶುಲ್ಕ — NRI ವಿದ್ಯಾರ್ಥಿ</span></h5>
+        <p>₹ 4,000</p>
+      </div>
+      <div class="sfee-card">
+        <h5><span class="en">Eligibility Fee — Foreign Student</span><span class="kn">ಅರ್ಹತಾ ಶುಲ್ಕ — ವಿದೇಶಿ ವಿದ್ಯಾರ್ಥಿ</span></h5>
+        <p>₹ 12,870</p>
+      </div>
+      <div class="sfee-card">
+        <h5><span class="en">Payment Seat Fee</span><span class="kn">ಪಾವತಿ ಸ್ಥಾನ ಶುಲ್ಕ</span></h5>
+        <p>₹ 75,000 <span style="font-size:.75rem;color:rgba(255,255,255,.4)">+ <span class="en">Eligibility fee (if applicable)</span><span class="kn">ಅರ್ಹತಾ ಶುಲ್ಕ</span></span></p>
+      </div>
+    </div>
+
+    <!-- SC/ST SCHOLARSHIP -->
+    <div class="scholar-card reveal" style="margin-top:2rem">
+      <h4>🎓 <span class="en">SC/ST Fee Concession & Freeship Card</span><span class="kn">SC/ST ಶುಲ್ಕ ರಿಯಾಯಿತಿ ಮತ್ತು ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್</span></h4>
+      <p class="en">
+        With effect from <strong>2023–24</strong>, SC/ST category students whose family annual income is less than <strong>₹2.5 Lakhs</strong> and are eligible for post-matric scholarship will be provided admission without pre-payment of compulsory fees, subject to submission of a <strong>Freeship Card</strong>. Students must submit: scholarship sanctioned status (2025–26) / Freeship card from SSP Portal, valid income and caste certificate issued by Tahsildar. <strong>Note:</strong> Cultural Activity (₹200) and Student Activity Fee (₹100) must still be paid as these are not reimbursable.
+      </p>
+      <p class="kn">
+        <strong>2023–24</strong>ರಿಂದ, ₹2.5 ಲಕ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ ವಾರ್ಷಿಕ ಕುಟುಂಬ ಆದಾಯ ಹೊಂದಿರುವ SC/ST ವರ್ಗದ ವಿದ್ಯಾರ್ಥಿಗಳು <strong>ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್</strong> ಸಲ್ಲಿಸಿ ಶುಲ್ಕ ಪೂರ್ವ ಪಾವತಿ ಇಲ್ಲದೆ ಪ್ರವೇಶ ಪಡೆಯಬಹುದು. SSP ಪೋರ್ಟಲ್‌ನಿಂದ ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್ ಮತ್ತು ತಹಶೀಲ್ದಾರ್ ಜಾತಿ/ಆದಾಯ ಪ್ರಮಾಣ ಪತ್ರ ಸಲ್ಲಿಸಬೇಕು.
+      </p>
+    </div>
+
+    <!-- EXAM FEES -->
+    <div style="margin-top:2.5rem" class="reveal">
+      <h3 style="font-family:'Cormorant Garamond',serif;color:var(--white);font-size:1.4rem;margin-bottom:1rem">
+        <span class="en">Examination Fees — BCA</span><span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ — BCA</span>
+      </h3>
+      <div class="matrix-wrap">
+        <table class="exam-table">
+          <thead>
+            <tr>
+              <th><span class="en">Course</span><span class="kn">ಕೋರ್ಸ್</span></th>
+              <th><span class="en">Semester</span><span class="kn">ಸೆಮಿಸ್ಟರ್</span></th>
+              <th><span class="en">Exam Fee (₹)</span><span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ</span></th>
+              <th><span class="en">NAD Processing (₹)</span><span class="kn">NAD ಶುಲ್ಕ</span></th>
+              <th><span class="en">Convocation (₹)</span><span class="kn">ಘಟಿಕೋತ್ಸವ ಶುಲ್ಕ</span></th>
+              <th><span class="en">Total (₹)</span><span class="kn">ಒಟ್ಟು</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td rowspan="6" style="font-weight:700;color:var(--gold-light)">BCA</td><td>I</td><td>4,950</td><td>275</td><td>—</td><td>5,225</td></tr>
+            <tr><td>II</td><td>4,950</td><td>275</td><td>—</td><td>5,225</td></tr>
+            <tr><td>III</td><td>5,445</td><td>275</td><td>—</td><td>5,720</td></tr>
+            <tr><td>IV</td><td>5,445</td><td>275</td><td>—</td><td>5,720</td></tr>
+            <tr><td>V</td><td>6,589</td><td>275</td><td>—</td><td>6,864</td></tr>
+            <tr><td>VI</td><td>6,589</td><td>275</td><td>2,305</td><td>9,169</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ── IMPORTANT DATES ── -->
-<div class="section" style="padding-top:0">
-  <div class="section-eyebrow reveal">Schedule</div>
-  <h2 class="section-heading reveal">Important dates</h2>
-  <p class="section-sub reveal">Keep track of key deadlines so you don't miss out.</p>
-
+<div class="section">
+  <div class="section-eye reveal"><span class="en">Schedule</span><span class="kn">ವೇಳಾಪಟ್ಟಿ</span></div>
+  <h2 class="section-heading reveal"><span class="en">Important Dates</span><span class="kn">ಮಹತ್ವದ ದಿನಾಂಕಗಳು</span></h2>
+  <p class="section-sub reveal"><span class="en">Keep track of all key deadlines.</span><span class="kn">ಎಲ್ಲಾ ಪ್ರಮುಖ ಗಡುವುಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.</span></p>
   <div class="dates-list">
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-door-open"></i> Application Form Opens</span>
-      <span class="date-val">May 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-door-open"></i> <span class="en">Application Form Opens</span><span class="kn">ಅರ್ಜಿ ಫಾರ್ಮ್ ತೆರೆಯುವ ದಿನ</span></span>
+      <span class="date-val"><span class="en">May 2026</span><span class="kn">ಮೇ 2026</span></span>
+      <span class="date-badge"><span class="en">Upcoming</span><span class="kn">ಮುಂಬರುವ</span></span>
     </div>
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-clock"></i> Last Date to Apply</span>
-      <span class="date-val">June 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-exclamation-circle"></i> <span class="en">Last Date for Application Submission</span><span class="kn">ಅರ್ಜಿ ಸಲ್ಲಿಕೆ ಕೊನೆಯ ದಿನ</span></span>
+      <span class="date-val">15.05.2025</span>
+      <span class="date-badge urgent"><span class="en">Deadline</span><span class="kn">ಗಡುವು</span></span>
     </div>
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-check-double"></i> Verification Completion</span>
-      <span class="date-val">July 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-check-double"></i> <span class="en">Verification Completion</span><span class="kn">ಪರಿಶೀಲನೆ ಪೂರ್ಣ</span></span>
+      <span class="date-val"><span class="en">July 2026</span><span class="kn">ಜುಲೈ 2026</span></span>
+      <span class="date-badge"><span class="en">Upcoming</span><span class="kn">ಮುಂಬರುವ</span></span>
     </div>
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-list-ol"></i> Merit List Publication</span>
-      <span class="date-val">July 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-list-ol"></i> <span class="en">Merit List Publication</span><span class="kn">ಅರ್ಹತಾ ಪಟ್ಟಿ ಪ್ರಕಟಣೆ</span></span>
+      <span class="date-val"><span class="en">July 2026</span><span class="kn">ಜುಲೈ 2026</span></span>
+      <span class="date-badge"><span class="en">Upcoming</span><span class="kn">ಮುಂಬರುವ</span></span>
     </div>
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-users"></i> Counselling Round 1</span>
-      <span class="date-val">August 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-users"></i> <span class="en">Counselling Round 1</span><span class="kn">ಕೌನ್ಸೆಲಿಂಗ್ ಸುತ್ತು 1</span></span>
+      <span class="date-val"><span class="en">August 2026</span><span class="kn">ಆಗಸ್ಟ್ 2026</span></span>
+      <span class="date-badge"><span class="en">Upcoming</span><span class="kn">ಮುಂಬರುವ</span></span>
     </div>
     <div class="date-item reveal">
-      <span class="date-label"><i class="fas fa-graduation-cap"></i> Classes Begin</span>
-      <span class="date-val">September 2026</span>
-      <span class="date-badge">Upcoming</span>
+      <span class="date-label"><i class="fas fa-graduation-cap"></i> <span class="en">Classes Begin</span><span class="kn">ತರಗತಿಗಳು ಆರಂಭ</span></span>
+      <span class="date-val"><span class="en">September 2026</span><span class="kn">ಸೆಪ್ಟೆಂಬರ್ 2026</span></span>
+      <span class="date-badge"><span class="en">Upcoming</span><span class="kn">ಮುಂಬರುವ</span></span>
     </div>
   </div>
 </div>
 
-<!-- ── CTA ── -->
-{% if not current_user.is_authenticated %}
-<div class="cta-section reveal">
-  <div class="cta-inner">
-    <h2>Ready to begin your BCA journey?</h2>
-    <p>Create your account now and secure your spot in the 2026 batch.</p>
-    <a href="{{ url_for('main.register') }}" class="btn-hero-primary" style="font-size:.95rem; padding:1rem 2.5rem">
-      <i class="fas fa-arrow-right"></i> Apply Now — It's Free
-    </a>
+<!-- ── INFO CARDS ── -->
+<div class="section" style="padding-top:0">
+  <div class="info-grid">
+    <div class="info-card reveal">
+      <div class="info-icon"><i class="fas fa-home"></i></div>
+      <div class="info-text">
+        <h4><span class="en">Hostel Facility</span><span class="kn">ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ</span></h4>
+        <p><span class="en">Hostel facility is <strong>not available</strong> for UG programme students. Local students will be preferred.</span><span class="kn">UG ಕಾರ್ಯಕ್ರಮದ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ ಲಭ್ಯವಿಲ್ಲ. ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ.</span></p>
+      </div>
+    </div>
+    <div class="info-card reveal">
+      <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+      <div class="info-text">
+        <!-- ★ CHANGE: Add full office address -->
+        <h4><span class="en">Office Address</span><span class="kn">ಕಚೇರಿ ವಿಳಾಸ</span></h4>
+        <p><span class="en">Office of the Coordinator, UG Programme<br><strong>[FULL ADDRESS HERE]</strong></span><span class="kn">ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿ<br><strong>[ಸಂಪೂರ್ಣ ವಿಳಾಸ ಇಲ್ಲಿ]</strong></span></p>
+      </div>
+    </div>
+    <div class="info-card reveal">
+      <div class="info-icon"><i class="fas fa-clock"></i></div>
+      <div class="info-text">
+        <!-- ★ CHANGE: Add office hours -->
+        <h4><span class="en">Office Hours</span><span class="kn">ಕಚೇರಿ ಸಮಯ</span></h4>
+        <p><span class="en"><strong>[OFFICE HOURS HERE]</strong><br>Contact: <strong>[PHONE NUMBER]</strong><br>Email: <strong>[EMAIL ADDRESS]</strong></span><span class="kn"><strong>[ಕಚೇರಿ ಸಮಯ]</strong><br>ಸಂಪರ್ಕ: <strong>[ದೂರವಾಣಿ ಸಂಖ್ಯೆ]</strong></span></p>
+      </div>
+    </div>
+    <div class="info-card reveal">
+      <div class="info-icon"><i class="fas fa-download"></i></div>
+      <div class="info-text">
+        <!-- ★ CHANGE: Add university website URL -->
+        <h4><span class="en">Download Application</span><span class="kn">ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್</span></h4>
+        <p><span class="en">Application form available at the university official website. <a href="https://bangaloreuniversity.karnataka.gov.in/" target="_blank" style="color:var(--gold)">Visit official website →</a></span><span class="kn">ಅರ್ಜಿ ಫಾರ್ಮ್ ವಿಶ್ವವಿದ್ಯಾಲಯದ ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಲಭ್ಯ.</span></p>
+      </div>
+    </div>
   </div>
 </div>
-{% endif %}
 
 <script>
-// Scroll reveal
+// ── LANGUAGE TOGGLE ──
+function setLang(lang) {
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnKn').classList.toggle('active', lang === 'kn');
+  if (lang === 'kn') {
+    document.body.classList.add('kannada');
+  } else {
+    document.body.classList.remove('kannada');
+  }
+  localStorage.setItem('bcaLang', lang);
+}
+
+// Remember language preference
+const savedLang = localStorage.getItem('bcaLang');
+if (savedLang) setLang(savedLang);
+
+// ── SCROLL REVEAL ──
 const revealEls = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 60);
+      setTimeout(() => entry.target.classList.add('visible'), i * 55);
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: 0.08 });
 revealEls.forEach(el => observer.observe(el));
 </script>
 
