@@ -6,7 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 /* ════════════════════════════════════════════
-   SITE CONFIG — edit only this block
+   🔧 EDIT ONLY THIS BLOCK — CHANGE YOUR DETAILS HERE 🔧
    ════════════════════════════════════════════ */
 :root {
   --cfg-univ-en:    "Bangalore University";
@@ -32,6 +32,7 @@
   --text-muted:    #6b7a8d;
   --radius:        14px;
 }
+/* ════════════════════════════════════════════ */
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -56,12 +57,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);o
 .kn{display:none}
 body.kannada .en{display:none}
 body.kannada .kn{display:block}
-/* inline spans */
 span.en{display:inline}
 span.kn{display:none}
 body.kannada span.en{display:none}
 body.kannada span.kn{display:inline}
-/* table cells */
 td.en{display:table-cell}
 td.kn{display:none}
 body.kannada td.en{display:none}
@@ -384,7 +383,7 @@ body.kannada td.kn{display:table-cell}
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="hero-inner">
-    <div class="hero-univ" id="heroUniv"><!-- filled by JS --></div>
+    <div class="hero-univ"><span class="en" id="univEN"></span><span class="kn" id="univKN"></span></div>
     <div class="hero-badge"><span class="badge-dot"></span>
       <span class="en">Admissions Open — 2026–2027</span>
       <span class="kn">ಪ್ರವೇಶ ತೆರೆದಿದೆ — 2026–2027</span>
@@ -425,47 +424,22 @@ body.kannada td.kn{display:table-cell}
 <!-- ════════════ STATS ════════════ -->
 <div class="stats-strip">
   <div class="stats-inner">
-    <div class="stat-item reveal">
-      <span class="stat-num">3</span>
-      <span class="stat-lbl"><span class="en">Year Programme</span><span class="kn">ವರ್ಷದ ಕಾರ್ಯಕ್ರಮ</span></span>
-    </div>
-    <div class="stat-item reveal">
-      <span class="stat-num">180</span>
-      <span class="stat-lbl"><span class="en">Seats per Spec</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ ಸ್ಥಾನ</span></span>
-    </div>
-    <div class="stat-item reveal">
-      <span class="stat-num en" style="font-size:1.4rem">Merit</span>
-      <span class="stat-num kn" style="font-size:1.2rem">ಅರ್ಹತೆ</span>
-      <span class="stat-lbl"><span class="en">Based Admission</span><span class="kn">ಆಧಾರಿತ ಪ್ರವೇಶ</span></span>
-    </div>
-    <div class="stat-item reveal">
-      <span class="stat-num">2026</span>
-      <span class="stat-lbl"><span class="en">Batch Starting</span><span class="kn">ಬ್ಯಾಚ್ ಆರಂಭ</span></span>
-    </div>
+    <div class="stat-item reveal"><span class="stat-num">3</span><span class="stat-lbl"><span class="en">Year Programme</span><span class="kn">ವರ್ಷದ ಕಾರ್ಯಕ್ರಮ</span></span></div>
+    <div class="stat-item reveal"><span class="stat-num">180</span><span class="stat-lbl"><span class="en">Seats per Spec</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ ಸ್ಥಾನ</span></span></div>
+    <div class="stat-item reveal"><span class="stat-num en" style="font-size:1.4rem">Merit</span><span class="stat-num kn" style="font-size:1.2rem">ಅರ್ಹತೆ</span><span class="stat-lbl"><span class="en">Based Admission</span><span class="kn">ಆಧಾರಿತ ಪ್ರವೇಶ</span></span></div>
+    <div class="stat-item reveal"><span class="stat-num">2026</span><span class="stat-lbl"><span class="en">Batch Starting</span><span class="kn">ಬ್ಯಾಚ್ ಆರಂಭ</span></span></div>
   </div>
 </div>
 
 <!-- ════════════ CONTACT + NOTICE ════════════ -->
 <div style="padding:1.5rem 1.5rem 0;max-width:1040px;margin:0 auto" id="info">
-  <div class="contact-strip reveal" id="contactStrip"><!-- filled by JS --></div>
+  <div class="contact-strip reveal" id="contactStrip"></div>
   <div class="offline-notice reveal" style="margin-top:1.2rem">
     <span class="ni">⚠️</span>
     <div>
-      <h4>
-        <span class="en">Application Submission is OFFLINE ONLY</span>
-        <span class="kn">ಅರ್ಜಿ ಸಲ್ಲಿಕೆ ಕೇವಲ ಕಚೇರಿಯಲ್ಲಿ ಮಾತ್ರ (ಆಫ್‌ಲೈನ್)</span>
-      </h4>
-      <p class="en">
-        Candidates must submit a <strong>printed hard copy</strong> of the application along with all necessary documents <strong>in person</strong> to the Office of the UG Programme Coordinator.
-        This website is used exclusively for the <strong>counselling process</strong>.
-        Last date for submission: <strong>15.05.2025</strong>.
-        Download the application from the official university website.
-      </p>
-      <p class="kn">
-        ಅಭ್ಯರ್ಥಿಗಳು ಎಲ್ಲಾ ಅಗತ್ಯ ದಾಖಲೆಗಳೊಂದಿಗೆ <strong>ಮುದ್ರಿತ ಅರ್ಜಿಯನ್ನು ನೇರವಾಗಿ</strong> ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಬೇಕು.
-        ಈ ವೆಬ್‌ಸೈಟ್ ಪ್ರತ್ಯೇಕವಾಗಿ <strong>ಕೌನ್ಸೆಲಿಂಗ್ ಪ್ರಕ್ರಿಯೆಗೆ</strong> ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ.
-        ಸಲ್ಲಿಕೆ ಕೊನೆಯ ದಿನ: <strong>15.05.2025</strong>.
-      </p>
+      <h4><span class="en">Application Submission is OFFLINE ONLY</span><span class="kn">ಅರ್ಜಿ ಸಲ್ಲಿಕೆ ಕೇವಲ ಕಚೇರಿಯಲ್ಲಿ ಮಾತ್ರ (ಆಫ್‌ಲೈನ್)</span></h4>
+      <p class="en">Candidates must submit a <strong>printed hard copy</strong> of the application along with all necessary documents <strong>in person</strong> to the Office of the UG Programme Coordinator. This website is used exclusively for the <strong>counselling process</strong>. Last date for submission: <strong>15.05.2025</strong>. Download the application from the official university website.</p>
+      <p class="kn">ಅಭ್ಯರ್ಥಿಗಳು ಎಲ್ಲಾ ಅಗತ್ಯ ದಾಖಲೆಗಳೊಂದಿಗೆ <strong>ಮುದ್ರಿತ ಅರ್ಜಿಯನ್ನು ನೇರವಾಗಿ</strong> ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಬೇಕು. ಈ ವೆಬ್‌ಸೈಟ್ ಪ್ರತ್ಯೇಕವಾಗಿ <strong>ಕೌನ್ಸೆಲಿಂಗ್ ಪ್ರಕ್ರಿಯೆಗೆ</strong> ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ. ಸಲ್ಲಿಕೆ ಕೊನೆಯ ದಿನ: <strong>15.05.2025</strong>.</p>
     </div>
   </div>
 </div>
@@ -475,333 +449,64 @@ body.kannada td.kn{display:table-cell}
   <div class="acc-list">
 
     <!-- 1. ABOUT PROGRAMME -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-university"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">About the Programme</span><span class="kn">ಕಾರ್ಯಕ್ರಮದ ಬಗ್ಗೆ</span></h3>
-          <p><span class="en">Specializations, duration &amp; structure</span><span class="kn">ವಿಶೇಷತೆಗಳು, ಅವಧಿ ಮತ್ತು ರಚನೆ</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="spec-grid">
-          <div class="spec-card">
-            <div class="spec-card-icon"><i class="fas fa-brain"></i></div>
-            <h4>Machine Learning</h4>
-            <span class="sk">ಮೆಷಿನ್ ಲರ್ನಿಂಗ್</span>
-            <p><span class="en">AI algorithms, neural networks, and intelligent systems. Build models that learn and predict from real-world data.</span><span class="kn">AI ಅಲ್ಗಾರಿದಮ್‌ಗಳು, ನ್ಯೂರಲ್ ನೆಟ್‌ವರ್ಕ್‌ಗಳು ಮತ್ತು ಬುದ್ಧಿವಂತ ವ್ಯವಸ್ಥೆಗಳನ್ನು ಕಲಿಯಿರಿ.</span></p>
-          </div>
-          <div class="spec-card">
-            <div class="spec-card-icon"><i class="fas fa-chart-bar"></i></div>
-            <h4>Data Science</h4>
-            <span class="sk">ಡೇಟಾ ಸೈನ್ಸ್</span>
-            <p><span class="en">Data analysis, visualization, and statistical modelling. Turn raw data into actionable business insights.</span><span class="kn">ಡೇಟಾ ವಿಶ್ಲೇಷಣೆ, ದೃಶ್ಯೀಕರಣ ಮತ್ತು ಸಂಖ್ಯಾಶಾಸ್ತ್ರೀಯ ಮಾದರಿ ಕಲಿಯಿರಿ.</span></p>
-          </div>
-          <div class="spec-card">
-            <div class="spec-card-icon"><i class="fas fa-code"></i></div>
-            <h4>Full Stack Development</h4>
-            <span class="sk">ಫುಲ್ ಸ್ಟಾಕ್ ಡೆವಲಪ್‌ಮೆಂಟ್</span>
-            <p><span class="en">Build complete web applications from frontend to backend. Master modern frameworks and deployment pipelines.</span><span class="kn">ಫ್ರಂಟೆಂಡ್‌ನಿಂದ ಬ್ಯಾಕೆಂಡ್‌ವರೆಗೆ ಸಂಪೂರ್ಣ ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್‌ಗಳನ್ನು ನಿರ್ಮಿಸಿ.</span></p>
-          </div>
-        </div>
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-university"></i></div><div class="acc-label"><h3><span class="en">About the Programme</span><span class="kn">ಕಾರ್ಯಕ್ರಮದ ಬಗ್ಗೆ</span></h3><p><span class="en">Specializations, duration &amp; structure</span><span class="kn">ವಿಶೇಷತೆಗಳು, ಅವಧಿ ಮತ್ತು ರಚನೆ</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="spec-grid"><div class="spec-card"><div class="spec-card-icon"><i class="fas fa-brain"></i></div><h4>Machine Learning</h4><span class="sk">ಮೆಷಿನ್ ಲರ್ನಿಂಗ್</span><p><span class="en">AI algorithms, neural networks, and intelligent systems.</span><span class="kn">AI ಅಲ್ಗಾರಿದಮ್‌ಗಳು, ನ್ಯೂರಲ್ ನೆಟ್‌ವರ್ಕ್‌ಗಳು ಮತ್ತು ಬುದ್ಧಿವಂತ ವ್ಯವಸ್ಥೆಗಳು.</span></p></div><div class="spec-card"><div class="spec-card-icon"><i class="fas fa-chart-bar"></i></div><h4>Data Science</h4><span class="sk">ಡೇಟಾ ಸೈನ್ಸ್</span><p><span class="en">Data analysis, visualization, and statistical modelling.</span><span class="kn">ಡೇಟಾ ವಿಶ್ಲೇಷಣೆ, ದೃಶ್ಯೀಕರಣ ಮತ್ತು ಸಂಖ್ಯಾಶಾಸ್ತ್ರೀಯ ಮಾದರಿ.</span></p></div><div class="spec-card"><div class="spec-card-icon"><i class="fas fa-code"></i></div><h4>Full Stack Development</h4><span class="sk">ಫುಲ್ ಸ್ಟಾಕ್ ಡೆವಲಪ್‌ಮೆಂಟ್</span><p><span class="en">Complete web applications from frontend to backend.</span><span class="kn">ಫ್ರಂಟೆಂಡ್‌ನಿಂದ ಬ್ಯಾಕೆಂಡ್‌ವರೆಗೆ ಸಂಪೂರ್ಣ ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು.</span></p></div></div></div>
     </div>
 
     <!-- 2. ELIGIBILITY -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-graduation-cap"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">Eligibility Criteria</span><span class="kn">ಅರ್ಹತಾ ಮಾನದಂಡ</span></h3>
-          <p><span class="en">Who can apply &amp; documents required</span><span class="kn">ಯಾರು ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು ಮತ್ತು ದಾಖಲೆಗಳು</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="elig-grid">
-          <div class="elig-card">
-            <h4><i class="fas fa-check-circle" style="color:var(--gold);margin-right:.4rem"></i><span class="en">Academic Requirements</span><span class="kn">ಶೈಕ್ಷಣಿಕ ಅವಶ್ಯಕತೆಗಳು</span></h4>
-            <ul class="elig-list">
-              <li><span class="en">Completed 2-year PUC or equivalent (Arts / Science / Commerce with any optional subjects)</span><span class="kn">2 ವರ್ಷದ PUC ಅಥವಾ ಸಮಾನ (ಕಲೆ / ವಿಜ್ಞಾನ / ವಾಣಿಜ್ಯ)</span></li>
-              <li><span class="en">Minimum <strong>50% aggregate marks</strong> in Class 12</span><span class="kn">12ನೇ ತರಗತಿಯಲ್ಲಿ ಕನಿಷ್ಠ <strong>50% ಒಟ್ಟು ಅಂಕಗಳು</strong></span></li>
-              <li><span class="en"><strong>45%</strong> for SC/ST &amp; Category-I (Karnataka state domicile)</span><span class="kn">SC/ST ಮತ್ತು ವರ್ಗ-I (ಕರ್ನಾಟಕ ನಿವಾಸಿ) ಗೆ <strong>45%</strong></span></li>
-              <li><span class="en">Selection based on qualifying examination score (merit)</span><span class="kn">ಅರ್ಹತಾ ಪರೀಕ್ಷೆಯ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಆಯ್ಕೆ</span></li>
-              <li><span class="en"><strong>Local students will be preferred</strong></span><span class="kn"><strong>ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ</strong></span></li>
-            </ul>
-            <div class="elig-note">
-              <span class="en">⚠ Hostel facility is <strong>not available</strong> for UG programme students.</span>
-              <span class="kn">⚠ UG ಕಾರ್ಯಕ್ರಮದ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ <strong>ಲಭ್ಯವಿಲ್ಲ</strong>.</span>
-            </div>
-          </div>
-          <div class="elig-card">
-            <h4><i class="fas fa-id-card" style="color:var(--gold);margin-right:.4rem"></i><span class="en">Documents Required</span><span class="kn">ಅಗತ್ಯ ದಾಖಲೆಗಳು</span></h4>
-            <ul class="elig-list">
-              <li><span class="en">Class 10 marksheet &amp; passing certificate</span><span class="kn">10ನೇ ತರಗತಿ ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
-              <li><span class="en">Class 12 (PUC) marksheet &amp; passing certificate</span><span class="kn">12ನೇ ತರಗತಿ (PUC) ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
-              <li><span class="en">Category / Caste certificate (if applicable)</span><span class="kn">ಜಾತಿ / ವರ್ಗ ಪ್ರಮಾಣ ಪತ್ರ (ಅನ್ವಯವಾದಲ್ಲಿ)</span></li>
-              <li><span class="en">Income certificate from Tahsildar (for fee concession)</span><span class="kn">ಶುಲ್ಕ ರಿಯಾಯಿತಿಗಾಗಿ ತಹಶೀಲ್ದಾರ್ ಆದಾಯ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
-              <li><span class="en">Transfer certificate from last institution</span><span class="kn">ಕೊನೆಯ ಸಂಸ್ಥೆಯ ವರ್ಗಾವಣೆ ಪ್ರಮಾಣ ಪತ್ರ</span></li>
-              <li><span class="en">Valid government photo ID</span><span class="kn">ಮಾನ್ಯ ಸರ್ಕಾರಿ ಫೋಟೋ ಗುರುತಿನ ಪ್ರಮಾಣ</span></li>
-              <li><span class="en">HK / PWD / Kannada Medium / Rural certificate (if applicable)</span><span class="kn">HK / PWD / ಕನ್ನಡ ಮಾಧ್ಯಮ / ಗ್ರಾಮೀಣ ಪ್ರಮಾಣ ಪತ್ರ (ಅನ್ವಯಿಸಿದರೆ)</span></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-graduation-cap"></i></div><div class="acc-label"><h3><span class="en">Eligibility Criteria</span><span class="kn">ಅರ್ಹತಾ ಮಾನದಂಡ</span></h3><p><span class="en">Who can apply &amp; documents required</span><span class="kn">ಯಾರು ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು ಮತ್ತು ದಾಖಲೆಗಳು</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="elig-grid"><div class="elig-card"><h4><i class="fas fa-check-circle" style="color:var(--gold);margin-right:.4rem"></i><span class="en">Academic Requirements</span><span class="kn">ಶೈಕ್ಷಣಿಕ ಅವಶ್ಯಕತೆಗಳು</span></h4><ul class="elig-list"><li><span class="en">Completed 2-year PUC or equivalent</span><span class="kn">2 ವರ್ಷದ PUC ಅಥವಾ ಸಮಾನ</span></li><li><span class="en">Minimum <strong>50% aggregate marks</strong> in Class 12</span><span class="kn">12ನೇ ತರಗತಿಯಲ್ಲಿ ಕನಿಷ್ಠ <strong>50% ಒಟ್ಟು ಅಂಕಗಳು</strong></span></li><li><span class="en"><strong>45%</strong> for SC/ST &amp; Category-I (Karnataka)</span><span class="kn">SC/ST ಮತ್ತು ವರ್ಗ-I (ಕರ್ನಾಟಕ) ಗೆ <strong>45%</strong></span></li><li><span class="en">Selection based on qualifying examination score</span><span class="kn">ಅರ್ಹತಾ ಪರೀಕ್ಷೆಯ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಆಯ್ಕೆ</span></li><li><span class="en"><strong>Local students will be preferred</strong></span><span class="kn"><strong>ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ</strong></span></li></ul><div class="elig-note"><span class="en">⚠ Hostel facility is <strong>not available</strong> for UG students.</span><span class="kn">⚠ UG ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ <strong>ಲಭ್ಯವಿಲ್ಲ</strong>.</span></div></div><div class="elig-card"><h4><i class="fas fa-id-card" style="color:var(--gold);margin-right:.4rem"></i><span class="en">Documents Required</span><span class="kn">ಅಗತ್ಯ ದಾಖಲೆಗಳು</span></h4><ul class="elig-list"><li><span class="en">Class 10 marksheet &amp; passing certificate</span><span class="kn">10ನೇ ತರಗತಿ ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li><li><span class="en">Class 12 (PUC) marksheet &amp; passing certificate</span><span class="kn">12ನೇ ತರಗತಿ (PUC) ಅಂಕ ಪಟ್ಟಿ ಮತ್ತು ಉತ್ತೀರ್ಣ ಪ್ರಮಾಣ ಪತ್ರ</span></li><li><span class="en">Category / Caste certificate (if applicable)</span><span class="kn">ಜಾತಿ / ವರ್ಗ ಪ್ರಮಾಣ ಪತ್ರ (ಅನ್ವಯವಾದಲ್ಲಿ)</span></li><li><span class="en">Income certificate from Tahsildar</span><span class="kn">ತಹಶೀಲ್ದಾರ್ ಆದಾಯ ಪ್ರಮಾಣ ಪತ್ರ</span></li><li><span class="en">Transfer certificate from last institution</span><span class="kn">ಕೊನೆಯ ಸಂಸ್ಥೆಯ ವರ್ಗಾವಣೆ ಪ್ರಮಾಣ ಪತ್ರ</span></li><li><span class="en">Valid government photo ID</span><span class="kn">ಮಾನ್ಯ ಸರ್ಕಾರಿ ಫೋಟೋ ಗುರುತಿನ ಪ್ರಮಾಣ</span></li></ul></div></div></div>
     </div>
 
     <!-- 3. ADMISSION PROCESS -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-list-ol"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">Admission Process</span><span class="kn">ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ</span></h3>
-          <p><span class="en">Step-by-step guide to getting admitted</span><span class="kn">ಪ್ರವೇಶ ಪಡೆಯಲು ಹಂತ-ಹಂತದ ಮಾರ್ಗದರ್ಶಿ</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="steps-grid" style="margin-bottom:1.4rem">
-          <div class="step-card"><span class="step-num-bg">01</span><div class="step-icon-box"><i class="fas fa-download"></i></div><h4><span class="en">Download &amp; Fill</span><span class="kn">ಡೌನ್‌ಲೋಡ್ ಮತ್ತು ಭರ್ತಿ</span></h4><p><span class="en">Download application from the official university website. Fill all details carefully.</span><span class="kn">ವಿಶ್ವವಿದ್ಯಾಲಯ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಭರ್ತಿ ಮಾಡಿ.</span></p></div>
-          <div class="step-card"><span class="step-num-bg">02</span><div class="step-icon-box"><i class="fas fa-building"></i></div><h4><span class="en">Submit at Office</span><span class="kn">ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ</span></h4><p><span class="en">Submit printed application + documents IN PERSON at the UG Coordinator's office before the deadline.</span><span class="kn">ಗಡುವಿನ ಮೊದಲು ಸ್ನಾತಕ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ನೇರವಾಗಿ ಸಲ್ಲಿಸಿ.</span></p></div>
-          <div class="step-card"><span class="step-num-bg">03</span><div class="step-icon-box"><i class="fas fa-check-circle"></i></div><h4><span class="en">Verification</span><span class="kn">ಪರಿಶೀಲನೆ</span></h4><p><span class="en">Admin team verifies your documents. Track status on this portal.</span><span class="kn">ಪ್ರವೇಶ ತಂಡ ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.</span></p></div>
-          <div class="step-card"><span class="step-num-bg">04</span><div class="step-icon-box"><i class="fas fa-sort-amount-up"></i></div><h4><span class="en">Merit Rank</span><span class="kn">ಅರ್ಹತಾ ಶ್ರೇಣಿ</span></h4><p><span class="en">Rank assigned based on Class 12 percentage. View on student dashboard.</span><span class="kn">12ನೇ ತರಗತಿ ಅಂಕ ಆಧಾರದ ಮೇಲೆ ಶ್ರೇಣಿ ನೀಡಲಾಗುವುದು.</span></p></div>
-          <div class="step-card"><span class="step-num-bg">05</span><div class="step-icon-box"><i class="fas fa-users"></i></div><h4><span class="en">Live Counselling</span><span class="kn">ಲೈವ್ ಕೌನ್ಸೆಲಿಂಗ್</span></h4><p><span class="en">Attend the one-day online counselling. Seats allotted by rank under Govt &amp; Management quota.</span><span class="kn">ಒಂದು ದಿನದ ಆನ್‌ಲೈನ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಹಾಜರಾಗಿ.</span></p></div>
-          <div class="step-card"><span class="step-num-bg">06</span><div class="step-icon-box"><i class="fas fa-graduation-cap"></i></div><h4><span class="en">Confirm Admission</span><span class="kn">ಪ್ರವೇಶ ದೃಢೀಕರಿಸಿ</span></h4><p><span class="en">Pay prescribed fees &amp; submit original documents to complete admission.</span><span class="kn">ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ಮೂಲ ದಾಖಲೆಗಳನ್ನು ಸಲ್ಲಿಸಿ.</span></p></div>
-        </div>
-        <!-- detailed steps dark bg -->
-        <div class="proc-bg">
-          <div class="proc-grid">
-            <div class="proc-card"><div class="proc-num">1</div><div class="proc-text"><h5><span class="en">Download Application</span><span class="kn">ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್</span></h5><p><span class="en">Download the form from the official university website.</span><span class="kn">ಅಧಿಕೃತ ವಿಶ್ವವಿದ್ಯಾಲಯ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">2</div><div class="proc-text"><h5><span class="en">Fill Personal Details</span><span class="kn">ವೈಯಕ್ತಿಕ ವಿವರ ಭರ್ತಿ</span></h5><p><span class="en">Name, DOB, gender, contact, address, category.</span><span class="kn">ಹೆಸರು, ಜನ್ಮ ದಿನಾಂಕ, ಲಿಂಗ, ವಿಳಾಸ, ವರ್ಗ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">3</div><div class="proc-text"><h5><span class="en">Enter Academic Marks</span><span class="kn">ಅಂಕಗಳನ್ನು ನಮೂದಿಸಿ</span></h5><p><span class="en">Class 10 and Class 12 board, school, year, percentage.</span><span class="kn">10ನೇ ಮತ್ತು 12ನೇ ತರಗತಿ ಅಂಕಗಳನ್ನು ನಿಖರವಾಗಿ ನಮೂದಿಸಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">4</div><div class="proc-text"><h5><span class="en">Attach Documents</span><span class="kn">ದಾಖಲೆಗಳನ್ನು ಲಗತ್ತಿಸಿ</span></h5><p><span class="en">Self-attested copies of all required documents.</span><span class="kn">ಎಲ್ಲಾ ಅಗತ್ಯ ದಾಖಲೆಗಳ ಸ್ವಯಂ-ಸಾಕ್ಷ್ಯಾಂಕಿತ ಪ್ರತಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">5</div><div class="proc-text"><h5><span class="en">Submit at Office (Offline)</span><span class="kn">ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ (ಆಫ್‌ಲೈನ್)</span></h5><p><span class="en">Hand-deliver to the UG Coordinator's office before 15.05.2025.</span><span class="kn">15.05.2025 ರ ಒಳಗಾಗಿ ಕಚೇರಿಗೆ ನೇರವಾಗಿ ಸಲ್ಲಿಸಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">6</div><div class="proc-text"><h5><span class="en">Document Verification</span><span class="kn">ದಾಖಲೆ ಪರಿಶೀಲನೆ</span></h5><p><span class="en">Team verifies documents. Status visible on this portal.</span><span class="kn">ತಂಡ ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ. ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಸ್ಥಿತಿ ನೋಡಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">7</div><div class="proc-text"><h5><span class="en">Merit List &amp; Rank</span><span class="kn">ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಶ್ರೇಣಿ</span></h5><p><span class="en">Rank visible on student dashboard after merit list publication.</span><span class="kn">ಅರ್ಹತಾ ಪಟ್ಟಿ ಪ್ರಕಟಣೆ ನಂತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಶ್ರೇಣಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">8</div><div class="proc-text"><h5><span class="en">One-Day Counselling</span><span class="kn">ಒಂದು ದಿನದ ಕೌನ್ಸೆಲಿಂಗ್</span></h5><p><span class="en">Join the online counselling session on the scheduled date when your rank is called.</span><span class="kn">ನಿಗದಿತ ದಿನ ಆನ್‌ಲೈನ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಸೇರಿ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">9</div><div class="proc-text"><h5><span class="en">Seat Allotment</span><span class="kn">ಸ್ಥಾನ ಹಂಚಿಕೆ</span></h5><p><span class="en">Seats allotted from Government and Management quota by category per seat matrix.</span><span class="kn">ವರ್ಗವಾರು ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್‌ನಂತೆ ಹಂಚಿಕೆ.</span></p></div></div>
-            <div class="proc-card"><div class="proc-num">10</div><div class="proc-text"><h5><span class="en">Pay Fees &amp; Confirm</span><span class="kn">ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ದೃಢೀಕರಿಸಿ</span></h5><p><span class="en">Pay fees and submit original documents to complete admission.</span><span class="kn">ಮೂಲ ದಾಖಲೆ ಸಲ್ಲಿಸಿ ಮತ್ತು ಶುಲ್ಕ ಪಾವತಿಸಿ.</span></p></div></div>
-          </div>
-        </div>
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-list-ol"></i></div><div class="acc-label"><h3><span class="en">Admission Process</span><span class="kn">ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ</span></h3><p><span class="en">Step-by-step guide to getting admitted</span><span class="kn">ಪ್ರವೇಶ ಪಡೆಯಲು ಹಂತ-ಹಂತದ ಮಾರ್ಗದರ್ಶಿ</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="steps-grid" style="margin-bottom:1.4rem"><div class="step-card"><span class="step-num-bg">01</span><div class="step-icon-box"><i class="fas fa-download"></i></div><h4><span class="en">Download &amp; Fill</span><span class="kn">ಡೌನ್‌ಲೋಡ್ ಮತ್ತು ಭರ್ತಿ</span></h4><p><span class="en">Download application from university website.</span><span class="kn">ವಿಶ್ವವಿದ್ಯಾಲಯ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.</span></p></div><div class="step-card"><span class="step-num-bg">02</span><div class="step-icon-box"><i class="fas fa-building"></i></div><h4><span class="en">Submit at Office</span><span class="kn">ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ</span></h4><p><span class="en">Submit printed application IN PERSON at UG Coordinator's office.</span><span class="kn">ಸ್ನಾತಕ ಸಂಯೋಜಕರ ಕಚೇರಿಗೆ ನೇರವಾಗಿ ಸಲ್ಲಿಸಿ.</span></p></div><div class="step-card"><span class="step-num-bg">03</span><div class="step-icon-box"><i class="fas fa-check-circle"></i></div><h4><span class="en">Verification</span><span class="kn">ಪರಿಶೀಲನೆ</span></h4><p><span class="en">Admin team verifies your documents.</span><span class="kn">ಪ್ರವೇಶ ತಂಡ ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.</span></p></div><div class="step-card"><span class="step-num-bg">04</span><div class="step-icon-box"><i class="fas fa-sort-amount-up"></i></div><h4><span class="en">Merit Rank</span><span class="kn">ಅರ್ಹತಾ ಶ್ರೇಣಿ</span></h4><p><span class="en">Rank based on Class 12 percentage.</span><span class="kn">12ನೇ ತರಗತಿ ಅಂಕ ಆಧಾರದ ಮೇಲೆ ಶ್ರೇಣಿ.</span></p></div><div class="step-card"><span class="step-num-bg">05</span><div class="step-icon-box"><i class="fas fa-users"></i></div><h4><span class="en">Live Counselling</span><span class="kn">ಲೈವ್ ಕೌನ್ಸೆಲಿಂಗ್</span></h4><p><span class="en">One-day online counselling. Seats allotted by rank.</span><span class="kn">ಒಂದು ದಿನದ ಆನ್‌ಲೈನ್ ಕೌನ್ಸೆಲಿಂಗ್.</span></p></div><div class="step-card"><span class="step-num-bg">06</span><div class="step-icon-box"><i class="fas fa-graduation-cap"></i></div><h4><span class="en">Confirm Admission</span><span class="kn">ಪ್ರವೇಶ ದೃಢೀಕರಿಸಿ</span></h4><p><span class="en">Pay fees &amp; submit original documents.</span><span class="kn">ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ಮೂಲ ದಾಖಲೆಗಳನ್ನು ಸಲ್ಲಿಸಿ.</span></p></div></div><div class="proc-bg"><div class="proc-grid"><div class="proc-card"><div class="proc-num">1</div><div class="proc-text"><h5><span class="en">Download Application</span><span class="kn">ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್</span></h5><p><span class="en">Download from university website.</span><span class="kn">ವಿಶ್ವವಿದ್ಯಾಲಯ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್.</span></p></div></div><div class="proc-card"><div class="proc-num">2</div><div class="proc-text"><h5><span class="en">Fill Personal Details</span><span class="kn">ವೈಯಕ್ತಿಕ ವಿವರ ಭರ್ತಿ</span></h5><p><span class="en">Name, DOB, gender, contact, address, category.</span><span class="kn">ಹೆಸರು, ಜನ್ಮ ದಿನಾಂಕ, ಲಿಂಗ, ವಿಳಾಸ, ವರ್ಗ.</span></p></div></div><div class="proc-card"><div class="proc-num">3</div><div class="proc-text"><h5><span class="en">Enter Academic Marks</span><span class="kn">ಅಂಕಗಳನ್ನು ನಮೂದಿಸಿ</span></h5><p><span class="en">Class 10 and Class 12 marks.</span><span class="kn">10ನೇ ಮತ್ತು 12ನೇ ತರಗತಿ ಅಂಕಗಳು.</span></p></div></div><div class="proc-card"><div class="proc-num">4</div><div class="proc-text"><h5><span class="en">Attach Documents</span><span class="kn">ದಾಖಲೆಗಳನ್ನು ಲಗತ್ತಿಸಿ</span></h5><p><span class="en">Self-attested copies.</span><span class="kn">ಸ್ವಯಂ-ಸಾಕ್ಷ್ಯಾಂಕಿತ ಪ್ರತಿಗಳು.</span></p></div></div><div class="proc-card"><div class="proc-num">5</div><div class="proc-text"><h5><span class="en">Submit at Office (Offline)</span><span class="kn">ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ (ಆಫ್‌ಲೈನ್)</span></h5><p><span class="en">Hand-deliver before 15.05.2025.</span><span class="kn">15.05.2025 ರ ಒಳಗಾಗಿ ಕಚೇರಿಗೆ ಸಲ್ಲಿಸಿ.</span></p></div></div><div class="proc-card"><div class="proc-num">6</div><div class="proc-text"><h5><span class="en">Document Verification</span><span class="kn">ದಾಖಲೆ ಪರಿಶೀಲನೆ</span></h5><p><span class="en">Team verifies documents.</span><span class="kn">ತಂಡ ದಾಖಲೆಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.</span></p></div></div><div class="proc-card"><div class="proc-num">7</div><div class="proc-text"><h5><span class="en">Merit List &amp; Rank</span><span class="kn">ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಶ್ರೇಣಿ</span></h5><p><span class="en">Rank visible on dashboard.</span><span class="kn">ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಶ್ರೇಣಿ.</span></p></div></div><div class="proc-card"><div class="proc-num">8</div><div class="proc-text"><h5><span class="en">One-Day Counselling</span><span class="kn">ಒಂದು ದಿನದ ಕೌನ್ಸೆಲಿಂಗ್</span></h5><p><span class="en">Join online counselling session.</span><span class="kn">ಆನ್‌ಲೈನ್ ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಸೇರಿ.</span></p></div></div><div class="proc-card"><div class="proc-num">9</div><div class="proc-text"><h5><span class="en">Seat Allotment</span><span class="kn">ಸ್ಥಾನ ಹಂಚಿಕೆ</span></h5><p><span class="en">Seats by category per seat matrix.</span><span class="kn">ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್‌ನಂತೆ ಹಂಚಿಕೆ.</span></p></div></div><div class="proc-card"><div class="proc-num">10</div><div class="proc-text"><h5><span class="en">Pay Fees &amp; Confirm</span><span class="kn">ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ದೃಢೀಕರಿಸಿ</span></h5><p><span class="en">Complete admission.</span><span class="kn">ಪ್ರವೇಶ ಪೂರ್ಣಗೊಳಿಸಿ.</span></p></div></div></div></div></div>
     </div>
 
     <!-- 4. SEAT MATRIX -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-table"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">Provisional Seat Matrix 2026–27</span><span class="kn">ತಾತ್ಕಾಲಿಕ ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 2026–27</span></h3>
-          <p><span class="en">Category-wise seat distribution</span><span class="kn">ವರ್ಗವಾರು ಸ್ಥಾನ ವಿತರಣೆ</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="matrix-wrap">
-          <table class="matrix-table">
-            <thead>
-              <tr>
-                <th rowspan="2" style="text-align:left;min-width:160px"><span class="en">Programme</span><span class="kn">ಕಾರ್ಯಕ್ರಮ</span></th>
-                <th rowspan="2"><span class="en">Category</span><span class="kn">ವರ್ಗ</span></th>
-                <th class="cat-th">GM<br><small>44%</small></th>
-                <th class="cat-th">SC<br><small>17%</small></th>
-                <th class="cat-th">ST<br><small>7%</small></th>
-                <th class="cat-th">Cat-I<br><small>4%</small></th>
-                <th class="cat-th">IIA<br><small>15%</small></th>
-                <th class="cat-th">IIB<br><small>4%</small></th>
-                <th class="cat-th">IIIA<br><small>4%</small></th>
-                <th class="cat-th">IIIB<br><small>5%</small></th>
-                <th class="cat-th">HK*<br><small>8%</small></th>
-                <th class="cat-th">PWD*<br><small>5%</small></th>
-                <th class="cat-th">KM</th>
-                <th class="cat-th">RL</th>
-                <th class="total-cell"><span class="en">Total</span><span class="kn">ಒಟ್ಟು</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td rowspan="2" style="text-align:left;vertical-align:middle">
-                  <span class="en"><strong>(a) Machine Learning<br>(b) Data Science<br>(c) Full Stack Dev</strong><br><small style="color:var(--text-muted)">Each Specialization</small></span>
-                  <span class="kn"><strong>(a) ಮೆಷಿನ್ ಲರ್ನಿಂಗ್<br>(b) ಡೇಟಾ ಸೈನ್ಸ್<br>(c) ಫುಲ್ ಸ್ಟಾಕ್ ಡೆವ್</strong><br><small style="color:var(--text-muted)">ಪ್ರತಿ ವಿಶೇಷತೆ</small></span>
-                </td>
-                <td style="text-align:left;font-size:.73rem"><span class="en">Regular</span><span class="kn">ನಿಯಮಿತ</span></td>
-                <td>33</td><td>3</td><td>13</td><td>5</td><td>3</td><td>11</td><td>3</td><td>3</td><td>7*</td><td>4*</td><td>2</td><td>2</td>
-                <td class="total-cell">90</td>
-              </tr>
-              <tr>
-                <td style="text-align:left;font-size:.73rem"><span class="en">Payment</span><span class="kn">ಪಾವತಿ</span></td>
-                <td>32</td><td>12</td><td>5</td><td>3</td><td>—</td><td>11</td><td>3</td><td>3</td><td>8*</td><td>5*</td><td>2</td><td>2</td>
-                <td class="total-cell">90</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2"><span class="en">Total per Specialization</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ ಒಟ್ಟು</span></td>
-                <td colspan="12" style="text-align:center">180 <span class="en">seats</span><span class="kn">ಸ್ಥಾನಗಳು</span> (90 <span class="en">Regular</span><span class="kn">ನಿಯಮಿತ</span> + 90 <span class="en">Payment</span><span class="kn">ಪಾವತಿ</span>)</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        <div class="matrix-note" style="margin-top:.9rem">
-          <strong><span class="en">Abbreviations:</span><span class="kn">ಸಂಕ್ಷೇಪಣ:</span></strong>
-          <span class="en"> HK = Hyderabad Karnataka | RL = Rural | KM = Kannada Medium | PWD = Persons with Disabilities</span>
-          <span class="kn"> HK = ಹೈದರಾಬಾದ್ ಕರ್ನಾಟಕ | RL = ಗ್ರಾಮೀಣ | KM = ಕನ್ನಡ ಮಾಧ್ಯಮ | PWD = ವಿಕಲಾಂಗ</span>
-          <br><br>
-          <strong><span class="en">HK Regular (7):</span><span class="kn">HK ನಿಯಮಿತ (7):</span></strong>
-          <span class="en"> GM-3, SC-1, ST-1, IIA-1, IIB-1 &nbsp;|&nbsp; </span><span class="kn"> GM-3, SC-1, ST-1, IIA-1, IIB-1 &nbsp;|&nbsp; </span>
-          <strong><span class="en">HK Payment (8):</span><span class="kn">HK ಪಾವತಿ (8):</span></strong>
-          <span class="en"> GM-4, SC-1, ST-1, IIA-1, IIB-1</span><span class="kn"> GM-4, SC-1, ST-1, IIA-1, IIB-1</span>
-          <br>
-          <strong><span class="en">PWD Regular (4) | PWD Payment (5)</span><span class="kn">PWD ನಿಯಮಿತ (4) | PWD ಪಾವತಿ (5)</span></strong>
-          <br><br>
-          <span class="en">Unfilled HK/PWD/Rural/KM seats transferred as per University norms. Preference order: SC → ST → Cat-I → IIA → IIB → IIIA → IIIB.</span>
-          <span class="kn">ಅಪೂರ್ಣ ಸ್ಥಾನಗಳನ್ನು ವಿಶ್ವವಿದ್ಯಾಲಯ ನಿಯಮಗಳ ಪ್ರಕಾರ ವರ್ಗಾಯಿಸಲಾಗುವುದು.</span>
-        </div>
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-table"></i></div><div class="acc-label"><h3><span class="en">Provisional Seat Matrix 2026–27</span><span class="kn">ತಾತ್ಕಾಲಿಕ ಸ್ಥಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 2026–27</span></h3><p><span class="en">Category-wise seat distribution</span><span class="kn">ವರ್ಗವಾರು ಸ್ಥಾನ ವಿತರಣೆ</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="matrix-wrap"><table class="matrix-table"><thead><tr><th rowspan="2" style="text-align:left;min-width:160px"><span class="en">Programme</span><span class="kn">ಕಾರ್ಯಕ್ರಮ</span></th><th rowspan="2"><span class="en">Category</span><span class="kn">ವರ್ಗ</span></th><th class="cat-th">GM</th><th class="cat-th">SC</th><th class="cat-th">ST</th><th class="cat-th">Cat-I</th><th class="cat-th">IIA</th><th class="cat-th">IIB</th><th class="cat-th">IIIA</th><th class="cat-th">IIIB</th><th class="cat-th">HK*</th><th class="cat-th">PWD*</th><th class="cat-th">KM</th><th class="cat-th">RL</th><th class="total-cell"><span class="en">Total</span><span class="kn">ಒಟ್ಟು</span></th></tr></thead><tbody><tr><td rowspan="2" style="text-align:left;vertical-align:middle"><span class="en">ML / DS / FSD</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ</span><br><small><span class="en">Each Specialization</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ</span></small></td><td style="text-align:left"><span class="en">Regular</span><span class="kn">ನಿಯಮಿತ</span></td><td>33</td><td>3</td><td>13</td><td>5</td><td>3</td><td>11</td><td>3</td><td>3</td><td>7*</td><td>4*</td><td>2</td><td>2</td><td class="total-cell">90</td></tr><tr><td style="text-align:left"><span class="en">Payment</span><span class="kn">ಪಾವತಿ</span></td><td>32</td><td>12</td><td>5</td><td>3</td><td>—</td><td>11</td><td>3</td><td>3</td><td>8*</td><td>5*</td><td>2</td><td>2</td><td class="total-cell">90</td></tr></tbody><tfoot><tr><td colspan="2"><span class="en">Total per Specialization</span><span class="kn">ಪ್ರತಿ ವಿಶೇಷತೆ ಒಟ್ಟು</span></td><td colspan="12" style="text-align:center">180 <span class="en">seats</span><span class="kn">ಸ್ಥಾನಗಳು</span> (90+90)</td></tr></tfoot></table></div><div class="matrix-note"><strong><span class="en">Abbreviations:</span><span class="kn">ಸಂಕ್ಷೇಪಣ:</span></strong> HK = Hyderabad Karnataka | RL = Rural | KM = Kannada Medium | PWD = Persons with Disabilities<br><br><strong><span class="en">HK Regular (7):</span><span class="kn">HK ನಿಯಮಿತ (7):</span></strong> GM-3, SC-1, ST-1, IIA-1, IIB-1 &nbsp;|&nbsp; <strong><span class="en">HK Payment (8):</span><span class="kn">HK ಪಾವತಿ (8):</span></strong> GM-4, SC-1, ST-1, IIA-1, IIB-1<br><strong><span class="en">PWD Regular (4) | PWD Payment (5)</span><span class="kn">PWD ನಿಯಮಿತ (4) | PWD ಪಾವತಿ (5)</span></strong><br><br><span class="en">Unfilled HK/PWD/Rural/KM seats transferred as per University norms.</span><span class="kn">ಅಪೂರ್ಣ ಸ್ಥಾನಗಳನ್ನು ವಿಶ್ವವಿದ್ಯಾಲಯ ನಿಯಮಗಳ ಪ್ರಕಾರ ವರ್ಗಾಯಿಸಲಾಗುವುದು.</span></div></div>
     </div>
 
     <!-- 5. FEE STRUCTURE -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-rupee-sign"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">Fee Structure 2026–27</span><span class="kn">ಶುಲ್ಕ ರಚನೆ 2026–27</span></h3>
-          <p><span class="en">Annual fees, exam fees &amp; SC/ST concession</span><span class="kn">ವಾರ್ಷಿಕ ಶುಲ್ಕ, ಪರೀಕ್ಷಾ ಶುಲ್ಕ ಮತ್ತು SC/ST ರಿಯಾಯಿತಿ</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="fee-bg">
-          <h4>
-            <span class="en">Annual Fees — B.C.A. (Regular Category)</span>
-            <span class="kn">ವಾರ್ಷಿಕ ಶುಲ್ಕ — B.C.A. (ನಿಯಮಿತ ವರ್ಗ)</span>
-          </h4>
-          <p style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.9rem">
-            <span class="en">Approved by Vice-Chancellor — 08.04.2026</span>
-            <span class="kn">ಕುಲಪತಿ ಅನುಮೋದನೆ — 08.04.2026</span>
-          </p>
-          <div class="matrix-wrap">
-            <table class="fee-table">
-              <thead>
-                <tr>
-                  <th style="text-align:left;min-width:180px"><span class="en">Type of Fee</span><span class="kn">ಶುಲ್ಕದ ವಿಧ</span></th>
-                  <th><span class="en">1st Yr (₹)</span><span class="kn">1ನೇ ವರ್ಷ</span></th>
-                  <th><span class="en">2nd Yr (₹)</span><span class="kn">2ನೇ ವರ್ಷ</span></th>
-                  <th><span class="en">3rd Yr (₹)</span><span class="kn">3ನೇ ವರ್ಷ</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td><span class="en">Registration Fee</span><span class="kn">ನೋಂದಣಿ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr>
-                <tr><td><span class="en">Admission Fee</span><span class="kn">ಪ್ರವೇಶ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr>
-                <tr><td><span class="en">Tuition Fee</span><span class="kn">ಬೋಧನಾ ಶುಲ್ಕ</span></td><td>24,700</td><td>24,700</td><td>24,700</td></tr>
-                <tr><td><span class="en">Laboratory Fee</span><span class="kn">ಪ್ರಯೋಗಾಲಯ ಶುಲ್ಕ</span></td><td>10,000</td><td>10,000</td><td>10,000</td></tr>
-                <tr><td><span class="en">Library Fee</span><span class="kn">ಗ್ರಂಥಾಲಯ ಶುಲ್ಕ</span></td><td>1,000</td><td>1,000</td><td>1,000</td></tr>
-                <tr><td><span class="en">Sports Development Fee</span><span class="kn">ಕ್ರೀಡಾ ಅಭಿವೃದ್ಧಿ ಶುಲ್ಕ</span></td><td>620</td><td>620</td><td>620</td></tr>
-                <tr><td><span class="en">Medical Examination Fee</span><span class="kn">ವೈದ್ಯಕೀಯ ಪರೀಕ್ಷೆ ಶುಲ್ಕ</span></td><td>200</td><td>200</td><td>200</td></tr>
-                <tr><td><span class="en">Student Activity Fee *</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>100</td><td>100</td><td>100</td></tr>
-                <tr><td><span class="en">Identity Card Fee</span><span class="kn">ಗುರುತಿನ ಚೀಟಿ ಶುಲ್ಕ</span></td><td>150</td><td>150</td><td>150</td></tr>
-                <tr><td><span class="en">Cultural Activity Fee *</span><span class="kn">ಸಾಂಸ್ಕೃತಿಕ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>200</td><td>200</td><td>200</td></tr>
-                <tr><td><span class="en">Twithers Benefit Fund</span><span class="kn">ಟ್ವಿದರ್ಸ್ ಬೆನಿಫಿಟ್ ಫಂಡ್</span></td><td>25</td><td>25</td><td>25</td></tr>
-                <tr><td><span class="en">Students Benefit Fund</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಲಾಭ ನಿಧಿ</span></td><td>25</td><td>25</td><td>25</td></tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td style="text-align:left"><strong><span class="en">Total</span><span class="kn">ಒಟ್ಟು</span></strong></td>
-                  <td><strong>₹ 39,020</strong></td><td><strong>₹ 37,020</strong></td><td><strong>₹ 37,020</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-          <div class="fee-note">
-            * <span class="en"><strong>Not reimbursable</strong> by Social Welfare Dept for SC/ST: Cultural Activity (₹200) + Student Activity (₹100).</span>
-            <span class="kn">SC/ST ಗೆ ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆಯಿಂದ <strong>ಮರುಪಾವತಿ ಸಿಗದ</strong> ಶುಲ್ಕ.</span>
-          </div>
-          <div class="sfee-grid">
-            <div class="sfee-card"><h6><span class="en">Non-Karnataka</span><span class="kn">ಕರ್ನಾಟಕೇತರ</span></h6><p>₹ 2,000</p></div>
-            <div class="sfee-card"><h6><span class="en">NRI Student</span><span class="kn">NRI ವಿದ್ಯಾರ್ಥಿ</span></h6><p>₹ 4,000</p></div>
-            <div class="sfee-card"><h6><span class="en">Foreign Student</span><span class="kn">ವಿದೇಶಿ ವಿದ್ಯಾರ್ಥಿ</span></h6><p>₹ 12,870</p></div>
-            <div class="sfee-card"><h6><span class="en">Payment Seat Fee</span><span class="kn">ಪಾವತಿ ಸ್ಥಾನ ಶುಲ್ಕ</span></h6><p>₹ 75,000 <span style="font-size:.7rem;color:rgba(255,255,255,.35)">+ <span class="en">eligibility fee if applicable</span><span class="kn">ಅರ್ಹತಾ ಶುಲ್ಕ</span></span></p></div>
-          </div>
-
-          <!-- SC/ST Scholarship -->
-          <div class="scholar-card">
-            <h5>🎓 <span class="en">SC/ST Freeship Card — Fee Concession</span><span class="kn">SC/ST ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್ — ಶುಲ್ಕ ರಿಯಾಯಿತಿ</span></h5>
-            <p class="en">From <strong>2023–24</strong>, SC/ST students with family income below <strong>₹2.5 Lakhs</strong> eligible for post-matric scholarship may be admitted without pre-payment of compulsory fees on submission of a <strong>Freeship Card</strong>. Required: scholarship status (2025–26) / Freeship card from SSP Portal + income &amp; caste certificate from Tahsildar. <strong>Note:</strong> Cultural Activity (₹200) and Student Activity (₹100) must still be paid.</p>
-            <p class="kn">₹2.5 ಲಕ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ ವಾರ್ಷಿಕ ಕುಟುಂಬ ಆದಾಯ ಹೊಂದಿರುವ SC/ST ವಿದ್ಯಾರ್ಥಿಗಳು <strong>ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್</strong> ಸಲ್ಲಿಸಿ ಪ್ರವೇಶ ಪಡೆಯಬಹುದು. SSP ಪೋರ್ಟಲ್‌ನಿಂದ ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್ + ತಹಶೀಲ್ದಾರ್ ಪ್ರಮಾಣ ಪತ್ರ ಸಲ್ಲಿಸಬೇಕು.</p>
-          </div>
-
-          <!-- Exam Fees -->
-          <h4 style="margin-top:1.5rem">
-            <span class="en">Examination Fees — BCA (Semester-wise)</span>
-            <span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ — BCA (ಸೆಮಿಸ್ಟರ್ ವಾರು)</span>
-          </h4>
-          <div class="matrix-wrap">
-            <table class="exam-table">
-              <thead>
-                <tr>
-                  <th><span class="en">Course</span><span class="kn">ಕೋರ್ಸ್</span></th>
-                  <th><span class="en">Sem</span><span class="kn">ಸೆಮ್</span></th>
-                  <th><span class="en">Exam Fee (₹)</span><span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ</span></th>
-                  <th><span class="en">NAD (₹)</span><span class="kn">NAD</span></th>
-                  <th><span class="en">Convocation (₹)</span><span class="kn">ಘಟಿಕೋತ್ಸವ</span></th>
-                  <th><span class="en">Total (₹)</span><span class="kn">ಒಟ್ಟು</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td rowspan="6" style="font-weight:700;color:var(--gold-light)">BCA</td><td>I</td><td>4,950</td><td>275</td><td>—</td><td>5,225</td></tr>
-                <tr><td>II</td><td>4,950</td><td>275</td><td>—</td><td>5,225</td></tr>
-                <tr><td>III</td><td>5,445</td><td>275</td><td>—</td><td>5,720</td></tr>
-                <tr><td>IV</td><td>5,445</td><td>275</td><td>—</td><td>5,720</td></tr>
-                <tr><td>V</td><td>6,589</td><td>275</td><td>—</td><td>6,864</td></tr>
-                <tr><td>VI</td><td>6,589</td><td>275</td><td>2,305</td><td>9,169</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div><!-- /fee-bg -->
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-rupee-sign"></i></div><div class="acc-label"><h3><span class="en">Fee Structure 2026–27</span><span class="kn">ಶುಲ್ಕ ರಚನೆ 2026–27</span></h3><p><span class="en">Annual fees, exam fees &amp; SC/ST concession</span><span class="kn">ವಾರ್ಷಿಕ ಶುಲ್ಕ, ಪರೀಕ್ಷಾ ಶುಲ್ಕ ಮತ್ತು SC/ST ರಿಯಾಯಿತಿ</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="fee-bg"><h4><span class="en">Annual Fees — B.C.A. (Regular Category)</span><span class="kn">ವಾರ್ಷಿಕ ಶುಲ್ಕ — B.C.A. (ನಿಯಮಿತ ವರ್ಗ)</span></h4><p style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.9rem"><span class="en">Approved by Vice-Chancellor — 08.04.2026</span><span class="kn">ಕುಲಪತಿ ಅನುಮೋದನೆ — 08.04.2026</span></p><div class="matrix-wrap"><table class="fee-table"><thead><tr><th style="text-align:left;min-width:180px"><span class="en">Type of Fee</span><span class="kn">ಶುಲ್ಕದ ವಿಧ</span></th><th><span class="en">1st Yr (₹)</span><span class="kn">1ನೇ ವರ್ಷ</span></th><th><span class="en">2nd Yr (₹)</span><span class="kn">2ನೇ ವರ್ಷ</span></th><th><span class="en">3rd Yr (₹)</span><span class="kn">3ನೇ ವರ್ಷ</span></th></tr></thead><tbody><tr><td><span class="en">Registration Fee</span><span class="kn">ನೋಂದಣಿ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr><tr><td><span class="en">Admission Fee</span><span class="kn">ಪ್ರವೇಶ ಶುಲ್ಕ</span></td><td>1,000</td><td>—</td><td>—</td></tr><tr><td><span class="en">Tuition Fee</span><span class="kn">ಬೋಧನಾ ಶುಲ್ಕ</span></td><td>24,700</td><td>24,700</td><td>24,700</td></tr><tr><td><span class="en">Laboratory Fee</span><span class="kn">ಪ್ರಯೋಗಾಲಯ ಶುಲ್ಕ</span></td><td>10,000</td><td>10,000</td><td>10,000</td></tr><tr><td><span class="en">Library Fee</span><span class="kn">ಗ್ರಂಥಾಲಯ ಶುಲ್ಕ</span></td><td>1,000</td><td>1,000</td><td>1,000</td></tr><tr><td><span class="en">Sports Development Fee</span><span class="kn">ಕ್ರೀಡಾ ಅಭಿವೃದ್ಧಿ ಶುಲ್ಕ</span></td><td>620</td><td>620</td><td>620</td></tr><tr><td><span class="en">Medical Examination Fee</span><span class="kn">ವೈದ್ಯಕೀಯ ಪರೀಕ್ಷೆ ಶುಲ್ಕ</span></td><td>200</td><td>200</td><td>200</td></tr><tr><td><span class="en">Student Activity Fee *</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>100</td><td>100</td><td>100</td></tr><tr><td><span class="en">Identity Card Fee</span><span class="kn">ಗುರುತಿನ ಚೀಟಿ ಶುಲ್ಕ</span></td><td>150</td><td>150</td><td>150</td></tr><tr><td><span class="en">Cultural Activity Fee *</span><span class="kn">ಸಾಂಸ್ಕೃತಿಕ ಚಟುವಟಿಕೆ ಶುಲ್ಕ *</span></td><td>200</td><td>200</td><td>200</td></tr><tr><td><span class="en">Twithers Benefit Fund</span><span class="kn">ಟ್ವಿದರ್ಸ್ ಬೆನಿಫಿಟ್ ಫಂಡ್</span></td><td>25</td><td>25</td><td>25</td></tr><tr><td><span class="en">Students Benefit Fund</span><span class="kn">ವಿದ್ಯಾರ್ಥಿ ಲಾಭ ನಿಧಿ</span></td><td>25</td><td>25</td><td>25</td></tr></tbody><tfoot><tr><td style="text-align:left"><strong><span class="en">Total</span><span class="kn">ಒಟ್ಟು</span></strong></td><td><strong>₹39,020</strong></td><td><strong>₹37,020</strong></td><td><strong>₹37,020</strong></td></tr></tfoot></table></div><div class="fee-note">* <span class="en"><strong>Not reimbursable</strong> by Social Welfare Dept for SC/ST.</span><span class="kn">SC/ST ಗೆ ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆಯಿಂದ <strong>ಮರುಪಾವತಿ ಸಿಗದ</strong> ಶುಲ್ಕ.</span></div><div class="sfee-grid"><div class="sfee-card"><h6><span class="en">Non-Karnataka</span><span class="kn">ಕರ್ನಾಟಕೇತರ</span></h6><p>₹ 2,000</p></div><div class="sfee-card"><h6><span class="en">NRI Student</span><span class="kn">NRI ವಿದ್ಯಾರ್ಥಿ</span></h6><p>₹ 4,000</p></div><div class="sfee-card"><h6><span class="en">Foreign Student</span><span class="kn">ವಿದೇಶಿ ವಿದ್ಯಾರ್ಥಿ</span></h6><p>₹ 12,870</p></div><div class="sfee-card"><h6><span class="en">Payment Seat Fee</span><span class="kn">ಪಾವತಿ ಸ್ಥಾನ ಶುಲ್ಕ</span></h6><p>₹ 75,000</p></div></div><div class="scholar-card"><h5>🎓 <span class="en">SC/ST Freeship Card — Fee Concession</span><span class="kn">SC/ST ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್ — ಶುಲ್ಕ ರಿಯಾಯಿತಿ</span></h5><p class="en">SC/ST students with family income &lt; ₹2.5 Lakhs eligible for freeship card. Cultural Activity (₹200) and Student Activity (₹100) not reimbursable.</p><p class="kn">₹2.5 ಲಕ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ ಕುಟುಂಬ ಆದಾಯ ಹೊಂದಿರುವ SC/ST ವಿದ್ಯಾರ್ಥಿಗಳು ಫ್ರೀಶಿಪ್ ಕಾರ್ಡ್‌ಗೆ ಅರ್ಹರು.</p></div><h4 style="margin-top:1.5rem"><span class="en">Examination Fees — BCA (Semester-wise)</span><span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ — BCA (ಸೆಮಿಸ್ಟರ್ ವಾರು)</span></h4><div class="matrix-wrap"><table class="exam-table"><thead><tr><th><span class="en">Course</span><span class="kn">ಕೋರ್ಸ್</span></th><th><span class="en">Sem</span><span class="kn">ಸೆಮ್</span></th><th><span class="en">Exam Fee (₹)</span><span class="kn">ಪರೀಕ್ಷಾ ಶುಲ್ಕ</span></th><th><span class="en">Total (₹)</span><span class="kn">ಒಟ್ಟು</span></th></tr></thead><tbody><tr><td rowspan="6" style="font-weight:700;color:var(--gold-light)">BCA</td><td>I</td><td>4,950</td><td>5,225</td></tr><tr><td>II</td><td>4,950</td><td>5,225</td></tr><tr><td>III</td><td>5,445</td><td>5,720</td></tr><tr><td>IV</td><td>5,445</td><td>5,720</td></tr><tr><td>V</td><td>6,589</td><td>6,864</td></tr><tr><td>VI</td><td>6,589</td><td>9,169</td></tr></tbody></table></div></div></div></div>
     </div>
 
     <!-- 6. CONTACT & INFO -->
-    <div class="acc-item reveal">
-      <button class="acc-trigger" onclick="toggleAcc(this)">
-        <div class="acc-icon"><i class="fas fa-map-marker-alt"></i></div>
-        <div class="acc-label">
-          <h3><span class="en">Contact &amp; Office Info</span><span class="kn">ಸಂಪರ್ಕ ಮತ್ತು ಕಚೇರಿ ಮಾಹಿತಿ</span></h3>
-          <p><span class="en">Address, phone, email, download link</span><span class="kn">ವಿಳಾಸ, ದೂರವಾಣಿ, ಇಮೇಲ್</span></p>
-        </div>
-        <i class="fas fa-chevron-down acc-arrow"></i>
-      </button>
-      <div class="acc-body">
-        <div class="info-grid" id="infoGrid"><!-- filled by JS --></div>
-      </div>
+    <div class="acc-item reveal"><button class="acc-trigger" onclick="toggleAcc(this)"><div class="acc-icon"><i class="fas fa-map-marker-alt"></i></div><div class="acc-label"><h3><span class="en">Contact &amp; Office Info</span><span class="kn">ಸಂಪರ್ಕ ಮತ್ತು ಕಚೇರಿ ಮಾಹಿತಿ</span></h3><p><span class="en">Address, phone, email, download link</span><span class="kn">ವಿಳಾಸ, ದೂರವಾಣಿ, ಇಮೇಲ್</span></p></div><i class="fas fa-chevron-down acc-arrow"></i></button>
+      <div class="acc-body"><div class="info-grid" id="infoGrid"></div></div>
     </div>
 
-  </div><!-- /acc-list -->
-</div><!-- /page-sections -->
+  </div>
+</div>
 
 <script>
 /* ════════════════════════════════════════════
-   SITE CONFIG — change values here only
+   SITE CONFIG — read from CSS variables
    ════════════════════════════════════════════ */
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim().replace(/^"|"$/g, '');
+}
+
 const SITE = {
-  univEN:   "YOUR UNIVERSITY NAME",          // ← change
-  univKN:   "ನಿಮ್ಮ ವಿಶ್ವವಿದ್ಯಾಲಯದ ಹೆಸರು",  // ← auto-fill or change
-  addrEN:   "Office of the Coordinator, UG Programme, [Full Address Here]",
-  addrKN:   "ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿ, [ಸಂಪೂರ್ಣ ವಿಳಾಸ]",
-  phone:    "+91-XXXXX-XXXXX",
-  hoursEN:  "Mon–Fri, 10:00 AM – 5:00 PM",
-  hoursKN:  "ಸೋಮ–ಶುಕ್ರ, ಬೆಳಗ್ಗೆ 10:00 – ಸಂಜೆ 5:00",
-  email:    "admissions@university.ac.in",
-  website:  "https://www.university.ac.in",
-  websiteLabel: "university.ac.in"
+  univEN:   getCSSVar('--cfg-univ-en'),
+  univKN:   getCSSVar('--cfg-univ-kn'),
+  addrEN:   getCSSVar('--cfg-addr-en'),
+  addrKN:   getCSSVar('--cfg-addr-kn'),
+  phone:    getCSSVar('--cfg-phone'),
+  hoursEN:  getCSSVar('--cfg-hours-en'),
+  hoursKN:  getCSSVar('--cfg-hours-kn'),
+  email:    getCSSVar('--cfg-email'),
+  website:  getCSSVar('--cfg-website'),
+  websiteLabel: getCSSVar('--cfg-website-label'),
 };
 
-/* ── Inject university name into hero ── */
-document.getElementById('heroUniv').innerHTML =
-  `<span class="en">${SITE.univEN}</span><span class="kn">${SITE.univKN}</span>`;
+/* Inject university name */
+document.getElementById('univEN').textContent = SITE.univEN;
+document.getElementById('univKN').textContent = SITE.univKN;
 
-/* ── Inject contact strip ── */
+/* Inject contact strip */
 document.getElementById('contactStrip').innerHTML = `
   <div class="contact-item"><i class="fas fa-phone"></i>
     <span><strong>${SITE.phone}</strong> &nbsp;·&nbsp;
@@ -816,7 +521,7 @@ document.getElementById('contactStrip').innerHTML = `
   </div>
 `;
 
-/* ── Inject info grid ── */
+/* Inject info grid */
 document.getElementById('infoGrid').innerHTML = `
   <div class="info-card">
     <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
@@ -829,39 +534,26 @@ document.getElementById('infoGrid').innerHTML = `
     <div class="info-icon"><i class="fas fa-clock"></i></div>
     <div class="info-text">
       <h4><span class="en">Office Hours</span><span class="kn">ಕಚೇರಿ ಸಮಯ</span></h4>
-      <p>
-        <span class="en">${SITE.hoursEN}</span><span class="kn">${SITE.hoursKN}</span><br>
-        <strong>${SITE.phone}</strong><br>
-        <a href="mailto:${SITE.email}">${SITE.email}</a>
-      </p>
+      <p><span class="en">${SITE.hoursEN}</span><span class="kn">${SITE.hoursKN}</span><br><strong>${SITE.phone}</strong><br><a href="mailto:${SITE.email}">${SITE.email}</a></p>
     </div>
   </div>
   <div class="info-card">
     <div class="info-icon"><i class="fas fa-home"></i></div>
     <div class="info-text">
       <h4><span class="en">Hostel Facility</span><span class="kn">ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ</span></h4>
-      <p>
-        <span class="en">Hostel is <strong>not available</strong> for UG students. Local students preferred.</span>
-        <span class="kn">UG ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ <strong>ಲಭ್ಯವಿಲ್ಲ</strong>. ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ.</span>
-      </p>
+      <p><span class="en">Hostel is <strong>not available</strong> for UG students. Local students preferred.</span><span class="kn">UG ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ <strong>ಲಭ್ಯವಿಲ್ಲ</strong>. ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ.</span></p>
     </div>
   </div>
   <div class="info-card">
     <div class="info-icon"><i class="fas fa-download"></i></div>
     <div class="info-text">
       <h4><span class="en">Download Application</span><span class="kn">ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್</span></h4>
-      <p>
-        <span class="en">Download from the official website: </span>
-        <span class="kn">ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಡೌನ್‌ಲೋಡ್: </span>
-        <a href="${SITE.website}" target="_blank"><span class="en">Visit →</span><span class="kn">ಭೇಟಿ →</span></a>
-      </p>
+      <p><a href="${SITE.website}" target="_blank"><span class="en">Visit Official Website →</span><span class="kn">ಅಧಿಕೃತ ವೆಬ್‌ಸೈಟ್ →</span></a></p>
     </div>
   </div>
 `;
 
-/* ════════════════════════════════════════════
-   LANGUAGE TOGGLE
-   ════════════════════════════════════════════ */
+/* Language Toggle */
 function setLang(lang) {
   const isKn = lang === 'kn';
   document.getElementById('btnEn').classList.toggle('active', !isKn);
@@ -869,21 +561,14 @@ function setLang(lang) {
   document.body.classList.toggle('kannada', isKn);
   try { localStorage.setItem('bcaLang', lang); } catch(e){}
 }
-try {
-  const saved = localStorage.getItem('bcaLang');
-  if (saved) setLang(saved);
-} catch(e){}
+try { const saved = localStorage.getItem('bcaLang'); if (saved) setLang(saved); } catch(e){}
 
-/* ════════════════════════════════════════════
-   ACCORDION
-   ════════════════════════════════════════════ */
+/* Accordion */
 function toggleAcc(btn) {
   const body = btn.nextElementSibling;
   const isOpen = body.classList.contains('open');
-  /* close all */
   document.querySelectorAll('.acc-body.open').forEach(b => b.classList.remove('open'));
   document.querySelectorAll('.acc-trigger.open').forEach(b => b.classList.remove('open'));
-  /* open clicked (unless already open) */
   if (!isOpen) {
     body.classList.add('open');
     btn.classList.add('open');
@@ -891,9 +576,7 @@ function toggleAcc(btn) {
   }
 }
 
-/* ════════════════════════════════════════════
-   SCROLL REVEAL
-   ════════════════════════════════════════════ */
+/* Scroll Reveal */
 const revealEls = document.querySelectorAll('.reveal');
 const obs = new IntersectionObserver((entries) => {
   entries.forEach((e, i) => {
