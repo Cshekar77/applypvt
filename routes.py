@@ -89,92 +89,91 @@ def index():
 
 
 # ─────────────────────────────────────────
-#  Registration + OTP (COMMENTED OUT - Using API import instead)
 # ─────────────────────────────────────────
-# @main.route('/register', methods=['GET', 'POST'])
-# def register():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('main.student_dashboard'))
-# 
-#     if request.method == 'POST':
-#         name     = request.form.get('full_name', '').strip()
-#         email    = request.form.get('email', '').strip().lower()
-#         password = request.form.get('password', '')
-#         confirm  = request.form.get('confirm_password', '')
-# 
-#         if not name or not email or not password:
-#             flash('All fields are required.', 'danger')
-#         elif len(password) < 8:
-#             flash('Password must be at least 8 characters.', 'danger')
-#         elif password != confirm:
-#             flash('Passwords do not match.', 'danger')
-#         elif User.query.filter_by(email=email).first():
-#             flash('An account with that email already exists.', 'danger')
-#         else:
-#             otp = generate_otp()
-#             ok, err = send_otp_email(email, name, otp)
-#             if ok:
-#                 session['temp_registration'] = {
-#                     'name': name, 'email': email, 'password': password,
-#                     'otp': otp,
-#                     'otp_expiry': (datetime.utcnow() + timedelta(minutes=10)).isoformat()
-#                 }
-#                 flash('A 6-digit OTP has been sent to your email.', 'success')
-#                 return redirect(url_for('main.verify_otp'))
-#             else:
-#                 flash(f'Could not send OTP. Error: {err}', 'danger')
-#                 return redirect(url_for('main.register'))
-#     return render_template('register.html')
+#  Registration + OTP (Using API import - kept for admin use)
+# ─────────────────────────────────────────
+@main.route('/register_xy9k4m2p7q8w3r5t', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.student_dashboard'))
+
+    if request.method == 'POST':
+        name     = request.form.get('full_name', '').strip()
+        email    = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        confirm  = request.form.get('confirm_password', '')
+
+        if not name or not email or not password:
+            flash('All fields are required.', 'danger')
+        elif len(password) < 8:
+            flash('Password must be at least 8 characters.', 'danger')
+        elif password != confirm:
+            flash('Passwords do not match.', 'danger')
+        elif User.query.filter_by(email=email).first():
+            flash('An account with that email already exists.', 'danger')
+        else:
+            otp = generate_otp()
+            ok, err = send_otp_email(email, name, otp)
+            if ok:
+                session['temp_registration'] = {
+                    'name': name, 'email': email, 'password': password,
+                    'otp': otp,
+                    'otp_expiry': (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                }
+                flash('A 6-digit OTP has been sent to your email.', 'success')
+                return redirect(url_for('main.verify_otp'))
+            else:
+                flash(f'Could not send OTP. Error: {err}', 'danger')
+                return redirect(url_for('main.register'))
+    return render_template('register.html')
 
 
-# @main.route('/verify-otp', methods=['GET', 'POST'])
-# def verify_otp():
-#     temp_data = session.get('temp_registration')
-#     if not temp_data:
-#         flash('No pending registration found.', 'warning')
-#         return redirect(url_for('main.register'))
-#     email = temp_data['email']
-#     existing_user = User.query.filter_by(email=email).first()
-#     if existing_user:
-#         session.pop('temp_registration', None)
-#         flash('Account already exists. Please login.', 'info')
-#         return redirect(url_for('main.login'))
-#     if request.method == 'POST':
-#         action = request.form.get('action')
-#         if action == 'resend':
-#             new_otp = generate_otp()
-#             ok, err = send_otp_email(email, temp_data['name'], new_otp)
-#             if ok:
-#                 temp_data['otp'] = new_otp
-#                 temp_data['otp_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
-#                 session['temp_registration'] = temp_data
-#                 flash('A new OTP has been sent.', 'success')
-#             else:
-#                 flash('Could not send email.', 'warning')
-#             return redirect(url_for('main.verify_otp'))
-#         entered    = request.form.get('otp', '').strip()
-#         stored_otp = temp_data.get('otp')
-#         expiry     = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
-#         if not entered:
-#             flash('Please enter the OTP.', 'danger')
-#         elif expiry and datetime.utcnow() > expiry:
-#             flash('OTP has expired.', 'danger')
-#         elif entered != stored_otp:
-#             flash('Incorrect OTP.', 'danger')
-#         else:
-#             user = User(
-#                 full_name=temp_data['name'], email=email,
-#                 password_hash=generate_password_hash(temp_data['password']),
-#                 is_verified=True, otp_code=None, otp_expires_at=None,
-#             )
-#             db.session.add(user)
-#             db.session.commit()
-#             session.pop('temp_registration', None)
-#             flash('Email verified! You can now log in.', 'success')
-#             return redirect(url_for('main.login'))
-#     return render_template('verify_otp.html', email=email)
-
-
+@main.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    temp_data = session.get('temp_registration')
+    if not temp_data:
+        flash('No pending registration found.', 'warning')
+        return redirect(url_for('main.register'))
+    email = temp_data['email']
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        session.pop('temp_registration', None)
+        flash('Account already exists. Please login.', 'info')
+        return redirect(url_for('main.login'))
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'resend':
+            new_otp = generate_otp()
+            ok, err = send_otp_email(email, temp_data['name'], new_otp)
+            if ok:
+                temp_data['otp'] = new_otp
+                temp_data['otp_expiry'] = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                session['temp_registration'] = temp_data
+                flash('A new OTP has been sent.', 'success')
+            else:
+                flash('Could not send email.', 'warning')
+            return redirect(url_for('main.verify_otp'))
+        entered    = request.form.get('otp', '').strip()
+        stored_otp = temp_data.get('otp')
+        expiry     = datetime.fromisoformat(temp_data.get('otp_expiry')) if temp_data.get('otp_expiry') else None
+        if not entered:
+            flash('Please enter the OTP.', 'danger')
+        elif expiry and datetime.utcnow() > expiry:
+            flash('OTP has expired.', 'danger')
+        elif entered != stored_otp:
+            flash('Incorrect OTP.', 'danger')
+        else:
+            user = User(
+                full_name=temp_data['name'], email=email,
+                password_hash=generate_password_hash(temp_data['password']),
+                is_verified=True, otp_code=None, otp_expires_at=None,
+            )
+            db.session.add(user)
+            db.session.commit()
+            session.pop('temp_registration', None)
+            flash('Email verified! You can now log in.', 'success')
+            return redirect(url_for('main.login'))
+    return render_template('verify_otp.html', email=email)
 # ─────────────────────────────────────────
 #  Login / Logout
 # ─────────────────────────────────────────
