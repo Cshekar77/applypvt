@@ -1,0 +1,9 @@
+  --cfg-univ-en:    "Bangalore University";
+  --cfg-univ-kn:    "ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾಲಯ";
+  --cfg-addr-en:    "Office of the Coordinator, UG Programme, RUSA Building, Jnanabharathi campus, Bangalore University, Bengaluru-56";
+  --cfg-addr-kn:    "ಸ್ನಾತಕ ಕಾರ್ಯಕ್ರಮ ಸಂಯೋಜಕರ ಕಚೇರಿ, RUSA ಕಟ್ಟಡ, ಜ್ಞಾನಭಾರತಿ ಆವರಣ, ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾಲಯ, ಬೆಂಗಳೂರು-೫೬";
+  --cfg-phone:      "+91-8147147632";
+  --cfg-hours-en:   "Mon–Fri, 10:00 AM – 5:00 PM";
+  --cfg-hours-kn:   "ಸೋಮ–ಶುಕ್ರ, ಬೆಳಗ್ಗೆ 10:00 – ಸಂಜೆ 5:00";
+  --cfg-email:      "bca@bub.ernet.in";
+  --cfg-website:    "https://bangaloreuniversity.karnataka.gov.in/";
