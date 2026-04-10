@@ -1,15 +1,15 @@
 import os
-import uuid
-import pandas as pd
 import re
+import uuid
+import requests
+import pandas as pd
 from werkzeug.utils import secure_filename
+
 from flask import (Blueprint, render_template, redirect, url_for,
                    flash, request, session, current_app, abort, send_file, jsonify)
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
-import requests
-import uuid
 
 from database import db
 from models import (User, FormSettings, StudentApplication, ApplicationCategory,
@@ -32,37 +32,6 @@ def utc_to_ist(dt):
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(IST)
 
-# ─────────────────────────────────────────
-#  Helper functions for API
-# ─────────────────────────────────────────
-def _str(val):
-    """Safely convert to string, return empty string if None or NaN"""
-    if val is None:
-        return ''
-    try:
-        if pd.isna(val):
-            return ''
-    except:
-        pass
-    return str(val).strip()
-
-def _flt(val):
-    """Safely convert to float, return None if invalid"""
-    try:
-        v = float(val)
-        if pd.isna(v):
-            return None
-        return v
-    except (TypeError, ValueError):
-        return None
-
-# Your Apps Script URL - CHANGE THIS
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"  # ← PUT YOUR ACTUAL URL HERE
-
-# Non-guessable API endpoint path - CHANGE THIS to a random string
-# Generate with: import secrets; print(secrets.token_urlsafe(16))
-API_SECRET_PATH = "d2faa6fb-745b-454d-8852-92ed0bb482d8"  # ← CHANGE THIS to a random string
-
 
 # ─────────────────────────────────────────
 #  Admin guard
@@ -79,30 +48,218 @@ def admin_required(f):
 
 
 # ─────────────────────────────────────────
+#  Shared helpers (used by import + API)
+# ─────────────────────────────────────────
+def _str(val, default=''):
+    if val is None or (isinstance(val, float) and pd.isna(val)):
+        return default
+    return str(val).strip()
+
+def _flt(val):
+    try:
+        v = float(val)
+        return None if pd.isna(v) else v
+    except (TypeError, ValueError):
+        return None
+
+def _dob_to_password(dob_raw):
+    """
+    Strip all non-digit characters from DOB to create password string.
+    e.g.  15/06/2006  →  15062006
+          15-06-2006  →  15062006
+          15.06.2006  →  15062006
+    Also handles pandas Timestamps (when Excel stores dates as date cells).
+    """
+    if not dob_raw or str(dob_raw).strip() in ('', 'nan', 'NaT'):
+        return None
+    # Handle pandas Timestamp
+    try:
+        ts = pd.Timestamp(dob_raw)
+        if not pd.isna(ts):
+            return ts.strftime('%d%m%Y')
+    except Exception:
+        pass
+    # Strip all non-digit characters from string
+    digits = re.sub(r'[^0-9]', '', str(dob_raw).strip())
+    return digits if digits else None
+
+
+# ─────────────────────────────────────────
+#  Welcome Email via Apps Script
+# ─────────────────────────────────────────
+def send_welcome_email(email, full_name, password_plain, dob_display):
+    """
+    Sends welcome email by calling Apps Script doPost.
+    Replace the two placeholders below with your actual values.
+
+    password_plain  →  digits only, e.g. 15062006
+    dob_display     →  original DOB string, e.g. 15/06/2006
+    """
+    APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"   # ← Paste your deployed Apps Script URL here
+    WEBSITE_URL     = "https://applybcabu.pythonanywhere.com/"        # ← Paste your website URL here
+
+    payload = {
+        "action":   "sendWelcome",
+        "email":    email,
+        "name":     full_name,
+        "password": password_plain,
+        "dob":      dob_display,
+        "website":  WEBSITE_URL,
+    }
+    try:
+        resp   = requests.post(APPS_SCRIPT_URL, data=payload, timeout=10)
+        result = resp.json()
+        return result.get("success", False), result.get("message", "")
+    except Exception as ex:
+        return False, str(ex)
+
+
+# ─────────────────────────────────────────
 #  Public
 # ─────────────────────────────────────────
 @main.route('/')
 def index():
     settings = FormSettings.get()
-    whatsapp = WhatsAppSettings.get()
-    return render_template('index.html', settings=settings, whatsapp_group_link=whatsapp.link if whatsapp and whatsapp.is_active else None)
+    return render_template('index.html', settings=settings)
 
 
 # ─────────────────────────────────────────
+#  POST API — Register Student from Apps Script / Google Sheets
 # ─────────────────────────────────────────
-#  Registration + OTP (Using API import - kept for admin use)
+@main.route('/api/d2faa6fb-745b-454d-8852-92ed0bb482d8', methods=['POST'])
+def api_register_student():
+    # 🔐 API Key validation
+    api_key = request.headers.get('x-api-key')
+    if api_key != current_app.config.get('API_SECRET_KEY'):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
+    try:
+        # ── Required fields ────────────────────────────────────────
+        email     = _str(data.get('email')).lower()
+        full_name = _str(data.get('full_name'))
+        dob_raw   = _str(data.get('dob'))
+
+        if not email or not full_name or not dob_raw:
+            return jsonify({"error": "Missing required fields: email, full_name, dob"}), 400
+
+        # ── Duplicate check ────────────────────────────────────────
+        if User.query.filter_by(email=email).first():
+            return jsonify({"error": "User already exists"}), 409
+
+        # ── DOB → password (digits only, e.g. 15062006) ────────────
+        password_plain = _dob_to_password(dob_raw)
+        if not password_plain:
+            return jsonify({"error": "Invalid DOB — could not parse into password"}), 400
+
+        # ── Create User ────────────────────────────────────────────
+        user = User(
+            full_name      = full_name,
+            email          = email,
+            password_hash  = generate_password_hash(password_plain),
+            is_verified    = True,
+            otp_code       = None,
+            otp_expires_at = None,
+        )
+        db.session.add(user)
+        db.session.flush()  # get user.id before commit
+
+        # ── Split name ─────────────────────────────────────────────
+        parts      = full_name.split(' ', 1)
+        first_name = parts[0]
+        last_name  = parts[1] if len(parts) > 1 else ''
+
+        # ── Category lookup ────────────────────────────────────────
+        cat_id  = None
+        cat_raw = _str(data.get('category')).lower()
+        if cat_raw:
+            cat    = ApplicationCategory.query.filter(
+                db.func.lower(ApplicationCategory.name) == cat_raw
+            ).first()
+            cat_id = cat.id if cat else None
+
+        # ── Marks ──────────────────────────────────────────────────
+        total_10    = _flt(data.get('total_10'))
+        obtained_10 = _flt(data.get('obtained_10'))
+        percent_10  = _flt(data.get('percent_10'))
+        if total_10 and obtained_10 and not percent_10:
+            percent_10 = round((obtained_10 / total_10) * 100, 2)
+
+        total_12    = _flt(data.get('total_12'))
+        obtained_12 = _flt(data.get('obtained_12'))
+        percent_12  = _flt(data.get('percent_12'))
+        if total_12 and obtained_12 and not percent_12:
+            percent_12 = round((obtained_12 / total_12) * 100, 2)
+
+        # ── Create Application ─────────────────────────────────────
+        appl = StudentApplication(
+            user_id        = user.id,
+            first_name     = first_name,
+            last_name      = last_name,
+            dob            = dob_raw,
+            email          = email,
+            phone          = _str(data.get('student_mobile')),
+            gender         = _str(data.get('gender')),
+            address        = _str(data.get('address')),
+            nationality    = _str(data.get('nationality')) or 'Indian',
+            category_id    = cat_id,
+            school_10      = _str(data.get('school_10')),
+            board_10       = _str(data.get('board_10')),
+            year_10        = _str(data.get('year_10')),
+            total_10       = total_10,
+            obtained_10    = obtained_10,
+            percent_10     = percent_10,
+            school_12      = _str(data.get('school_12')),
+            board_12       = _str(data.get('board_12')),
+            stream_12      = _str(data.get('stream_12')),
+            year_12        = _str(data.get('year_12')),
+            total_12       = total_12,
+            obtained_12    = obtained_12,
+            percent_12     = percent_12,
+            specialization = _str(data.get('combination_12')),
+            marksheet_10   = None,
+            marksheet_12   = None,
+        )
+        db.session.add(appl)
+        db.session.commit()
+
+        # ── Send welcome email via Apps Script ─────────────────────
+        send_welcome_email(
+            email          = email,
+            full_name      = full_name,
+            password_plain = password_plain,
+            dob_display    = dob_raw,
+        )
+
+        return jsonify({
+            "message": "Student registered successfully",
+            "user_id": user.id,
+            "email":   email,
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
 # ─────────────────────────────────────────
-@main.route('/register_xy9k4m2p7q8w3r5t', methods=['GET', 'POST'])
+#  Registration + OTP  — hidden URL
+#  Students are imported via Excel or API.
+#  Self-registration kept at obscure URL
+#  so it's not publicly accessible.
+# ─────────────────────────────────────────
+@main.route('/register28497234827', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.student_dashboard'))
-
     if request.method == 'POST':
         name     = request.form.get('full_name', '').strip()
         email    = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         confirm  = request.form.get('confirm_password', '')
-
         if not name or not email or not password:
             flash('All fields are required.', 'danger')
         elif len(password) < 8:
@@ -174,6 +331,8 @@ def verify_otp():
             flash('Email verified! You can now log in.', 'success')
             return redirect(url_for('main.login'))
     return render_template('verify_otp.html', email=email)
+
+
 # ─────────────────────────────────────────
 #  Login / Logout
 # ─────────────────────────────────────────
@@ -188,7 +347,7 @@ def login():
         if not user or not check_password_hash(user.password_hash, password):
             flash('Invalid email or password.', 'danger')
         elif not user.is_verified:
-            flash('Please contact admin to verify your account.', 'warning')
+            flash('Your account is not verified yet. Please contact the admissions office.', 'warning')
         else:
             login_user(user)
             return redirect(url_for('main.student_dashboard'))
@@ -323,7 +482,13 @@ def student_counselling():
         cat_seats = CategorySeats.get_for_category(appl.category_id)
     allotment = None
     if appl:
-        allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+        a = SeatAllotment.query.filter_by(application_id=appl.id).first()
+        if a:
+            allotted_ist = utc_to_ist(a.allotted_at)
+            allotment = {
+                'quota':       a.quota,
+                'allotted_at': allotted_ist
+            }
     return render_template('student_counselling.html',
                            appl=appl, counselling=counselling,
                            cat_seats=cat_seats, allotment=allotment)
@@ -332,51 +497,58 @@ def student_counselling():
 @main.route('/counselling/status')
 @login_required
 def counselling_status_api():
+    """JSON endpoint polled every 10 seconds by student counselling page."""
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
-    
-    # Get ALL seats for all categories
-    all_seats = []
+
+    all_seats  = []
+    # FIX: eagerly load category to avoid lazy-load issues
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
     for cat in categories:
         cs = CategorySeats.get_for_category(cat.id)
         all_seats.append({
-            'category': cat.name,
-            'govt_total': cs.govt_total,
-            'govt_filled': cs.govt_filled,
+            'category':       cat.name,
+            'govt_total':     cs.govt_total,
+            'govt_filled':    cs.govt_filled,
             'govt_remaining': cs.govt_remaining,
-            'mgmt_total': cs.mgmt_total,
-            'mgmt_filled': cs.mgmt_filled,
+            'mgmt_total':     cs.mgmt_total,
+            'mgmt_filled':    cs.mgmt_filled,
             'mgmt_remaining': cs.mgmt_remaining,
         })
-    
+
     cat_seats = None
     if appl and appl.category_id:
-        cs = CategorySeats.get_for_category(appl.category_id)
+        cs  = CategorySeats.get_for_category(appl.category_id)
+        # FIX: load category name safely without relying on lazy relationship
+        cat = ApplicationCategory.query.get(appl.category_id)
         cat_seats = {
-            'category': appl.category.name if appl.category else '',
-            'govt_total': cs.govt_total,
-            'govt_filled': cs.govt_filled,
+            'category':       cat.name if cat else '',
+            'govt_total':     cs.govt_total,
+            'govt_filled':    cs.govt_filled,
             'govt_remaining': cs.govt_remaining,
-            'mgmt_total': cs.mgmt_total,
-            'mgmt_filled': cs.mgmt_filled,
+            'mgmt_total':     cs.mgmt_total,
+            'mgmt_filled':    cs.mgmt_filled,
             'mgmt_remaining': cs.mgmt_remaining,
         }
-    
+
     allotment = None
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
-            allotment = {'quota': a.quota, 'allotted_at': a.allotted_at.strftime('%d %b %Y, %I:%M %p')}
-    
+            allotted_ist = utc_to_ist(a.allotted_at)
+            allotment = {
+                'quota':       a.quota,
+                'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else None
+            }
+
     return jsonify({
-        'status': counselling.status,
+        'status':       counselling.status,
         'current_rank': counselling.current_rank,
-        'message': counselling.message,
-        'my_rank': appl.rank if appl else None,
-        'all_seats': all_seats,
-        'cat_seats': cat_seats,
-        'allotment': allotment,
+        'message':      counselling.message,
+        'my_rank':      appl.rank if appl else None,
+        'all_seats':    all_seats,
+        'cat_seats':    cat_seats,
+        'allotment':    allotment,
     })
 
 
@@ -443,6 +615,9 @@ def my_application():
     return render_template('my_application.html', appl=appl)
 
 
+# ─────────────────────────────────────────
+#  Student — Change Password
+# ─────────────────────────────────────────
 @main.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def student_change_password():
@@ -469,125 +644,6 @@ def student_change_password():
 
 
 # ─────────────────────────────────────────
-#  API - Register Student (via POST) - NON-GUESSABLE URL
-# ─────────────────────────────────────────
-@main.route(f'/api/{API_SECRET_PATH}', methods=['POST'])
-def api_register_student():
-    # 🔐 API Key check
-    api_key = request.headers.get('x-api-key')
-    if current_app.config.get('API_SECRET_KEY') and api_key != current_app.config.get('API_SECRET_KEY'):
-        return jsonify({"error": "Unauthorized"}), 401
-
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid or missing JSON body"}), 400
-
-    try:
-        # Required fields
-        email     = _str(data.get('email')).lower()
-        full_name = _str(data.get('full_name'))
-        dob_raw   = _str(data.get('dob'))
-
-        if not email or not full_name or not dob_raw:
-            return jsonify({"error": "Missing required fields: email, full_name, dob"}), 400
-
-        # Duplicate check
-        if User.query.filter_by(email=email).first():
-            return jsonify({"error": "User already exists"}), 409
-
-        # DOB → password (strip all non-digit characters) - FIXED!
-        # Example: "15/06/2006" → "15062006"
-        password_plain = re.sub(r'[^0-9]', '', dob_raw)
-        if not password_plain or len(password_plain) != 8:
-            return jsonify({"error": "Invalid DOB format. Use DD/MM/YYYY"}), 400
-
-        # Create User
-        user = User(
-            full_name     = full_name,
-            email         = email,
-            password_hash = generate_password_hash(password_plain),
-            is_verified   = True,
-            otp_code      = None,
-            otp_expires_at= None,
-        )
-        db.session.add(user)
-        db.session.flush()
-
-        # Split name
-        parts      = full_name.split(' ', 1)
-        first_name = parts[0]
-        last_name  = parts[1] if len(parts) > 1 else ''
-
-        # Category lookup
-        cat_id = None
-        cat_raw = _str(data.get('category')).lower()
-        if cat_raw:
-            cat = ApplicationCategory.query.filter(
-                db.func.lower(ApplicationCategory.name) == cat_raw
-            ).first()
-            cat_id = cat.id if cat else None
-
-        # Create Application
-        appl = StudentApplication(
-            user_id      = user.id,
-            first_name   = first_name,
-            last_name    = last_name,
-            dob          = dob_raw,
-            email        = email,
-            phone        = _str(data.get('student_mobile')),
-            gender       = _str(data.get('gender')),
-            address      = _str(data.get('address')),
-            nationality  = _str(data.get('nationality')) or 'Indian',
-            category_id  = cat_id,
-            school_10    = _str(data.get('school_10')),
-            board_10     = _str(data.get('board_10')),
-            year_10      = _str(data.get('year_10')),
-            total_10     = _flt(data.get('total_10')),
-            obtained_10  = _flt(data.get('obtained_10')),
-            percent_10   = _flt(data.get('percent_10')),
-            school_12    = _str(data.get('school_12')),
-            board_12     = _str(data.get('board_12')),
-            stream_12    = _str(data.get('stream_12')),
-            year_12      = _str(data.get('year_12')),
-            total_12     = _flt(data.get('total_12')),
-            obtained_12  = _flt(data.get('obtained_12')),
-            percent_12   = _flt(data.get('percent_12')),
-            specialization = _str(data.get('combination_12')),
-            marksheet_10 = None,
-            marksheet_12 = None,
-        )
-        db.session.add(appl)
-        db.session.commit()
-
-        # Send welcome email via Apps Script
-        website_url = request.host_url.rstrip('/')
-        try:
-            requests.post(
-                APPS_SCRIPT_URL,
-                data={
-                    'action': 'sendWelcome',
-                    'email': email,
-                    'name': full_name,
-                    'password': password_plain,
-                    'website': website_url
-                },
-                timeout=30
-            )
-        except Exception as e:
-            print(f"Welcome email error: {e}")
-
-        return jsonify({
-            "message": "Student registered successfully",
-            "user_id": user.id,
-            "email":   email,
-        }), 201
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-
-# ─────────────────────────────────────────
 #  Admin Login / Logout
 # ─────────────────────────────────────────
 @main.route('/admin/login', methods=['GET', 'POST'])
@@ -600,8 +656,7 @@ def admin_login():
         if (u == current_app.config['ADMIN_USERNAME'] and
                 p == current_app.config['ADMIN_PASSWORD']):
             session['admin_logged_in'] = True
-            session['admin_username'] = u
-            session['admin_password_hash'] = generate_password_hash(p)
+            session['admin_username']  = u
             return redirect(url_for('main.admin_dashboard'))
         flash('Invalid admin credentials.', 'danger')
     return render_template('admin_login.html')
@@ -611,10 +666,12 @@ def admin_login():
 def admin_logout():
     session.pop('admin_logged_in', None)
     session.pop('admin_username', None)
-    session.pop('admin_password_hash', None)
     return redirect(url_for('main.admin_login'))
 
 
+# ─────────────────────────────────────────
+#  Admin Dashboard
+# ─────────────────────────────────────────
 @main.route('/admin')
 @admin_required
 def admin_dashboard():
@@ -639,81 +696,77 @@ def admin_dashboard():
 @main.route('/admin/counselling', methods=['GET', 'POST'])
 @admin_required
 def admin_counselling():
-    cs         = CounsellingSettings.get()
-    categories = ApplicationCategory.query.filter_by(is_active=True).all()
-    cat_seats  = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
-    students   = StudentApplication.query.filter_by(is_verified=True)\
-                   .filter(StudentApplication.rank.isnot(None))\
-                   .order_by(StudentApplication.rank.asc()).all()
-    allotments = {a.application_id: a for a in SeatAllotment.query.all()}
-
     if request.method == 'POST':
+        # FIX: fetch cs fresh inside POST so we're always working on
+        # the current DB row, not a stale object from before the request
+        cs     = CounsellingSettings.get()
         action = request.form.get('action')
-        
-        # Start Counselling
+
         if action == 'start':
-            cs.status = 'running'
-            cs.started_at = datetime.utcnow()
+            cs.status       = 'running'
+            cs.started_at   = datetime.utcnow()
             cs.current_rank = None
+            cs.updated_at   = datetime.utcnow()
             db.session.commit()
             flash('Counselling started!', 'success')
-        
-        # Stop Counselling
+
         elif action == 'stop':
-            cs.status = 'stopped'
-            cs.current_rank = None
+            cs.status     = 'stopped'
+            cs.updated_at = datetime.utcnow()
             db.session.commit()
             flash('Counselling stopped.', 'info')
-        
-        # Resume Counselling
+
         elif action == 'resume':
-            cs.status = 'running'
+            cs.status     = 'running'
+            cs.updated_at = datetime.utcnow()
             db.session.commit()
             flash('Counselling resumed!', 'success')
-        
-        # Pause Counselling
+
         elif action == 'pause':
-            cs.status = 'paused'
+            cs.status     = 'paused'
+            cs.updated_at = datetime.utcnow()
             db.session.commit()
             flash('Counselling paused.', 'warning')
-        
-        # Update Current Rank
+
         elif action == 'update_rank':
-            rank_val = request.form.get('current_rank', '').strip()
-            msg_val = request.form.get('message', '').strip()
-            if rank_val and rank_val.isdigit():
-                cs.current_rank = int(rank_val)
-            cs.message = msg_val if msg_val else None
-            cs.updated_at = datetime.utcnow()
+            rank_val        = request.form.get('current_rank', '').strip()
+            msg_val         = request.form.get('message', '').strip()
+            cs.current_rank = int(rank_val) if rank_val.isdigit() else None
+            cs.message      = msg_val or None
+            cs.updated_at   = datetime.utcnow()
             db.session.commit()
-            flash(f'Live rank updated to #{cs.current_rank}', 'success')
-        
-        # Next Rank (Auto Increment)
+            flash('Live rank updated.', 'success')
+
         elif action == 'next_rank':
             cs.current_rank = (cs.current_rank or 0) + 1
-            cs.updated_at = datetime.utcnow()
+            cs.updated_at   = datetime.utcnow()
             db.session.commit()
             flash(f'Now calling Rank #{cs.current_rank}', 'success')
-        
-        # Set Seats (Government/Management Quota)
+
         elif action == 'set_seats':
-            cat_id = request.form.get('cat_id')
-            quota = request.form.get('quota')
+            cat_id    = request.form.get('cat_id')
+            quota     = request.form.get('quota')
             total_str = request.form.get('total_seats', '0').strip()
             if cat_id and quota:
                 seats = CategorySeats.get_for_category(int(cat_id))
-                val = int(total_str) if total_str.isdigit() else 0
+                val   = int(total_str) if total_str.isdigit() else 0
                 if quota == 'government':
                     seats.govt_total = val
                 else:
                     seats.mgmt_total = val
                 db.session.commit()
                 flash('Seats updated.', 'success')
-        
-        # Allot Seat to Student
+
         elif action == 'allot_seat':
+            # FIX: cast app_id to int — form values are always strings
             app_id = request.form.get('app_id')
-            quota = request.form.get('quota')
+            quota  = request.form.get('quota')
+            try:
+                app_id = int(app_id)
+            except (TypeError, ValueError):
+                flash('Invalid student ID.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
             appl = StudentApplication.query.get(app_id)
             if not appl:
                 flash('Student not found.', 'danger')
@@ -739,11 +792,17 @@ def admin_counselling():
                         seats.mgmt_filled += 1
                     db.session.commit()
                     flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota)!', 'success')
-        
-        # Revoke Seat
+
         elif action == 'revoke_seat':
+            # FIX: cast app_id to int consistently
             app_id = request.form.get('app_id')
-            allotment = SeatAllotment.query.filter_by(application_id=int(app_id)).first()
+            try:
+                app_id = int(app_id)
+            except (TypeError, ValueError):
+                flash('Invalid student ID.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
+            allotment = SeatAllotment.query.filter_by(application_id=app_id).first()
             if allotment:
                 seats = CategorySeats.get_for_category(allotment.category_id)
                 if allotment.quota == 'government':
@@ -753,13 +812,26 @@ def admin_counselling():
                 db.session.delete(allotment)
                 db.session.commit()
                 flash('Seat allotment revoked.', 'info')
-        
+
         return redirect(url_for('main.admin_counselling'))
+
+    # GET — fetch everything fresh
+    cs         = CounsellingSettings.get()
+    categories = ApplicationCategory.query.filter_by(is_active=True).all()
+    cat_seats  = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
+    students   = (StudentApplication.query
+                  .filter_by(is_verified=True)
+                  .filter(StudentApplication.rank.isnot(None))
+                  .order_by(StudentApplication.rank.asc())
+                  .all())
+    allotments = {a.application_id: a for a in SeatAllotment.query.all()}
 
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,
                            cat_seats=cat_seats, students=students,
                            allotments=allotments)
+
+
 # ─────────────────────────────────────────
 #  Admin — WhatsApp Group Management
 # ─────────────────────────────────────────
@@ -770,9 +842,12 @@ def admin_whatsapp():
     if request.method == 'POST':
         action = request.form.get('action')
         if action in ('delete', 'clear_all'):
-            wa.link = None; wa.description = None; wa.is_active = False
-            wa.updated_at = datetime.utcnow()
-            db.session.commit(); flash('WhatsApp link cleared.', 'info')
+            wa.link        = None
+            wa.description = None
+            wa.is_active   = False
+            wa.updated_at  = datetime.utcnow()
+            db.session.commit()
+            flash('WhatsApp link cleared.', 'info')
         else:
             link = request.form.get('link', '').strip()
             desc = request.form.get('description', '').strip()
@@ -782,132 +857,19 @@ def admin_whatsapp():
             if not link.startswith('https://chat.whatsapp.com/'):
                 flash('Please enter a valid WhatsApp invite link.', 'danger')
                 return render_template('admin_whatsapp.html', wa=wa)
-            wa.link = link; wa.description = desc; wa.is_active = True
-            wa.updated_at = datetime.utcnow()
-            db.session.commit(); flash('WhatsApp group link updated!', 'success')
+            wa.link        = link
+            wa.description = desc
+            wa.is_active   = True
+            wa.updated_at  = datetime.utcnow()
+            db.session.commit()
+            flash('WhatsApp group link updated!', 'success')
         return redirect(url_for('main.admin_whatsapp'))
     return render_template('admin_whatsapp.html', wa=wa)
 
 
 # ─────────────────────────────────────────
-#  Admin — Import Students from Excel (Full Feature)
+#  Admin — Change Password
 # ─────────────────────────────────────────
-@main.route('/admin/import', methods=['GET', 'POST'])
-@admin_required
-def admin_import():
-    import pandas as pd
-    import re
-    from werkzeug.security import generate_password_hash
-    
-    # Handle POST requests (file upload or import)
-    if request.method == 'POST':
-        action = request.form.get('action')
-        
-        # Step 1: Upload file
-        if action == 'upload':
-            if 'excel_file' not in request.files:
-                flash('No file selected', 'danger')
-                return redirect(url_for('main.admin_import'))
-            
-            file = request.files['excel_file']
-            if file.filename == '':
-                flash('No file selected', 'danger')
-                return redirect(url_for('main.admin_import'))
-            
-            if not file.filename.endswith(('.xlsx', '.xls')):
-                flash('Please upload an Excel file (.xlsx or .xls)', 'danger')
-                return redirect(url_for('main.admin_import'))
-            
-            try:
-                # Read the Excel file
-                df = pd.read_excel(file)
-                
-                # Generate a unique session ID for this import
-                import uuid
-                session_id = str(uuid.uuid4())
-                session[f'import_{session_id}'] = {
-                    'columns': df.columns.tolist(),
-                    'preview': df.head(5).to_dict('records'),
-                    'total_rows': len(df),
-                    'filename': file.filename
-                }
-                session['current_import'] = session_id
-                
-                # Auto-map common column names
-                auto_map = {}
-                col_lower = {col.lower(): col for col in df.columns}
-                
-                field_mappings = {
-                    'email': ['email', 'mail', 'e-mail'],
-                    'full_name': ['full_name', 'fullname', 'name', 'student_name'],
-                    'first_name': ['first_name', 'firstname', 'fname'],
-                    'last_name': ['last_name', 'lastname', 'lname'],
-                    'dob': ['dob', 'date_of_birth', 'birth_date', 'birthdate'],
-                    'phone': ['phone', 'mobile', 'contact', 'student_mobile'],
-                    'gender': ['gender'],
-                    'address': ['address'],
-                    'nationality': ['nationality'],
-                    'category': ['category'],
-                    'school_10': ['school_10', '10th_school', 'class10_school'],
-                    'board_10': ['board_10', '10th_board'],
-                    'year_10': ['year_10', '10th_year'],
-                    'total_10': ['total_10', '10th_total'],
-                    'obtained_10': ['obtained_10', '10th_obtained'],
-                    'percent_10': ['percent_10', '10th_percent'],
-                    'school_12': ['school_12', '12th_school', 'class12_school'],
-                    'board_12': ['board_12', '12th_board'],
-                    'stream_12': ['stream_12', '12th_stream'],
-                    'year_12': ['year_12', '12th_year'],
-                    'total_12': ['total_12', '12th_total'],
-                    'obtained_12': ['obtained_12', '12th_obtained'],
-                    'percent_12': ['percent_12', '12th_percent'],
-                    'specialization': ['specialization', 'combination_12', 'spec']
-                }
-                
-                for field, possible_names in field_mappings.items():
-                    for name in possible_names:
-                        if name in col_lower:
-                            auto_map[field] = col_lower[name]
-                            break
-                
-                return render_template('admin_import.html', 
-                                     columns=df.columns.tolist(),
-                                     preview_rows=df.head(5).to_dict('records'),
-                                     total_rows=len(df),
-                                     auto_map=auto_map,
-                                     session_file=session_id)
-                
-            except Exception as e:
-                flash(f'Error reading file: {str(e)}', 'danger')
-                return redirect(url_for('main.admin_import'))
-        
-        # Step 2: Import data
-        elif action == 'import':
-            session_id = request.form.get('session_file')
-            import_data = session.get(f'import_{session_id}')
-            
-            if not import_data:
-                flash('Import session expired. Please upload the file again.', 'danger')
-                return redirect(url_for('main.admin_import'))
-            
-            # Get column mappings from form
-            mappings = {}
-            for key in request.form:
-                if key.startswith('map_'):
-                    field = key[4:]  # Remove 'map_' prefix
-                    column = request.form.get(key)
-                    if column:
-                        mappings[field] = column
-            
-            # Read the Excel file again
-            filepath = import_data.get('filename')
-            # Need to get the actual file - for now, show error
-            flash('Please upload the file again to complete import.', 'warning')
-            return redirect(url_for('main.admin_import'))
-    
-    # GET request - show upload form
-    return render_template('admin_import.html')
-
 @main.route('/admin/change-password', methods=['GET', 'POST'])
 @admin_required
 def admin_change_password():
@@ -933,6 +895,9 @@ def admin_change_password():
                            back_url=url_for('main.admin_dashboard'))
 
 
+# ─────────────────────────────────────────
+#  Admin — Students
+# ─────────────────────────────────────────
 @main.route('/admin/students')
 @admin_required
 def admin_students():
@@ -960,8 +925,9 @@ def admin_verification():
 @main.route('/admin/verify/<int:app_id>', methods=['POST'])
 @admin_required
 def verify_student(app_id):
-    appl = StudentApplication.query.get_or_404(app_id)
-    appl.is_verified = True; appl.verified_at = datetime.utcnow()
+    appl             = StudentApplication.query.get_or_404(app_id)
+    appl.is_verified = True
+    appl.verified_at = datetime.utcnow()
     appl.admin_notes = request.form.get('notes', appl.admin_notes)
     db.session.commit()
     flash(f'{appl.full_name} verified.', 'success')
@@ -974,7 +940,9 @@ def verify_all_students():
     pending_students = StudentApplication.query.filter_by(is_verified=False).all()
     count = 0
     for student in pending_students:
-        student.is_verified = True; student.verified_at = datetime.utcnow(); count += 1
+        student.is_verified = True
+        student.verified_at = datetime.utcnow()
+        count += 1
     db.session.commit()
     flash(f'Successfully verified {count} student(s)!', 'success')
     return redirect(url_for('main.admin_verification'))
@@ -983,8 +951,9 @@ def verify_all_students():
 @main.route('/admin/unverify/<int:app_id>', methods=['POST'])
 @admin_required
 def unverify_student(app_id):
-    appl = StudentApplication.query.get_or_404(app_id)
-    appl.is_verified = False; appl.verified_at = None
+    appl             = StudentApplication.query.get_or_404(app_id)
+    appl.is_verified = False
+    appl.verified_at = None
     db.session.commit()
     flash(f'{appl.full_name} moved back to pending.', 'info')
     return redirect(url_for('main.admin_verified'))
@@ -1047,6 +1016,9 @@ def admin_form_control():
     return render_template('admin_form_control.html', settings=settings)
 
 
+# ─────────────────────────────────────────
+#  Category Management
+# ─────────────────────────────────────────
 @main.route('/admin/categories')
 @admin_required
 def admin_categories():
@@ -1106,7 +1078,7 @@ def admin_category_delete(cat_id):
 @main.route('/admin/categories/toggle/<int:cat_id>', methods=['POST'])
 @admin_required
 def admin_category_toggle(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
+    category           = ApplicationCategory.query.get_or_404(cat_id)
     category.is_active = not category.is_active
     db.session.commit()
     status = "activated" if category.is_active else "deactivated"
@@ -1114,6 +1086,9 @@ def admin_category_toggle(cat_id):
     return redirect(url_for('main.admin_categories'))
 
 
+# ─────────────────────────────────────────
+#  Exports
+# ─────────────────────────────────────────
 @main.route('/admin/export/all')
 @admin_required
 def export_all():
@@ -1127,3 +1102,296 @@ def export_verified():
     apps = StudentApplication.query.filter_by(is_verified=True)\
              .order_by(StudentApplication.rank.asc().nullslast()).all()
     return export_verified_excel(apps, 'verified_students.xlsx')
+
+
+# ─────────────────────────────────────────
+#  Admin — Import Students from Excel
+# ─────────────────────────────────────────
+IMPORT_TMP_DIR = '/tmp/bca_imports'
+
+def _ensure_tmp():
+    os.makedirs(IMPORT_TMP_DIR, exist_ok=True)
+
+def _auto_map(columns):
+    mapping = {}
+    HINTS = {
+        'email':          ['email', 'mail', 'e-mail', 'email address', 'emailid', 'email id'],
+        'full_name':      ['full name', 'fullname', 'name', 'student name', 'student_name'],
+        'first_name':     ['first name', 'firstname', 'fname', 'first'],
+        'last_name':      ['last name', 'lastname', 'lname', 'last', 'surname'],
+        'dob':            ['dob', 'date of birth', 'dateofbirth', 'birth date',
+                           'birthdate', 'date_of_birth', 'birth_date'],
+        # FIX: added 'student_mobile' and more phone aliases
+        'phone':          ['phone', 'mobile', 'contact', 'phone number', 'mobile number',
+                           'contact number', 'student mobile', 'student_mobile',
+                           'mob', 'mob no', 'mobile no', 'phone no'],
+        'gender':         ['gender', 'sex'],
+        'address':        ['address', 'residential address', 'addr', 'full address'],
+        'nationality':    ['nationality', 'nation'],
+        'category':       ['category', 'caste', 'cat', 'reservation', 'category name'],
+        'school_10':      ['school 10', 'school10', '10th school', 'class 10 school',
+                           'ssc school', '10 school'],
+        'board_10':       ['board 10', 'board10', '10th board', 'class 10 board',
+                           'ssc board', '10 board'],
+        'year_10':        ['year 10', 'year10', '10th year', 'class 10 year',
+                           'passing year 10', '10 year', 'pass year 10'],
+        'total_10':       ['total 10', 'total10', '10th total', 'class 10 total',
+                           'max marks 10', '10 total', 'total marks 10'],
+        'obtained_10':    ['obtained 10', 'obtained10', '10th obtained',
+                           'marks obtained 10', '10 obtained', 'obtained marks 10'],
+        'percent_10':     ['percent 10', 'percentage 10', '10th percent',
+                           'class 10 percentage', '%10', '10 percent', '10 percentage'],
+        'school_12':      ['school 12', 'school12', '12th school', 'class 12 school',
+                           'hsc school', '12 school'],
+        'board_12':       ['board 12', 'board12', '12th board', 'class 12 board',
+                           'hsc board', '12 board'],
+        'stream_12':      ['stream', 'stream 12', '12th stream', 'class 12 stream',
+                           '12 stream'],
+        'year_12':        ['year 12', 'year12', '12th year', 'class 12 year',
+                           'passing year 12', '12 year', 'pass year 12'],
+        'total_12':       ['total 12', 'total12', '12th total', 'class 12 total',
+                           'max marks 12', '12 total', 'total marks 12'],
+        'obtained_12':    ['obtained 12', 'obtained12', '12th obtained',
+                           'marks obtained 12', '12 obtained', 'obtained marks 12'],
+        'percent_12':     ['percent 12', 'percentage 12', '12th percent',
+                           'class 12 percentage', '%12', '12 percent', '12 percentage'],
+        'specialization': ['specialization', 'specialisation', 'spec',
+                           'programme', 'program', 'combination', 'combination_12',
+                           'combination 12'],
+    }
+    col_lower = {c.lower().strip(): c for c in columns}
+    for field, hints in HINTS.items():
+        for hint in hints:
+            if hint in col_lower:
+                mapping[field] = col_lower[hint]
+                break
+    return mapping
+
+
+@main.route('/admin/import', methods=['GET', 'POST'])
+@admin_required
+def admin_import():
+    _ensure_tmp()
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'upload':
+            f = request.files.get('excel_file')
+            if not f or not f.filename:
+                flash('Please select an Excel file.', 'danger')
+                return redirect(url_for('main.admin_import'))
+            ext = os.path.splitext(f.filename)[1].lower()
+            if ext not in ('.xlsx', '.xls'):
+                flash('Only .xlsx and .xls files are supported.', 'danger')
+                return redirect(url_for('main.admin_import'))
+            tmp_name = f'{uuid.uuid4().hex}{ext}'
+            tmp_path = os.path.join(IMPORT_TMP_DIR, tmp_name)
+            f.save(tmp_path)
+            try:
+                df       = pd.read_excel(tmp_path, nrows=5)
+                df_full  = pd.read_excel(tmp_path)
+                columns  = list(df.columns)
+                if not columns:
+                    flash('The Excel file appears to be empty.', 'danger')
+                    return redirect(url_for('main.admin_import'))
+                preview_rows = df.fillna('').astype(str).to_dict(orient='records')
+                auto_map     = _auto_map(columns)
+                total_rows   = len(df_full)
+                return render_template('admin_import.html',
+                                       columns=columns,
+                                       preview_rows=preview_rows,
+                                       auto_map=auto_map,
+                                       total_rows=total_rows,
+                                       session_file=tmp_name,
+                                       result=None)
+            except Exception as e:
+                flash(f'Could not read Excel file: {e}', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+        elif action == 'import':
+            tmp_name = request.form.get('session_file', '')
+            tmp_path = os.path.join(IMPORT_TMP_DIR, tmp_name)
+            if not tmp_name or not os.path.exists(tmp_path):
+                flash('Session expired. Please upload the file again.', 'warning')
+                return redirect(url_for('main.admin_import'))
+
+            field_map = {}
+            for key in request.form:
+                if key.startswith('map_') and request.form[key]:
+                    field_map[key[4:]] = request.form[key]
+
+            required = ['email', 'dob']
+            missing  = [r for r in required if r not in field_map]
+            if 'full_name' not in field_map and 'first_name' not in field_map:
+                missing.append('full_name or first_name')
+
+            if missing:
+                flash(f'Required fields not mapped: {", ".join(missing)}', 'danger')
+                try:
+                    df      = pd.read_excel(tmp_path, nrows=5)
+                    df_full = pd.read_excel(tmp_path)
+                    columns = list(df.columns)
+                except Exception as e:
+                    flash(f'Could not re-read file: {e}', 'danger')
+                    return redirect(url_for('main.admin_import'))
+                return render_template('admin_import.html',
+                                       columns=columns,
+                                       preview_rows=df.fillna('').astype(str).to_dict(orient='records'),
+                                       auto_map=field_map,
+                                       total_rows=len(df_full),
+                                       session_file=tmp_name,
+                                       result=None)
+
+            try:
+                df = pd.read_excel(tmp_path)
+            except Exception as e:
+                flash(f'Could not read file: {e}', 'danger')
+                return redirect(url_for('main.admin_import'))
+
+            categories   = ApplicationCategory.query.filter_by(is_active=True).all()
+            cat_name_map = {c.name.lower().strip(): c.id for c in categories}
+
+            created = 0
+            skipped = 0
+            errors  = []
+
+            for idx, row in df.iterrows():
+                row_num = idx + 2
+
+                # FIX: use [] access with fallback — safer than .get() for
+                # column names that may not exist in field_map
+                email_col = field_map.get('email', '')
+                email_raw = _str(row[email_col]) if email_col and email_col in df.columns else ''
+                if not email_raw:
+                    errors.append({'row': row_num, 'msg': 'Email is empty'})
+                    continue
+                email = email_raw.lower()
+
+                if User.query.filter_by(email=email).first():
+                    skipped += 1
+                    continue
+
+                if 'full_name' in field_map:
+                    fn_col     = field_map['full_name']
+                    full_name  = _str(row[fn_col]) if fn_col in df.columns else ''
+                    parts      = full_name.split(' ', 1)
+                    first_name = parts[0]
+                    last_name  = parts[1] if len(parts) > 1 else ''
+                else:
+                    fn_col     = field_map.get('first_name', '')
+                    ln_col     = field_map.get('last_name', '')
+                    first_name = _str(row[fn_col]) if fn_col and fn_col in df.columns else ''
+                    last_name  = _str(row[ln_col]) if ln_col and ln_col in df.columns else ''
+                    full_name  = f'{first_name} {last_name}'.strip()
+
+                if not full_name:
+                    errors.append({'row': row_num, 'msg': 'Name is empty'})
+                    continue
+
+                dob_col        = field_map.get('dob', '')
+                dob_raw        = row[dob_col] if dob_col and dob_col in df.columns else None
+                password_plain = _dob_to_password(dob_raw)
+                dob_str        = _str(dob_raw)
+
+                if not password_plain:
+                    errors.append({'row': row_num, 'msg': f'Could not parse DOB for {email}'})
+                    continue
+
+                def _get_col(field):
+                    """Safely get a column value from the row by mapped field name."""
+                    col = field_map.get(field, '')
+                    if col and col in df.columns:
+                        return row[col]
+                    return None
+
+                try:
+                    user = User(
+                        full_name      = full_name,
+                        email          = email,
+                        password_hash  = generate_password_hash(password_plain),
+                        is_verified    = True,
+                        otp_code       = None,
+                        otp_expires_at = None,
+                    )
+                    db.session.add(user)
+                    db.session.flush()
+
+                    cat_id = None
+                    if 'category' in field_map:
+                        cat_col = field_map['category']
+                        if cat_col in df.columns:
+                            cat_raw = _str(row[cat_col]).lower()
+                            cat_id  = cat_name_map.get(cat_raw)
+
+                    total_10    = _flt(_get_col('total_10'))
+                    obtained_10 = _flt(_get_col('obtained_10'))
+                    percent_10  = _flt(_get_col('percent_10'))
+                    if total_10 and obtained_10 and not percent_10:
+                        percent_10 = round((obtained_10 / total_10) * 100, 2)
+
+                    total_12    = _flt(_get_col('total_12'))
+                    obtained_12 = _flt(_get_col('obtained_12'))
+                    percent_12  = _flt(_get_col('percent_12'))
+                    if total_12 and obtained_12 and not percent_12:
+                        percent_12 = round((obtained_12 / total_12) * 100, 2)
+
+                    appl = StudentApplication(
+                        user_id        = user.id,
+                        first_name     = first_name,
+                        last_name      = last_name,
+                        dob            = dob_str,
+                        email          = email,
+                        phone          = _str(_get_col('phone')),
+                        gender         = _str(_get_col('gender')),
+                        address        = _str(_get_col('address')),
+                        nationality    = _str(_get_col('nationality')) or 'Indian',
+                        category_id    = cat_id,
+                        school_10      = _str(_get_col('school_10')),
+                        board_10       = _str(_get_col('board_10')),
+                        year_10        = _str(_get_col('year_10')),
+                        total_10       = total_10,
+                        obtained_10    = obtained_10,
+                        percent_10     = percent_10,
+                        school_12      = _str(_get_col('school_12')),
+                        board_12       = _str(_get_col('board_12')),
+                        stream_12      = _str(_get_col('stream_12')),
+                        year_12        = _str(_get_col('year_12')),
+                        total_12       = total_12,
+                        obtained_12    = obtained_12,
+                        percent_12     = percent_12,
+                        specialization = _str(_get_col('specialization')),
+                        marksheet_10   = None,
+                        marksheet_12   = None,
+                    )
+                    db.session.add(appl)
+                    db.session.commit()
+                    created += 1
+
+                except Exception as e:
+                    db.session.rollback()
+                    errors.append({'row': row_num, 'msg': str(e)[:80]})
+
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+            # FIX: pass all required template vars so result page renders
+            # correctly and doesn't fall back to showing the upload form
+            result = {'created': created, 'skipped': skipped, 'errors': errors}
+            return render_template('admin_import.html',
+                                   result=result,
+                                   columns=None,
+                                   preview_rows=None,
+                                   auto_map=None,
+                                   total_rows=None,
+                                   session_file=None)
+
+    return render_template('admin_import.html',
+                           columns=None,
+                           preview_rows=None,
+                           auto_map=None,
+                           total_rows=None,
+                           session_file=None,
+                           result=None)
