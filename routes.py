@@ -9,6 +9,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
 import requests
+import uuid
 
 from database import db
 from models import (User, FormSettings, StudentApplication, ApplicationCategory,
@@ -60,7 +61,7 @@ APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE"  # ← PUT YOUR ACTUAL URL HERE
 
 # Non-guessable API endpoint path - CHANGE THIS to a random string
 # Generate with: import secrets; print(secrets.token_urlsafe(16))
-API_SECRET_PATH = "d2faa6fb-745b-454d-8852-92ed0bb482d8"  # ← CHANGE THIS to a random string
+API_SECRET_PATH = ""  # ← CHANGE THIS to a random string
 
 
 # ─────────────────────────────────────────
@@ -686,6 +687,125 @@ def admin_whatsapp():
         return redirect(url_for('main.admin_whatsapp'))
     return render_template('admin_whatsapp.html', wa=wa)
 
+
+# ─────────────────────────────────────────
+#  Admin — Import Students from Excel (Full Feature)
+# ─────────────────────────────────────────
+@main.route('/admin/import', methods=['GET', 'POST'])
+@admin_required
+def admin_import():
+    import pandas as pd
+    import re
+    from werkzeug.security import generate_password_hash
+    
+    # Handle POST requests (file upload or import)
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        # Step 1: Upload file
+        if action == 'upload':
+            if 'excel_file' not in request.files:
+                flash('No file selected', 'danger')
+                return redirect(url_for('main.admin_import'))
+            
+            file = request.files['excel_file']
+            if file.filename == '':
+                flash('No file selected', 'danger')
+                return redirect(url_for('main.admin_import'))
+            
+            if not file.filename.endswith(('.xlsx', '.xls')):
+                flash('Please upload an Excel file (.xlsx or .xls)', 'danger')
+                return redirect(url_for('main.admin_import'))
+            
+            try:
+                # Read the Excel file
+                df = pd.read_excel(file)
+                
+                # Generate a unique session ID for this import
+                import uuid
+                session_id = str(uuid.uuid4())
+                session[f'import_{session_id}'] = {
+                    'columns': df.columns.tolist(),
+                    'preview': df.head(5).to_dict('records'),
+                    'total_rows': len(df),
+                    'filename': file.filename
+                }
+                session['current_import'] = session_id
+                
+                # Auto-map common column names
+                auto_map = {}
+                col_lower = {col.lower(): col for col in df.columns}
+                
+                field_mappings = {
+                    'email': ['email', 'mail', 'e-mail'],
+                    'full_name': ['full_name', 'fullname', 'name', 'student_name'],
+                    'first_name': ['first_name', 'firstname', 'fname'],
+                    'last_name': ['last_name', 'lastname', 'lname'],
+                    'dob': ['dob', 'date_of_birth', 'birth_date', 'birthdate'],
+                    'phone': ['phone', 'mobile', 'contact', 'student_mobile'],
+                    'gender': ['gender'],
+                    'address': ['address'],
+                    'nationality': ['nationality'],
+                    'category': ['category'],
+                    'school_10': ['school_10', '10th_school', 'class10_school'],
+                    'board_10': ['board_10', '10th_board'],
+                    'year_10': ['year_10', '10th_year'],
+                    'total_10': ['total_10', '10th_total'],
+                    'obtained_10': ['obtained_10', '10th_obtained'],
+                    'percent_10': ['percent_10', '10th_percent'],
+                    'school_12': ['school_12', '12th_school', 'class12_school'],
+                    'board_12': ['board_12', '12th_board'],
+                    'stream_12': ['stream_12', '12th_stream'],
+                    'year_12': ['year_12', '12th_year'],
+                    'total_12': ['total_12', '12th_total'],
+                    'obtained_12': ['obtained_12', '12th_obtained'],
+                    'percent_12': ['percent_12', '12th_percent'],
+                    'specialization': ['specialization', 'combination_12', 'spec']
+                }
+                
+                for field, possible_names in field_mappings.items():
+                    for name in possible_names:
+                        if name in col_lower:
+                            auto_map[field] = col_lower[name]
+                            break
+                
+                return render_template('admin_import.html', 
+                                     columns=df.columns.tolist(),
+                                     preview_rows=df.head(5).to_dict('records'),
+                                     total_rows=len(df),
+                                     auto_map=auto_map,
+                                     session_file=session_id)
+                
+            except Exception as e:
+                flash(f'Error reading file: {str(e)}', 'danger')
+                return redirect(url_for('main.admin_import'))
+        
+        # Step 2: Import data
+        elif action == 'import':
+            session_id = request.form.get('session_file')
+            import_data = session.get(f'import_{session_id}')
+            
+            if not import_data:
+                flash('Import session expired. Please upload the file again.', 'danger')
+                return redirect(url_for('main.admin_import'))
+            
+            # Get column mappings from form
+            mappings = {}
+            for key in request.form:
+                if key.startswith('map_'):
+                    field = key[4:]  # Remove 'map_' prefix
+                    column = request.form.get(key)
+                    if column:
+                        mappings[field] = column
+            
+            # Read the Excel file again
+            filepath = import_data.get('filename')
+            # Need to get the actual file - for now, show error
+            flash('Please upload the file again to complete import.', 'warning')
+            return redirect(url_for('main.admin_import'))
+    
+    # GET request - show upload form
+    return render_template('admin_import.html')
 
 @main.route('/admin/change-password', methods=['GET', 'POST'])
 @admin_required

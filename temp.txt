@@ -7,3 +7,45 @@
   --cfg-hours-kn:   "ಸೋಮ–ಶುಕ್ರ, ಬೆಳಗ್ಗೆ 10:00 – ಸಂಜೆ 5:00";
   --cfg-email:      "bca@bub.ernet.in";
   --cfg-website:    "https://bangaloreuniversity.karnataka.gov.in/";
+
+
+
+
+
+
+ import requests
+import json
+
+url = "https://applybcabu.pythonanywhere.com/api/d2faa6fb-745b-454d-8852-92ed0bb482d8"
+api_key = "b3b1e6ab-42f9-4b9c-bb1d-13f41a3984f1"  # ← Your actual key here
+
+data = {
+    "email": "test123@example.com",
+    "full_name": "Test User",
+    "dob": "15/06/2006",
+    "student_mobile": "9876543210",
+    "gender": "Male",
+    "address": "Test Address",
+    "nationality": "Indian",
+    "category": "General",
+    "board_10": "CBSE",
+    "percent_10": 85.5,
+    "board_12": "CBSE",
+    "stream_12": "Science",
+    "total_12": 500,
+    "obtained_12": 425,
+    "percent_12": 85,
+    "combination_12": "AI/ML"
+}
+
+response = requests.post(
+    url,
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": api_key
+    },
+    json=data
+)
+
+print(f"Status: {response.status_code}")
+print(f"Response: {response.json()}")
