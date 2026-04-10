@@ -57,11 +57,11 @@ def _flt(val):
         return None
 
 # Your Apps Script URL - CHANGE THIS
-APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE"  # ← PUT YOUR ACTUAL URL HERE
+APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"  # ← PUT YOUR ACTUAL URL HERE
 
 # Non-guessable API endpoint path - CHANGE THIS to a random string
 # Generate with: import secrets; print(secrets.token_urlsafe(16))
-API_SECRET_PATH = ""  # ← CHANGE THIS to a random string
+API_SECRET_PATH = "d2faa6fb-745b-454d-8852-92ed0bb482d8"  # ← CHANGE THIS to a random string
 
 
 # ─────────────────────────────────────────
