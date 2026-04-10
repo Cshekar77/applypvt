@@ -54,6 +54,69 @@ def index():
     settings = FormSettings.get()
     return render_template('index.html', settings=settings)
 
+@main.route('/api/register-student', methods=['POST'])
+def api_register_student():
+    data = request.get_json()
+
+    # 🔐 API Key check
+    api_key = request.headers.get('x-api-key')
+    if api_key != current_app.config.get('API_SECRET_KEY'):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        email = data.get('email')
+        full_name = data.get('full_name')
+        dob = data.get('dob')
+
+        if not email or not full_name or not dob:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        if User.query.filter_by(email=email).first():
+            return jsonify({"error": "User already exists"}), 409
+
+        # 👤 Create user
+        user = User(
+            full_name=full_name,
+            email=email.lower(),
+            password_hash=generate_password_hash(dob),
+            is_verified=True
+        )
+        db.session.add(user)
+        db.session.flush()
+
+        # ✍️ Split name
+        parts = full_name.split(" ", 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ""
+
+        # 📄 Create application (map important fields)
+        appl = StudentApplication(
+            user_id=user.id,
+            first_name=first_name,
+            last_name=last_name,
+            dob=dob,
+            email=email,
+            phone=data.get('student_mobile'),
+            gender=data.get('gender'),
+            address=data.get('address'),
+            nationality=data.get('nationality'),
+            school_10=data.get('board_10'),
+            percent_10=float(data.get('percent_10') or 0),
+            board_12=data.get('board_12'),
+            stream_12=data.get('stream_12'),
+            total_12=float(data.get('total_12') or 0),
+            obtained_12=float(data.get('obtained_12') or 0),
+            percent_12=float(data.get('percent_12') or 0),
+        )
+
+        db.session.add(appl)
+        db.session.commit()
+
+        return jsonify({"message": "Student created"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 # ─────────────────────────────────────────
 #  Registration + OTP
