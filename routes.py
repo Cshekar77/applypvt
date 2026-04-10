@@ -649,15 +649,117 @@ def admin_counselling():
 
     if request.method == 'POST':
         action = request.form.get('action')
-        # ... (keep all existing counselling management code)
-        pass
+        
+        # Start Counselling
+        if action == 'start':
+            cs.status = 'running'
+            cs.started_at = datetime.utcnow()
+            cs.current_rank = None
+            db.session.commit()
+            flash('Counselling started!', 'success')
+        
+        # Stop Counselling
+        elif action == 'stop':
+            cs.status = 'stopped'
+            cs.current_rank = None
+            db.session.commit()
+            flash('Counselling stopped.', 'info')
+        
+        # Resume Counselling
+        elif action == 'resume':
+            cs.status = 'running'
+            db.session.commit()
+            flash('Counselling resumed!', 'success')
+        
+        # Pause Counselling
+        elif action == 'pause':
+            cs.status = 'paused'
+            db.session.commit()
+            flash('Counselling paused.', 'warning')
+        
+        # Update Current Rank
+        elif action == 'update_rank':
+            rank_val = request.form.get('current_rank', '').strip()
+            msg_val = request.form.get('message', '').strip()
+            if rank_val and rank_val.isdigit():
+                cs.current_rank = int(rank_val)
+            cs.message = msg_val if msg_val else None
+            cs.updated_at = datetime.utcnow()
+            db.session.commit()
+            flash(f'Live rank updated to #{cs.current_rank}', 'success')
+        
+        # Next Rank (Auto Increment)
+        elif action == 'next_rank':
+            cs.current_rank = (cs.current_rank or 0) + 1
+            cs.updated_at = datetime.utcnow()
+            db.session.commit()
+            flash(f'Now calling Rank #{cs.current_rank}', 'success')
+        
+        # Set Seats (Government/Management Quota)
+        elif action == 'set_seats':
+            cat_id = request.form.get('cat_id')
+            quota = request.form.get('quota')
+            total_str = request.form.get('total_seats', '0').strip()
+            if cat_id and quota:
+                seats = CategorySeats.get_for_category(int(cat_id))
+                val = int(total_str) if total_str.isdigit() else 0
+                if quota == 'government':
+                    seats.govt_total = val
+                else:
+                    seats.mgmt_total = val
+                db.session.commit()
+                flash('Seats updated.', 'success')
+        
+        # Allot Seat to Student
+        elif action == 'allot_seat':
+            app_id = request.form.get('app_id')
+            quota = request.form.get('quota')
+            appl = StudentApplication.query.get(app_id)
+            if not appl:
+                flash('Student not found.', 'danger')
+            elif not quota or quota not in ('government', 'management'):
+                flash('Please select a quota.', 'danger')
+            elif SeatAllotment.query.filter_by(application_id=appl.id).first():
+                flash(f'Seat already allotted to {appl.full_name}.', 'warning')
+            else:
+                seats = CategorySeats.get_for_category(appl.category_id)
+                if quota == 'government' and seats.govt_remaining <= 0:
+                    flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
+                elif quota == 'management' and seats.mgmt_remaining <= 0:
+                    flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
+                else:
+                    db.session.add(SeatAllotment(
+                        application_id=appl.id,
+                        category_id=appl.category_id,
+                        quota=quota,
+                    ))
+                    if quota == 'government':
+                        seats.govt_filled += 1
+                    else:
+                        seats.mgmt_filled += 1
+                    db.session.commit()
+                    flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota)!', 'success')
+        
+        # Revoke Seat
+        elif action == 'revoke_seat':
+            app_id = request.form.get('app_id')
+            allotment = SeatAllotment.query.filter_by(application_id=int(app_id)).first()
+            if allotment:
+                seats = CategorySeats.get_for_category(allotment.category_id)
+                if allotment.quota == 'government':
+                    seats.govt_filled = max(0, seats.govt_filled - 1)
+                else:
+                    seats.mgmt_filled = max(0, seats.mgmt_filled - 1)
+                db.session.delete(allotment)
+                db.session.commit()
+                flash('Seat allotment revoked.', 'info')
+        
+        return redirect(url_for('main.admin_counselling'))
 
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,
                            cat_seats=cat_seats, students=students,
                            allotments=allotments)
-
-
 # ─────────────────────────────────────────
 #  Admin — WhatsApp Group Management
 # ─────────────────────────────────────────
