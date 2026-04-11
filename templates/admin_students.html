@@ -262,7 +262,7 @@
               <span class="badge-warning"><i class="fas fa-clock"></i> Pending</span>
             {% endif %}
           </td>
-          <td>{{ s.submitted_at.strftime('%d-%m-%Y') if s.submitted_at else '—' }}</td>
+          <td>{{ s.submitted_at | ist }}</td>
         </tr>
         {% else %}
         <tr>

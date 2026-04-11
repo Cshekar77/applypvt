@@ -173,7 +173,7 @@
               —
             {% endif %}
           </td>
-          <td>{{ s.verified_at.strftime('%d-%m-%Y') if s.verified_at else '—' }}</td>
+          <td>{{ s.verified_at | ist }}</td>
           <td>
             <form method="POST" action="{{ url_for('main.unverify_student', app_id=s.id) }}" onsubmit="return confirm('Move this student back to pending verification?')">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>

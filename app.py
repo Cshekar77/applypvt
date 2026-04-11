@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
+from datetime import timezone, timedelta
 from flask import Flask
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
@@ -9,6 +10,8 @@ from database import init_db, db
 from models import User
 
 csrf = CSRFProtect()
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 def create_app():
     app = Flask(__name__)
@@ -31,6 +34,15 @@ def create_app():
 
     init_db(app)
     csrf.init_app(app)
+
+    # ── IST Jinja2 filter — use {{ some_datetime | ist }} in any template ──
+    @app.template_filter('ist')
+    def ist_filter(dt):
+        if dt is None:
+            return ''
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(IST).strftime('%d %b %Y, %I:%M %p')
 
     login_manager = LoginManager(app)
     login_manager.login_view = 'main.login'

@@ -283,7 +283,7 @@
         </div>
         <div class="status-sub">
           {% if cs.current_rank %}Currently calling Rank #{{ cs.current_rank }}{% else %}No rank set yet{% endif %}
-          {% if cs.started_at %} &mdash; Started {{ cs.started_at.strftime('%d %b, %I:%M %p') }}{% endif %}
+          {% if cs.started_at %} &mdash; Started {{ cs.started_at | ist }}{% endif %}
         </div>
       </div>
     </div>
@@ -530,7 +530,7 @@
               <i class="fas fa-check-circle" style="color:#25c26e;font-size:1.3rem;"></i>
               <p>
                 Seat allotted under <strong>{{ allotment.quota|title }} Quota</strong>
-                on {{ allotment.allotted_at.strftime('%d %b %Y, %I:%M %p') }}
+                on {{ allotment.allotted_at | ist }}
               </p>
               <form method="POST" style="margin-left:auto"
                     onsubmit="return confirm('Revoke seat allotment for {{ appl.full_name }}?')">

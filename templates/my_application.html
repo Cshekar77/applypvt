@@ -199,7 +199,7 @@
     <div>
       <h2><i class="fas fa-file-alt"></i> My Application</h2>
       <p class="text-muted">
-        <i class="fas fa-calendar"></i> Submitted on {{ appl.submitted_at.strftime('%d %B %Y, %I:%M %p') }}
+        <i class="fas fa-calendar"></i> Submitted on {{ appl.submitted_at | ist }}
       </p>
     </div>
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">

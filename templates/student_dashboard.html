@@ -102,7 +102,7 @@
       <div class="status-icon">&#10003;</div>
       <div>
         <strong>Application Submitted</strong>
-        <p>Submitted on {{ application.submitted_at.strftime('%d %B %Y, %I:%M %p') }}</p>
+        <p>Submitted on {{ application.submitted_at | ist }}</p>
         {% if application.is_verified %}
           <span class="badge badge-success">Verified</span>
           {% if application.rank %}<span class="badge badge-gold">Rank #{{ application.rank }}</span>{% endif %}

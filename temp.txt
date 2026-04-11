@@ -49,3 +49,42 @@ response = requests.post(
 
 print(f"Status: {response.status_code}")
 print(f"Response: {response.json()}")
+
+
+
+
+
+
+
+
+
+
+import requests
+
+url = "https://applybcabu.pythonanywhere.com/api/d2faa6fb-745b-454d-8852-92ed0bb482d8"
+
+headers = {
+    "x-api-key": "b3b1e6ab-42f9-4b9c-bb1d-13f41a3984f1",
+    "Content-Type": "application/json"
+}
+
+data = {
+    "email": "reckon20267@outlook.com",
+    "full_name": "Test Student",
+    "dob": "15/06/2006",
+    "gender": "Male",
+    "phone": "9876543210",
+    "address": "Test Address",
+    "category": "general",
+    "board_10": "CBSE",
+    "total_10": 500,
+    "obtained_10": 450,
+    "board_12": "CBSE",
+    "stream_12": "Science",
+    "total_12": 500,
+    "obtained_12": 420
+}
+
+response = requests.post(url, json=data, headers=headers)
+print("Status Code:", response.status_code)
+print("Response:", response.json())

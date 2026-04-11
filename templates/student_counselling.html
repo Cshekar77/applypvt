@@ -234,7 +234,7 @@
       <h4>Your Seat Has Been Allotted!</h4>
       <p>
         Quota: <strong>{{ allotment.quota|title }}</strong> &nbsp;·&nbsp;
-        Allotted on {{ allotment.allotted_at.strftime('%d %b %Y, %I:%M %p') }} IST
+        Allotted on {{ allotment.allotted_at | ist }} IST
       </p>
     </div>
   </div>
