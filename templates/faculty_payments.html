@@ -27,78 +27,144 @@
     border: none; border-radius: 12px; cursor: pointer; font-size: .875rem; font-weight: 600;
   }
   .search-bar button:hover { background: #142d5c; }
-  .search-bar .btn-clear {
-    background: #f3f4f6; color: #5a6e82;
-  }
-  .search-bar .btn-clear:hover { background: #e5e7eb; }
+  .btn-clear { background: #f3f4f6 !important; color: #5a6e82 !important; }
+  .btn-clear:hover { background: #e5e7eb !important; }
 
-  /* ── Student cards ── */
-  .student-card {
-    background: white; border-radius: 20px; padding: 1.5rem;
-    border: 1px solid #eef2f8; margin-bottom: 1.5rem;
+  /* ── List card ── */
+  .list-card {
+    background: white; border-radius: 20px;
+    border: 1px solid #eef2f8; overflow: hidden;
   }
+  .list-card-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .list-card-header h3 { font-size: 1rem; color: #0a1f44; margin: 0; }
+  .list-card-header i  { color: #0f766e; }
 
-  .card-header {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;
-    padding-bottom: 1rem; border-bottom: 1px solid #f5f7fa;
+  /* ── Student list rows ── */
+  .stu-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .9rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    cursor: pointer; transition: background .15s;
   }
-  .stu-info {}
-  .stu-name { font-weight: 700; font-size: 1.05rem; color: #0a1f44; }
-  .stu-sub  { color: #5a6e82; font-size: .82rem; margin-top: 2px; }
+  .stu-row:last-child { border-bottom: none; }
+  .stu-row:hover { background: #f8faff; }
 
-  .rank-badge {
-    display: inline-block; background: #0a1f44; color: white;
-    font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
-    margin-right: .4rem;
+  .rank-pill {
+    background: #0a1f44; color: white; font-size: .7rem;
+    font-weight: 700; padding: 3px 9px; border-radius: 20px;
+    min-width: 36px; text-align: center; flex-shrink: 0;
   }
+  .stu-info { flex: 1; min-width: 0; }
+  .stu-name { font-weight: 600; color: #0a1f44; font-size: .925rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stu-sub  { color: #5a6e82; font-size: .78rem; margin-top: 1px; }
+
   .badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 3px 10px; border-radius: 20px;
+    display: inline-block; font-size: .68rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
   }
   .badge-govt { background: #dbeafe; color: #1e40af; }
   .badge-mgmt { background: #fce7f3; color: #9d174d; }
 
-  /* Fee summary row */
-  .fee-summary {
-    display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;
-    align-items: center;
+  .fee-status {
+    font-size: .75rem; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; flex-shrink: 0; white-space: nowrap;
   }
-  .fee-box {
-    background: #f5f7fa; border-radius: 12px; padding: .6rem 1rem;
-    min-width: 120px; text-align: center;
+  .fee-status.cleared { background: #d1fae5; color: #065f46; }
+  .fee-status.partial { background: #fef3c7; color: #92400e; }
+  .fee-status.pending { background: #fee2e2; color: #991b1b; }
+  .fee-status.no-fee  { background: #f3f4f6; color: #6b7280; }
+
+  .row-arrow { color: #c9a03d; font-size: .8rem; flex-shrink: 0; }
+
+  /* ── Modal overlay ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,31,68,.45);
+    align-items: center; justify-content: center;
+    padding: 1rem;
   }
-  .fee-box .fee-val { font-size: 1.1rem; font-weight: 700; color: #0a1f44; }
-  .fee-box .fee-lbl { font-size: .72rem; color: #5a6e82; margin-top: 2px; }
-  .fee-box.teal .fee-val { color: #0f766e; }
-  .fee-box.red  .fee-val { color: #dc2626; }
-  .fee-box.gold .fee-val { color: #c9a03d; }
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: white; border-radius: 24px;
+    width: 100%; max-width: 620px;
+    max-height: 90vh; overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(10,31,68,.2);
+    animation: modal-in .18s ease;
+  }
+  @keyframes modal-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    position: sticky; top: 0; background: white; z-index: 2;
+    border-radius: 24px 24px 0 0;
+  }
+  .modal-title { font-size: 1.1rem; font-weight: 700; color: #0a1f44; margin: 0; }
+  .modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 2px; }
+
+  .modal-close {
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 32px; height: 32px; cursor: pointer; font-size: 1rem;
+    color: #5a6e82; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background .15s;
+  }
+  .modal-close:hover { background: #fee2e2; color: #991b1b; }
+
+  .modal-body { padding: 1.5rem; }
+
+  /* Fee summary in modal */
+  .modal-fee-row {
+    display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+  }
+  .m-fee-box {
+    flex: 1; min-width: 100px; background: #f5f7fa;
+    border-radius: 12px; padding: .6rem .85rem; text-align: center;
+  }
+  .m-fee-box .mf-val { font-size: 1rem; font-weight: 700; color: #0a1f44; }
+  .m-fee-box .mf-lbl { font-size: .7rem; color: #5a6e82; margin-top: 2px; }
+  .m-fee-box.teal .mf-val { color: #0f766e; }
+  .m-fee-box.red  .mf-val { color: #dc2626; }
+  .m-fee-box.gold .mf-val { color: #c9a03d; }
 
   .progress-bar-wrap {
     background: #f3f4f6; border-radius: 20px; height: 6px;
-    margin-top: 4px; overflow: hidden; width: 100%;
+    margin-bottom: 1.25rem; overflow: hidden;
   }
   .progress-bar-fill {
     height: 100%; border-radius: 20px; background: #0f766e; transition: width .4s ease;
   }
 
-  /* Set fees form */
-  .set-fees-row {
-    display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;
-    margin-bottom: 1.25rem;
+  /* Set fees */
+  .section-label {
+    font-size: .75rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: .6rem;
   }
-  .set-fees-row label {
-    font-size: .78rem; font-weight: 600; color: #5a6e82;
-    text-transform: uppercase; letter-spacing: .04em; white-space: nowrap;
+  .set-fees-row {
+    display: flex; gap: .6rem; flex-wrap: wrap;
+    align-items: center; margin-bottom: 1.5rem;
   }
   .set-fees-row input {
-    flex: 1; min-width: 140px; max-width: 200px; padding: .5rem .85rem;
-    border: 1px solid #dde3ef; border-radius: 10px; font-size: .9rem; color: #0a1f44;
+    flex: 1; min-width: 130px; padding: .5rem .85rem;
+    border: 1px solid #dde3ef; border-radius: 10px;
+    font-size: .9rem; color: #0a1f44;
   }
   .set-fees-row input:focus { outline: none; border-color: #0f766e; }
-  .btn { display: inline-flex; align-items: center; gap: .35rem;
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem;
     padding: .5rem 1rem; border-radius: 10px; font-size: .82rem;
-    font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+  }
   .btn-teal    { background: #0f766e; color: white; }
   .btn-teal:hover    { background: #0d6560; }
   .btn-navy    { background: #0a1f44; color: white; }
@@ -109,90 +175,109 @@
   .btn-danger:hover  { background: #fecaca; }
   .btn-sm { padding: .35rem .7rem; font-size: .78rem; border-radius: 8px; }
 
-  /* Receipts */
-  .receipts-section h4 {
-    font-size: .85rem; font-weight: 600; color: #5a6e82;
-    text-transform: uppercase; letter-spacing: .05em; margin: 0 0 .75rem;
+  /* Receipt table in modal */
+  .receipt-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .84rem; margin-bottom: 1rem;
   }
+  .receipt-table th {
+    text-align: left; font-size: .7rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .04em;
+    padding: .45rem .6rem; border-bottom: 2px solid #eef2f8; white-space: nowrap;
+  }
+  .receipt-table td {
+    padding: .6rem .6rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle;
+  }
+  .receipt-table tr:last-child td { border-bottom: none; }
 
-  .receipts-grid { display: flex; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
-  .receipt-chip {
-    background: #f0fdfa; border: 1px solid #99f6e4;
-    border-radius: 12px; padding: .5rem .85rem;
-    display: flex; align-items: center; gap: .75rem;
-  }
-  .receipt-num { font-size: .78rem; font-weight: 600; color: #0a1f44; }
-  .receipt-amt { font-size: .9rem; font-weight: 700; color: #0f766e; }
-  .receipt-actions { display: flex; gap: .35rem; }
+  .r-num  { font-weight: 600; color: #0a1f44; }
+  .r-amt  { font-weight: 700; color: #0f766e; }
+  .r-date { font-size: .72rem; color: #aab4c8; white-space: nowrap; }
+  .r-actions { display: flex; gap: .35rem; flex-wrap: wrap; }
 
-  /* Inline edit form */
-  .edit-receipt-form {
-    display: none; background: #fff7ed; border: 1px solid #fed7aa;
-    border-radius: 10px; padding: .75rem; margin-top: .5rem;
+  /* Inline edit row */
+  .edit-receipt-row { display: none; }
+  .edit-receipt-row.open { display: table-row; }
+  .edit-receipt-row td {
+    background: #fff7ed; border-bottom: 1px solid #fed7aa; padding: .55rem .6rem;
   }
-  .edit-receipt-form.open { display: block; }
-  .edit-row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-  .edit-row input {
-    flex: 1; min-width: 120px; padding: .4rem .7rem;
-    border: 1px solid #fed7aa; border-radius: 8px; font-size: .85rem;
+  .edit-inner { display: flex; gap: .45rem; flex-wrap: wrap; align-items: center; }
+  .edit-inner input {
+    flex: 1; min-width: 100px; padding: .38rem .6rem;
+    border: 1px solid #fed7aa; border-radius: 8px; font-size: .83rem; color: #0a1f44;
   }
-  .edit-row input:focus { outline: none; border-color: #f97316; }
+  .edit-inner input:focus { outline: none; border-color: #f97316; }
 
-  /* Add receipt form */
+  /* Add receipt */
   .add-receipt-form {
     background: #f0fdfa; border: 1px solid #99f6e4;
-    border-radius: 14px; padding: 1rem;
+    border-radius: 14px; padding: .9rem;
   }
   .add-receipt-form h5 {
-    font-size: .82rem; font-weight: 600; color: #0f766e;
-    text-transform: uppercase; letter-spacing: .04em; margin: 0 0 .75rem;
+    font-size: .78rem; font-weight: 600; color: #0f766e;
+    text-transform: uppercase; letter-spacing: .04em; margin: 0 0 .65rem;
   }
-  .add-row { display: flex; gap: .75rem; flex-wrap: wrap; align-items: flex-end; }
-  .add-row .field { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 130px; }
+  .add-row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; }
+  .add-row .field { display: flex; flex-direction: column; gap: .28rem; flex: 1; min-width: 120px; }
   .add-row .field label {
-    font-size: .72rem; font-weight: 600; color: #5a6e82;
+    font-size: .7rem; font-weight: 600; color: #5a6e82;
     text-transform: uppercase; letter-spacing: .04em;
   }
   .add-row .field input {
-    padding: .5rem .8rem; border: 1px solid #99f6e4;
-    border-radius: 10px; font-size: .9rem; color: #0a1f44;
+    padding: .45rem .75rem; border: 1px solid #99f6e4;
+    border-radius: 10px; font-size: .88rem; color: #0a1f44;
   }
   .add-row .field input:focus { outline: none; border-color: #0f766e; }
-  .no-fees-msg {
-    background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px;
-    padding: .75rem 1rem; font-size: .85rem; color: #92400e;
-  }
 
+  .no-fees-msg {
+    background: #fff7ed; border: 1px solid #fed7aa;
+    border-radius: 12px; padding: .65rem .9rem; font-size: .83rem; color: #92400e;
+  }
   .empty-state {
     text-align: center; padding: 3rem 1rem; color: #aab4c8;
   }
   .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #dde3ef; }
 
   /* Dark mode */
-  body.dark .student-card { background: #1a2538; border-color: #2d3e54; }
-  body.dark .card-header  { border-color: #2d3e54; }
-  body.dark .stu-name     { color: #eef2ff; }
-  body.dark .stu-sub      { color: #b9c8e8; }
-  body.dark .fee-box      { background: #0f1c2e; }
-  body.dark .fee-box .fee-val { color: #eef2ff; }
-  body.dark .fee-box .fee-lbl { color: #b9c8e8; }
-  body.dark .fee-box.teal .fee-val { color: #2dd4bf; }
-  body.dark .fee-box.red  .fee-val { color: #f87171; }
-  body.dark .set-fees-row label { color: #b9c8e8; }
+  body.dark .list-card,
+  body.dark .modal-box,
+  body.dark .modal-header { background: #1a2538; border-color: #2d3e54; }
+  body.dark .modal-header  { background: #1a2538; }
+  body.dark .list-card-header { border-color: #2d3e54; }
+  body.dark .list-card-header h3,
+  body.dark .modal-title,
+  body.dark .stu-name,
+  body.dark .r-num          { color: #eef2ff; }
+  body.dark .modal-sub,
+  body.dark .stu-sub        { color: #b9c8e8; }
+  body.dark .stu-row        { border-color: #1e2e42; }
+  body.dark .stu-row:hover  { background: #1e2e42; }
+  body.dark .m-fee-box      { background: #0f1c2e; }
+  body.dark .m-fee-box .mf-val { color: #eef2ff; }
+  body.dark .m-fee-box .mf-lbl { color: #b9c8e8; }
+  body.dark .m-fee-box.teal .mf-val { color: #2dd4bf; }
+  body.dark .m-fee-box.red  .mf-val { color: #f87171; }
+  body.dark .m-fee-box.gold .mf-val { color: #c9a03d; }
+  body.dark .progress-bar-wrap { background: #2d3e54; }
+  body.dark .section-label  { color: #b9c8e8; }
   body.dark .set-fees-row input,
-  body.dark .search-bar input  { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .receipts-section h4 { color: #b9c8e8; }
-  body.dark .receipt-chip { background: #0f2420; border-color: #0f766e; }
-  body.dark .receipt-num  { color: #eef2ff; }
-  body.dark .add-receipt-form { background: #0f2420; border-color: #0f766e; }
+  body.dark .search-bar input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .receipt-table th { color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .receipt-table td { border-color: #1e2e42; }
+  body.dark .r-amt  { color: #2dd4bf; }
+  body.dark .r-date { color: #5a6e82; }
+  body.dark .add-receipt-form  { background: #0f2420; border-color: #0f766e; }
   body.dark .add-receipt-form h5 { color: #2dd4bf; }
   body.dark .add-row .field label { color: #b9c8e8; }
   body.dark .add-row .field input { background: #0a1a16; border-color: #0f766e; color: #eef2ff; }
-  body.dark .progress-bar-wrap { background: #2d3e54; }
+  body.dark .edit-receipt-row td  { background: #1a1208; border-color: #92400e; }
+  body.dark .edit-inner input { background: #110d04; border-color: #d97706; color: #eef2ff; }
+  body.dark .modal-close { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
 
   @media (max-width: 600px) {
-    .fee-summary { flex-direction: column; }
-    .fee-box { min-width: unset; width: 100%; }
+    .fee-status, .badge { display: none; }
+    .modal-box { border-radius: 18px; }
   }
 </style>
 
@@ -218,157 +303,211 @@
   </form>
 
   {% if students %}
+  <div class="list-card">
+    <div class="list-card-header">
+      <i class="fas fa-list"></i>
+      <h3>Students ({{ students | length }})</h3>
+    </div>
+
     {% for s in students %}
     {% set paid_amt = s.receipts | sum(attribute='amount_paid') if s.receipts else 0 %}
     {% set due_amt  = (s.fees.total_fees - paid_amt) if s.fees else None %}
-    {% set pct = ((paid_amt / s.fees.total_fees * 100) | round | int) if s.fees and s.fees.total_fees > 0 else 0 %}
 
-    <div class="student-card">
-      {# Header #}
-      <div class="card-header">
-        <div class="stu-info">
-          <div>
-            <span class="rank-badge">#{{ s.appl.rank or '—' }}</span>
-            <span class="stu-name">{{ s.appl.full_name }}</span>
-          </div>
-          <div class="stu-sub" style="margin-top:4px">
-            {{ s.appl.email }} &bull; {{ s.appl.phone or '—' }}
-          </div>
-          <div style="margin-top:6px">
-            <span class="badge badge-{{ s.allotment.quota }}">{{ s.allotment.quota | title }} Quota</span>
-            <span class="stu-sub" style="margin-left:.4rem">{{ s.appl.category_name or '' }}</span>
-          </div>
-        </div>
+    {# ── List row ── #}
+    <div class="stu-row" onclick="openModal('fac-modal-{{ s.appl.id }}')">
+      <span class="rank-pill">#{{ s.appl.rank or '—' }}</span>
+      <div class="stu-info">
+        <div class="stu-name">{{ s.appl.full_name }}</div>
+        <div class="stu-sub">{{ s.appl.email }}</div>
       </div>
+      <span class="badge badge-{{ s.allotment.quota }}">
+        {{ s.allotment.quota | title }}
+      </span>
+      {% if not s.fees %}
+        <span class="fee-status no-fee">No fees</span>
+      {% elif due_amt is not none and due_amt <= 0 %}
+        <span class="fee-status cleared"><i class="fas fa-check"></i> Cleared</span>
+      {% elif paid_amt > 0 %}
+        <span class="fee-status partial">Partial</span>
+      {% else %}
+        <span class="fee-status pending">Unpaid</span>
+      {% endif %}
+      <span class="row-arrow"><i class="fas fa-chevron-right"></i></span>
+    </div>
 
-      {# Fee summary #}
-      {% if s.fees %}
-      <div class="fee-summary">
-        <div class="fee-box gold">
-          <div class="fee-val">₹{{ '{:,.0f}'.format(s.fees.total_fees) }}</div>
-          <div class="fee-lbl">Total Fees</div>
+    {# ── Modal ── #}
+    <div class="modal-overlay" id="fac-modal-{{ s.appl.id }}"
+      onclick="closeOnOverlay(event, 'fac-modal-{{ s.appl.id }}')">
+      <div class="modal-box">
+
+        {# Header #}
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">
+              <span class="rank-pill" style="margin-right:.5rem">#{{ s.appl.rank or '—' }}</span>
+              {{ s.appl.full_name }}
+            </div>
+            <div class="modal-sub">
+              {{ s.appl.email }} &bull; {{ s.appl.phone or '—' }}
+              &bull;
+              <span class="badge badge-{{ s.allotment.quota }}" style="font-size:.68rem">
+                {{ s.allotment.quota | title }} Quota
+              </span>
+              &bull; {{ s.appl.category_name or '—' }}
+            </div>
+          </div>
+          <button class="modal-close"
+            onclick="closeModal('fac-modal-{{ s.appl.id }}')"
+            title="Close">&times;</button>
         </div>
-        <div class="fee-box teal">
-          <div class="fee-val">₹{{ '{:,.0f}'.format(paid_amt) }}</div>
-          <div class="fee-lbl">Paid</div>
-        </div>
-        <div class="fee-box {% if due_amt and due_amt > 0 %}red{% endif %}">
-          {% if due_amt is not none and due_amt <= 0 %}
-            <div class="fee-val" style="color:#0f766e"><i class="fas fa-check"></i> Cleared</div>
-          {% else %}
-            <div class="fee-val">₹{{ '{:,.0f}'.format(due_amt or 0) }}</div>
-          {% endif %}
-          <div class="fee-lbl">Due</div>
-        </div>
-        <div style="flex:1;min-width:100px;align-self:center">
-          <div style="font-size:.72rem;color:#5a6e82;margin-bottom:4px">{{ pct }}% paid</div>
+
+        <div class="modal-body">
+
+          {# Fee summary #}
+          {% set pct = ((paid_amt / s.fees.total_fees * 100) | round | int) if s.fees and s.fees.total_fees > 0 else 0 %}
+          {% if s.fees %}
+          <div class="modal-fee-row">
+            <div class="m-fee-box gold">
+              <div class="mf-val">₹{{ '{:,.0f}'.format(s.fees.total_fees) }}</div>
+              <div class="mf-lbl">Total Fees</div>
+            </div>
+            <div class="m-fee-box teal">
+              <div class="mf-val">₹{{ '{:,.0f}'.format(paid_amt) }}</div>
+              <div class="mf-lbl">Paid</div>
+            </div>
+            <div class="m-fee-box {% if due_amt and due_amt > 0 %}red{% endif %}">
+              {% if due_amt is not none and due_amt <= 0 %}
+                <div class="mf-val" style="color:#0f766e"><i class="fas fa-check"></i> Cleared</div>
+              {% else %}
+                <div class="mf-val">₹{{ '{:,.0f}'.format(due_amt or 0) }}</div>
+              {% endif %}
+              <div class="mf-lbl">Due</div>
+            </div>
+          </div>
           <div class="progress-bar-wrap">
             <div class="progress-bar-fill" style="width:{{ pct }}%"></div>
           </div>
-        </div>
-      </div>
-      {% endif %}
+          {% endif %}
 
-      {# Set / update total fees #}
-      <div class="set-fees-row">
-        <label>{{ 'Update' if s.fees else 'Set' }} Total Fees:</label>
-        <form method="POST"
-          action="{{ url_for('main.faculty_set_fees', app_id=s.appl.id) }}"
-          style="display:flex;gap:.5rem;flex:1;flex-wrap:wrap">
-          <input type="number" name="total_fees" min="0" step="0.01"
-            value="{{ s.fees.total_fees if s.fees else '' }}"
-            placeholder="Enter total amount (₹)" required>
-          <button type="submit" class="btn btn-teal">
-            <i class="fas fa-save"></i> {{ 'Update' if s.fees else 'Set Fees' }}
-          </button>
-        </form>
-      </div>
-
-      {# Receipts section #}
-      <div class="receipts-section">
-        <h4><i class="fas fa-receipt"></i> Payment Receipts</h4>
-
-        {% if s.receipts %}
-        <div class="receipts-grid">
-          {% for r in s.receipts %}
-          <div>
-            <div class="receipt-chip">
-              <div>
-                <div class="receipt-num">#{{ r.receipt_number }}</div>
-                <div class="receipt-amt">₹{{ '{:,.0f}'.format(r.amount_paid) }}</div>
-              </div>
-              <div class="receipt-actions">
-                <button type="button" class="btn btn-sm btn-warning"
-                  onclick="toggleEdit('edit-{{ r.id }}')">
-                  <i class="fas fa-pencil-alt"></i> Edit
-                </button>
-                <form method="POST"
-                  action="{{ url_for('main.faculty_delete_receipt', receipt_id=r.id) }}"
-                  style="display:inline"
-                  onsubmit="return confirm('Delete receipt #{{ r.receipt_number }}?')">
-                  <button type="submit" class="btn btn-sm btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            {# Inline edit form #}
-            <div class="edit-receipt-form" id="edit-{{ r.id }}">
-              <form method="POST"
-                action="{{ url_for('main.faculty_edit_receipt', receipt_id=r.id) }}">
-                <div class="edit-row">
-                  <input type="text" name="receipt_number"
-                    value="{{ r.receipt_number }}" placeholder="Receipt #" required>
-                  <input type="number" name="amount_paid" min="0.01" step="0.01"
-                    value="{{ r.amount_paid }}" placeholder="Amount" required>
-                  <button type="submit" class="btn btn-sm btn-teal">
-                    <i class="fas fa-save"></i> Save
-                  </button>
-                  <button type="button" class="btn btn-sm btn-warning"
-                    onclick="toggleEdit('edit-{{ r.id }}')">
-                    <i class="fas fa-times"></i> Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {# Add receipt #}
-        {% if s.fees %}
-        <div class="add-receipt-form">
-          <h5><i class="fas fa-plus"></i> Add New Receipt</h5>
+          {# Set / update fees #}
+          <div class="section-label">{{ 'Update' if s.fees else 'Set' }} Total Fees</div>
           <form method="POST"
-            action="{{ url_for('main.faculty_add_receipt', app_id=s.appl.id) }}">
-            <div class="add-row">
-              <div class="field">
-                <label>Receipt Number</label>
-                <input type="text" name="receipt_number" placeholder="e.g. REC-001" required>
-              </div>
-              <div class="field">
-                <label>Amount Paid (₹)</label>
-                <input type="number" name="amount_paid" min="0.01" step="0.01"
-                  placeholder="0.00" required>
-              </div>
-              <button type="submit" class="btn btn-navy" style="align-self:flex-end;margin-bottom:1px">
-                <i class="fas fa-plus"></i> Add Receipt
+            action="{{ url_for('main.faculty_set_fees', app_id=s.appl.id) }}">
+            <div class="set-fees-row">
+              <input type="number" name="total_fees" min="0" step="0.01"
+                value="{{ s.fees.total_fees if s.fees else '' }}"
+                placeholder="Enter total amount (₹)" required>
+              <button type="submit" class="btn btn-teal">
+                <i class="fas fa-save"></i> {{ 'Update' if s.fees else 'Set Fees' }}
               </button>
             </div>
           </form>
-        </div>
-        {% else %}
-        <div class="no-fees-msg">
-          <i class="fas fa-exclamation-triangle"></i>
-          Set total fees above before adding receipts.
-        </div>
-        {% endif %}
 
-      </div>
-    </div>
+          {# Receipts #}
+          <div class="section-label" style="margin-top:.25rem">Payment Receipts</div>
+
+          {% if s.receipts %}
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Receipt #</th>
+                <th>Amount</th>
+                <th>Date &amp; Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in s.receipts %}
+              <tr id="vr-{{ r.id }}">
+                <td><span class="r-num">#{{ r.receipt_number }}</span></td>
+                <td><span class="r-amt">₹{{ '{:,.0f}'.format(r.amount_paid) }}</span></td>
+                <td>
+                  <span class="r-date">
+                    {% if r.created_at %}
+                      {{ r.created_at.strftime('%d %b %Y') }},
+                      {{ r.created_at.strftime('%I:%M %p') }}
+                    {% else %}—{% endif %}
+                  </span>
+                </td>
+                <td>
+                  <div class="r-actions">
+                    <button type="button" class="btn btn-sm btn-warning"
+                      onclick="toggleEdit('{{ r.id }}')">
+                      <i class="fas fa-pencil-alt"></i> Edit
+                    </button>
+                    <form method="POST"
+                      action="{{ url_for('main.faculty_delete_receipt', receipt_id=r.id) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Delete receipt #{{ r.receipt_number }}?')">
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {# Inline edit row #}
+              <tr class="edit-receipt-row" id="er-{{ r.id }}">
+                <td colspan="4">
+                  <form method="POST"
+                    action="{{ url_for('main.faculty_edit_receipt', receipt_id=r.id) }}">
+                    <div class="edit-inner">
+                      <input type="text" name="receipt_number"
+                        value="{{ r.receipt_number }}" placeholder="Receipt #" required>
+                      <input type="number" name="amount_paid" min="0.01" step="0.01"
+                        value="{{ r.amount_paid }}" placeholder="Amount (₹)" required>
+                      <button type="submit" class="btn btn-sm btn-teal">
+                        <i class="fas fa-save"></i> Save
+                      </button>
+                      <button type="button" class="btn btn-sm btn-warning"
+                        onclick="toggleEdit('{{ r.id }}')">
+                        <i class="fas fa-times"></i> Cancel
+                      </button>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endif %}
+
+          {# Add receipt #}
+          {% if s.fees %}
+          <div class="add-receipt-form">
+            <h5><i class="fas fa-plus"></i> Add New Receipt</h5>
+            <form method="POST"
+              action="{{ url_for('main.faculty_add_receipt', app_id=s.appl.id) }}">
+              <div class="add-row">
+                <div class="field">
+                  <label>Receipt Number</label>
+                  <input type="text" name="receipt_number" placeholder="e.g. REC-001" required>
+                </div>
+                <div class="field">
+                  <label>Amount Paid (₹)</label>
+                  <input type="number" name="amount_paid" min="0.01" step="0.01"
+                    placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn btn-navy"
+                  style="align-self:flex-end; margin-bottom:1px;">
+                  <i class="fas fa-plus"></i> Add
+                </button>
+              </div>
+            </form>
+          </div>
+          {% else %}
+          <div class="no-fees-msg">
+            <i class="fas fa-exclamation-triangle"></i>
+            Set total fees above before adding receipts.
+          </div>
+          {% endif %}
+
+        </div>{# /modal-body #}
+      </div>{# /modal-box #}
+    </div>{# /modal-overlay #}
+
     {% endfor %}
+  </div>{# /list-card #}
 
   {% else %}
   <div class="empty-state">
@@ -385,10 +524,33 @@
 
 {% block scripts %}
 <script>
-function toggleEdit(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle('open');
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOnOverlay(e, id) {
+  if (e.target === e.currentTarget) closeModal(id);
+}
+function toggleEdit(id) {
+  const vr = document.getElementById('vr-' + id);
+  const er = document.getElementById('er-' + id);
+  const open = er.classList.contains('open');
+  er.classList.toggle('open', !open);
+  vr.style.opacity = open ? '1' : '0.4';
+  if (!open) er.querySelector('input').focus();
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+      m.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
 </script>
 {% endblock %}
 {% endblock %}
