@@ -91,7 +91,7 @@
         const html = htm.bind(React.createElement);
 
         const SITE = {
-             univEN: "Bangalore University",
+            univEN: "Bangalore University",
             univKN: "ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾಲಯ",
             deptEN: "Department of Computer Science & Applications",
             deptKN: "ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಮತ್ತು ಅಪ್ಲಿಕೇಶನ್ಸ್ ವಿಭಾಗ",
@@ -148,10 +148,13 @@
                                 </a>
                             </div>
 
-                            <button className="bg-navy text-white px-6 py-2.5 rounded-full text-[0.7rem] font-bold uppercase tracking-widest hover:bg-gold transition-all flex items-center gap-2">
+                            <a 
+                                href="/login"
+                                className="bg-navy text-white px-6 py-2.5 rounded-full text-[0.7rem] font-bold uppercase tracking-widest hover:bg-gold transition-all flex items-center gap-2"
+                            >
                                 <${Users} size=${14} />
                                 ${t('Login', 'ಲಾಗಿನ್')}
-                            </button>
+                            </a>
                         </div>
                     </nav>
 
