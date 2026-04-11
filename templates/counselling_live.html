@@ -1,402 +1,679 @@
 {% extends 'base.html' %}
 {% block title %}Live Counselling Tracker — BCA Admissions{% endblock %}
 
+{% block navbar_auth %}{% endblock %}
+
 {% block content %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:         #f0f4f9;
-    --card:       #ffffff;
-    --border:     #dde3ed;
-    --accent:     #1a56db;
-    --accent2:    #1e40af;
-    --green:      #059669;
-    --green-bg:   #ecfdf5;
-    --green-bdr:  #a7f3d0;
-    --yellow:     #d97706;
-    --yellow-bg:  #fffbeb;
-    --yellow-bdr: #fde68a;
-    --red:        #dc2626;
-    --red-bg:     #fef2f2;
-    --red-bdr:    #fecaca;
-    --text:       #0f172a;
-    --text2:      #334155;
-    --muted:      #64748b;
-    --shadow:     0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
-    --shadow-md:  0 4px 24px rgba(0,0,0,0.09);
+    --ink:       #0b1120;
+    --ink2:      #1e293b;
+    --ink3:      #475569;
+    --muted:     #94a3b8;
+    --line:      #e2e8f0;
+    --surface:   #ffffff;
+    --lift:      #f8fafc;
+    --blue:      #2563eb;
+    --blue-d:    #1d4ed8;
+    --blue-pale: #eff6ff;
+    --blue-mid:  #bfdbfe;
+    --green:     #16a34a;
+    --green-pale:#f0fdf4;
+    --green-mid: #bbf7d0;
+    --amber:     #d97706;
+    --amber-pale:#fffbeb;
+    --amber-mid: #fde68a;
+    --red:       #dc2626;
+    --red-pale:  #fef2f2;
+    --red-mid:   #fecaca;
+    --radius-sm: 8px;
+    --radius:    14px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 1px 2px rgba(11,17,32,0.06);
+    --shadow:    0 2px 8px rgba(11,17,32,0.08), 0 0 0 1px rgba(11,17,32,0.05);
+    --shadow-lg: 0 8px 32px rgba(11,17,32,0.12), 0 0 0 1px rgba(11,17,32,0.06);
   }
 
-  body { background: var(--bg) !important; color: var(--text) !important; }
+  body { background: #f1f5fb !important; color: var(--ink) !important; }
 
-  .live-page {
+  .lp {
+    font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
-    background: var(--bg);
-    padding: 2rem 1.25rem 5rem;
-    font-family: 'DM Sans', sans-serif;
+    background: #f1f5fb;
+    padding: 0 0 6rem;
   }
 
-  /* ── Header ── */
-  .live-header { text-align: center; margin-bottom: 2rem; }
-  .portal-tag {
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
+  /* ── HERO BAND ── */
+  .hero-band {
+    background: var(--ink);
+    padding: 3rem 1.5rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 20% 50%, rgba(37,99,235,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 70% at 80% 30%, rgba(29,78,216,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-band::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 32px;
+    background: #f1f5fb;
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .uni-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--accent);
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    padding: 0.3rem 0.9rem;
-    border-radius: 2rem;
-    margin-bottom: 0.9rem;
-  }
-  .live-header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2rem, 6vw, 3.4rem);
-    letter-spacing: 0.05em;
-    color: var(--text);
-    line-height: 1;
-    margin: 0 0 0.4rem;
-  }
-  .live-header h1 span { color: var(--accent); }
-  .live-header .subtitle { font-size: 0.85rem; color: var(--muted); margin: 0; }
-
-  /* ── Status pill ── */
-  .status-bar {
-    display: flex; align-items: center; justify-content: center;
-    gap: 0.6rem; margin-bottom: 2rem;
-  }
-  .status-pill {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.35rem 1rem; border-radius: 2rem;
-    font-family: 'DM Mono', monospace; font-size: 0.72rem;
-    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
-  }
-  .status-pill.running { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bdr); }
-  .status-pill.paused  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bdr); }
-  .status-pill.stopped { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bdr); }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .status-dot.running { background: var(--green); animation: pulse-dot 1.5s infinite; }
-  .status-dot.paused  { background: var(--yellow); }
-  .status-dot.stopped { background: var(--red); }
-  @keyframes pulse-dot {
-    0%,100% { box-shadow: 0 0 0 0 rgba(5,150,105,0.4); }
-    50%      { box-shadow: 0 0 0 5px rgba(5,150,105,0); }
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0.6rem;
   }
 
-  /* ── Layout ── */
-  .live-center { max-width: 720px; margin: 0 auto; }
+  /* ── REPLACE [UNIVERSITY NAME] WITH YOUR ACTUAL UNIVERSITY NAME ── */
+  .uni-name span { color: rgba(255,255,255,0.85); }
 
-  /* ── State card ── */
+  .hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: #60a5fa;
+  }
+  .hero-sub {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── STATUS CHIP ── */
+  .status-row {
+    display: flex;
+    justify-content: center;
+    margin: -1rem 0 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.1rem;
+    border-radius: 99px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow);
+  }
+  .status-chip.running { background: var(--green-pale); color: var(--green); border: 1.5px solid var(--green-mid); }
+  .status-chip.paused  { background: var(--amber-pale); color: var(--amber); border: 1.5px solid var(--amber-mid); }
+  .status-chip.stopped { background: var(--red-pale);   color: var(--red);   border: 1.5px solid var(--red-mid); }
+  .pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pulse.running { background: var(--green); animation: blink 1.4s ease-in-out infinite; }
+  .pulse.paused  { background: var(--amber); }
+  .pulse.stopped { background: var(--red); }
+  @keyframes blink {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(22,163,74,0.5); }
+    50%      { opacity: 0.7; box-shadow: 0 0 0 5px rgba(22,163,74,0); }
+  }
+
+  /* ── WRAP ── */
+  .wrap { max-width: 740px; margin: 0 auto; padding: 0 1.25rem; }
+
+  /* ── STATE CARDS ── */
   .state-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 1rem; padding: 3rem 2rem;
-    text-align: center; box-shadow: var(--shadow);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 3.5rem 2rem;
+    text-align: center;
   }
-  .state-card .state-icon { font-size: 2.8rem; margin-bottom: 0.75rem; display: block; }
+  .state-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    line-height: 1;
+  }
   .state-card h2 {
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem;
-    letter-spacing: 0.04em; color: var(--text); margin: 0 0 0.4rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
   }
-  .state-card p { color: var(--muted); font-size: 0.9rem; margin: 0; line-height: 1.6; }
+  .state-card p { font-size: 0.9rem; color: var(--ink3); line-height: 1.7; }
 
-  /* ── Rank Card ── */
+  /* ── RANK CARD ── */
   .rank-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 1rem; overflow: hidden; box-shadow: var(--shadow-md);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
   }
-  .rank-hero {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    padding: 1.6rem 2rem; display: flex; align-items: center; gap: 1.5rem;
+  .rank-top {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    padding: 2rem 2rem 1.75rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
   }
-  .rank-hero .rank-label {
-    font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    color: rgba(255,255,255,0.7); margin-bottom: 0.2rem;
+  .rank-top::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(96,165,250,0.07);
+    pointer-events: none;
   }
-  .rank-hero .rank-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(3rem, 10vw, 5rem);
-    line-height: 1; color: #fff; letter-spacing: 0.02em;
+  .rank-top::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(96,165,250,0.05);
+    pointer-events: none;
   }
-  .rank-hero .rank-badge {
-    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
-    color: #fff; font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.28rem 0.7rem; border-radius: 2rem; white-space: nowrap;
+  .rank-num-block { position: relative; z-index: 1; }
+  .rank-calling-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.2rem;
   }
-  .rank-body { padding: 1.5rem 2rem; }
+  .rank-big {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(4rem, 14vw, 6.5rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .rank-big span {
+    font-size: 0.4em;
+    color: rgba(255,255,255,0.4);
+    font-weight: 400;
+    vertical-align: super;
+    letter-spacing: 0;
+  }
+  .rank-live-badge {
+    position: relative; z-index: 1;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #fca5a5;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 99px;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .rank-live-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: blink 1.2s ease-in-out infinite;
+    display: inline-block;
+  }
 
-  .info-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 1rem; margin-bottom: 1.25rem;
+  /* Student details */
+  .rank-details { padding: 1.75rem 2rem; }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
   }
-  @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 500px) { .detail-grid { grid-template-columns: 1fr; gap: 1rem; } }
 
-  .info-item .info-label {
-    font-family: 'DM Mono', monospace; font-size: 0.62rem;
-    letter-spacing: 0.13em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 0.25rem;
+  .detail-item {}
+  .detail-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
   }
-  .info-item .info-value { font-size: 1rem; font-weight: 600; color: var(--text); word-break: break-word; }
-  .info-item .info-value.marks {
-    font-family: 'DM Mono', monospace; font-size: 1.35rem; color: var(--accent);
+  .detail-val {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .detail-val.big-marks {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: -0.02em;
   }
 
-  .allotment-banner {
-    background: var(--green-bg); border: 1px solid var(--green-bdr);
-    border-radius: 0.75rem; padding: 0.9rem 1.1rem;
-    display: flex; align-items: flex-start; gap: 0.75rem;
+  /* Allotment result */
+  .allot-result {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
   }
-  .check-icon {
-    width: 26px; height: 26px; background: var(--green); border-radius: 50%;
+  .allot-result.success {
+    background: var(--green-pale);
+    border: 1.5px solid var(--green-mid);
+  }
+  .allot-result.pending {
+    background: var(--lift);
+    border: 1.5px solid var(--line);
+  }
+  .allot-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; font-size: 0.8rem; color: #fff; margin-top: 1px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 1px;
   }
-  .allot-title {
-    font-size: 0.72rem; font-family: 'DM Mono', monospace;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--green); margin-bottom: 0.15rem;
+  .allot-result.success .allot-icon { background: var(--green); color: #fff; }
+  .allot-result.pending  .allot-icon { background: var(--line);  color: var(--muted); font-size: 1rem; }
+  .allot-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
   }
-  .allot-detail { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.1rem; }
-  .allot-time   { font-size: 0.75rem; color: var(--muted); }
+  .allot-result.success .allot-tag { color: var(--green); }
+  .allot-result.pending  .allot-tag { color: var(--muted); }
+  .allot-main { font-size: 0.92rem; font-weight: 600; color: var(--ink); margin-bottom: 0.1rem; }
+  .allot-time { font-size: 0.75rem; color: var(--ink3); }
 
-  .not-allotted {
-    background: #f8fafc; border: 1px solid var(--border);
-    border-radius: 0.75rem; padding: 0.7rem 1.1rem;
-    display: flex; align-items: center; gap: 0.5rem;
-    color: var(--muted); font-size: 0.86rem;
-  }
-  .admin-message {
-    margin-top: 1rem; background: var(--yellow-bg);
-    border: 1px solid var(--yellow-bdr); border-radius: 0.75rem;
-    padding: 0.8rem 1.1rem; font-size: 0.86rem; color: #92400e;
-    display: flex; gap: 0.5rem; align-items: flex-start;
-  }
-
-  /* ── Stats bar ── */
-  .stats-bar { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
-  .stat-chip {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 0.6rem; padding: 0.6rem 1rem;
-    font-family: 'DM Mono', monospace; font-size: 0.7rem;
-    color: var(--muted); flex: 1; min-width: 110px;
-    text-align: center; box-shadow: var(--shadow);
-  }
-  .stat-chip strong {
-    display: block; font-size: 1.25rem; color: var(--text);
-    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; margin-bottom: 0.1rem;
+  /* Admin msg */
+  .admin-msg {
+    margin-top: 1rem;
+    background: var(--amber-pale);
+    border: 1.5px solid var(--amber-mid);
+    border-radius: var(--radius);
+    padding: 0.85rem 1.1rem;
+    font-size: 0.86rem;
+    color: #78350f;
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    line-height: 1.5;
   }
 
-  /* ── Section title ── */
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
-    letter-spacing: 0.06em; color: var(--text2);
-    margin: 2rem 0 0.75rem;
-    display: flex; align-items: center; gap: 0.5rem;
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .stat-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem 0.75rem;
+    text-align: center;
+    border: 1px solid var(--line);
+  }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
-  /* ── Seats tracker ── */
+  /* ── SECTION HEADING ── */
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 2.5rem 0 1rem;
+  }
+  .sec-head-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink2);
+    white-space: nowrap;
+  }
+  .sec-head-line { flex: 1; height: 1px; background: var(--line); }
+
+  /* ── SEATS GRID ── */
   .seats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 0.75rem;
   }
-  .seat-cat-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 0.85rem; padding: 1rem 1.25rem; box-shadow: var(--shadow);
+  .seat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    padding: 1.1rem 1.25rem;
   }
-  .seat-cat-name { font-weight: 600; font-size: 0.9rem; color: var(--text); margin-bottom: 0.75rem; }
+  .seat-card-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--line);
+  }
   .quota-row {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 0.4rem; font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
   }
-  .quota-label {
-    font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  .q-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
-  .quota-nums { display: flex; gap: 0.5rem; align-items: center; }
-  .q-filled { color: var(--accent); font-weight: 600; font-size: 0.88rem; }
-  .q-total  { color: var(--muted); font-size: 0.78rem; }
-  .q-remain {
-    background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe;
-    border-radius: 0.35rem; font-family: 'DM Mono', monospace;
-    font-size: 0.65rem; padding: 0.1rem 0.4rem; white-space: nowrap;
+  .q-right { display: flex; align-items: center; gap: 0.5rem; }
+  .q-fraction { font-size: 0.82rem; font-weight: 600; color: var(--ink2); }
+  .q-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 5px;
+    white-space: nowrap;
   }
-  .q-remain.zero { background: var(--red-bg); color: var(--red); border-color: var(--red-bdr); }
-  .seat-progress {
-    height: 4px; background: #e2e8f0; border-radius: 2px;
-    overflow: hidden; margin-top: 0.3rem; margin-bottom: 0.6rem;
-  }
-  .seat-progress-fill {
-    height: 100%; border-radius: 2px;
-    background: linear-gradient(90deg, var(--accent2), var(--accent));
-    transition: width 0.4s ease;
-  }
-  .seat-progress-fill.full { background: linear-gradient(90deg, var(--red), #f87171); }
+  .q-tag.avail { background: var(--blue-pale); color: var(--blue); }
+  .q-tag.full  { background: var(--red-pale);  color: var(--red); }
+  .q-bar { height: 5px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 0.85rem; margin-top: 0.3rem; }
+  .q-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue-d), var(--blue)); }
+  .q-bar-fill.full { background: linear-gradient(90deg, #b91c1c, var(--red)); }
 
-  /* ── History toggle ── */
-  .history-toggle-btn {
-    width: 100%; margin-top: 2rem; padding: 0.75rem 1.5rem;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 0.75rem; color: var(--text2);
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
-    cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-    box-shadow: var(--shadow); transition: background 0.15s, border-color 0.15s;
+  /* ── HISTORY TOGGLE ── */
+  .hist-toggle {
+    width: 100%;
+    margin-top: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
-  .history-toggle-btn:hover { background: #f8fafc; border-color: #c7d2e0; }
-  .history-toggle-btn .btn-left { display: flex; align-items: center; gap: 0.6rem; }
-  .history-toggle-btn .chevron { transition: transform 0.25s; font-size: 0.8rem; color: var(--muted); }
-  .history-toggle-btn.open .chevron { transform: rotate(180deg); }
-  .history-count {
-    background: var(--accent); color: #fff;
-    font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    padding: 0.15rem 0.55rem; border-radius: 2rem;
+  .hist-toggle:hover { background: var(--lift); }
+  .hist-toggle-left { display: flex; align-items: center; gap: 0.75rem; }
+  .hist-toggle-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ink2);
   }
+  .hist-badge {
+    background: var(--blue);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 99px;
+  }
+  .hist-chevron {
+    font-size: 0.75rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .hist-toggle.open .hist-chevron { transform: rotate(180deg); }
 
-  /* ── History panel ── */
-  .history-panel {
-    display: none; background: var(--card); border: 1px solid var(--border);
-    border-radius: 0.85rem; margin-top: 0.5rem;
-    overflow: hidden; box-shadow: var(--shadow);
+  .hist-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-top: -0.5rem;
+    padding-top: 0.5rem;
   }
-  .history-panel.open { display: block; }
-  .history-table-wrap { overflow-x: auto; }
-  .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  .history-table th {
-    background: #f8fafc; font-family: 'DM Mono', monospace; font-size: 0.62rem;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
-    padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
-  }
-  .history-table td {
-    padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9;
-    color: var(--text2); vertical-align: middle;
-  }
-  .history-table tr:last-child td { border-bottom: none; }
-  .history-table tr:hover td { background: #f8fafc; }
+  .hist-panel.open { display: block; }
 
-  .quota-badge {
-    display: inline-block; font-family: 'DM Mono', monospace;
-    font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 0.15rem 0.55rem; border-radius: 2rem; white-space: nowrap;
+  .hist-table-wrap { overflow-x: auto; }
+  .hist-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  .hist-table thead th {
+    background: var(--lift);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.65rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
   }
-  .quota-badge.government { background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe; }
-  .quota-badge.management { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+  .hist-table tbody td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--lift);
+    color: var(--ink2);
+    vertical-align: middle;
+  }
+  .hist-table tbody tr:last-child td { border-bottom: none; }
+  .hist-table tbody tr:hover td { background: var(--lift); }
 
-  .rank-pill {
-    display: inline-block; background: #f1f5f9; color: var(--text2);
-    font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500;
-    padding: 0.1rem 0.5rem; border-radius: 0.35rem;
+  .r-pill {
+    display: inline-block;
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.55rem;
+    border-radius: 6px;
+    letter-spacing: -0.01em;
   }
-  .history-empty { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.88rem; }
+  .q-pill {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.55rem;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .q-pill.government { background: var(--blue-pale); color: var(--blue); border: 1px solid var(--blue-mid); }
+  .q-pill.management { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+  .hist-empty { text-align: center; padding: 2.5rem; color: var(--muted); font-size: 0.86rem; }
 
-  /* ── Refresh bar ── */
-  .refresh-bar { margin-top: 2rem; text-align: center; }
-  .refresh-info {
-    font-family: 'DM Mono', monospace; font-size: 0.68rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  /* ── REFRESH ── */
+  .refresh-wrap {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
-  .refresh-countdown { color: var(--accent); font-weight: 500; min-width: 2ch; display: inline-block; }
-  .progress-track {
-    width: 180px; height: 2px; background: var(--border);
-    border-radius: 2px; margin: 0.5rem auto 0; overflow: hidden;
+  .refresh-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
   }
-  .progress-fill {
-    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
-    border-radius: 2px; width: 100%; transform-origin: left;
+  .refresh-count { color: var(--blue); }
+  .refresh-track {
+    width: 200px; height: 3px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .refresh-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue-d), var(--blue));
+    border-radius: 99px;
+    transform-origin: left;
     animation: drain 30s linear forwards;
   }
   @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 </style>
 
-<div class="live-page">
+<div class="lp">
 
-  <div class="live-header">
-    <div class="portal-tag">BCA Admissions 2026–2027</div>
-    <h1>Live <span>Counselling</span> Tracker</h1>
-    <p class="subtitle">Public view &mdash; updates every 30 seconds &mdash; no login required</p>
+  <!-- HERO -->
+  <div class="hero-band">
+    <!-- ↓ CHANGE [UNIVERSITY NAME] TO YOUR ACTUAL UNIVERSITY NAME ↓ -->
+    <div class="uni-name"><span>Bangalore University</span> &nbsp;·&nbsp; BCA Admissions 2026–27</div>
+    <h1 class="hero-title">Live <em>Counselling</em> Tracker</h1>
+    <p class="hero-sub">Public · No login required · Auto-refreshes every 30 seconds</p>
   </div>
 
-  <div class="status-bar">
+  <!-- STATUS CHIP -->
+  <div class="status-row">
     {% if cs.status == 'running' %}
-      <span class="status-pill running"><span class="status-dot running"></span>Counselling In Progress</span>
+      <span class="status-chip running"><span class="pulse running"></span>Counselling In Progress</span>
     {% elif cs.status == 'paused' %}
-      <span class="status-pill paused"><span class="status-dot paused"></span>Counselling Paused</span>
+      <span class="status-chip paused"><span class="pulse paused"></span>Counselling Paused</span>
     {% else %}
-      <span class="status-pill stopped"><span class="status-dot stopped"></span>Counselling Not Started</span>
+      <span class="status-chip stopped"><span class="pulse stopped"></span>Not Started</span>
     {% endif %}
   </div>
 
-  <div class="live-center">
+  <div class="wrap">
 
-    <!-- Current Rank -->
+    <!-- CURRENT RANK SECTION -->
     {% if cs.status == 'stopped' %}
     <div class="state-card">
-      <span class="state-icon">🎓</span>
-      <h2>Counselling Not Started</h2>
-      <p>The counselling process has not begun yet.<br>Please check back later or contact the admissions office.</p>
+      <span class="state-emoji">🎓</span>
+      <h2>Counselling Not Started Yet</h2>
+      <p>The counselling process has not begun.<br>Please check back later or contact the admissions office.</p>
     </div>
 
     {% elif cs.status == 'paused' %}
     <div class="state-card">
-      <span class="state-icon">⏸️</span>
-      <h2>Counselling Paused</h2>
-      <p>The counselling process is temporarily paused.<br>It will resume shortly. Please wait.</p>
+      <span class="state-emoji">⏸</span>
+      <h2>Temporarily Paused</h2>
+      <p>The counselling session is on a short break.<br>It will resume shortly — please wait.</p>
       {% if cs.message %}
-      <div class="admin-message" style="margin-top:1.25rem; justify-content:center;">
-        <span>📢</span><span>{{ cs.message }}</span>
+      <div class="admin-msg" style="margin-top:1.25rem; text-align:left;">
+        <span style="font-size:1rem;">📢</span><span>{{ cs.message }}</span>
       </div>
       {% endif %}
     </div>
 
     {% elif cs.status == 'running' and not cs.current_rank %}
     <div class="state-card">
-      <span class="state-icon">⏳</span>
+      <span class="state-emoji">⏳</span>
       <h2>Waiting for First Rank</h2>
-      <p>Counselling has started. The admin will set the current rank shortly.</p>
+      <p>Counselling has started. Admin will call the first rank shortly.</p>
     </div>
 
     {% else %}
+    <!-- ACTIVE RANK CARD -->
     <div class="rank-card">
-      <div class="rank-hero">
-        <div>
-          <div class="rank-label">Currently Calling</div>
-          <div class="rank-number">#{{ cs.current_rank }}</div>
+      <div class="rank-top">
+        <div class="rank-num-block">
+          <div class="rank-calling-label">Currently Calling</div>
+          <div class="rank-big"><span>#</span>{{ cs.current_rank }}</div>
         </div>
-        <div class="rank-badge">🔴 Live Now</div>
+        <div class="rank-live-badge">Live Now</div>
       </div>
-      <div class="rank-body">
+
+      <div class="rank-details">
         {% if student %}
-        <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Student Name</div>
-            <div class="info-value">{{ student.full_name }}</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Student Name</div>
+            <div class="detail-val">{{ student.full_name }}</div>
           </div>
-          <div class="info-item">
-            <div class="info-label">Rank</div>
-            <div class="info-value">#{{ student.rank }}</div>
+          <div class="detail-item">
+            <div class="detail-label">Rank</div>
+            <div class="detail-val"># {{ student.rank }}</div>
           </div>
-          <div class="info-item">
-            <div class="info-label">12th Marks</div>
-            <div class="info-value marks">
+          <div class="detail-item">
+            <div class="detail-label">12th Percentage</div>
+            <div class="detail-val big-marks">
               {% if student.percent_12 %}{{ "%.2f"|format(student.percent_12) }}%{% else %}—{% endif %}
             </div>
           </div>
-          <div class="info-item">
-            <div class="info-label">Category</div>
-            <div class="info-value">{{ student.category_name or '—' }}</div>
+          <div class="detail-item">
+            <div class="detail-label">Category</div>
+            <div class="detail-val">{{ student.category_name or '—' }}</div>
           </div>
         </div>
 
         {% if allotment %}
-        <div class="allotment-banner">
-          <div class="check-icon">✓</div>
+        <div class="allot-result success">
+          <div class="allot-icon">✓</div>
           <div>
-            <div class="allot-title">Seat Allotted</div>
-            <div class="allot-detail">
+            <div class="allot-tag">Seat Allotted</div>
+            <div class="allot-main">
               {{ student.full_name }} &mdash;
               {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}
             </div>
@@ -404,61 +681,90 @@
           </div>
         </div>
         {% else %}
-        <div class="not-allotted"><span>⏳</span><span>Seat not yet allotted for this rank</span></div>
+        <div class="allot-result pending">
+          <div class="allot-icon" style="font-size:0.9rem;">⏳</div>
+          <div>
+            <div class="allot-tag">Pending</div>
+            <div class="allot-main" style="font-weight:400; color:var(--ink3);">Seat not yet allotted for this rank</div>
+          </div>
+        </div>
         {% endif %}
 
         {% else %}
-        <div class="not-allotted"><span>ℹ️</span><span>No student record found for Rank #{{ cs.current_rank }}</span></div>
+        <div class="allot-result pending">
+          <div class="allot-icon">ℹ</div>
+          <div>
+            <div class="allot-tag">No Record</div>
+            <div class="allot-main" style="font-weight:400; color:var(--ink3);">No student found for Rank #{{ cs.current_rank }}</div>
+          </div>
+        </div>
         {% endif %}
 
         {% if cs.message %}
-        <div class="admin-message"><span>📢</span><span>{{ cs.message }}</span></div>
+        <div class="admin-msg"><span style="font-size:1rem;">📢</span><span>{{ cs.message }}</span></div>
         {% endif %}
       </div>
     </div>
 
-    <div class="stats-bar">
-      <div class="stat-chip"><strong>{{ total_ranked }}</strong>Total Ranked</div>
-      <div class="stat-chip"><strong>{{ cs.current_rank }}</strong>Current Rank</div>
-      <div class="stat-chip"><strong>{{ total_allotted }}</strong>Seats Allotted</div>
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num">{{ total_ranked }}</div>
+        <div class="stat-label">Total Ranked</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:var(--blue);">{{ cs.current_rank }}</div>
+        <div class="stat-label">Current Rank</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:var(--green);">{{ total_allotted }}</div>
+        <div class="stat-label">Seats Allotted</div>
+      </div>
     </div>
     {% endif %}
 
-    <!-- Live Seat Availability -->
+    <!-- LIVE SEAT AVAILABILITY -->
     {% if cat_seats_list %}
-    <div class="section-title">📊 Live Seat Availability</div>
+    <div class="sec-head">
+      <span class="sec-head-label">Live Seat Availability</span>
+      <span class="sec-head-line"></span>
+    </div>
     <div class="seats-grid">
       {% for item in cat_seats_list %}
-      <div class="seat-cat-card">
-        <div class="seat-cat-name">{{ item.category }}</div>
+      <div class="seat-card">
+        <div class="seat-card-title">{{ item.category }}</div>
 
+        <!-- Govt -->
         <div class="quota-row">
-          <span class="quota-label">Govt Quota</span>
-          <div class="quota-nums">
-            <span class="q-filled">{{ item.govt_filled }}</span>
-            <span class="q-total">/ {{ item.govt_total }}</span>
-            <span class="q-remain {% if item.govt_remaining == 0 %}zero{% endif %}">{{ item.govt_remaining }} left</span>
+          <span class="q-name">Govt Quota</span>
+          <div class="q-right">
+            <span class="q-fraction">{{ item.govt_filled }} / {{ item.govt_total }}</span>
+            <span class="q-tag {% if item.govt_remaining == 0 %}full{% else %}avail{% endif %}">
+              {% if item.govt_remaining == 0 %}Full{% else %}{{ item.govt_remaining }} left{% endif %}
+            </span>
           </div>
         </div>
         {% if item.govt_total > 0 %}
-        <div class="seat-progress">
-          <div class="seat-progress-fill {% if item.govt_remaining == 0 %}full{% endif %}"
-               style="width: {{ ((item.govt_filled / item.govt_total) * 100)|int }}%"></div>
+        <div class="q-bar">
+          <div class="q-bar-fill {% if item.govt_remaining == 0 %}full{% endif %}"
+               style="width:{{ ((item.govt_filled / item.govt_total) * 100)|int }}%"></div>
         </div>
         {% endif %}
 
+        <!-- Mgmt -->
         <div class="quota-row">
-          <span class="quota-label">Mgmt Quota</span>
-          <div class="quota-nums">
-            <span class="q-filled">{{ item.mgmt_filled }}</span>
-            <span class="q-total">/ {{ item.mgmt_total }}</span>
-            <span class="q-remain {% if item.mgmt_remaining == 0 %}zero{% endif %}">{{ item.mgmt_remaining }} left</span>
+          <span class="q-name">Mgmt Quota</span>
+          <div class="q-right">
+            <span class="q-fraction">{{ item.mgmt_filled }} / {{ item.mgmt_total }}</span>
+            <span class="q-tag {% if item.mgmt_remaining == 0 %}full{% else %}avail{% endif %}">
+              {% if item.mgmt_remaining == 0 %}Full{% else %}{{ item.mgmt_remaining }} left{% endif %}
+            </span>
           </div>
         </div>
         {% if item.mgmt_total > 0 %}
-        <div class="seat-progress">
-          <div class="seat-progress-fill {% if item.mgmt_remaining == 0 %}full{% endif %}"
-               style="width: {{ ((item.mgmt_filled / item.mgmt_total) * 100)|int }}%"></div>
+        <div class="q-bar">
+          <div class="q-bar-fill {% if item.mgmt_remaining == 0 %}full{% endif %}"
+               style="width:{{ ((item.mgmt_filled / item.mgmt_total) * 100)|int }}%"></div>
         </div>
         {% endif %}
 
@@ -467,19 +773,20 @@
     </div>
     {% endif %}
 
-    <!-- Allotment History -->
-    <button class="history-toggle-btn" id="historyBtn" onclick="toggleHistory()">
-      <span class="btn-left">
-        🏅 Seats Allotted History
-        <span class="history-count">{{ allotment_history|length }}</span>
-      </span>
-      <span class="chevron">▼</span>
+    <!-- ALLOTMENT HISTORY -->
+    <button class="hist-toggle" id="histBtn" onclick="toggleHist()">
+      <div class="hist-toggle-left">
+        <span style="font-size:1rem;">🏅</span>
+        <span class="hist-toggle-title">Seats Allotted History</span>
+        <span class="hist-badge">{{ allotment_history|length }}</span>
+      </div>
+      <span class="hist-chevron">▼</span>
     </button>
 
-    <div class="history-panel" id="historyPanel">
+    <div class="hist-panel" id="histPanel">
       {% if allotment_history %}
-      <div class="history-table-wrap">
-        <table class="history-table">
+      <div class="hist-table-wrap">
+        <table class="hist-table">
           <thead>
             <tr>
               <th>#</th>
@@ -487,37 +794,35 @@
               <th>Student Name</th>
               <th>Category</th>
               <th>Quota</th>
-              <th>Allotted At</th>
+              <th>Allotted At (IST)</th>
             </tr>
           </thead>
           <tbody>
             {% for h in allotment_history %}
             <tr>
-              <td style="color:var(--muted);font-size:0.78rem;">{{ loop.index }}</td>
-              <td><span class="rank-pill">#{{ h.rank }}</span></td>
-              <td style="font-weight:500;color:var(--text);">{{ h.name }}</td>
-              <td style="color:var(--muted);font-size:0.82rem;">{{ h.category }}</td>
-              <td><span class="quota-badge {{ h.quota }}">{{ h.quota|title }}</span></td>
-              <td style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">{{ h.allotted_at }}</td>
+              <td style="color:var(--muted);font-size:0.75rem;">{{ loop.index }}</td>
+              <td><span class="r-pill">#{{ h.rank }}</span></td>
+              <td style="font-weight:600;color:var(--ink);">{{ h.name }}</td>
+              <td style="color:var(--ink3);font-size:0.8rem;">{{ h.category }}</td>
+              <td><span class="q-pill {{ h.quota }}">{{ h.quota|title }}</span></td>
+              <td style="font-size:0.78rem;color:var(--ink3);white-space:nowrap;">{{ h.allotted_at }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="history-empty">No seats allotted yet.</div>
+      <div class="hist-empty">No seats allotted yet.</div>
       {% endif %}
     </div>
 
-    <!-- Refresh bar -->
-    <div class="refresh-bar">
-      <div class="refresh-info">
-        <span>Auto-refresh in</span>
-        <span class="refresh-countdown" id="countdown">30</span>
-        <span>sec</span>
+    <!-- REFRESH BAR -->
+    <div class="refresh-wrap">
+      <div class="refresh-label">
+        Auto-refresh in <span class="refresh-count" id="cd">30</span>s
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill"></div>
+      <div class="refresh-track">
+        <div class="refresh-fill" id="rf"></div>
       </div>
     </div>
 
@@ -527,24 +832,14 @@
 
 {% block scripts %}
 <script>
-  let seconds = 30;
-  const countdownEl = document.getElementById('countdown');
-  setInterval(() => {
-    seconds--;
-    if (countdownEl) countdownEl.textContent = seconds;
-    if (seconds <= 0) window.location.reload();
-  }, 1000);
-
-  const fill = document.getElementById('progress-fill');
-  if (fill) {
-    fill.style.animation = 'none';
-    fill.offsetHeight;
-    fill.style.animation = 'drain 30s linear forwards';
-  }
-
-  function toggleHistory() {
-    document.getElementById('historyBtn').classList.toggle('open');
-    document.getElementById('historyPanel').classList.toggle('open');
+  let s = 30;
+  const cd = document.getElementById('cd');
+  setInterval(() => { s--; if (cd) cd.textContent = s; if (s <= 0) location.reload(); }, 1000);
+  const rf = document.getElementById('rf');
+  if (rf) { rf.style.animation='none'; rf.offsetHeight; rf.style.animation='drain 30s linear forwards'; }
+  function toggleHist() {
+    document.getElementById('histBtn').classList.toggle('open');
+    document.getElementById('histPanel').classList.toggle('open');
   }
 </script>
 {% endblock %}
