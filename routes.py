@@ -122,6 +122,42 @@ def index():
 
 
 # ─────────────────────────────────────────
+#  Public — Live Counselling Tracker
+#  No login required — anyone can view
+# ─────────────────────────────────────────
+@main.route('/live')
+def counselling_live():
+    cs = CounsellingSettings.get()
+
+    student       = None
+    allotment     = None
+    total_ranked  = StudentApplication.query.filter(
+                        StudentApplication.rank.isnot(None)).count()
+    total_allotted = SeatAllotment.query.count()
+
+    if cs.current_rank:
+        student = StudentApplication.query.filter_by(
+            rank=cs.current_rank,
+            is_verified=True
+        ).first()
+
+        if student:
+            a = SeatAllotment.query.filter_by(application_id=student.id).first()
+            if a:
+                allotted_ist = utc_to_ist(a.allotted_at)
+                allotment = {
+                    'quota':       a.quota,
+                    'allotted_at': allotted_ist,
+                }
+
+    return render_template('counselling_live.html',
+                           cs=cs,
+                           student=student,
+                           allotment=allotment,
+                           total_ranked=total_ranked,
+                           total_allotted=total_allotted)
+
+# ─────────────────────────────────────────
 #  POST API — Register Student
 # ─────────────────────────────────────────
 @main.route('/api/d2faa6fb-745b-454d-8852-92ed0bb482d8', methods=['POST'])

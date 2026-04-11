@@ -1,0 +1,596 @@
+{% extends 'base.html' %}
+{% block title %}Live Counselling Tracker — BCA Admissions{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --live-bg:       #0a0f1e;
+    --live-card:     #111827;
+    --live-border:   #1e2d45;
+    --live-accent:   #00c6ff;
+    --live-accent2:  #0072ff;
+    --live-green:    #10b981;
+    --live-yellow:   #f59e0b;
+    --live-red:      #ef4444;
+    --live-text:     #e2e8f0;
+    --live-muted:    #64748b;
+  }
+
+  body {
+    background: var(--live-bg) !important;
+    color: var(--live-text) !important;
+  }
+
+  .live-page {
+    min-height: 100vh;
+    background: var(--live-bg);
+    padding: 2rem 1.25rem 4rem;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── Header ── */
+  .live-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .live-header .portal-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--live-accent);
+    background: rgba(0,198,255,0.08);
+    border: 1px solid rgba(0,198,255,0.25);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .live-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    letter-spacing: 0.06em;
+    color: #fff;
+    line-height: 1;
+    margin: 0 0 0.5rem;
+  }
+
+  .live-header h1 span {
+    background: linear-gradient(90deg, var(--live-accent), var(--live-accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .live-header .subtitle {
+    font-size: 0.9rem;
+    color: var(--live-muted);
+    margin: 0;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-dot.running  { background: var(--live-green);  animation: pulse-green 1.5s infinite; }
+  .status-dot.paused   { background: var(--live-yellow); }
+  .status-dot.stopped  { background: var(--live-red);    }
+
+  @keyframes pulse-green {
+    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+    50%      { box-shadow: 0 0 0 6px rgba(16,185,129,0);  }
+  }
+
+  .status-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .status-label.running { color: var(--live-green);  }
+  .status-label.paused  { color: var(--live-yellow); }
+  .status-label.stopped { color: var(--live-red);    }
+
+  /* ── Main card area ── */
+  .live-center {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* ── State card (stopped/paused/no rank) ── */
+  .state-card {
+    background: var(--live-card);
+    border: 1px solid var(--live-border);
+    border-radius: 1.25rem;
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .state-card .state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .state-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+    margin: 0 0 0.5rem;
+  }
+
+  .state-card p {
+    color: var(--live-muted);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Live Rank Card ── */
+  .rank-card {
+    background: var(--live-card);
+    border: 1px solid var(--live-border);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .rank-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+      rgba(0,198,255,0.05) 0%,
+      transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Rank number hero */
+  .rank-hero {
+    background: linear-gradient(135deg, var(--live-accent2), var(--live-accent));
+    padding: 1.8rem 2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .rank-hero .rank-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0.25rem;
+  }
+
+  .rank-hero .rank-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 10vw, 5.5rem);
+    line-height: 1;
+    color: #fff;
+    letter-spacing: 0.03em;
+  }
+
+  .rank-hero .rank-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2rem;
+    white-space: nowrap;
+  }
+
+  /* Student info */
+  .rank-body {
+    padding: 1.75rem 2rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .info-grid { grid-template-columns: 1fr; }
+  }
+
+  .info-item .info-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--live-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .info-item .info-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--live-text);
+    word-break: break-word;
+  }
+
+  .info-item .info-value.marks {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--live-accent);
+  }
+
+  /* Allotment banner */
+  .allotment-banner {
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .allotment-banner .check-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--live-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-top: 1px;
+  }
+
+  .allotment-banner .allot-title {
+    font-size: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--live-green);
+    margin-bottom: 0.2rem;
+  }
+
+  .allotment-banner .allot-detail {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--live-text);
+    margin-bottom: 0.15rem;
+  }
+
+  .allotment-banner .allot-time {
+    font-size: 0.78rem;
+    color: var(--live-muted);
+  }
+
+  /* Not allotted badge */
+  .not-allotted {
+    background: rgba(100,116,139,0.1);
+    border: 1px solid rgba(100,116,139,0.25);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--live-muted);
+    font-size: 0.88rem;
+  }
+
+  /* ── Admin message ── */
+  .admin-message {
+    margin-top: 1.25rem;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 0.75rem;
+    padding: 0.9rem 1.25rem;
+    font-size: 0.88rem;
+    color: #fde68a;
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    background: rgba(30,45,69,0.8);
+    border: 1px solid var(--live-border);
+    border-radius: 0.6rem;
+    padding: 0.5rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--live-muted);
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .stat-chip strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--live-text);
+    margin-bottom: 0.1rem;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Refresh bar ── */
+  .refresh-bar {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .refresh-info {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--live-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .refresh-countdown {
+    color: var(--live-accent);
+    font-weight: 500;
+    min-width: 2ch;
+    display: inline-block;
+  }
+
+  .progress-track {
+    width: 200px;
+    height: 2px;
+    background: var(--live-border);
+    border-radius: 2px;
+    margin: 0.6rem auto 0;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--live-accent2), var(--live-accent));
+    border-radius: 2px;
+    width: 100%;
+    transform-origin: left;
+    animation: drain 30s linear forwards;
+  }
+
+  @keyframes drain {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+  }
+
+  /* Dark mode safe navbar override */
+  .navbar { background: #070c18 !important; border-bottom: 1px solid var(--live-border) !important; }
+  .site-footer { background: #070c18 !important; border-top: 1px solid var(--live-border) !important; color: var(--live-muted) !important; }
+</style>
+
+<div class="live-page">
+  <div class="live-header">
+    <div class="portal-tag">BCA Admissions 2026–2027</div>
+    <h1>Live <span>Counselling</span> Tracker</h1>
+    <p class="subtitle">Public view &mdash; updates every 30 seconds &mdash; no login required</p>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    {% if cs.status == 'running' %}
+      <span class="status-dot running"></span>
+      <span class="status-label running">Counselling In Progress</span>
+    {% elif cs.status == 'paused' %}
+      <span class="status-dot paused"></span>
+      <span class="status-label paused">Counselling Paused</span>
+    {% else %}
+      <span class="status-dot stopped"></span>
+      <span class="status-label stopped">Counselling Not Started</span>
+    {% endif %}
+  </div>
+
+  <div class="live-center">
+
+    {% if cs.status == 'stopped' %}
+    <!-- Stopped State -->
+    <div class="state-card">
+      <span class="state-icon">🎓</span>
+      <h2>Counselling Not Started</h2>
+      <p>The counselling process has not begun yet.<br>Please check back later or contact the admissions office.</p>
+    </div>
+
+    {% elif cs.status == 'paused' %}
+    <!-- Paused State -->
+    <div class="state-card">
+      <span class="state-icon">⏸️</span>
+      <h2>Counselling Paused</h2>
+      <p>The counselling process is temporarily paused.<br>It will resume shortly. Please wait.</p>
+      {% if cs.message %}
+      <div class="admin-message" style="margin-top:1.5rem; justify-content:center;">
+        <span>📢</span>
+        <span>{{ cs.message }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    {% elif cs.status == 'running' and not cs.current_rank %}
+    <!-- Running but no rank set yet -->
+    <div class="state-card">
+      <span class="state-icon">⏳</span>
+      <h2>Waiting for First Rank</h2>
+      <p>Counselling has started. The admin will set the current rank shortly.</p>
+    </div>
+
+    {% else %}
+    <!-- Active rank being called -->
+    <div class="rank-card">
+
+      <!-- Rank Hero -->
+      <div class="rank-hero">
+        <div>
+          <div class="rank-label">Currently Calling</div>
+          <div class="rank-number">#{{ cs.current_rank }}</div>
+        </div>
+        <div class="rank-badge">🔴 Live Now</div>
+      </div>
+
+      <!-- Student Info Body -->
+      <div class="rank-body">
+
+        {% if student %}
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Student Name</div>
+            <div class="info-value">{{ student.full_name }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Rank</div>
+            <div class="info-value"># {{ student.rank }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">12th Marks</div>
+            <div class="info-value marks">
+              {% if student.percent_12 %}
+                {{ "%.2f"|format(student.percent_12) }}%
+              {% else %}
+                —
+              {% endif %}
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Category</div>
+            <div class="info-value">{{ student.category_name or '—' }}</div>
+          </div>
+        </div>
+
+        <!-- Allotment Status -->
+        {% if allotment %}
+        <div class="allotment-banner">
+          <div class="check-icon">✓</div>
+          <div>
+            <div class="allot-title">Seat Allotted</div>
+            <div class="allot-detail">
+              {{ student.full_name }} &mdash;
+              {% if allotment.quota == 'government' %}
+                Government Quota
+              {% else %}
+                Management Quota
+              {% endif %}
+            </div>
+            <div class="allot-time">
+              Allotted on {{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="not-allotted">
+          <span>⏳</span>
+          <span>Seat not yet allotted for this rank</span>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Rank exists but no student found with this rank -->
+        <div class="not-allotted">
+          <span>ℹ️</span>
+          <span>No student record found for Rank #{{ cs.current_rank }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Admin Message -->
+        {% if cs.message %}
+        <div class="admin-message">
+          <span>📢</span>
+          <span>{{ cs.message }}</span>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-chip">
+        <strong>{{ total_ranked }}</strong>
+        Total Ranked
+      </div>
+      <div class="stat-chip">
+        <strong>{{ cs.current_rank }}</strong>
+        Current Rank
+      </div>
+      <div class="stat-chip">
+        <strong>{{ total_allotted }}</strong>
+        Seats Allotted
+      </div>
+    </div>
+
+    {% endif %}
+
+    <!-- Refresh Bar -->
+    <div class="refresh-bar">
+      <div class="refresh-info">
+        <span>Auto-refresh in</span>
+        <span class="refresh-countdown" id="countdown">30</span>
+        <span>sec</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+  </div><!-- /.live-center -->
+</div><!-- /.live-page -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Countdown timer + auto-refresh
+  let seconds = 30;
+  const countdownEl = document.getElementById('countdown');
+
+  const timer = setInterval(() => {
+    seconds--;
+    if (countdownEl) countdownEl.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(timer);
+      window.location.reload();
+    }
+  }, 1000);
+
+  // Restart animation on each load
+  const fill = document.getElementById('progress-fill');
+  if (fill) {
+    fill.style.animation = 'none';
+    fill.offsetHeight; // reflow
+    fill.style.animation = 'drain 30s linear forwards';
+  }
+</script>
+{% endblock %}
