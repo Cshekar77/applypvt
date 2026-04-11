@@ -3,239 +3,224 @@
 {% block content %}
 <style>
   .page-header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
   }
-  
   .page-header-inner h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: #0a1f44;
-    margin: 0;
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0;
   }
-  
-  .header-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  
+  .header-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+
+  /* Buttons */
   .btn-outline {
-    background: transparent;
-    border: 1px solid #c9a03d;
-    color: #c9a03d;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
+    background: transparent; border: 1px solid #c9a03d; color: #c9a03d;
+    padding: .4rem .9rem; border-radius: 20px; font-size: .8rem;
+    cursor: pointer; text-decoration: none; display: inline-block; transition: all .2s;
   }
-  
-  .btn-outline:hover {
-    background: #c9a03d;
-    color: white;
-  }
-  
-  .btn-primary {
-    background: #c9a03d;
-    color: #0a1f44;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.8rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-  
-  .btn-primary:hover {
-    background: #b58c2e;
-    transform: translateY(-2px);
-  }
-  
+  .btn-outline:hover { background: #c9a03d; color: white; }
+
   .btn-success {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.8rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    background: #28a745; color: white; border: none;
+    padding: .4rem .9rem; border-radius: 20px; font-weight: 600;
+    cursor: pointer; font-size: .8rem; display: inline-flex;
+    align-items: center; gap: .4rem; transition: all .2s;
   }
-  
-  .btn-success:hover {
-    background: #218838;
-    transform: translateY(-2px);
+  .btn-success:hover { background: #218838; }
+
+  .btn-primary {
+    background: #c9a03d; color: #0a1f44; border: none;
+    padding: .5rem 1.1rem; border-radius: 20px; font-weight: 600;
+    cursor: pointer; font-size: .85rem; display: inline-flex;
+    align-items: center; gap: .4rem; transition: all .2s;
   }
-  
-  .btn-sm {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.8rem;
+  .btn-primary:hover { background: #b58c2e; }
+
+  .btn-sm { font-size: .8rem; padding: .35rem .8rem; }
+
+  /* ── List card ── */
+  .list-card {
+    background: white; border-radius: 20px;
+    border: 1px solid #eef2f8; overflow: hidden; margin-bottom: 1.5rem;
   }
-  
-  .verify-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eef2f8;
+  .list-card-header {
+    padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    display: flex; align-items: center; gap: .5rem;
   }
-  
-  .verify-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #eef2f8;
+  .list-card-header h3 { font-size: 1rem; color: #0a1f44; margin: 0; }
+  .list-card-header i  { color: #c9a03d; }
+
+  /* ── Student rows ── */
+  .stu-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .9rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    cursor: pointer; transition: background .15s;
   }
-  
-  .verify-header strong {
-    font-size: 1.1rem;
-    color: #0a1f44;
+  .stu-row:last-child { border-bottom: none; }
+  .stu-row:hover { background: #fffdf5; }
+
+  .serial-num {
+    background: #f5f7fa; color: #5a6e82; font-size: .72rem;
+    font-weight: 700; padding: 3px 8px; border-radius: 20px;
+    min-width: 28px; text-align: center; flex-shrink: 0;
   }
-  
-  .text-muted {
-    color: #5a6e82;
-    font-size: 0.85rem;
+  .stu-info { flex: 1; min-width: 0; }
+  .stu-name {
+    font-weight: 600; color: #0a1f44; font-size: .925rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  
+  .stu-sub  { color: #5a6e82; font-size: .78rem; margin-top: 1px; }
+
   .badge {
-    display: inline-block;
-    padding: 0.25rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    display: inline-block; font-size: .68rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
   }
-  
-  .badge-warning {
-    background: #fff3cd;
-    color: #856404;
+  .badge-warning  { background: #fff3cd; color: #856404; }
+  .badge-submitted { background: #e0f2fe; color: #0369a1; }
+
+  .row-arrow { color: #c9a03d; font-size: .8rem; flex-shrink: 0; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,31,68,.45);
+    align-items: center; justify-content: center; padding: 1rem;
   }
-  
-  .verify-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.8rem;
-    margin-bottom: 1rem;
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: white; border-radius: 24px;
+    width: 100%; max-width: 660px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(10,31,68,.2);
+    animation: modal-in .18s ease;
   }
-  
-  .verify-grid div span {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: #5a6e82;
-    display: block;
+  @keyframes modal-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
   }
-  
-  .verify-grid div strong {
-    font-size: 0.9rem;
-    color: #1a2c3e;
+
+  .modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    position: sticky; top: 0; background: white; z-index: 2;
+    border-radius: 24px 24px 0 0;
   }
-  
-  .field {
-    margin-top: 1rem;
+  .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; }
+  .modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 3px; }
+
+  .modal-close {
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 32px; height: 32px; cursor: pointer; font-size: 1rem;
+    color: #5a6e82; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background .15s;
   }
-  
-  .field label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #4a627a;
-    display: block;
-    margin-bottom: 0.3rem;
+  .modal-close:hover { background: #fee2e2; color: #991b1b; }
+
+  .modal-body { padding: 1.5rem; }
+
+  /* Detail grid */
+  .detail-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem; margin-bottom: 1.25rem;
   }
-  
-  .field input {
-    padding: 0.5rem 0.8rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    width: 100%;
-    max-width: 300px;
+  .detail-item span {
+    font-size: .7rem; text-transform: uppercase; color: #5a6e82;
+    letter-spacing: .04em; display: block; margin-bottom: 2px;
   }
-  
-  .field input:focus {
-    outline: none;
-    border-color: #c9a03d;
+  .detail-item strong { font-size: .88rem; color: #0a1f44; }
+
+  .section-divider {
+    font-size: .72rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .05em;
+    margin: 1.25rem 0 .75rem; padding-bottom: .4rem;
+    border-bottom: 1px solid #f5f7fa;
   }
-  
+
+  /* Marksheet links */
+  .marksheet-row { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .marksheet-btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .45rem .9rem; border-radius: 10px; font-size: .82rem;
+    font-weight: 600; text-decoration: none; border: 1px solid #dde3ef;
+    color: #0a1f44; background: #f5f7fa; transition: all .2s;
+  }
+  .marksheet-btn:hover { background: #eef2f8; border-color: #c9a03d; color: #c9a03d; }
+  .marksheet-btn i { color: #c9a03d; }
+
+  /* Notes + verify form */
+  .notes-field { margin-bottom: 1rem; }
+  .notes-field label {
+    font-size: .78rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .04em;
+    display: block; margin-bottom: .4rem;
+  }
+  .notes-field input {
+    width: 100%; padding: .55rem .9rem; border: 1px solid #dde3ef;
+    border-radius: 12px; font-size: .88rem; color: #0a1f44;
+    box-sizing: border-box;
+  }
+  .notes-field input:focus { outline: none; border-color: #c9a03d; }
+
+  .modal-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+
+  .sop-box {
+    background: #f5f7fa; border-radius: 12px; padding: .75rem 1rem;
+    font-size: .85rem; color: #5a6e82; font-style: italic;
+    margin-bottom: 1.25rem; border-left: 3px solid #c9a03d;
+  }
+
+  /* Empty state */
   .empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: #6c757d;
-    background: white;
-    border-radius: 20px;
+    text-align: center; padding: 3rem 1rem; color: #aab4c8;
+    background: white; border-radius: 20px; border: 1px solid #eef2f8;
   }
-  
-  body.dark .verify-card {
-    background: #1a2538;
-    border-color: #2d3e54;
-  }
-  
-  body.dark .verify-header strong {
-    color: #eef2ff;
-  }
-  
-  body.dark .verify-grid div strong {
-    color: #eef2ff;
-  }
-  
-  body.dark .field label {
-    color: #c9a03d;
-  }
-  
-  body.dark .field input {
-    background: #0f1a24;
-    border-color: #2d3e54;
-    color: #eef2ff;
-  }
-  
-  @media (max-width: 768px) {
-    .verify-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .page-header-inner {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    
-    .header-actions {
-      width: 100%;
-    }
-    
-    .btn-success, .btn-outline {
-      flex: 1;
-      text-align: center;
-      justify-content: center;
-    }
+  .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: #d4edda; }
+
+  /* Dark mode */
+  body.dark .list-card,
+  body.dark .modal-box,
+  body.dark .modal-header { background: #1a2538; border-color: #2d3e54; }
+  body.dark .modal-header  { background: #1a2538; }
+  body.dark .list-card-header { border-color: #2d3e54; }
+  body.dark .list-card-header h3,
+  body.dark .modal-title,
+  body.dark .stu-name,
+  body.dark .detail-item strong { color: #eef2ff; }
+  body.dark .stu-sub,
+  body.dark .modal-sub,
+  body.dark .detail-item span   { color: #b9c8e8; }
+  body.dark .stu-row       { border-color: #1e2e42; }
+  body.dark .stu-row:hover { background: #1e2e42; }
+  body.dark .serial-num    { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close   { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
+  body.dark .section-divider { color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .detail-grid   { }
+  body.dark .notes-field label { color: #b9c8e8; }
+  body.dark .notes-field input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .marksheet-btn { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .sop-box { background: #0f1c2e; color: #b9c8e8; }
+  body.dark .empty-state { background: #1a2538; border-color: #2d3e54; }
+
+  @media (max-width: 600px) {
+    .badge-submitted { display: none; }
+    .modal-box { border-radius: 18px; }
+    .detail-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
+
+{% block navbar_auth %}{% endblock %}
 
 <div class="page-wrap">
   <div class="page-header-inner">
     <h2><i class="fas fa-clock"></i> Pending Verification</h2>
     <div class="header-actions">
       {% if students %}
-      <form method="POST" action="{{ url_for('main.verify_all_students') }}" onsubmit="return confirm('Are you sure you want to mark ALL pending applications as verified? This action cannot be undone.');" style="display: inline;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+      <form method="POST" action="{{ url_for('main.verify_all_students') }}"
+        onsubmit="return confirm('Mark ALL pending applications as verified? This cannot be undone.');"
+        style="display:inline;">
         <button type="submit" class="btn-success btn-sm">
-          <i class="fas fa-check-double"></i> Mark All as Verified
+          <i class="fas fa-check-double"></i> Verify All ({{ students|length }})
         </button>
       </form>
       {% endif %}
@@ -244,47 +229,225 @@
       </a>
     </div>
   </div>
-  
+
   {% if not students %}
   <div class="empty-state">
-    <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-    <p>All applications have been verified!</p>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm">Back to Dashboard</a>
+    <i class="fas fa-check-circle" style="color:#28a745"></i>
+    <p style="font-size:1.1rem; font-weight:600; color:#0a1f44; margin-bottom:.5rem">
+      All caught up!
+    </p>
+    <p>No pending applications to verify.</p>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm"
+      style="display:inline-block; margin-top:1rem">Back to Dashboard</a>
   </div>
-  {% endif %}
-  
-  {% for s in students %}
-  <div class="verify-card">
-    <div class="verify-header">
-      <div><strong>{{ s.full_name }}</strong><span class="text-muted" style="margin-left:.75rem">{{ s.email }} &bull; {{ s.phone }}</span></div>
-      <span class="badge badge-warning"><i class="fas fa-hourglass-half"></i> Pending</span>
+
+  {% else %}
+  <div class="list-card">
+    <div class="list-card-header">
+      <i class="fas fa-hourglass-half"></i>
+      <h3>Pending Applications ({{ students|length }})</h3>
     </div>
-    <div class="verify-grid">
-      <div><span>DOB</span><strong>{{ s.dob }}</strong></div>
-      <div><span>Gender</span><strong>{{ s.gender or '—' }}</strong></div>
-      <div><span>Nationality</span><strong>{{ s.nationality }}</strong></div>
-      <div><span>Stream (12)</span><strong>{{ s.stream_12 }}</strong></div>
-      <div><span>Board (10)</span><strong>{{ s.board_10_display }}</strong></div>
-      <div><span>Board (12)</span><strong>{{ s.board_12_display }}</strong></div>
-      <div><span>School (10)</span><strong>{{ s.school_10 }}</strong></div>
-      <div><span>College (12)</span><strong>{{ s.school_12 }}</strong></div>
-      <div><span>Marks 10</span><strong>{{ s.obtained_10|int }}/{{ s.total_10|int }} ({{ s.percent_10 }}%)</strong></div>
-      <div><span>Marks 12</span><strong>{{ s.obtained_12|int }}/{{ s.total_12|int }} ({{ s.percent_12 }}%)</strong></div>
-    </div>
-    <div style="display:flex;gap:1rem;margin-top:.75rem; flex-wrap:wrap;">
-      {% if s.marksheet_10 %}<a href="{{ url_for('static', filename='uploads/' + s.marksheet_10) }}" target="_blank" class="btn-outline btn-sm">View Marksheet 10</a>{% endif %}
-      {% if s.marksheet_12 %}<a href="{{ url_for('static', filename='uploads/' + s.marksheet_12) }}" target="_blank" class="btn-outline btn-sm">View Marksheet 12</a>{% endif %}
-    </div>
-    {% if s.why_bca %}<p class="sop-text" style="margin-top:.75rem"><em>{{ s.why_bca }}</em></p>{% endif %}
-    <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}" style="margin-top:1rem">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <div class="field">
-        <label>Admin notes (optional)</label>
-        <input type="text" name="notes" placeholder="Any notes about this applicant...">
+
+    {% for s in students %}
+    {# ── List row ── #}
+    <div class="stu-row" onclick="openModal('ver-modal-{{ s.id }}')">
+      <span class="serial-num">{{ loop.index }}</span>
+      <div class="stu-info">
+        <div class="stu-name">{{ s.full_name }}</div>
+        <div class="stu-sub">{{ s.email }} &bull; {{ s.phone or '—' }}</div>
       </div>
-      <button type="submit" class="btn-primary btn-sm">Mark as Verified</button>
-    </form>
-  </div>
-  {% endfor %}
+      <span class="badge badge-submitted">
+        {{ s.submitted_at.strftime('%d %b %Y') if s.submitted_at else '—' }}
+      </span>
+      <span class="badge badge-warning">
+        <i class="fas fa-hourglass-half"></i> Pending
+      </span>
+      <span class="row-arrow"><i class="fas fa-chevron-right"></i></span>
+    </div>
+
+    {# ── Modal ── #}
+    <div class="modal-overlay" id="ver-modal-{{ s.id }}"
+      onclick="closeOnOverlay(event, 'ver-modal-{{ s.id }}')">
+      <div class="modal-box">
+
+        {# Header #}
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">{{ s.full_name }}</div>
+            <div class="modal-sub">
+              {{ s.email }} &bull; {{ s.phone or '—' }}
+              {% if s.submitted_at %}
+                &bull; Submitted {{ s.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+              {% endif %}
+            </div>
+          </div>
+          <button class="modal-close"
+            onclick="closeModal('ver-modal-{{ s.id }}')"
+            title="Close this student details">&times;</button>
+        </div>
+
+        <div class="modal-body">
+
+          {# Personal details #}
+          <div class="section-divider"><i class="fas fa-user"></i> Personal Details</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>Date of Birth</span>
+              <strong>{{ s.dob or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Gender</span>
+              <strong>{{ s.gender or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Nationality</span>
+              <strong>{{ s.nationality or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Category</span>
+              <strong>{{ s.category_name or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Address</span>
+              <strong>{{ s.address or '—' }}</strong>
+            </div>
+          </div>
+
+          {# Class 10 #}
+          <div class="section-divider"><i class="fas fa-graduation-cap"></i> Class 10</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>School</span>
+              <strong>{{ s.school_10 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Board</span>
+              <strong>{{ s.board_10_display or s.board_10 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Year</span>
+              <strong>{{ s.year_10 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Marks</span>
+              <strong>
+                {% if s.obtained_10 and s.total_10 %}
+                  {{ s.obtained_10|int }} / {{ s.total_10|int }}
+                  {% if s.percent_10 %}({{ s.percent_10 }}%){% endif %}
+                {% else %}—{% endif %}
+              </strong>
+            </div>
+          </div>
+
+          {# Class 12 #}
+          <div class="section-divider"><i class="fas fa-graduation-cap"></i> Class 12</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>College</span>
+              <strong>{{ s.school_12 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Board</span>
+              <strong>{{ s.board_12_display or s.board_12 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Stream</span>
+              <strong>{{ s.stream_12 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Year</span>
+              <strong>{{ s.year_12 or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Marks</span>
+              <strong>
+                {% if s.obtained_12 and s.total_12 %}
+                  {{ s.obtained_12|int }} / {{ s.total_12|int }}
+                  {% if s.percent_12 %}({{ s.percent_12 }}%){% endif %}
+                {% else %}—{% endif %}
+              </strong>
+            </div>
+            <div class="detail-item">
+              <span>Specialization</span>
+              <strong>{{ s.specialization or '—' }}</strong>
+            </div>
+          </div>
+
+          {# Marksheets #}
+          {% if s.marksheet_10 or s.marksheet_12 %}
+          <div class="section-divider"><i class="fas fa-file-alt"></i> Documents</div>
+          <div class="marksheet-row">
+            {% if s.marksheet_10 %}
+            <a href="{{ url_for('static', filename='uploads/' + s.marksheet_10) }}"
+              target="_blank" class="marksheet-btn">
+              <i class="fas fa-file-pdf"></i> View Class 10 Marksheet
+            </a>
+            {% endif %}
+            {% if s.marksheet_12 %}
+            <a href="{{ url_for('static', filename='uploads/' + s.marksheet_12) }}"
+              target="_blank" class="marksheet-btn">
+              <i class="fas fa-file-pdf"></i> View Class 12 Marksheet
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          {# SOP / Why BCA #}
+          {% if s.why_bca %}
+          <div class="section-divider"><i class="fas fa-comment"></i> Statement of Purpose</div>
+          <div class="sop-box">{{ s.why_bca }}</div>
+          {% endif %}
+
+          {# Verify form #}
+          <div class="section-divider"><i class="fas fa-check-circle"></i> Verification Action</div>
+          <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}">
+            <div class="notes-field">
+              <label>Admin Notes (optional)</label>
+              <input type="text" name="notes"
+                placeholder="Any notes about this applicant…">
+            </div>
+            <div class="modal-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-check"></i> Mark as Verified
+              </button>
+              <button type="button" class="btn-outline"
+                onclick="closeModal('ver-modal-{{ s.id }}')">
+                <i class="fas fa-times"></i> Close Without Verifying
+              </button>
+            </div>
+          </form>
+
+        </div>{# /modal-body #}
+      </div>{# /modal-box #}
+    </div>{# /modal-overlay #}
+
+    {% endfor %}
+  </div>{# /list-card #}
+  {% endif %}
+
 </div>
+
+{% block scripts %}
+<script>
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOnOverlay(e, id) {
+  if (e.target === e.currentTarget) closeModal(id);
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+      m.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
+</script>
+{% endblock %}
 {% endblock %}

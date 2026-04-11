@@ -1,7 +1,90 @@
 {% extends 'base.html' %}
 {% block title %}Faculty Dashboard — BCA Admissions{% endblock %}
+
 {% block content %}
 <style>
+  /* ── Faculty navbar override ── */
+  .faculty-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .75rem 1.5rem; background: white;
+    border-bottom: 1px solid #eef2f8; margin-bottom: 0;
+    position: relative;
+  }
+  .faculty-brand {
+    font-size: 1rem; font-weight: 700; color: #0a1f44;
+    display: flex; align-items: center; gap: .5rem; text-decoration: none;
+  }
+  .faculty-brand span { color: #7c3aed; }
+
+  .faculty-nav-links {
+    display: flex; align-items: center; gap: 1.25rem;
+  }
+  .faculty-nav-links a {
+    color: #5a6e82; text-decoration: none; font-size: .875rem; font-weight: 500;
+    transition: color .2s;
+  }
+  .faculty-nav-links a:hover { color: #0a1f44; }
+  .faculty-nav-links .nav-logout {
+    background: #f3f4f6; color: #0a1f44; padding: .4rem .9rem;
+    border-radius: 8px; font-weight: 600; font-size: .82rem;
+  }
+  .faculty-nav-links .nav-logout:hover { background: #fee2e2; color: #991b1b; }
+
+  /* ── Hamburger ── */
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: .4rem; border: none; background: none;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: #0a1f44; border-radius: 2px; transition: all .25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── Mobile slide panel ── */
+  .mobile-panel {
+    display: none; position: fixed; top: 0; right: 0;
+    width: 240px; height: 100vh; z-index: 999;
+    background: white; box-shadow: -4px 0 24px rgba(10,31,68,.12);
+    padding: 1.5rem 1.25rem; flex-direction: column; gap: .25rem;
+    transform: translateX(100%); transition: transform .25s ease;
+  }
+  .mobile-panel.open {
+    display: flex; transform: translateX(0);
+  }
+  .panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #eef2f8;
+  }
+  .panel-header strong { font-size: .9rem; color: #0a1f44; }
+  .panel-close {
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 28px; height: 28px; cursor: pointer; font-size: .9rem;
+    color: #5a6e82; display: flex; align-items: center; justify-content: center;
+  }
+  .panel-close:hover { background: #fee2e2; color: #991b1b; }
+  .panel-link {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .7rem .85rem; border-radius: 10px;
+    color: #0a1f44; text-decoration: none; font-size: .875rem; font-weight: 500;
+    transition: background .15s;
+  }
+  .panel-link:hover { background: #f5f7fa; }
+  .panel-link i { width: 16px; text-align: center; color: #7c3aed; }
+  .panel-link.teal i { color: #0f766e; }
+  .panel-link.logout-link { color: #991b1b; margin-top: auto; }
+  .panel-link.logout-link i { color: #991b1b; }
+  .panel-link.logout-link:hover { background: #fee2e2; }
+
+  .panel-overlay {
+    display: none; position: fixed; inset: 0; z-index: 998;
+    background: rgba(10,31,68,.3);
+  }
+  .panel-overlay.open { display: block; }
+
+  /* ── Page content ── */
   .page-header-inner {
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
@@ -9,7 +92,7 @@
   .page-header-inner h2 {
     font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
   }
-  .text-muted   { color: #5a6e82; }
+  .text-muted   { color: #5a6e82; font-size: .875rem; }
   .text-muted a { color: #c9a03d; text-decoration: none; }
 
   .stats-grid {
@@ -23,10 +106,11 @@
   }
   .stat-num { font-size: 2.5rem; font-weight: 700; color: #0a1f44; }
   .stat-lbl { color: #5a6e82; font-size: .85rem; margin-top: .5rem; }
-  .stat-teal { border-left-color: #0f766e; }
-  .stat-teal .stat-num { color: #0f766e; }
+  .stat-teal   { border-left-color: #0f766e; }
+  .stat-teal   .stat-num { color: #0f766e; }
   .stat-purple { border-left-color: #7c3aed; }
   .stat-purple .stat-num { color: #7c3aed; }
+  .stat-gold   .stat-num { color: #c9a03d; }
 
   .nav-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
@@ -40,8 +124,8 @@
     transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,.1);
     border-color: #c9a03d;
   }
-  .nav-card.teal-card  { border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6); }
-  .nav-card.teal-card:hover  { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,.15); }
+  .nav-card.teal-card   { border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6); }
+  .nav-card.teal-card:hover   { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,.15); }
   .nav-card.purple-card { border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff); }
   .nav-card.purple-card:hover { border-color: #7c3aed; box-shadow: 0 10px 25px rgba(124,58,237,.15); }
 
@@ -49,25 +133,95 @@
   .nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
   .nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
 
-  body.dark .stat-card { background: #1a2538; }
-  body.dark .stat-num  { color: #eef2ff; }
-  body.dark .stat-lbl  { color: #b9c8e8; }
-  body.dark .stat-teal  .stat-num { color: #2dd4bf; }
+  /* dark mode */
+  body.dark .faculty-topbar  { background: #1a2538; border-color: #2d3e54; }
+  body.dark .faculty-brand   { color: #eef2ff; }
+  body.dark .faculty-nav-links a { color: #b9c8e8; }
+  body.dark .faculty-nav-links a:hover { color: #eef2ff; }
+  body.dark .faculty-nav-links .nav-logout { background: #2d3e54; color: #eef2ff; }
+  body.dark .hamburger span  { background: #eef2ff; }
+  body.dark .mobile-panel    { background: #1a2538; }
+  body.dark .panel-header    { border-color: #2d3e54; }
+  body.dark .panel-header strong { color: #eef2ff; }
+  body.dark .panel-close     { background: #2d3e54; color: #b9c8e8; }
+  body.dark .panel-link      { color: #eef2ff; }
+  body.dark .panel-link:hover { background: #1e2e42; }
+  body.dark .stat-card  { background: #1a2538; }
+  body.dark .stat-num   { color: #eef2ff; }
+  body.dark .stat-lbl   { color: #b9c8e8; }
+  body.dark .stat-teal   .stat-num { color: #2dd4bf; }
   body.dark .stat-purple .stat-num { color: #a78bfa; }
   body.dark .nav-card   { background: #1a2538; border-color: #2d3e54; }
   body.dark .nav-card strong { color: #eef2ff; }
-  body.dark .nav-card p  { color: #b9c8e8; }
+  body.dark .nav-card p { color: #b9c8e8; }
   body.dark .nav-card.teal-card   { background: #0f2420; border-color: #0f766e; }
   body.dark .nav-card.purple-card { background: #1e1530; border-color: #6d28d9; }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
+    .faculty-nav-links { display: none; }
+    .hamburger         { display: flex; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .nav-grid   { grid-template-columns: 1fr; }
   }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+  }
 </style>
 
+{# ── Suppress base navbar for faculty — render our own ── #}
 {% block navbar_auth %}{% endblock %}
 
+{# ── Faculty Topbar ── #}
+<nav class="faculty-topbar">
+  <a href="{{ url_for('main.faculty_dashboard') }}" class="faculty-brand">
+    <i class="fas fa-chalkboard-teacher"></i>
+    Faculty <span>Portal</span>
+  </a>
+
+  {# Desktop links #}
+  <div class="faculty-nav-links">
+    <a href="{{ url_for('main.faculty_dashboard') }}">
+      <i class="fas fa-home"></i> Dashboard
+    </a>
+    <a href="{{ url_for('main.faculty_allotted') }}">
+      <i class="fas fa-user-check"></i> Allotted
+    </a>
+    <a href="{{ url_for('main.faculty_payments') }}">
+      <i class="fas fa-rupee-sign"></i> Payments
+    </a>
+    <a href="{{ url_for('main.faculty_logout') }}" class="nav-logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
+
+  {# Mobile hamburger #}
+  <button class="hamburger" id="hamburger" onclick="togglePanel()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+{# ── Mobile slide panel ── #}
+<div class="panel-overlay" id="panelOverlay" onclick="togglePanel()"></div>
+<div class="mobile-panel" id="mobilePanel">
+  <div class="panel-header">
+    <strong>{{ session.get('faculty_name', 'Faculty') }}</strong>
+    <button class="panel-close" onclick="togglePanel()">&times;</button>
+  </div>
+  <a href="{{ url_for('main.faculty_dashboard') }}" class="panel-link">
+    <i class="fas fa-home"></i> Dashboard
+  </a>
+  <a href="{{ url_for('main.faculty_allotted') }}" class="panel-link">
+    <i class="fas fa-user-check"></i> Allotted Students
+  </a>
+  <a href="{{ url_for('main.faculty_payments') }}" class="panel-link teal">
+    <i class="fas fa-rupee-sign"></i> Payments &amp; Receipts
+  </a>
+  <a href="{{ url_for('main.faculty_logout') }}" class="panel-link logout-link" style="margin-top:auto">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </a>
+</div>
+
+{# ── Main content ── #}
 <div class="page-wrap">
   <div class="page-header-inner">
     <div>
@@ -76,10 +230,7 @@
         Welcome, <strong>{{ faculty_name }}</strong>
       </p>
     </div>
-    <p class="text-muted">
-      BCA Admissions 2026–2027 &mdash;
-      <a href="{{ url_for('main.faculty_logout') }}">Logout</a>
-    </p>
+    <p class="text-muted">BCA Admissions 2026–2027</p>
   </div>
 
   {# Stats #}
@@ -92,25 +243,45 @@
       <div class="stat-num">{{ fees_set }}</div>
       <div class="stat-lbl">Fees Set</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card stat-gold">
       <div class="stat-num">{{ paid_count }}</div>
       <div class="stat-lbl">Payments Recorded</div>
     </div>
   </div>
 
-  {# Navigation #}
+  {# Navigation cards #}
   <div class="nav-grid">
     <a href="{{ url_for('main.faculty_allotted') }}" class="nav-card purple-card">
       <div class="nav-icon" style="color:#7c3aed"><i class="fas fa-user-check"></i></div>
       <strong>Allotted Students</strong>
       <p>View all students with seat allotments</p>
     </a>
-
     <a href="{{ url_for('main.faculty_payments') }}" class="nav-card teal-card">
       <div class="nav-icon" style="color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
-      <strong>Payment & Receipts</strong>
+      <strong>Payment &amp; Receipts</strong>
       <p>Set fees, add receipts and track payments</p>
     </a>
   </div>
 </div>
+
+{% block scripts %}
+<script>
+function togglePanel() {
+  const panel   = document.getElementById('mobilePanel');
+  const overlay = document.getElementById('panelOverlay');
+  const burger  = document.getElementById('hamburger');
+  const isOpen  = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  burger.classList.toggle('open', !isOpen);
+  document.body.style.overflow = isOpen ? '' : 'hidden';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const panel = document.getElementById('mobilePanel');
+    if (panel.classList.contains('open')) togglePanel();
+  }
+});
+</script>
+{% endblock %}
 {% endblock %}
