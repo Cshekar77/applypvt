@@ -13,7 +13,8 @@ from datetime import datetime, timedelta, timezone
 
 from database import db
 from models import (User, FormSettings, StudentApplication, ApplicationCategory,
-                    WhatsAppSettings, CounsellingSettings, CategorySeats, SeatAllotment)
+                    WhatsAppSettings, CounsellingSettings, CategorySeats, SeatAllotment,
+                    Faculty, StudentFees, PaymentReceipt)
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel, export_verified_excel
@@ -48,6 +49,20 @@ def admin_required(f):
 
 
 # ─────────────────────────────────────────
+#  Faculty guard
+# ─────────────────────────────────────────
+def faculty_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('faculty_logged_in'):
+            flash('Faculty login required.', 'warning')
+            return redirect(url_for('main.faculty_login'))
+        return f(*args, **kwargs)
+    return decorated
+
+
+# ─────────────────────────────────────────
 #  Shared helpers (used by import + API)
 # ─────────────────────────────────────────
 def _str(val, default=''):
@@ -63,23 +78,14 @@ def _flt(val):
         return None
 
 def _dob_to_password(dob_raw):
-    """
-    Strip all non-digit characters from DOB to create password string.
-    e.g.  15/06/2006  →  15062006
-          15-06-2006  →  15062006
-          15.06.2006  →  15062006
-    Also handles pandas Timestamps (when Excel stores dates as date cells).
-    """
     if not dob_raw or str(dob_raw).strip() in ('', 'nan', 'NaT'):
         return None
-    # Handle pandas Timestamp
     try:
         ts = pd.Timestamp(dob_raw)
         if not pd.isna(ts):
             return ts.strftime('%d%m%Y')
     except Exception:
         pass
-    # Strip all non-digit characters from string
     digits = re.sub(r'[^0-9]', '', str(dob_raw).strip())
     return digits if digits else None
 
@@ -88,16 +94,8 @@ def _dob_to_password(dob_raw):
 #  Welcome Email via Apps Script
 # ─────────────────────────────────────────
 def send_welcome_email(email, full_name, password_plain, dob_display):
-    """
-    Sends welcome email by calling Apps Script doPost.
-    Replace the two placeholders below with your actual values.
-
-    password_plain  →  digits only, e.g. 15062006
-    dob_display     →  original DOB string, e.g. 15/06/2006
-    """
-    APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"   # ← Paste your deployed Apps Script URL here
-    WEBSITE_URL     = "https://applybcabu.pythonanywhere.com/"        # ← Paste your website URL here
-
+    APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"
+    WEBSITE_URL     = "https://applybcabu.pythonanywhere.com/"
     payload = {
         "action":   "sendWelcome",
         "email":    email,
@@ -124,11 +122,10 @@ def index():
 
 
 # ─────────────────────────────────────────
-#  POST API — Register Student from Apps Script / Google Sheets
+#  POST API — Register Student
 # ─────────────────────────────────────────
 @main.route('/api/d2faa6fb-745b-454d-8852-92ed0bb482d8', methods=['POST'])
 def api_register_student():
-    # 🔐 API Key validation
     api_key = request.headers.get('x-api-key')
     if api_key != current_app.config.get('API_SECRET_KEY'):
         return jsonify({"error": "Unauthorized"}), 401
@@ -138,7 +135,6 @@ def api_register_student():
         return jsonify({"error": "Invalid or missing JSON body"}), 400
 
     try:
-        # ── Required fields ────────────────────────────────────────
         email     = _str(data.get('email')).lower()
         full_name = _str(data.get('full_name'))
         dob_raw   = _str(data.get('dob'))
@@ -146,16 +142,13 @@ def api_register_student():
         if not email or not full_name or not dob_raw:
             return jsonify({"error": "Missing required fields: email, full_name, dob"}), 400
 
-        # ── Duplicate check ────────────────────────────────────────
         if User.query.filter_by(email=email).first():
             return jsonify({"error": "User already exists"}), 409
 
-        # ── DOB → password (digits only, e.g. 15062006) ────────────
         password_plain = _dob_to_password(dob_raw)
         if not password_plain:
             return jsonify({"error": "Invalid DOB — could not parse into password"}), 400
 
-        # ── Create User ────────────────────────────────────────────
         user = User(
             full_name      = full_name,
             email          = email,
@@ -165,14 +158,12 @@ def api_register_student():
             otp_expires_at = None,
         )
         db.session.add(user)
-        db.session.flush()  # get user.id before commit
+        db.session.flush()
 
-        # ── Split name ─────────────────────────────────────────────
         parts      = full_name.split(' ', 1)
         first_name = parts[0]
         last_name  = parts[1] if len(parts) > 1 else ''
 
-        # ── Category lookup ────────────────────────────────────────
         cat_id  = None
         cat_raw = _str(data.get('category')).lower()
         if cat_raw:
@@ -181,7 +172,6 @@ def api_register_student():
             ).first()
             cat_id = cat.id if cat else None
 
-        # ── Marks ──────────────────────────────────────────────────
         total_10    = _flt(data.get('total_10'))
         obtained_10 = _flt(data.get('obtained_10'))
         percent_10  = _flt(data.get('percent_10'))
@@ -194,7 +184,6 @@ def api_register_student():
         if total_12 and obtained_12 and not percent_12:
             percent_12 = round((obtained_12 / total_12) * 100, 2)
 
-        # ── Create Application ─────────────────────────────────────
         appl = StudentApplication(
             user_id        = user.id,
             first_name     = first_name,
@@ -226,7 +215,6 @@ def api_register_student():
         db.session.add(appl)
         db.session.commit()
 
-        # ── Send welcome email via Apps Script ─────────────────────
         send_welcome_email(
             email          = email,
             full_name      = full_name,
@@ -246,10 +234,7 @@ def api_register_student():
 
 
 # ─────────────────────────────────────────
-#  Registration + OTP  — hidden URL
-#  Students are imported via Excel or API.
-#  Self-registration kept at obscure URL
-#  so it's not publicly accessible.
+#  Registration + OTP — hidden URL
 # ─────────────────────────────────────────
 @main.route('/register28497234827', methods=['GET', 'POST'])
 def register():
@@ -497,12 +482,10 @@ def student_counselling():
 @main.route('/counselling/status')
 @login_required
 def counselling_status_api():
-    """JSON endpoint polled every 10 seconds by student counselling page."""
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
 
     all_seats  = []
-    # FIX: eagerly load category to avoid lazy-load issues
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
     for cat in categories:
         cs = CategorySeats.get_for_category(cat.id)
@@ -519,7 +502,6 @@ def counselling_status_api():
     cat_seats = None
     if appl and appl.category_id:
         cs  = CategorySeats.get_for_category(appl.category_id)
-        # FIX: load category name safely without relying on lazy relationship
         cat = ApplicationCategory.query.get(appl.category_id)
         cat_seats = {
             'category':       cat.name if cat else '',
@@ -691,14 +673,99 @@ def admin_dashboard():
 
 
 # ─────────────────────────────────────────
+#  Admin — Faculty Credentials Management
+# ─────────────────────────────────────────
+@main.route('/admin/faculty', methods=['GET', 'POST'])
+@admin_required
+def admin_faculty():
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'add':
+            full_name = request.form.get('full_name', '').strip()
+            username  = request.form.get('username', '').strip()
+            password  = request.form.get('password', '').strip()
+            if not full_name or not username or not password:
+                flash('All fields are required.', 'danger')
+            elif Faculty.query.filter_by(username=username).first():
+                flash(f'Username "{username}" already exists.', 'danger')
+            elif len(password) < 6:
+                flash('Password must be at least 6 characters.', 'danger')
+            else:
+                db.session.add(Faculty(
+                    full_name     = full_name,
+                    username      = username,
+                    password_hash = generate_password_hash(password),
+                    is_active     = True,
+                ))
+                db.session.commit()
+                flash(f'Faculty "{full_name}" added successfully!', 'success')
+
+        elif action == 'toggle':
+            fac_id  = request.form.get('fac_id')
+            faculty = Faculty.query.get_or_404(int(fac_id))
+            faculty.is_active = not faculty.is_active
+            db.session.commit()
+            status = 'activated' if faculty.is_active else 'deactivated'
+            flash(f'Faculty "{faculty.full_name}" {status}.', 'info')
+
+        elif action == 'reset_password':
+            fac_id       = request.form.get('fac_id')
+            new_password = request.form.get('new_password', '').strip()
+            faculty      = Faculty.query.get_or_404(int(fac_id))
+            if len(new_password) < 6:
+                flash('Password must be at least 6 characters.', 'danger')
+            else:
+                faculty.password_hash = generate_password_hash(new_password)
+                db.session.commit()
+                flash(f'Password reset for "{faculty.full_name}".', 'success')
+
+        elif action == 'delete':
+            fac_id  = request.form.get('fac_id')
+            faculty = Faculty.query.get_or_404(int(fac_id))
+            name    = faculty.full_name
+            db.session.delete(faculty)
+            db.session.commit()
+            flash(f'Faculty "{name}" deleted.', 'info')
+
+        return redirect(url_for('main.admin_faculty'))
+
+    faculties = Faculty.query.order_by(Faculty.created_at.desc()).all()
+    return render_template('admin_faculty.html', faculties=faculties)
+
+
+# ─────────────────────────────────────────
+#  Admin — Payment Overview
+# ─────────────────────────────────────────
+@main.route('/admin/payments')
+@admin_required
+def admin_payments():
+    allotments    = SeatAllotment.query.all()
+    students_data = []
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        fees     = StudentFees.query.filter_by(application_id=appl.id).first()
+        receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
+                     .order_by(PaymentReceipt.created_at.asc()).all()
+        students_data.append({
+            'appl':      appl,
+            'allotment': a,
+            'fees':      fees,
+            'receipts':  receipts,
+        })
+    students_data.sort(key=lambda x: (x['appl'].rank or 9999))
+    return render_template('admin_payments.html', students_data=students_data)
+
+
+# ─────────────────────────────────────────
 #  Admin — Counselling Management
 # ─────────────────────────────────────────
 @main.route('/admin/counselling', methods=['GET', 'POST'])
 @admin_required
 def admin_counselling():
     if request.method == 'POST':
-        # FIX: fetch cs fresh inside POST so we're always working on
-        # the current DB row, not a stale object from before the request
         cs     = CounsellingSettings.get()
         action = request.form.get('action')
 
@@ -758,7 +825,6 @@ def admin_counselling():
                 flash('Seats updated.', 'success')
 
         elif action == 'allot_seat':
-            # FIX: cast app_id to int — form values are always strings
             app_id = request.form.get('app_id')
             quota  = request.form.get('quota')
             try:
@@ -794,7 +860,6 @@ def admin_counselling():
                     flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota)!', 'success')
 
         elif action == 'revoke_seat':
-            # FIX: cast app_id to int consistently
             app_id = request.form.get('app_id')
             try:
                 app_id = int(app_id)
@@ -815,7 +880,6 @@ def admin_counselling():
 
         return redirect(url_for('main.admin_counselling'))
 
-    # GET — fetch everything fresh
     cs         = CounsellingSettings.get()
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
     cat_seats  = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
@@ -1121,7 +1185,6 @@ def _auto_map(columns):
         'last_name':      ['last name', 'lastname', 'lname', 'last', 'surname'],
         'dob':            ['dob', 'date of birth', 'dateofbirth', 'birth date',
                            'birthdate', 'date_of_birth', 'birth_date'],
-        # FIX: added 'student_mobile' and more phone aliases
         'phone':          ['phone', 'mobile', 'contact', 'phone number', 'mobile number',
                            'contact number', 'student mobile', 'student_mobile',
                            'mob', 'mob no', 'mobile no', 'phone no'],
@@ -1259,8 +1322,6 @@ def admin_import():
             for idx, row in df.iterrows():
                 row_num = idx + 2
 
-                # FIX: use [] access with fallback — safer than .get() for
-                # column names that may not exist in field_map
                 email_col = field_map.get('email', '')
                 email_raw = _str(row[email_col]) if email_col and email_col in df.columns else ''
                 if not email_raw:
@@ -1299,7 +1360,6 @@ def admin_import():
                     continue
 
                 def _get_col(field):
-                    """Safely get a column value from the row by mapped field name."""
                     col = field_map.get(field, '')
                     if col and col in df.columns:
                         return row[col]
@@ -1377,8 +1437,6 @@ def admin_import():
             except Exception:
                 pass
 
-            # FIX: pass all required template vars so result page renders
-            # correctly and doesn't fall back to showing the upload form
             result = {'created': created, 'skipped': skipped, 'errors': errors}
             return render_template('admin_import.html',
                                    result=result,
@@ -1395,3 +1453,215 @@ def admin_import():
                            total_rows=None,
                            session_file=None,
                            result=None)
+
+
+# ─────────────────────────────────────────
+#  Faculty Login / Logout
+# ─────────────────────────────────────────
+@main.route('/faculty/login', methods=['GET', 'POST'])
+def faculty_login():
+    if session.get('faculty_logged_in'):
+        return redirect(url_for('main.faculty_dashboard'))
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        faculty  = Faculty.query.filter_by(username=username).first()
+        if not faculty or not check_password_hash(faculty.password_hash, password):
+            flash('Invalid username or password.', 'danger')
+        elif not faculty.is_active:
+            flash('Your account has been deactivated. Contact admin.', 'warning')
+        else:
+            session['faculty_logged_in'] = True
+            session['faculty_id']        = faculty.id
+            session['faculty_name']      = faculty.full_name
+            return redirect(url_for('main.faculty_dashboard'))
+    return render_template('faculty_login.html')
+
+
+@main.route('/faculty/logout')
+def faculty_logout():
+    session.pop('faculty_logged_in', None)
+    session.pop('faculty_id', None)
+    session.pop('faculty_name', None)
+    flash('Logged out successfully.', 'info')
+    return redirect(url_for('main.faculty_login'))
+
+
+# ─────────────────────────────────────────
+#  Faculty Dashboard
+# ─────────────────────────────────────────
+@main.route('/faculty')
+@faculty_required
+def faculty_dashboard():
+    total_allotted = SeatAllotment.query.count()
+    fees_set       = StudentFees.query.count()
+    paid_count     = db.session.query(PaymentReceipt.application_id.distinct()).count()
+    return render_template('faculty_dashboard.html',
+                           total_allotted=total_allotted,
+                           fees_set=fees_set,
+                           paid_count=paid_count,
+                           faculty_name=session.get('faculty_name'))
+
+
+# ─────────────────────────────────────────
+#  Faculty — Allotted Seats View
+# ─────────────────────────────────────────
+@main.route('/faculty/allotted')
+@faculty_required
+def faculty_allotted():
+    allotments = SeatAllotment.query.all()
+    students   = []
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if appl:
+            students.append({'appl': appl, 'allotment': a})
+    students.sort(key=lambda x: (x['appl'].rank or 9999))
+    return render_template('faculty_allotted.html', students=students)
+
+
+# ─────────────────────────────────────────
+#  Faculty — Payment Receipts
+# ─────────────────────────────────────────
+@main.route('/faculty/payments')
+@faculty_required
+def faculty_payments():
+    q          = request.args.get('q', '').strip()
+    allotments = SeatAllotment.query.all()
+    students   = []
+
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        if q:
+            rank_match = str(appl.rank or '') == q
+            name_match = q.lower() in appl.full_name.lower()
+            if not rank_match and not name_match:
+                continue
+        fees     = StudentFees.query.filter_by(application_id=appl.id).first()
+        receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
+                     .order_by(PaymentReceipt.created_at.asc()).all()
+        students.append({
+            'appl':      appl,
+            'allotment': a,
+            'fees':      fees,
+            'receipts':  receipts,
+        })
+
+    students.sort(key=lambda x: (x['appl'].rank or 9999))
+    return render_template('faculty_payments.html', students=students, q=q)
+
+
+# ─────────────────────────────────────────
+#  Faculty — Set / Update Total Fees
+# ─────────────────────────────────────────
+@main.route('/faculty/payments/<int:app_id>/set-fees', methods=['POST'])
+@faculty_required
+def faculty_set_fees(app_id):
+    appl = StudentApplication.query.get_or_404(app_id)
+    if not SeatAllotment.query.filter_by(application_id=appl.id).first():
+        flash('This student does not have a seat allotment.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    total_fees_str = request.form.get('total_fees', '').strip()
+    try:
+        total_fees = float(total_fees_str)
+        if total_fees < 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid fee amount.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    fees = StudentFees.query.filter_by(application_id=appl.id).first()
+    if fees:
+        fees.total_fees = total_fees
+        fees.updated_at = datetime.utcnow()
+    else:
+        fees = StudentFees(application_id=appl.id, total_fees=total_fees)
+        db.session.add(fees)
+    db.session.commit()
+    flash(f'Total fees updated for {appl.full_name}.', 'success')
+    return redirect(url_for('main.faculty_payments'))
+
+
+# ─────────────────────────────────────────
+#  Faculty — Add Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/faculty/payments/<int:app_id>/add-receipt', methods=['POST'])
+@faculty_required
+def faculty_add_receipt(app_id):
+    appl = StudentApplication.query.get_or_404(app_id)
+    fees = StudentFees.query.filter_by(application_id=appl.id).first()
+    if not fees:
+        flash('Please set total fees for this student first.', 'warning')
+        return redirect(url_for('main.faculty_payments'))
+
+    receipt_number = request.form.get('receipt_number', '').strip()
+    amount_str     = request.form.get('amount_paid', '').strip()
+
+    if not receipt_number:
+        flash('Receipt number is required.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    try:
+        amount_paid = float(amount_str)
+        if amount_paid <= 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid amount.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    db.session.add(PaymentReceipt(
+        fees_id        = fees.id,
+        application_id = appl.id,
+        faculty_id     = session.get('faculty_id'),
+        receipt_number = receipt_number,
+        amount_paid    = amount_paid,
+    ))
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} added for {appl.full_name}.', 'success')
+    return redirect(url_for('main.faculty_payments'))
+
+
+# ─────────────────────────────────────────
+#  Faculty — Edit Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/faculty/payments/receipt/<int:receipt_id>/edit', methods=['POST'])
+@faculty_required
+def faculty_edit_receipt(receipt_id):
+    receipt        = PaymentReceipt.query.get_or_404(receipt_id)
+    receipt_number = request.form.get('receipt_number', '').strip()
+    amount_str     = request.form.get('amount_paid', '').strip()
+
+    if not receipt_number:
+        flash('Receipt number is required.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    try:
+        amount_paid = float(amount_str)
+        if amount_paid <= 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid amount.', 'danger')
+        return redirect(url_for('main.faculty_payments'))
+
+    receipt.receipt_number = receipt_number
+    receipt.amount_paid    = amount_paid
+    receipt.updated_at     = datetime.utcnow()
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} updated.', 'success')
+    return redirect(url_for('main.faculty_payments'))
+
+
+# ─────────────────────────────────────────
+#  Faculty — Delete Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/faculty/payments/receipt/<int:receipt_id>/delete', methods=['POST'])
+@faculty_required
+def faculty_delete_receipt(receipt_id):
+    receipt        = PaymentReceipt.query.get_or_404(receipt_id)
+    receipt_number = receipt.receipt_number
+    db.session.delete(receipt)
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} deleted.', 'info')
+    return redirect(url_for('main.faculty_payments'))

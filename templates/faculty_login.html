@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Login — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .auth-wrap {
+    min-height: 70vh; display: flex;
+    align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  .auth-card {
+    background: white; border-radius: 24px; padding: 2.5rem;
+    width: 100%; max-width: 400px; border: 1px solid #eef2f8;
+    box-shadow: 0 4px 24px rgba(0,0,0,.06);
+  }
+  .auth-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: #f3f0ff; display: flex; align-items: center;
+    justify-content: center; font-size: 1.5rem; color: #7c3aed;
+    margin: 0 auto 1.5rem;
+  }
+  .auth-card h2 {
+    font-family: 'Playfair Display', serif; font-size: 1.6rem;
+    color: #0a1f44; text-align: center; margin: 0 0 .4rem;
+  }
+  .auth-subtitle {
+    text-align: center; color: #5a6e82; font-size: .875rem; margin-bottom: 2rem;
+  }
+
+  .form-group { margin-bottom: 1.1rem; }
+  .form-group label {
+    display: block; font-size: .78rem; font-weight: 600;
+    color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem;
+  }
+  .form-group input {
+    width: 100%; padding: .7rem 1rem; border: 1px solid #dde3ef;
+    border-radius: 12px; font-size: .95rem; color: #0a1f44;
+    box-sizing: border-box; transition: border-color .2s;
+  }
+  .form-group input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.08); }
+
+  .btn-login {
+    width: 100%; padding: .8rem; background: #0a1f44; color: white;
+    border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background .2s; margin-top: .5rem;
+  }
+  .btn-login:hover { background: #142d5c; }
+
+  .auth-footer {
+    text-align: center; margin-top: 1.5rem; font-size: .85rem; color: #5a6e82;
+  }
+  .auth-footer a { color: #c9a03d; text-decoration: none; }
+  .auth-footer a:hover { text-decoration: underline; }
+
+  body.dark .auth-card  { background: #1a2538; border-color: #2d3e54; }
+  body.dark .auth-icon  { background: #1e1530; color: #a78bfa; }
+  body.dark .auth-card h2 { color: #eef2ff; }
+  body.dark .auth-subtitle { color: #b9c8e8; }
+  body.dark .form-group label { color: #b9c8e8; }
+  body.dark .form-group input {
+    background: #0f1c2e; border-color: #2d3e54; color: #eef2ff;
+  }
+  body.dark .btn-login { background: #c9a03d; color: #0a1f44; }
+  body.dark .btn-login:hover { background: #b8902e; }
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+    <h2>Faculty Login</h2>
+    <p class="auth-subtitle">BCA Admissions Portal — Staff Access</p>
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Enter your username"
+          autocomplete="username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password"
+          autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <a href="{{ url_for('main.admin_login') }}">Admin Login</a>
+      &nbsp;&bull;&nbsp;
+      <a href="{{ url_for('main.index') }}">Back to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

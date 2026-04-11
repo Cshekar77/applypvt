@@ -135,7 +135,6 @@ class CategorySeats(db.Model):
     def mgmt_remaining(self):
         return max(0, self.mgmt_total - self.mgmt_filled)
 
-    # Legacy helpers so old code that references total_seats / remaining_seats still works
     @property
     def total_seats(self):
         return self.govt_total + self.mgmt_total
@@ -176,6 +175,79 @@ class SeatAllotment(db.Model):
 
     application     = db.relationship('StudentApplication', backref='allotment')
     category        = db.relationship('ApplicationCategory', backref='allotments')
+
+
+# ─────────────────────────────────────────
+#  Faculty  (multiple, managed by admin)
+# ─────────────────────────────────────────
+class Faculty(db.Model):
+    __tablename__ = 'faculty'
+    id            = db.Column(db.Integer, primary_key=True)
+    full_name     = db.Column(db.String(120), nullable=False)
+    username      = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    is_active     = db.Column(db.Boolean, default=True)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Receipts added by this faculty
+    receipts      = db.relationship('PaymentReceipt', backref='faculty', lazy=True)
+
+    def __repr__(self):
+        return f'<Faculty {self.username}>'
+
+
+# ─────────────────────────────────────────
+#  Student Fees  (one per allotted student)
+#  Total fees is set manually and can be edited
+# ─────────────────────────────────────────
+class StudentFees(db.Model):
+    __tablename__ = 'student_fees'
+    id             = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(db.Integer, db.ForeignKey('student_applications.id'), unique=True)
+
+    # Total fees for this student (manually set, editable)
+    total_fees     = db.Column(db.Float, nullable=False, default=0.0)
+
+    created_at     = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at     = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    application    = db.relationship('StudentApplication', backref='fees')
+    receipts       = db.relationship('PaymentReceipt', backref='student_fees', lazy=True)
+
+    # ── Convenience properties ──────────────────
+    @property
+    def total_paid(self):
+        return sum(r.amount_paid for r in self.receipts)
+
+    @property
+    def balance_remaining(self):
+        return max(0.0, self.total_fees - self.total_paid)
+
+    def __repr__(self):
+        return f'<StudentFees app_id={self.application_id} total={self.total_fees}>'
+
+
+# ─────────────────────────────────────────
+#  Payment Receipt
+#  Multiple receipts allowed per student
+# ─────────────────────────────────────────
+class PaymentReceipt(db.Model):
+    __tablename__ = 'payment_receipt'
+    id             = db.Column(db.Integer, primary_key=True)
+    fees_id        = db.Column(db.Integer, db.ForeignKey('student_fees.id'), nullable=False)
+    application_id = db.Column(db.Integer, db.ForeignKey('student_applications.id'), nullable=False)
+    faculty_id     = db.Column(db.Integer, db.ForeignKey('faculty.id'), nullable=True)
+
+    receipt_number = db.Column(db.String(100), nullable=False)
+    amount_paid    = db.Column(db.Float, nullable=False, default=0.0)
+
+    created_at     = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at     = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    application    = db.relationship('StudentApplication', backref='receipts')
+
+    def __repr__(self):
+        return f'<PaymentReceipt {self.receipt_number} amt={self.amount_paid}>'
 
 
 # ─────────────────────────────────────────

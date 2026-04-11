@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Credentials — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .page-header-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
+  }
+  .back-link {
+    color: #c9a03d; text-decoration: none; font-size: .9rem;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  /* ── Layout ── */
+  .faculty-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  /* ── Add faculty card ── */
+  .add-card {
+    background: white; border-radius: 20px; padding: 1.75rem;
+    border: 1px solid #eef2f8;
+    position: sticky; top: 1rem;
+  }
+  .add-card h3 {
+    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .add-card h3 i { color: #7c3aed; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block; font-size: .8rem; font-weight: 600;
+    color: #5a6e82; margin-bottom: .35rem; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .form-group input {
+    width: 100%; padding: .6rem .85rem; border: 1px solid #dde3ef;
+    border-radius: 10px; font-size: .9rem; color: #0a1f44;
+    box-sizing: border-box; transition: border-color .2s;
+  }
+  .form-group input:focus { outline: none; border-color: #7c3aed; }
+
+  .btn { display: inline-flex; align-items: center; gap: .4rem;
+    padding: .6rem 1.2rem; border-radius: 10px; font-size: .875rem;
+    font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+  .btn-primary { background: #0a1f44; color: white; width: 100%; justify-content: center; }
+  .btn-primary:hover { background: #142d5c; }
+  .btn-danger  { background: #fee2e2; color: #991b1b; }
+  .btn-danger:hover  { background: #fecaca; }
+  .btn-warning { background: #fef3c7; color: #92400e; }
+  .btn-warning:hover { background: #fde68a; }
+  .btn-sm { padding: .4rem .8rem; font-size: .8rem; border-radius: 8px; }
+
+  /* ── Faculty table ── */
+  .table-card {
+    background: white; border-radius: 20px; padding: 1.75rem;
+    border: 1px solid #eef2f8;
+  }
+  .table-card h3 {
+    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .table-card h3 i { color: #7c3aed; }
+
+  .fac-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .fac-table th {
+    text-align: left; font-size: .75rem; font-weight: 600;
+    color: #5a6e82; text-transform: uppercase; letter-spacing: .05em;
+    padding: .6rem 1rem; border-bottom: 2px solid #eef2f8;
+  }
+  .fac-table td { padding: .85rem 1rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .fac-table tr:last-child td { border-bottom: none; }
+  .fac-table tr:hover td { background: #fafbff; }
+
+  .fac-name { font-weight: 600; color: #0a1f44; }
+  .fac-username { color: #5a6e82; font-size: .82rem; font-family: monospace; }
+  .fac-date { color: #aab4c8; font-size: .8rem; }
+
+  .badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .badge-active   { background: #d1fae5; color: #065f46; }
+  .badge-inactive { background: #f3f4f6; color: #6b7280; }
+
+  .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+  /* ── Reset password inline form ── */
+  .reset-form {
+    display: none; margin-top: .5rem;
+    background: #faf5ff; border: 1px solid #ddd6fe;
+    border-radius: 10px; padding: .75rem;
+  }
+  .reset-form.open { display: block; }
+  .reset-form .reset-row { display: flex; gap: .5rem; align-items: center; }
+  .reset-form input {
+    flex: 1; padding: .45rem .7rem; border: 1px solid #ddd6fe;
+    border-radius: 8px; font-size: .85rem; color: #0a1f44;
+  }
+  .reset-form input:focus { outline: none; border-color: #7c3aed; }
+
+  .empty-state {
+    text-align: center; padding: 3rem 1rem; color: #aab4c8;
+  }
+  .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #dde3ef; }
+
+  /* Dark mode */
+  body.dark .add-card,
+  body.dark .table-card       { background: #1a2538; border-color: #2d3e54; }
+  body.dark .add-card h3,
+  body.dark .table-card h3,
+  body.dark .fac-name         { color: #eef2ff; }
+  body.dark .form-group label { color: #b9c8e8; }
+  body.dark .form-group input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .fac-table th     { color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .fac-table td     { border-color: #1e2e42; }
+  body.dark .fac-table tr:hover td { background: #1e2e42; }
+  body.dark .fac-username     { color: #8899b8; }
+  body.dark .btn-primary      { background: #c9a03d; color: #0a1f44; }
+  body.dark .btn-primary:hover { background: #b8902e; }
+  body.dark .reset-form       { background: #1e1530; border-color: #6d28d9; }
+  body.dark .reset-form input { background: #130e20; border-color: #6d28d9; color: #eef2ff; }
+
+  @media (max-width: 900px) {
+    .faculty-layout { grid-template-columns: 1fr; }
+    .add-card { position: static; }
+  }
+</style>
+
+{% block navbar_auth %}{% endblock %}
+
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2><i class="fas fa-user-shield" style="color:#7c3aed; margin-right:.5rem"></i>Faculty Credentials</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <div class="faculty-layout">
+
+    {# ── Add Faculty Form ── #}
+    <div class="add-card">
+      <h3><i class="fas fa-user-plus"></i> Add New Faculty</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="full_name" placeholder="e.g. Dr. Priya Sharma" required>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="e.g. priya.sharma" autocomplete="off" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Min. 6 characters" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Add Faculty
+        </button>
+      </form>
+    </div>
+
+    {# ── Faculty List ── #}
+    <div class="table-card">
+      <h3><i class="fas fa-users"></i>
+        Faculty Accounts
+        <span style="font-size:.8rem; font-weight:400; color:#aab4c8; margin-left:auto">
+          {{ faculties|length }} total
+        </span>
+      </h3>
+
+      {% if faculties %}
+      <table class="fac-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name / Username</th>
+            <th>Status</th>
+            <th>Added</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fac in faculties %}
+          <tr>
+            <td style="color:#aab4c8; font-size:.8rem">{{ loop.index }}</td>
+            <td>
+              <div class="fac-name">{{ fac.full_name }}</div>
+              <div class="fac-username">@{{ fac.username }}</div>
+            </td>
+            <td>
+              {% if fac.is_active %}
+                <span class="badge badge-active"><i class="fas fa-circle" style="font-size:.5rem"></i> Active</span>
+              {% else %}
+                <span class="badge badge-inactive"><i class="fas fa-circle" style="font-size:.5rem"></i> Inactive</span>
+              {% endif %}
+            </td>
+            <td class="fac-date">
+              {{ fac.created_at.strftime('%d %b %Y') if fac.created_at else '—' }}
+            </td>
+            <td>
+              <div class="actions">
+                {# Toggle active/inactive #}
+                <form method="POST" style="display:inline">
+                  <input type="hidden" name="action" value="toggle">
+                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                  <button type="submit" class="btn btn-sm btn-warning" title="{{ 'Deactivate' if fac.is_active else 'Activate' }}">
+                    <i class="fas fa-{{ 'ban' if fac.is_active else 'check' }}"></i>
+                    {{ 'Deactivate' if fac.is_active else 'Activate' }}
+                  </button>
+                </form>
+
+                {# Reset password toggle #}
+                <button type="button" class="btn btn-sm btn-warning"
+                  onclick="toggleReset('reset-{{ fac.id }}')">
+                  <i class="fas fa-key"></i> Reset PW
+                </button>
+
+                {# Delete #}
+                <form method="POST" style="display:inline"
+                  onsubmit="return confirm('Delete {{ fac.full_name }}? This cannot be undone.')">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </div>
+
+              {# Inline reset password form #}
+              <div class="reset-form" id="reset-{{ fac.id }}">
+                <form method="POST">
+                  <input type="hidden" name="action" value="reset_password">
+                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                  <div class="reset-row">
+                    <input type="password" name="new_password"
+                      placeholder="New password (min 6 chars)" autocomplete="new-password" required>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                      <i class="fas fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-sm btn-warning"
+                      onclick="toggleReset('reset-{{ fac.id }}')">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% else %}
+      <div class="empty-state">
+        <div><i class="fas fa-user-slash"></i></div>
+        <p>No faculty accounts yet.<br>Add one using the form on the left.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+function toggleReset(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) {
+    el.querySelector('input[type="password"]').focus();
+  }
+}
+</script>
+{% endblock %}
+{% endblock %}

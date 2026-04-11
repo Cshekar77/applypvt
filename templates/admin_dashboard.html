@@ -90,6 +90,38 @@
   .counsel-badge.paused   { background: #fff3cd; color: #856404; }
   .counsel-badge.stopped  { background: #f5f7fa; color: #5a6e82; }
 
+  /* Faculty card */
+  .admin-nav-card.faculty-card {
+    border-color: #ddd6fe;
+    background: linear-gradient(135deg, #faf5ff, #f3eeff);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.faculty-card:hover {
+    border-color: #7c3aed;
+    box-shadow: 0 10px 25px rgba(124,58,237,0.15);
+  }
+  .faculty-badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
+    background: #ede9fe; color: #5b21b6;
+  }
+
+  /* Payments card */
+  .admin-nav-card.payments-card {
+    border-color: #99f6e4;
+    background: linear-gradient(135deg, #f0fdfa, #e8faf6);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.payments-card:hover {
+    border-color: #0f766e;
+    box-shadow: 0 10px 25px rgba(15,118,110,0.15);
+  }
+  .payments-badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
+    background: #ccfbf1; color: #0f766e;
+  }
+
   .anc-icon { font-size: 2rem; margin-bottom: 1rem; }
   .admin-nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
   .admin-nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
@@ -141,6 +173,8 @@
   body.dark .admin-nav-card.whatsapp-card    { border-color: #25D366; }
   body.dark .admin-nav-card.counselling-card { background: #1a2030; border-color: #c9a03d; }
   body.dark .admin-nav-card.import-card      { background: #131e2e; border-color: #2e5a8a; }
+  body.dark .admin-nav-card.faculty-card     { background: #1e1530; border-color: #6d28d9; }
+  body.dark .admin-nav-card.payments-card    { background: #0f2420; border-color: #0f766e; }
   body.dark .stat-card  { background: #1a2538; }
   body.dark .stat-num   { color: #eef2ff; }
   body.dark .stat-lbl   { color: #b9c8e8; }
@@ -243,6 +277,22 @@
       <span class="wa-badge {% if not whatsapp.is_active or not whatsapp.link %}inactive{% endif %}">
         {% if whatsapp.is_active and whatsapp.link %}● Active{% else %}● Not Set{% endif %}
       </span>
+    </a>
+
+    {# ── Faculty Credentials ── #}
+    <a href="{{ url_for('main.admin_faculty') }}" class="admin-nav-card faculty-card">
+      <div class="anc-icon" style="color:#7c3aed"><i class="fas fa-user-shield"></i></div>
+      <strong>Faculty Credentials</strong>
+      <p>Add, manage and reset passwords for faculty accounts</p>
+      <span class="faculty-badge"><i class="fas fa-key"></i> Staff Access</span>
+    </a>
+
+    {# ── Payment Overview ── #}
+    <a href="{{ url_for('main.admin_payments') }}" class="admin-nav-card payments-card">
+      <div class="anc-icon" style="color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
+      <strong>Payment Overview</strong>
+      <p>View fee details and payment receipts for allotted students</p>
+      <span class="payments-badge"><i class="fas fa-receipt"></i> Receipts</span>
     </a>
 
     <a href="{{ url_for('main.export_all') }}" class="admin-nav-card">

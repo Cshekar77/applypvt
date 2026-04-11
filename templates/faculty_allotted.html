@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Allotted Students — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .page-header-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
+  }
+  .back-link { color: #c9a03d; text-decoration: none; font-size: .9rem; }
+  .back-link:hover { text-decoration: underline; }
+
+  .table-card {
+    background: white; border-radius: 20px; padding: 1.75rem;
+    border: 1px solid #eef2f8; overflow-x: auto;
+  }
+  .table-card h3 {
+    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .table-card h3 i { color: #7c3aed; }
+
+  .allot-table { width: 100%; border-collapse: collapse; font-size: .875rem; min-width: 600px; }
+  .allot-table th {
+    text-align: left; font-size: .72rem; font-weight: 600;
+    color: #5a6e82; text-transform: uppercase; letter-spacing: .05em;
+    padding: .6rem 1rem; border-bottom: 2px solid #eef2f8;
+  }
+  .allot-table td { padding: .85rem 1rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .allot-table tr:last-child td { border-bottom: none; }
+  .allot-table tr:hover td { background: #fafbff; }
+
+  .stu-name { font-weight: 600; color: #0a1f44; }
+  .stu-sub  { color: #5a6e82; font-size: .8rem; }
+
+  .rank-badge {
+    display: inline-block; background: #0a1f44; color: white;
+    font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  }
+  .badge {
+    display: inline-block; font-size: .7rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .badge-govt { background: #dbeafe; color: #1e40af; }
+  .badge-mgmt { background: #fce7f3; color: #9d174d; }
+
+  .allot-time { color: #aab4c8; font-size: .8rem; }
+
+  .empty-state {
+    text-align: center; padding: 3rem 1rem; color: #aab4c8;
+  }
+  .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #dde3ef; }
+
+  body.dark .table-card { background: #1a2538; border-color: #2d3e54; }
+  body.dark .table-card h3,
+  body.dark .stu-name   { color: #eef2ff; }
+  body.dark .stu-sub,
+  body.dark .allot-table th { color: #b9c8e8; }
+  body.dark .allot-table td { border-color: #1e2e42; }
+  body.dark .allot-table tr:hover td { background: #1e2e42; }
+  body.dark .rank-badge { background: #c9a03d; color: #0a1f44; }
+</style>
+
+{% block navbar_auth %}{% endblock %}
+
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2><i class="fas fa-user-check" style="color:#7c3aed; margin-right:.5rem"></i>Allotted Students</h2>
+    <a href="{{ url_for('main.faculty_dashboard') }}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <div class="table-card">
+    <h3>
+      <i class="fas fa-list"></i> Seat Allotments
+      <span style="font-size:.8rem;font-weight:400;color:#aab4c8;margin-left:auto">
+        {{ students | length }} student(s)
+      </span>
+    </h3>
+
+    {% if students %}
+    <table class="allot-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Student</th>
+          <th>Category</th>
+          <th>Quota</th>
+          <th>Allotted At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td><span class="rank-badge">#{{ s.appl.rank or '—' }}</span></td>
+          <td>
+            <div class="stu-name">{{ s.appl.full_name }}</div>
+            <div class="stu-sub">{{ s.appl.email }}</div>
+            <div class="stu-sub">{{ s.appl.phone or '' }}</div>
+          </td>
+          <td>
+            <div class="stu-sub">{{ s.appl.category_name or '—' }}</div>
+          </td>
+          <td>
+            <span class="badge badge-{{ s.allotment.quota }}">
+              {{ s.allotment.quota | title }} Quota
+            </span>
+          </td>
+          <td class="allot-time">
+            {% if s.allotment.allotted_at %}
+              {{ s.allotment.allotted_at.strftime('%d %b %Y, %I:%M %p') }}
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% else %}
+    <div class="empty-state">
+      <div><i class="fas fa-user-slash"></i></div>
+      <p>No students have been allotted seats yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

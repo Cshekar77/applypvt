@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Faculty Dashboard — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .page-header-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
+  }
+  .text-muted   { color: #5a6e82; }
+  .text-muted a { color: #c9a03d; text-decoration: none; }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem; margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: white; border-radius: 20px; padding: 1.5rem;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    border-left: 4px solid #c9a03d;
+  }
+  .stat-num { font-size: 2.5rem; font-weight: 700; color: #0a1f44; }
+  .stat-lbl { color: #5a6e82; font-size: .85rem; margin-top: .5rem; }
+  .stat-teal { border-left-color: #0f766e; }
+  .stat-teal .stat-num { color: #0f766e; }
+  .stat-purple { border-left-color: #7c3aed; }
+  .stat-purple .stat-num { color: #7c3aed; }
+
+  .nav-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
+  }
+  .nav-card {
+    background: white; border-radius: 20px; padding: 1.75rem;
+    text-decoration: none; border: 1px solid #eef2f8;
+    transition: all .3s ease; display: block;
+  }
+  .nav-card:hover {
+    transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,.1);
+    border-color: #c9a03d;
+  }
+  .nav-card.teal-card  { border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6); }
+  .nav-card.teal-card:hover  { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,.15); }
+  .nav-card.purple-card { border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff); }
+  .nav-card.purple-card:hover { border-color: #7c3aed; box-shadow: 0 10px 25px rgba(124,58,237,.15); }
+
+  .nav-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
+  .nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
+
+  body.dark .stat-card { background: #1a2538; }
+  body.dark .stat-num  { color: #eef2ff; }
+  body.dark .stat-lbl  { color: #b9c8e8; }
+  body.dark .stat-teal  .stat-num { color: #2dd4bf; }
+  body.dark .stat-purple .stat-num { color: #a78bfa; }
+  body.dark .nav-card   { background: #1a2538; border-color: #2d3e54; }
+  body.dark .nav-card strong { color: #eef2ff; }
+  body.dark .nav-card p  { color: #b9c8e8; }
+  body.dark .nav-card.teal-card   { background: #0f2420; border-color: #0f766e; }
+  body.dark .nav-card.purple-card { background: #1e1530; border-color: #6d28d9; }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .nav-grid   { grid-template-columns: 1fr; }
+  }
+</style>
+
+{% block navbar_auth %}{% endblock %}
+
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <div>
+      <h2>Faculty Dashboard</h2>
+      <p class="text-muted" style="margin:.25rem 0 0">
+        Welcome, <strong>{{ faculty_name }}</strong>
+      </p>
+    </div>
+    <p class="text-muted">
+      BCA Admissions 2026–2027 &mdash;
+      <a href="{{ url_for('main.faculty_logout') }}">Logout</a>
+    </p>
+  </div>
+
+  {# Stats #}
+  <div class="stats-grid">
+    <div class="stat-card stat-purple">
+      <div class="stat-num">{{ total_allotted }}</div>
+      <div class="stat-lbl">Allotted Students</div>
+    </div>
+    <div class="stat-card stat-teal">
+      <div class="stat-num">{{ fees_set }}</div>
+      <div class="stat-lbl">Fees Set</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ paid_count }}</div>
+      <div class="stat-lbl">Payments Recorded</div>
+    </div>
+  </div>
+
+  {# Navigation #}
+  <div class="nav-grid">
+    <a href="{{ url_for('main.faculty_allotted') }}" class="nav-card purple-card">
+      <div class="nav-icon" style="color:#7c3aed"><i class="fas fa-user-check"></i></div>
+      <strong>Allotted Students</strong>
+      <p>View all students with seat allotments</p>
+    </a>
+
+    <a href="{{ url_for('main.faculty_payments') }}" class="nav-card teal-card">
+      <div class="nav-icon" style="color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
+      <strong>Payment & Receipts</strong>
+      <p>Set fees, add receipts and track payments</p>
+    </a>
+  </div>
+</div>
+{% endblock %}
