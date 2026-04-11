@@ -458,14 +458,14 @@
                   <div class="r-actions">
                     <button type="button" class="btn btn-sm btn-warning"
                       onclick="toggleEdit('{{ r.id }}')">
-                      <i class="fas fa-pencil-alt"></i>
+                      <i class="fas fa-pencil-alt"></i> Edit
                     </button>
                     <form method="POST"
                       action="{{ url_for('main.faculty_delete_receipt', receipt_id=r.id) }}"
                       style="display:inline"
                       onsubmit="return confirm('Delete receipt #{{ r.receipt_number }}?')">
                       <button type="submit" class="btn btn-sm btn-danger">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"></i> Delete
                       </button>
                     </form>
                   </div>
@@ -485,7 +485,7 @@
                       </button>
                       <button type="button" class="btn btn-sm btn-warning"
                         onclick="toggleEdit('{{ r.id }}')">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times"></i> Cancel
                       </button>
                     </div>
                   </form>
