@@ -3,424 +3,337 @@
 
 {% block content %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
 
   :root {
-    --live-bg:       #0a0f1e;
-    --live-card:     #111827;
-    --live-border:   #1e2d45;
-    --live-accent:   #00c6ff;
-    --live-accent2:  #0072ff;
-    --live-green:    #10b981;
-    --live-yellow:   #f59e0b;
-    --live-red:      #ef4444;
-    --live-text:     #e2e8f0;
-    --live-muted:    #64748b;
+    --bg:         #f0f4f9;
+    --card:       #ffffff;
+    --border:     #dde3ed;
+    --accent:     #1a56db;
+    --accent2:    #1e40af;
+    --green:      #059669;
+    --green-bg:   #ecfdf5;
+    --green-bdr:  #a7f3d0;
+    --yellow:     #d97706;
+    --yellow-bg:  #fffbeb;
+    --yellow-bdr: #fde68a;
+    --red:        #dc2626;
+    --red-bg:     #fef2f2;
+    --red-bdr:    #fecaca;
+    --text:       #0f172a;
+    --text2:      #334155;
+    --muted:      #64748b;
+    --shadow:     0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    --shadow-md:  0 4px 24px rgba(0,0,0,0.09);
   }
 
-  body {
-    background: var(--live-bg) !important;
-    color: var(--live-text) !important;
-  }
+  body { background: var(--bg) !important; color: var(--text) !important; }
 
   .live-page {
     min-height: 100vh;
-    background: var(--live-bg);
-    padding: 2rem 1.25rem 4rem;
+    background: var(--bg);
+    padding: 2rem 1.25rem 5rem;
     font-family: 'DM Sans', sans-serif;
   }
 
   /* ── Header ── */
-  .live-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-  }
-
-  .live-header .portal-tag {
+  .live-header { text-align: center; margin-bottom: 2rem; }
+  .portal-tag {
     display: inline-block;
     font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.18em;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--live-accent);
-    background: rgba(0,198,255,0.08);
-    border: 1px solid rgba(0,198,255,0.25);
+    color: var(--accent);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
     padding: 0.3rem 0.9rem;
     border-radius: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.9rem;
   }
-
   .live-header h1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.2rem, 6vw, 3.8rem);
-    letter-spacing: 0.06em;
-    color: #fff;
-    line-height: 1;
-    margin: 0 0 0.5rem;
-  }
-
-  .live-header h1 span {
-    background: linear-gradient(90deg, var(--live-accent), var(--live-accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .live-header .subtitle {
-    font-size: 0.9rem;
-    color: var(--live-muted);
-    margin: 0;
-  }
-
-  /* ── Status Bar ── */
-  .status-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-bottom: 2.5rem;
-  }
-
-  .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .status-dot.running  { background: var(--live-green);  animation: pulse-green 1.5s infinite; }
-  .status-dot.paused   { background: var(--live-yellow); }
-  .status-dot.stopped  { background: var(--live-red);    }
-
-  @keyframes pulse-green {
-    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
-    50%      { box-shadow: 0 0 0 6px rgba(16,185,129,0);  }
-  }
-
-  .status-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .status-label.running { color: var(--live-green);  }
-  .status-label.paused  { color: var(--live-yellow); }
-  .status-label.stopped { color: var(--live-red);    }
-
-  /* ── Main card area ── */
-  .live-center {
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  /* ── State card (stopped/paused/no rank) ── */
-  .state-card {
-    background: var(--live-card);
-    border: 1px solid var(--live-border);
-    border-radius: 1.25rem;
-    padding: 3rem 2rem;
-    text-align: center;
-  }
-
-  .state-card .state-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .state-card h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
+    font-size: clamp(2rem, 6vw, 3.4rem);
     letter-spacing: 0.05em;
-    color: #fff;
-    margin: 0 0 0.5rem;
+    color: var(--text);
+    line-height: 1;
+    margin: 0 0 0.4rem;
+  }
+  .live-header h1 span { color: var(--accent); }
+  .live-header .subtitle { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+  /* ── Status pill ── */
+  .status-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.6rem; margin-bottom: 2rem;
+  }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 1rem; border-radius: 2rem;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
+  }
+  .status-pill.running { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bdr); }
+  .status-pill.paused  { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-bdr); }
+  .status-pill.stopped { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bdr); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.running { background: var(--green); animation: pulse-dot 1.5s infinite; }
+  .status-dot.paused  { background: var(--yellow); }
+  .status-dot.stopped { background: var(--red); }
+  @keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 0 0 rgba(5,150,105,0.4); }
+    50%      { box-shadow: 0 0 0 5px rgba(5,150,105,0); }
   }
 
-  .state-card p {
-    color: var(--live-muted);
-    font-size: 0.9rem;
-    margin: 0;
-    line-height: 1.6;
-  }
+  /* ── Layout ── */
+  .live-center { max-width: 720px; margin: 0 auto; }
 
-  /* ── Live Rank Card ── */
+  /* ── State card ── */
+  .state-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 1rem; padding: 3rem 2rem;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .state-card .state-icon { font-size: 2.8rem; margin-bottom: 0.75rem; display: block; }
+  .state-card h2 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem;
+    letter-spacing: 0.04em; color: var(--text); margin: 0 0 0.4rem;
+  }
+  .state-card p { color: var(--muted); font-size: 0.9rem; margin: 0; line-height: 1.6; }
+
+  /* ── Rank Card ── */
   .rank-card {
-    background: var(--live-card);
-    border: 1px solid var(--live-border);
-    border-radius: 1.25rem;
-    overflow: hidden;
-    position: relative;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 1rem; overflow: hidden; box-shadow: var(--shadow-md);
   }
-
-  .rank-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg,
-      rgba(0,198,255,0.05) 0%,
-      transparent 60%);
-    pointer-events: none;
-  }
-
-  /* Rank number hero */
   .rank-hero {
-    background: linear-gradient(135deg, var(--live-accent2), var(--live-accent));
-    padding: 1.8rem 2rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    padding: 1.6rem 2rem; display: flex; align-items: center; gap: 1.5rem;
   }
-
   .rank-hero .rank-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.75);
-    margin-bottom: 0.25rem;
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); margin-bottom: 0.2rem;
   }
-
   .rank-hero .rank-number {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(3.5rem, 10vw, 5.5rem);
-    line-height: 1;
-    color: #fff;
-    letter-spacing: 0.03em;
+    font-size: clamp(3rem, 10vw, 5rem);
+    line-height: 1; color: #fff; letter-spacing: 0.02em;
   }
-
   .rank-hero .rank-badge {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.75rem;
-    border-radius: 2rem;
-    white-space: nowrap;
+    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.28rem 0.7rem; border-radius: 2rem; white-space: nowrap;
   }
-
-  /* Student info */
-  .rank-body {
-    padding: 1.75rem 2rem;
-  }
+  .rank-body { padding: 1.5rem 2rem; }
 
   .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin-bottom: 1.25rem;
   }
-
-  @media (max-width: 480px) {
-    .info-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
 
   .info-item .info-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--live-muted);
-    margin-bottom: 0.3rem;
+    font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.25rem;
   }
-
-  .info-item .info-value {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--live-text);
-    word-break: break-word;
-  }
-
+  .info-item .info-value { font-size: 1rem; font-weight: 600; color: var(--text); word-break: break-word; }
   .info-item .info-value.marks {
-    font-family: 'DM Mono', monospace;
-    font-size: 1.4rem;
-    color: var(--live-accent);
+    font-family: 'DM Mono', monospace; font-size: 1.35rem; color: var(--accent);
   }
 
-  /* Allotment banner */
   .allotment-banner {
-    background: rgba(16,185,129,0.1);
-    border: 1px solid rgba(16,185,129,0.3);
-    border-radius: 0.75rem;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
+    background: var(--green-bg); border: 1px solid var(--green-bdr);
+    border-radius: 0.75rem; padding: 0.9rem 1.1rem;
+    display: flex; align-items: flex-start; gap: 0.75rem;
   }
-
-  .allotment-banner .check-icon {
-    width: 28px;
-    height: 28px;
-    background: var(--live-green);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 0.9rem;
-    color: #fff;
-    margin-top: 1px;
+  .check-icon {
+    width: 26px; height: 26px; background: var(--green); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 0.8rem; color: #fff; margin-top: 1px;
   }
-
-  .allotment-banner .allot-title {
-    font-size: 0.8rem;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--live-green);
-    margin-bottom: 0.2rem;
+  .allot-title {
+    font-size: 0.72rem; font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 0.15rem;
   }
+  .allot-detail { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.1rem; }
+  .allot-time   { font-size: 0.75rem; color: var(--muted); }
 
-  .allotment-banner .allot-detail {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--live-text);
-    margin-bottom: 0.15rem;
-  }
-
-  .allotment-banner .allot-time {
-    font-size: 0.78rem;
-    color: var(--live-muted);
-  }
-
-  /* Not allotted badge */
   .not-allotted {
-    background: rgba(100,116,139,0.1);
-    border: 1px solid rgba(100,116,139,0.25);
-    border-radius: 0.75rem;
-    padding: 0.75rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    color: var(--live-muted);
-    font-size: 0.88rem;
+    background: #f8fafc; border: 1px solid var(--border);
+    border-radius: 0.75rem; padding: 0.7rem 1.1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    color: var(--muted); font-size: 0.86rem;
   }
-
-  /* ── Admin message ── */
   .admin-message {
-    margin-top: 1.25rem;
-    background: rgba(245,158,11,0.08);
-    border: 1px solid rgba(245,158,11,0.25);
-    border-radius: 0.75rem;
-    padding: 0.9rem 1.25rem;
-    font-size: 0.88rem;
-    color: #fde68a;
-    display: flex;
-    gap: 0.6rem;
-    align-items: flex-start;
+    margin-top: 1rem; background: var(--yellow-bg);
+    border: 1px solid var(--yellow-bdr); border-radius: 0.75rem;
+    padding: 0.8rem 1.1rem; font-size: 0.86rem; color: #92400e;
+    display: flex; gap: 0.5rem; align-items: flex-start;
   }
 
   /* ── Stats bar ── */
-  .stats-bar {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.25rem;
-    flex-wrap: wrap;
-  }
-
+  .stats-bar { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
   .stat-chip {
-    background: rgba(30,45,69,0.8);
-    border: 1px solid var(--live-border);
-    border-radius: 0.6rem;
-    padding: 0.5rem 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--live-muted);
-    flex: 1;
-    min-width: 120px;
-    text-align: center;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 0.6rem; padding: 0.6rem 1rem;
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--muted); flex: 1; min-width: 110px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .stat-chip strong {
+    display: block; font-size: 1.25rem; color: var(--text);
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; margin-bottom: 0.1rem;
   }
 
-  .stat-chip strong {
-    display: block;
-    font-size: 1.1rem;
-    color: var(--live-text);
-    margin-bottom: 0.1rem;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 0.04em;
+  /* ── Section title ── */
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem;
+    letter-spacing: 0.06em; color: var(--text2);
+    margin: 2rem 0 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
   }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── Seats tracker ── */
+  .seats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.75rem;
+  }
+  .seat-cat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 0.85rem; padding: 1rem 1.25rem; box-shadow: var(--shadow);
+  }
+  .seat-cat-name { font-weight: 600; font-size: 0.9rem; color: var(--text); margin-bottom: 0.75rem; }
+  .quota-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.4rem; font-size: 0.82rem;
+  }
+  .quota-label {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .quota-nums { display: flex; gap: 0.5rem; align-items: center; }
+  .q-filled { color: var(--accent); font-weight: 600; font-size: 0.88rem; }
+  .q-total  { color: var(--muted); font-size: 0.78rem; }
+  .q-remain {
+    background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe;
+    border-radius: 0.35rem; font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; padding: 0.1rem 0.4rem; white-space: nowrap;
+  }
+  .q-remain.zero { background: var(--red-bg); color: var(--red); border-color: var(--red-bdr); }
+  .seat-progress {
+    height: 4px; background: #e2e8f0; border-radius: 2px;
+    overflow: hidden; margin-top: 0.3rem; margin-bottom: 0.6rem;
+  }
+  .seat-progress-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transition: width 0.4s ease;
+  }
+  .seat-progress-fill.full { background: linear-gradient(90deg, var(--red), #f87171); }
+
+  /* ── History toggle ── */
+  .history-toggle-btn {
+    width: 100%; margin-top: 2rem; padding: 0.75rem 1.5rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 0.75rem; color: var(--text2);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow); transition: background 0.15s, border-color 0.15s;
+  }
+  .history-toggle-btn:hover { background: #f8fafc; border-color: #c7d2e0; }
+  .history-toggle-btn .btn-left { display: flex; align-items: center; gap: 0.6rem; }
+  .history-toggle-btn .chevron { transition: transform 0.25s; font-size: 0.8rem; color: var(--muted); }
+  .history-toggle-btn.open .chevron { transform: rotate(180deg); }
+  .history-count {
+    background: var(--accent); color: #fff;
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    padding: 0.15rem 0.55rem; border-radius: 2rem;
+  }
+
+  /* ── History panel ── */
+  .history-panel {
+    display: none; background: var(--card); border: 1px solid var(--border);
+    border-radius: 0.85rem; margin-top: 0.5rem;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .history-panel.open { display: block; }
+  .history-table-wrap { overflow-x: auto; }
+  .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .history-table th {
+    background: #f8fafc; font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  .history-table td {
+    padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9;
+    color: var(--text2); vertical-align: middle;
+  }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-table tr:hover td { background: #f8fafc; }
+
+  .quota-badge {
+    display: inline-block; font-family: 'DM Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.15rem 0.55rem; border-radius: 2rem; white-space: nowrap;
+  }
+  .quota-badge.government { background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe; }
+  .quota-badge.management { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+  .rank-pill {
+    display: inline-block; background: #f1f5f9; color: var(--text2);
+    font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500;
+    padding: 0.1rem 0.5rem; border-radius: 0.35rem;
+  }
+  .history-empty { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.88rem; }
 
   /* ── Refresh bar ── */
-  .refresh-bar {
-    margin-top: 2rem;
-    text-align: center;
-  }
-
+  .refresh-bar { margin-top: 2rem; text-align: center; }
   .refresh-info {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--live-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   }
-
-  .refresh-countdown {
-    color: var(--live-accent);
-    font-weight: 500;
-    min-width: 2ch;
-    display: inline-block;
-  }
-
+  .refresh-countdown { color: var(--accent); font-weight: 500; min-width: 2ch; display: inline-block; }
   .progress-track {
-    width: 200px;
-    height: 2px;
-    background: var(--live-border);
-    border-radius: 2px;
-    margin: 0.6rem auto 0;
-    overflow: hidden;
+    width: 180px; height: 2px; background: var(--border);
+    border-radius: 2px; margin: 0.5rem auto 0; overflow: hidden;
   }
-
   .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--live-accent2), var(--live-accent));
-    border-radius: 2px;
-    width: 100%;
-    transform-origin: left;
+    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 2px; width: 100%; transform-origin: left;
     animation: drain 30s linear forwards;
   }
-
-  @keyframes drain {
-    from { transform: scaleX(1); }
-    to   { transform: scaleX(0); }
-  }
-
-  /* Dark mode safe navbar override */
-  .navbar { background: #070c18 !important; border-bottom: 1px solid var(--live-border) !important; }
-  .site-footer { background: #070c18 !important; border-top: 1px solid var(--live-border) !important; color: var(--live-muted) !important; }
+  @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 </style>
 
 <div class="live-page">
+
   <div class="live-header">
     <div class="portal-tag">BCA Admissions 2026–2027</div>
     <h1>Live <span>Counselling</span> Tracker</h1>
     <p class="subtitle">Public view &mdash; updates every 30 seconds &mdash; no login required</p>
   </div>
 
-  <!-- Status Bar -->
   <div class="status-bar">
     {% if cs.status == 'running' %}
-      <span class="status-dot running"></span>
-      <span class="status-label running">Counselling In Progress</span>
+      <span class="status-pill running"><span class="status-dot running"></span>Counselling In Progress</span>
     {% elif cs.status == 'paused' %}
-      <span class="status-dot paused"></span>
-      <span class="status-label paused">Counselling Paused</span>
+      <span class="status-pill paused"><span class="status-dot paused"></span>Counselling Paused</span>
     {% else %}
-      <span class="status-dot stopped"></span>
-      <span class="status-label stopped">Counselling Not Started</span>
+      <span class="status-pill stopped"><span class="status-dot stopped"></span>Counselling Not Started</span>
     {% endif %}
   </div>
 
   <div class="live-center">
 
+    <!-- Current Rank -->
     {% if cs.status == 'stopped' %}
-    <!-- Stopped State -->
     <div class="state-card">
       <span class="state-icon">🎓</span>
       <h2>Counselling Not Started</h2>
@@ -428,21 +341,18 @@
     </div>
 
     {% elif cs.status == 'paused' %}
-    <!-- Paused State -->
     <div class="state-card">
       <span class="state-icon">⏸️</span>
       <h2>Counselling Paused</h2>
       <p>The counselling process is temporarily paused.<br>It will resume shortly. Please wait.</p>
       {% if cs.message %}
-      <div class="admin-message" style="margin-top:1.5rem; justify-content:center;">
-        <span>📢</span>
-        <span>{{ cs.message }}</span>
+      <div class="admin-message" style="margin-top:1.25rem; justify-content:center;">
+        <span>📢</span><span>{{ cs.message }}</span>
       </div>
       {% endif %}
     </div>
 
     {% elif cs.status == 'running' and not cs.current_rank %}
-    <!-- Running but no rank set yet -->
     <div class="state-card">
       <span class="state-icon">⏳</span>
       <h2>Waiting for First Rank</h2>
@@ -450,10 +360,7 @@
     </div>
 
     {% else %}
-    <!-- Active rank being called -->
     <div class="rank-card">
-
-      <!-- Rank Hero -->
       <div class="rank-hero">
         <div>
           <div class="rank-label">Currently Calling</div>
@@ -461,10 +368,7 @@
         </div>
         <div class="rank-badge">🔴 Live Now</div>
       </div>
-
-      <!-- Student Info Body -->
       <div class="rank-body">
-
         {% if student %}
         <div class="info-grid">
           <div class="info-item">
@@ -473,16 +377,12 @@
           </div>
           <div class="info-item">
             <div class="info-label">Rank</div>
-            <div class="info-value"># {{ student.rank }}</div>
+            <div class="info-value">#{{ student.rank }}</div>
           </div>
           <div class="info-item">
             <div class="info-label">12th Marks</div>
             <div class="info-value marks">
-              {% if student.percent_12 %}
-                {{ "%.2f"|format(student.percent_12) }}%
-              {% else %}
-                —
-              {% endif %}
+              {% if student.percent_12 %}{{ "%.2f"|format(student.percent_12) }}%{% else %}—{% endif %}
             </div>
           </div>
           <div class="info-item">
@@ -491,7 +391,6 @@
           </div>
         </div>
 
-        <!-- Allotment Status -->
         {% if allotment %}
         <div class="allotment-banner">
           <div class="check-icon">✓</div>
@@ -499,62 +398,118 @@
             <div class="allot-title">Seat Allotted</div>
             <div class="allot-detail">
               {{ student.full_name }} &mdash;
-              {% if allotment.quota == 'government' %}
-                Government Quota
-              {% else %}
-                Management Quota
-              {% endif %}
+              {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}
             </div>
-            <div class="allot-time">
-              Allotted on {{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST
-            </div>
+            <div class="allot-time">Allotted on {{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST</div>
           </div>
         </div>
         {% else %}
-        <div class="not-allotted">
-          <span>⏳</span>
-          <span>Seat not yet allotted for this rank</span>
-        </div>
+        <div class="not-allotted"><span>⏳</span><span>Seat not yet allotted for this rank</span></div>
         {% endif %}
 
         {% else %}
-        <!-- Rank exists but no student found with this rank -->
-        <div class="not-allotted">
-          <span>ℹ️</span>
-          <span>No student record found for Rank #{{ cs.current_rank }}</span>
-        </div>
+        <div class="not-allotted"><span>ℹ️</span><span>No student record found for Rank #{{ cs.current_rank }}</span></div>
         {% endif %}
 
-        <!-- Admin Message -->
         {% if cs.message %}
-        <div class="admin-message">
-          <span>📢</span>
-          <span>{{ cs.message }}</span>
-        </div>
+        <div class="admin-message"><span>📢</span><span>{{ cs.message }}</span></div>
         {% endif %}
-
       </div>
     </div>
 
-    <!-- Stats Bar -->
     <div class="stats-bar">
-      <div class="stat-chip">
-        <strong>{{ total_ranked }}</strong>
-        Total Ranked
-      </div>
-      <div class="stat-chip">
-        <strong>{{ cs.current_rank }}</strong>
-        Current Rank
-      </div>
-      <div class="stat-chip">
-        <strong>{{ total_allotted }}</strong>
-        Seats Allotted
-      </div>
+      <div class="stat-chip"><strong>{{ total_ranked }}</strong>Total Ranked</div>
+      <div class="stat-chip"><strong>{{ cs.current_rank }}</strong>Current Rank</div>
+      <div class="stat-chip"><strong>{{ total_allotted }}</strong>Seats Allotted</div>
     </div>
-
     {% endif %}
 
-    <!-- Refresh Bar -->
+    <!-- Live Seat Availability -->
+    {% if cat_seats_list %}
+    <div class="section-title">📊 Live Seat Availability</div>
+    <div class="seats-grid">
+      {% for item in cat_seats_list %}
+      <div class="seat-cat-card">
+        <div class="seat-cat-name">{{ item.category }}</div>
+
+        <div class="quota-row">
+          <span class="quota-label">Govt Quota</span>
+          <div class="quota-nums">
+            <span class="q-filled">{{ item.govt_filled }}</span>
+            <span class="q-total">/ {{ item.govt_total }}</span>
+            <span class="q-remain {% if item.govt_remaining == 0 %}zero{% endif %}">{{ item.govt_remaining }} left</span>
+          </div>
+        </div>
+        {% if item.govt_total > 0 %}
+        <div class="seat-progress">
+          <div class="seat-progress-fill {% if item.govt_remaining == 0 %}full{% endif %}"
+               style="width: {{ ((item.govt_filled / item.govt_total) * 100)|int }}%"></div>
+        </div>
+        {% endif %}
+
+        <div class="quota-row">
+          <span class="quota-label">Mgmt Quota</span>
+          <div class="quota-nums">
+            <span class="q-filled">{{ item.mgmt_filled }}</span>
+            <span class="q-total">/ {{ item.mgmt_total }}</span>
+            <span class="q-remain {% if item.mgmt_remaining == 0 %}zero{% endif %}">{{ item.mgmt_remaining }} left</span>
+          </div>
+        </div>
+        {% if item.mgmt_total > 0 %}
+        <div class="seat-progress">
+          <div class="seat-progress-fill {% if item.mgmt_remaining == 0 %}full{% endif %}"
+               style="width: {{ ((item.mgmt_filled / item.mgmt_total) * 100)|int }}%"></div>
+        </div>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Allotment History -->
+    <button class="history-toggle-btn" id="historyBtn" onclick="toggleHistory()">
+      <span class="btn-left">
+        🏅 Seats Allotted History
+        <span class="history-count">{{ allotment_history|length }}</span>
+      </span>
+      <span class="chevron">▼</span>
+    </button>
+
+    <div class="history-panel" id="historyPanel">
+      {% if allotment_history %}
+      <div class="history-table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Rank</th>
+              <th>Student Name</th>
+              <th>Category</th>
+              <th>Quota</th>
+              <th>Allotted At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in allotment_history %}
+            <tr>
+              <td style="color:var(--muted);font-size:0.78rem;">{{ loop.index }}</td>
+              <td><span class="rank-pill">#{{ h.rank }}</span></td>
+              <td style="font-weight:500;color:var(--text);">{{ h.name }}</td>
+              <td style="color:var(--muted);font-size:0.82rem;">{{ h.category }}</td>
+              <td><span class="quota-badge {{ h.quota }}">{{ h.quota|title }}</span></td>
+              <td style="font-size:0.78rem;color:var(--muted);white-space:nowrap;">{{ h.allotted_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="history-empty">No seats allotted yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- Refresh bar -->
     <div class="refresh-bar">
       <div class="refresh-info">
         <span>Auto-refresh in</span>
@@ -566,31 +521,30 @@
       </div>
     </div>
 
-  </div><!-- /.live-center -->
-</div><!-- /.live-page -->
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  // Countdown timer + auto-refresh
   let seconds = 30;
   const countdownEl = document.getElementById('countdown');
-
-  const timer = setInterval(() => {
+  setInterval(() => {
     seconds--;
     if (countdownEl) countdownEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(timer);
-      window.location.reload();
-    }
+    if (seconds <= 0) window.location.reload();
   }, 1000);
 
-  // Restart animation on each load
   const fill = document.getElementById('progress-fill');
   if (fill) {
     fill.style.animation = 'none';
-    fill.offsetHeight; // reflow
+    fill.offsetHeight;
     fill.style.animation = 'drain 30s linear forwards';
+  }
+
+  function toggleHistory() {
+    document.getElementById('historyBtn').classList.toggle('open');
+    document.getElementById('historyPanel').classList.toggle('open');
   }
 </script>
 {% endblock %}

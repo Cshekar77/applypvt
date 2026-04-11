@@ -123,39 +123,76 @@ def index():
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
+# ───────────────────────────────────
+
+# ─────────────────────────────────────────
+#  Public — Live Counselling Tracker
 #  No login required — anyone can view
 # ─────────────────────────────────────────
 @main.route('/live')
 def counselling_live():
     cs = CounsellingSettings.get()
 
-    student       = None
-    allotment     = None
-    total_ranked  = StudentApplication.query.filter(
-                        StudentApplication.rank.isnot(None)).count()
+    student        = None
+    allotment      = None
+    total_ranked   = StudentApplication.query.filter(
+                         StudentApplication.rank.isnot(None)).count()
     total_allotted = SeatAllotment.query.count()
 
+    # Current rank student
     if cs.current_rank:
         student = StudentApplication.query.filter_by(
             rank=cs.current_rank,
             is_verified=True
         ).first()
-
         if student:
             a = SeatAllotment.query.filter_by(application_id=student.id).first()
             if a:
-                allotted_ist = utc_to_ist(a.allotted_at)
                 allotment = {
                     'quota':       a.quota,
-                    'allotted_at': allotted_ist,
+                    'allotted_at': utc_to_ist(a.allotted_at),
                 }
+
+    # Seat availability per category
+    categories    = ApplicationCategory.query.filter_by(is_active=True).all()
+    cat_seats_list = []
+    for cat in categories:
+        cs_row = CategorySeats.get_for_category(cat.id)
+        cat_seats_list.append({
+            'category':       cat.name,
+            'govt_total':     cs_row.govt_total,
+            'govt_filled':    cs_row.govt_filled,
+            'govt_remaining': cs_row.govt_remaining,
+            'mgmt_total':     cs_row.mgmt_total,
+            'mgmt_filled':    cs_row.mgmt_filled,
+            'mgmt_remaining': cs_row.mgmt_remaining,
+        })
+
+    # Allotment history — all allotted students sorted by rank
+    all_allotments   = SeatAllotment.query.order_by(SeatAllotment.allotted_at.asc()).all()
+    allotment_history = []
+    for a in all_allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        allotted_ist = utc_to_ist(a.allotted_at)
+        allotment_history.append({
+            'rank':       appl.rank or '—',
+            'name':       appl.full_name,
+            'category':   appl.category_name or '—',
+            'quota':      a.quota,
+            'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '—',
+        })
+    allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
 
     return render_template('counselling_live.html',
                            cs=cs,
                            student=student,
                            allotment=allotment,
                            total_ranked=total_ranked,
-                           total_allotted=total_allotted)
+                           total_allotted=total_allotted,
+                           cat_seats_list=cat_seats_list,
+                           allotment_history=allotment_history)
 
 # ─────────────────────────────────────────
 #  POST API — Register Student
