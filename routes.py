@@ -1052,11 +1052,23 @@ def admin_admit_categories():
 @main.route('/admin/admitted-students')
 @admin_required
 def admin_admitted_students():
-    allotments = (SeatAllotment.query
-                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
-                  .order_by(SeatAllotment.allotted_at)
-                  .all())
-    return render_template('admin_admitted_students.html', allotments=allotments)
+    allotments    = SeatAllotment.query.order_by(SeatAllotment.allotted_at).all()
+    students_data = []
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        fees     = StudentFees.query.filter_by(application_id=appl.id).first()
+        receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
+                     .order_by(PaymentReceipt.created_at.asc()).all()
+        students_data.append({
+            'appl':      appl,
+            'allotment': a,
+            'fees':      fees,
+            'receipts':  receipts,
+        })
+    students_data.sort(key=lambda x: (x['appl'].rank or 9999))
+    return render_template('admin_admitted_students.html', students_data=students_data)
 
 
 # ─────────────────────────────────────────
