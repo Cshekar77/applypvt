@@ -1056,11 +1056,8 @@ def admin_admit_categories():
 @main.route('/admin/admitted-students')
 @admin_required
 def admin_admitted_students():
-    # All admit categories (show all, not just active — so vacant rows show even if deactivated)
     admit_categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
 
-    # Build seat_map: (admit_category_id, seat_number) → SeatAllotment
-    # This lets the template look up "who is in GM seat 5?" in O(1)
     all_allotments = SeatAllotment.query.filter(
         SeatAllotment.admit_category_id.isnot(None),
         SeatAllotment.admit_seat_number.isnot(None)
@@ -1068,14 +1065,19 @@ def admin_admitted_students():
 
     seat_map = {}
     for a in all_allotments:
+        appl     = a.application
+        fees_obj = StudentFees.query.filter_by(application_id=appl.id).first()
+        a._has_fees     = fees_obj is not None
+        a._fees_total   = float(fees_obj.total_fees)   if fees_obj and fees_obj.total_fees   else 0.0
+        a._fees_paid    = float(fees_obj.total_paid)   if fees_obj else 0.0
+        a._fees_pending = float(fees_obj.balance_remaining) if fees_obj else 0.0
         key = (a.admit_category_id, a.admit_seat_number)
         seat_map[key] = a
 
-    # Summary counts
-    total_seats   = sum(ac.total_seats for ac in admit_categories)
+    total_seats    = sum(ac.total_seats for ac in admit_categories)
     total_assigned = len(seat_map)
-    govt_count    = sum(1 for a in seat_map.values() if a.quota == 'government')
-    mgmt_count    = sum(1 for a in seat_map.values() if a.quota == 'management')
+    govt_count     = sum(1 for a in seat_map.values() if a.quota == 'government')
+    mgmt_count     = sum(1 for a in seat_map.values() if a.quota == 'management')
 
     return render_template('admin_admitted_students.html',
                            admit_categories=admit_categories,
@@ -1084,7 +1086,6 @@ def admin_admitted_students():
                            total_assigned=total_assigned,
                            govt_count=govt_count,
                            mgmt_count=mgmt_count)
-
 
 # ─────────────────────────────────────────
 #  Admin — WhatsApp Group Management

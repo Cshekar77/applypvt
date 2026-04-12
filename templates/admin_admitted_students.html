@@ -18,7 +18,6 @@
   }
   .btn-back:hover { color: #0a1f44; }
 
-  /* ── Summary strip ── */
   .summary-strip {
     display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
   }
@@ -35,7 +34,6 @@
     font-size: 1.65rem; font-weight: 800; color: #0a1f44; line-height: 1;
   }
 
-  /* ── Category section ── */
   .cat-section { margin-bottom: 2.5rem; }
   .cat-section-header {
     display: flex; align-items: center; gap: .75rem;
@@ -66,20 +64,14 @@
     height: 100%; border-radius: 20px; transition: width .5s;
   }
 
-  /* ── Table card ── */
   .table-card {
     background: white; border-radius: 18px;
     border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05);
     overflow: hidden;
   }
-
   .as-table-wrap { overflow-x: auto; }
-  .as-table {
-    width: 100%; border-collapse: collapse; font-size: .87rem;
-  }
-  .as-table thead tr {
-    background: #f8f9fd; border-bottom: 2px solid #eef2f8;
-  }
+  .as-table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+  .as-table thead tr { background: #f8f9fd; border-bottom: 2px solid #eef2f8; }
   .as-table th {
     padding: .65rem 1rem; text-align: left; font-size: .68rem;
     font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
@@ -90,10 +82,8 @@
     color: #1a2c3e; vertical-align: middle;
   }
   .as-table tr:last-child td { border-bottom: none; }
-
-  /* Row states */
-  .as-table tr.assigned td       { background: #fafffe; }
-  .as-table tr.assigned:hover td { background: #f0fdf8; }
+  .as-table tr.assigned td         { background: #fafffe; }
+  .as-table tr.assigned:hover td   { background: #f0fdf8; }
   .as-table tr.unassigned td       { background: #fafbfd; }
   .as-table tr.unassigned:hover td { background: #f5f7ff; }
 
@@ -118,10 +108,7 @@
   }
   .rank-empty { font-size: .78rem; color: #c4cdd8; font-style: italic; }
 
-  .badge {
-    display: inline-block; font-size: .68rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px;
-  }
+  .badge { display: inline-block; font-size: .68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
   .badge-govt { background: #cce5ff; color: #004085; }
   .badge-mgmt { background: #fff3cd; color: #856404; }
 
@@ -129,7 +116,6 @@
   .student-email { font-size: .75rem; color: #8a9ab0; margin-top: 1px; }
   .unassigned-label { font-size: .8rem; color: #c4cdd8; font-style: italic; }
 
-  /* Fees */
   .fees-total   { font-weight: 700; color: #0a1f44; }
   .fees-paid    { color: #15803d; font-weight: 600; }
   .fees-pending { color: #dc3545; font-weight: 600; }
@@ -144,7 +130,6 @@
     background: #25c26e; height: 100%; border-radius: 20px; transition: width .4s;
   }
 
-  /* Search */
   .search-row {
     display: flex; align-items: center; gap: .65rem; margin-bottom: 1.5rem; flex-wrap: wrap;
   }
@@ -155,30 +140,28 @@
   }
   .search-input:focus { border-color: #7c3aed; }
 
-  /* Empty */
   .empty-state {
     text-align: center; padding: 4rem; color: #8a9ab0;
     background: white; border-radius: 18px; border: 1.5px dashed #e2e8f0;
   }
 
-  /* Dark mode */
-  body.dark .sum-box          { background: #1a2538; border-color: #2d3e54; }
-  body.dark .sum-box .sum-val { color: #eef2ff; }
+  body.dark .sum-box            { background: #1a2538; border-color: #2d3e54; }
+  body.dark .sum-box .sum-val   { color: #eef2ff; }
   body.dark .cat-section-header h3 { color: #eef2ff; }
-  body.dark .cat-stats        { background: #131e2e; border-color: #2d3e54; color: #b9c8e8; }
-  body.dark .progress-cat-wrap { background: #2d3e54; }
-  body.dark .table-card       { background: #1a2538; border-color: #2d3e54; }
-  body.dark .as-table thead tr { background: #131e2e; border-color: #2d3e54; }
-  body.dark .as-table th      { color: #8a9ab0; }
-  body.dark .as-table td      { border-color: #1e2e42; color: #eef2ff; }
-  body.dark .as-table tr.assigned td       { background: #0d1f18; }
-  body.dark .as-table tr.assigned:hover td { background: #0a1f15; }
+  body.dark .cat-stats          { background: #131e2e; border-color: #2d3e54; color: #b9c8e8; }
+  body.dark .progress-cat-wrap  { background: #2d3e54; }
+  body.dark .table-card         { background: #1a2538; border-color: #2d3e54; }
+  body.dark .as-table thead tr  { background: #131e2e; border-color: #2d3e54; }
+  body.dark .as-table th        { color: #8a9ab0; }
+  body.dark .as-table td        { border-color: #1e2e42; color: #eef2ff; }
+  body.dark .as-table tr.assigned td         { background: #0d1f18; }
+  body.dark .as-table tr.assigned:hover td   { background: #0a1f15; }
   body.dark .as-table tr.unassigned td       { background: #131e2e; }
   body.dark .as-table tr.unassigned:hover td { background: #1a2538; }
-  body.dark .student-name     { color: #eef2ff; }
-  body.dark .fees-total       { color: #eef2ff; }
-  body.dark .search-input     { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .as-header h2     { color: #eef2ff; }
+  body.dark .student-name       { color: #eef2ff; }
+  body.dark .fees-total         { color: #eef2ff; }
+  body.dark .search-input       { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .as-header h2       { color: #eef2ff; }
   body.dark .admit-seat-badge.vacant { background: #1e2e42; border-color: #2d3e54; color: #5a6e82; }
 </style>
 
@@ -191,7 +174,6 @@
     <h2><i class="fas fa-user-check" style="color:#0f766e"></i> Admitted Students</h2>
   </div>
 
-  {# ── Summary ── #}
   <div class="summary-strip">
     <div class="sum-box">
       <div class="sum-label"><i class="fas fa-chair"></i> Total Seats</div>
@@ -217,19 +199,16 @@
 
   {% if admit_categories %}
 
-  {# Search #}
   <div class="search-row">
     <i class="fas fa-search" style="color:#8a9ab0"></i>
     <input type="text" class="search-input" id="searchInput"
       placeholder="Search by name, rank, category…" oninput="filterRows()">
   </div>
 
-  {# ── One section per admit category ── #}
   {% for ac in admit_categories %}
   {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
 
   <div class="cat-section" id="cat-section-{{ ac.id }}">
-
     <div class="cat-section-header">
       <span class="cat-pill"><i class="fas fa-tag"></i> {{ ac.name }}</span>
       <h3>{{ ac.name }} — {{ ac.seats_used }}/{{ ac.total_seats }} Seats Filled</h3>
@@ -261,17 +240,14 @@
             {% set allotment = seat_map.get((ac.id, seat_num)) %}
 
             {% if allotment %}
-              {% set appl = allotment.application %}
-              {% set fees = appl.fees %}
-              {% set total_paid = fees.total_paid if fees else 0 %}
-              {% set total_fees_val = fees.total_fees if fees else 0 %}
-              {% set pending = fees.balance_remaining if fees else 0 %}
+              {% set appl           = allotment.application %}
+              {% set total_fees_val = allotment._fees_total %}
+              {% set total_paid     = allotment._fees_paid %}
+              {% set pending        = allotment._fees_pending %}
               <tr class="assigned"
                 data-search="{{ appl.full_name|lower }} rank{{ appl.rank }} {{ appl.category_name|lower if appl.category_name else '' }} {{ ac.name|lower }}">
                 <td class="sl-num">{{ seat_num }}</td>
-                <td>
-                  <span class="admit-seat-badge">{{ ac.name }}({{ seat_num }})</span>
-                </td>
+                <td><span class="admit-seat-badge">{{ ac.name }}({{ seat_num }})</span></td>
                 <td>
                   {% if appl.rank %}
                     <span class="rank-pill">#{{ appl.rank }}</span>
@@ -290,20 +266,20 @@
                   </span>
                 </td>
                 <td>
-                  {% if fees %}
-                    <span class="fees-total">₹{{ '{:,.0f}'.format(total_fees_val or 0) }}</span>
+                  {% if allotment._has_fees %}
+                    <span class="fees-total">₹{{ '{:,.0f}'.format(total_fees_val) }}</span>
                   {% else %}
                     <span class="fees-none">Not set</span>
                   {% endif %}
                 </td>
                 <td>
-                  {% if fees %}
-                    <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid or 0) }}</span>
+                  {% if allotment._has_fees %}
+                    <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid) }}</span>
                     {% if total_fees_val > 0 %}
-                     <div class="progress-bar-wrap">
-                        <div class="progress-bar-fill"
-                            style="width:{{ [((total_paid / total_fees_val) * 100)|int, 100]|min if total_fees_val else 0 }}%">
-                        </div>
+                    <div class="progress-bar-wrap">
+                      <div class="progress-bar-fill"
+                        style="width:{{ [((total_paid / total_fees_val) * 100)|int, 100]|min }}%">
+                      </div>
                     </div>
                     {% endif %}
                   {% else %}
@@ -311,11 +287,11 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if fees %}
+                  {% if allotment._has_fees %}
                     {% if pending <= 0 %}
                       <span class="fees-clear"><i class="fas fa-check-circle"></i> Cleared</span>
                     {% else %}
-                      <span class="fees-pending">₹{{ '{:,.0f}'.format(pending or 0) }}</span>
+                      <span class="fees-pending">₹{{ '{:,.0f}'.format(pending) }}</span>
                     {% endif %}
                   {% else %}
                     <span class="fees-none">—</span>
@@ -329,12 +305,9 @@
               </tr>
 
             {% else %}
-              {# ── Vacant row ── #}
               <tr class="unassigned" data-search="{{ ac.name|lower }}">
                 <td class="sl-num">{{ seat_num }}</td>
-                <td>
-                  <span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span>
-                </td>
+                <td><span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span></td>
                 <td><span class="rank-empty">—</span></td>
                 <td><span class="unassigned-label">Not yet assigned</span></td>
                 <td><span class="fees-none">—</span></td>
@@ -351,8 +324,7 @@
         </table>
       </div>
     </div>
-
-  </div>{# /cat-section #}
+  </div>
   {% endfor %}
 
   {% else %}
