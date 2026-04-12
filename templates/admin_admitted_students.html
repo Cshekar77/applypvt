@@ -2,297 +2,245 @@
 {% block title %}Admitted Students — Admin{% endblock %}
 {% block content %}
 <style>
-  .as-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
-
-  .as-header {
-    display: flex; align-items: center; justify-content: space-between;
+  .page-header-inner {
+    display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
   }
-  .as-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.9rem; color: #0a1f44; margin: 0;
+  .page-header-inner h2 {
+    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
   }
-  .btn-back {
-    display: inline-flex; align-items: center; gap: .4rem;
-    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
-  }
-  .btn-back:hover { color: #0a1f44; }
+  .back-link { color: #c9a03d; text-decoration: none; font-size: .9rem; }
+  .back-link:hover { text-decoration: underline; }
 
-  /* ── Summary strip ── */
-  .summary-strip {
-    display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+  /* Summary bar */
+  .summary-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
   }
-  .sum-box {
-    background: white; border-radius: 14px; border: 1px solid #eef2f8;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    padding: .9rem 1.4rem; flex: 1; min-width: 140px;
+  .sum-card {
+    background: white; border-radius: 16px; padding: 1.25rem;
+    text-align: center; border: 1px solid #eef2f8;
   }
-  .sum-box .sum-label {
-    font-size: .7rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .07em; color: #8a9ab0; margin-bottom: .25rem;
-  }
-  .sum-box .sum-val {
-    font-size: 1.65rem; font-weight: 800; color: #0a1f44; line-height: 1;
-  }
+  .sum-num { font-size: 2rem; font-weight: 700; color: #0a1f44; }
+  .sum-lbl { color: #5a6e82; font-size: .8rem; margin-top: .3rem; }
+  .sum-green .sum-num { color: #16a34a; }
+  .sum-teal  .sum-num { color: #0f766e; }
+  .sum-red   .sum-num { color: #dc2626; }
+  .sum-gold  .sum-num { color: #c9a03d; }
 
-  /* ── Table card ── */
+  /* Table card */
   .table-card {
-    background: white; border-radius: 20px;
-    border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    overflow: hidden;
+    background: white; border-radius: 20px; padding: 1.75rem;
+    border: 1px solid #eef2f8; overflow-x: auto;
   }
-  .table-card-header {
-    padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: .5rem;
+  .table-card h3 {
+    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
   }
-  .table-card-header h4 { font-size: 1rem; color: #0a1f44; margin: 0; }
+  .table-card h3 i { color: #16a34a; }
 
-  .as-table-wrap { overflow-x: auto; }
-  .as-table {
-    width: 100%; border-collapse: collapse; font-size: .87rem;
+  .adm-table { width: 100%; border-collapse: collapse; font-size: .875rem; min-width: 800px; }
+  .adm-table th {
+    text-align: left; font-size: .72rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: .6rem 1rem; border-bottom: 2px solid #eef2f8; white-space: nowrap;
   }
-  .as-table thead tr {
-    background: #f8f9fd; border-bottom: 2px solid #eef2f8;
-  }
-  .as-table th {
-    padding: .7rem 1rem; text-align: left; font-size: .7rem;
-    font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
-    white-space: nowrap;
-  }
-  .as-table td {
-    padding: .75rem 1rem; border-bottom: 1px solid #f5f7fa;
-    color: #1a2c3e; vertical-align: middle;
-  }
-  .as-table tr:last-child td { border-bottom: none; }
-  .as-table tr:hover td { background: #fafbff; }
+  .adm-table td { padding: .85rem 1rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .adm-table tr:last-child td { border-bottom: none; }
+  .adm-table tr:hover td { background: #f8fff8; }
 
   .sl-num {
-    font-size: .78rem; color: #8a9ab0; font-weight: 600;
-  }
-  .admit-seat-badge {
-    display: inline-block; font-size: .8rem; font-weight: 800;
-    padding: 4px 12px; border-radius: 20px;
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    color: white; letter-spacing: .03em;
-    box-shadow: 0 2px 8px rgba(124,58,237,.3);
-  }
-  .admit-seat-none {
-    font-size: .78rem; color: #b0bac8; font-style: italic;
-  }
-  .rank-pill {
     background: #0a1f44; color: white; font-size: .7rem;
-    font-weight: 700; padding: 3px 9px; border-radius: 20px;
-    display: inline-block;
-  }
-  .badge {
-    display: inline-block; font-size: .68rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px;
-  }
-  .badge-govt { background: #cce5ff; color: #004085; }
-  .badge-mgmt { background: #fff3cd; color: #856404; }
-
-  /* Fees columns */
-  .fees-total   { font-weight: 700; color: #0a1f44; }
-  .fees-paid    { color: #15803d; font-weight: 600; }
-  .fees-pending { color: #dc3545; font-weight: 600; }
-  .fees-clear   { color: #15803d; font-weight: 700; }
-  .fees-none    { color: #b0bac8; font-style: italic; font-size: .8rem; }
-
-  .progress-bar-wrap {
-    background: #eef2f8; border-radius: 20px; height: 5px;
-    overflow: hidden; width: 70px; margin-top: 4px;
-  }
-  .progress-bar-fill {
-    background: #25c26e; height: 100%; border-radius: 20px; transition: width .4s;
+    font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap;
   }
 
-  /* Search */
-  .search-wrap {
-    display: flex; align-items: center; gap: .65rem; margin-bottom: 1.25rem;
+  /* Admit seat label e.g. GM(1) */
+  .admit-seat-label {
+    display: inline-block; font-size: .85rem; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px;
+    background: #fef3c7; color: #92400e;
+    border: 1px solid #fde68a; white-space: nowrap;
   }
-  .search-input {
-    padding: .6rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: .88rem; font-family: inherit; outline: none;
-    transition: border-color .2s; width: 260px;
-  }
-  .search-input:focus { border-color: #7c3aed; }
-
-  .empty-state {
-    text-align: center; padding: 3.5rem; color: #8a9ab0;
+  .admit-seat-label.no-cat {
+    background: #f3f4f6; color: #6b7280; border-color: #e5e7eb;
+    font-weight: 400; font-size: .78rem;
   }
 
-  /* Dark mode */
-  body.dark .sum-box       { background: #1a2538; border-color: #2d3e54; }
-  body.dark .sum-box .sum-val   { color: #eef2ff; }
-  body.dark .table-card    { background: #1a2538; border-color: #2d3e54; }
-  body.dark .table-card-header { border-color: #2d3e54; }
-  body.dark .table-card-header h4 { color: #eef2ff; }
-  body.dark .as-table thead tr { background: #131e2e; border-color: #2d3e54; }
-  body.dark .as-table th   { color: #8a9ab0; }
-  body.dark .as-table td   { border-color: #1e2e42; color: #eef2ff; }
-  body.dark .as-table tr:hover td { background: #1e2e42; }
-  body.dark .fees-total    { color: #eef2ff; }
-  body.dark .search-input  { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .as-header h2  { color: #eef2ff; }
+  .stu-name { font-weight: 600; color: #0a1f44; }
+  .stu-sub  { color: #5a6e82; font-size: .78rem; margin-top: 1px; }
+
+  .badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-govt { background: #dbeafe; color: #1e40af; }
+  .badge-mgmt { background: #fce7f3; color: #9d174d; }
+
+  .fee-total { font-weight: 700; color: #0a1f44; }
+  .fee-paid  { color: #0f766e; font-weight: 600; }
+  .fee-due   { color: #dc2626; font-weight: 600; }
+  .fee-na    { color: #aab4c8; font-style: italic; font-size: .82rem; }
+
+  .progress-bar-wrap { background: #f3f4f6; border-radius: 20px; height: 5px; margin-top: 4px; overflow: hidden; min-width: 60px; }
+  .progress-bar-fill { height: 100%; border-radius: 20px; background: #0f766e; transition: width .4s; }
+
+  .cleared-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: #d1fae5; color: #065f46;
+    font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+  }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #aab4c8; }
+  .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #dde3ef; }
+
+  body.dark .sum-card,
+  body.dark .table-card  { background: #1a2538; border-color: #2d3e54; }
+  body.dark .sum-num,
+  body.dark .stu-name,
+  body.dark .fee-total,
+  body.dark .table-card h3 { color: #eef2ff; }
+  body.dark .sum-lbl,
+  body.dark .stu-sub,
+  body.dark .adm-table th  { color: #b9c8e8; }
+  body.dark .adm-table td  { border-color: #1e2e42; }
+  body.dark .adm-table tr:hover td { background: #1e2e42; }
+  body.dark .progress-bar-wrap { background: #2d3e54; }
+  body.dark .sum-green .sum-num { color: #4ade80; }
+  body.dark .sum-teal  .sum-num { color: #2dd4bf; }
+  body.dark .sum-red   .sum-num { color: #f87171; }
+  body.dark .fee-paid  { color: #2dd4bf; }
+  body.dark .fee-due   { color: #f87171; }
+
+  @media (max-width: 600px) {
+    .summary-bar { grid-template-columns: repeat(2, 1fr); }
+  }
 </style>
 
-<div class="as-page">
-  <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back">
-    <i class="fas fa-arrow-left"></i> Back to Dashboard
-  </a>
+{% block navbar_auth %}{% endblock %}
 
-  <div class="as-header" style="margin-top:1rem">
-    <h2><i class="fas fa-user-check" style="color:#0f766e"></i> Admitted Students</h2>
+<div class="page-wrap">
+  <div class="page-header-inner">
+    <h2><i class="fas fa-user-graduate" style="color:#16a34a;margin-right:.5rem"></i>Admitted Students</h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
   </div>
 
-  {# ── Summary ── #}
-  {% set total_admitted = allotments|length %}
-  {% set govt_count = allotments|selectattr('quota','equalto','government')|list|length %}
-  {% set mgmt_count = allotments|selectattr('quota','equalto','management')|list|length %}
+  {# Summary stats #}
+  {% set total_admitted = students_data | length %}
+  {% set total_collected = namespace(val=0) %}
+  {% set total_due_ns    = namespace(val=0) %}
+  {% for s in students_data %}
+    {% if s.fees %}
+      {% set paid = s.receipts | sum(attribute='amount_paid') %}
+      {% set total_collected.val = total_collected.val + paid %}
+      {% set due = s.fees.total_fees - paid %}
+      {% if due > 0 %}{% set total_due_ns.val = total_due_ns.val + due %}{% endif %}
+    {% endif %}
+  {% endfor %}
 
-  <div class="summary-strip">
-    <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-users"></i> Total Admitted</div>
-      <div class="sum-val" style="color:#0a1f44">{{ total_admitted }}</div>
+  <div class="summary-bar">
+    <div class="sum-card sum-green">
+      <div class="sum-num">{{ total_admitted }}</div>
+      <div class="sum-lbl">Admitted Students</div>
     </div>
-    <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-landmark"></i> Govt Quota</div>
-      <div class="sum-val" style="color:#004085">{{ govt_count }}</div>
+    <div class="sum-card sum-teal">
+      <div class="sum-num">₹{{ '{:,.0f}'.format(total_collected.val) }}</div>
+      <div class="sum-lbl">Total Collected</div>
     </div>
-    <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-building"></i> Mgmt Quota</div>
-      <div class="sum-val" style="color:#856404">{{ mgmt_count }}</div>
+    <div class="sum-card sum-red">
+      <div class="sum-num">₹{{ '{:,.0f}'.format(total_due_ns.val) }}</div>
+      <div class="sum-lbl">Total Pending</div>
     </div>
-    <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-tags"></i> With Admit Category</div>
-      <div class="sum-val" style="color:#7c3aed">
-        {{ allotments|selectattr('admit_category_id')|list|length }}
-      </div>
+    <div class="sum-card sum-gold">
+      <div class="sum-num">{{ students_data | selectattr('fees') | list | length }}</div>
+      <div class="sum-lbl">Fees Set</div>
     </div>
-  </div>
-
-  {# ── Table ── #}
-  {% if allotments %}
-  <div class="search-wrap">
-    <i class="fas fa-search" style="color:#8a9ab0"></i>
-    <input type="text" class="search-input" id="searchInput"
-      placeholder="Search by name, category, rank…" oninput="filterTable()">
   </div>
 
   <div class="table-card">
-    <div class="table-card-header">
-      <h4><i class="fas fa-list" style="color:#c9a03d;margin-right:.4rem"></i>
-        All Admitted Students ({{ total_admitted }})</h4>
-      <span style="font-size:.8rem;color:#8a9ab0">Sorted by allotment time</span>
-    </div>
-    <div class="as-table-wrap">
-      <table class="as-table" id="admittedTable">
-        <thead>
-          <tr>
-            <th>Sl No</th>
-            <th>Admit Category Seat</th>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Caste Category</th>
-            <th>Quota</th>
-            <th>Total Fees</th>
-            <th>Paid So Far</th>
-            <th>Pending</th>
-            <th>Allotted At</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in allotments %}
-          {% set appl = a.application %}
-          {% set fees = appl.fees %}
-          {% set total_paid = fees.total_paid if fees else 0 %}
-          {% set total_fees = fees.total_fees if fees else 0 %}
-          {% set pending = fees.balance_remaining if fees else 0 %}
-          <tr>
-            <td class="sl-num">{{ loop.index }}</td>
-            <td>
-              {% if a.admit_seat_label %}
-                <span class="admit-seat-badge">{{ a.admit_seat_label }}</span>
-              {% else %}
-                <span class="admit-seat-none">Not assigned</span>
-              {% endif %}
-            </td>
-            <td><span class="rank-pill">#{{ appl.rank }}</span></td>
-            <td>
-              <div style="font-weight:600;color:#0a1f44">{{ appl.full_name }}</div>
-              <div style="font-size:.75rem;color:#8a9ab0">{{ appl.email }}</div>
-            </td>
-            <td>{{ appl.category_name or '—' }}</td>
-            <td>
-              <span class="badge badge-{{ a.quota }}">
-                {{ a.quota|title }}
-              </span>
-            </td>
-            <td>
-              {% if fees %}
-                <span class="fees-total">₹{{ '{:,.0f}'.format(total_fees) }}</span>
-              {% else %}
-                <span class="fees-none">Not set</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if fees %}
-                <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid) }}</span>
-                {% if total_fees > 0 %}
-                <div class="progress-bar-wrap">
-                  <div class="progress-bar-fill"
-                    style="width:{{ ((total_paid/total_fees)*100)|int if total_fees > 0 else 0 }}%">
-                  </div>
-                </div>
-                {% endif %}
-              {% else %}
-                <span class="fees-none">—</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if fees %}
-                {% if pending <= 0 %}
-                  <span class="fees-clear"><i class="fas fa-check-circle"></i> Cleared</span>
-                {% else %}
-                  <span class="fees-pending">₹{{ '{:,.0f}'.format(pending) }}</span>
-                {% endif %}
-              {% else %}
-                <span class="fees-none">—</span>
-              {% endif %}
-            </td>
-            <td style="font-size:.8rem;color:#5a6e82;white-space:nowrap">
-              {% if a.allotted_at %}
-                {{ a.allotted_at | ist }}
-              {% else %}—{% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <h3><i class="fas fa-list-ol"></i> Admitted Students List</h3>
 
-  {% else %}
-  <div class="table-card">
+    {% if students_data %}
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Admit Category Seat</th>
+          <th>Name</th>
+          <th>Caste Category</th>
+          <th>Quota</th>
+          <th>Total Fees</th>
+          <th>Paid So Far</th>
+          <th>Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students_data %}
+        {% set paid_amt = s.receipts | sum(attribute='amount_paid') if s.receipts else 0 %}
+        {% set due_amt  = (s.fees.total_fees - paid_amt) if s.fees else None %}
+        {% set pct = ((paid_amt / s.fees.total_fees * 100) | round | int) if s.fees and s.fees.total_fees > 0 else 0 %}
+        <tr>
+          <td>
+            <span class="sl-num">{{ loop.index }}</span>
+          </td>
+          <td>
+            {% if s.allotment.admit_seat_label %}
+              <span class="admit-seat-label">{{ s.allotment.admit_seat_label }}</span>
+            {% else %}
+              <span class="admit-seat-label no-cat">Not assigned</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="stu-name">{{ s.appl.full_name }}</div>
+            <div class="stu-sub">{{ s.appl.email }}</div>
+          </td>
+          <td>
+            <div style="font-weight:500;color:#0a1f44;font-size:.875rem">
+              {{ s.appl.category_name or '—' }}
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-{{ s.allotment.quota }}">
+              {{ s.allotment.quota | title }}
+            </span>
+          </td>
+          <td>
+            {% if s.fees %}
+              <div class="fee-total">₹{{ '{:,.0f}'.format(s.fees.total_fees) }}</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style="width:{{ pct }}%"></div>
+              </div>
+            {% else %}
+              <span class="fee-na">Not set</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if s.fees %}
+              <span class="fee-paid">₹{{ '{:,.0f}'.format(paid_amt) }}</span>
+            {% else %}
+              <span class="fee-na">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if s.fees %}
+              {% if due_amt is not none and due_amt <= 0 %}
+                <span class="cleared-badge"><i class="fas fa-check"></i> Cleared</span>
+              {% else %}
+                <span class="fee-due">₹{{ '{:,.0f}'.format(due_amt or 0) }}</span>
+              {% endif %}
+            {% else %}
+              <span class="fee-na">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% else %}
     <div class="empty-state">
-      <i class="fas fa-user-clock" style="font-size:2.5rem;margin-bottom:1rem;display:block;color:#c4b5fd"></i>
-      No students have been admitted yet.<br>
-      <span style="font-size:.85rem">Go to Counselling Management to allot seats.</span>
+      <i class="fas fa-user-graduate"></i>
+      <p>No students have been admitted yet.<br>Allot seats during counselling to see them here.</p>
     </div>
+    {% endif %}
   </div>
-  {% endif %}
-
 </div>
-
-{% block scripts %}
-<script>
-function filterTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  document.querySelectorAll('#admittedTable tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-</script>
-{% endblock %}
 {% endblock %}
