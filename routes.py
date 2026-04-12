@@ -1049,26 +1049,41 @@ def admin_admit_categories():
 # ─────────────────────────────────────────
 #  Admin — Admitted Students              ← NEW
 # ─────────────────────────────────────────
+# ─────────────────────────────────────────
+#  REPLACE your existing admin_admitted_students route with this
+# ─────────────────────────────────────────
+
 @main.route('/admin/admitted-students')
 @admin_required
 def admin_admitted_students():
-    allotments    = SeatAllotment.query.order_by(SeatAllotment.allotted_at).all()
-    students_data = []
-    for a in allotments:
-        appl = StudentApplication.query.get(a.application_id)
-        if not appl:
-            continue
-        fees     = StudentFees.query.filter_by(application_id=appl.id).first()
-        receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
-                     .order_by(PaymentReceipt.created_at.asc()).all()
-        students_data.append({
-            'appl':      appl,
-            'allotment': a,
-            'fees':      fees,
-            'receipts':  receipts,
-        })
-    students_data.sort(key=lambda x: (x['appl'].rank or 9999))
-    return render_template('admin_admitted_students.html', students_data=students_data)
+    # All admit categories (show all, not just active — so vacant rows show even if deactivated)
+    admit_categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
+
+    # Build seat_map: (admit_category_id, seat_number) → SeatAllotment
+    # This lets the template look up "who is in GM seat 5?" in O(1)
+    all_allotments = SeatAllotment.query.filter(
+        SeatAllotment.admit_category_id.isnot(None),
+        SeatAllotment.admit_seat_number.isnot(None)
+    ).all()
+
+    seat_map = {}
+    for a in all_allotments:
+        key = (a.admit_category_id, a.admit_seat_number)
+        seat_map[key] = a
+
+    # Summary counts
+    total_seats   = sum(ac.total_seats for ac in admit_categories)
+    total_assigned = len(seat_map)
+    govt_count    = sum(1 for a in seat_map.values() if a.quota == 'government')
+    mgmt_count    = sum(1 for a in seat_map.values() if a.quota == 'management')
+
+    return render_template('admin_admitted_students.html',
+                           admit_categories=admit_categories,
+                           seat_map=seat_map,
+                           total_seats=total_seats,
+                           total_assigned=total_assigned,
+                           govt_count=govt_count,
+                           mgmt_count=mgmt_count)
 
 
 # ─────────────────────────────────────────
