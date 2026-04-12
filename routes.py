@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 from database import db
 from models import (User, FormSettings, StudentApplication, ApplicationCategory,
                     WhatsAppSettings, CounsellingSettings, CategorySeats, SeatAllotment,
-                    Faculty, StudentFees, PaymentReceipt)
+                    Faculty, StudentFees, PaymentReceipt, AdmitCategory)   # ← AdmitCategory added
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel, export_verified_excel
@@ -123,10 +123,6 @@ def index():
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
-# ───────────────────────────────────
-
-# ─────────────────────────────────────────
-#  Public — Live Counselling Tracker
 #  No login required — anyone can view
 # ─────────────────────────────────────────
 @main.route('/live')
@@ -154,7 +150,7 @@ def counselling_live():
                 }
 
     # Seat availability per category
-    categories    = ApplicationCategory.query.filter_by(is_active=True).all()
+    categories     = ApplicationCategory.query.filter_by(is_active=True).all()
     cat_seats_list = []
     for cat in categories:
         cs_row = CategorySeats.get_for_category(cat.id)
@@ -169,7 +165,7 @@ def counselling_live():
         })
 
     # Allotment history — all allotted students sorted by rank
-    all_allotments   = SeatAllotment.query.order_by(SeatAllotment.allotted_at.asc()).all()
+    all_allotments    = SeatAllotment.query.order_by(SeatAllotment.allotted_at.asc()).all()
     allotment_history = []
     for a in all_allotments:
         appl = StudentApplication.query.get(a.application_id)
@@ -177,10 +173,10 @@ def counselling_live():
             continue
         allotted_ist = utc_to_ist(a.allotted_at)
         allotment_history.append({
-            'rank':       appl.rank or '—',
-            'name':       appl.full_name,
-            'category':   appl.category_name or '—',
-            'quota':      a.quota,
+            'rank':        appl.rank or '—',
+            'name':        appl.full_name,
+            'category':    appl.category_name or '—',
+            'quota':       a.quota,
             'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '—',
         })
     allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
@@ -193,6 +189,7 @@ def counselling_live():
                            total_allotted=total_allotted,
                            cat_seats_list=cat_seats_list,
                            allotment_history=allotment_history)
+
 
 # ─────────────────────────────────────────
 #  POST API — Register Student
@@ -898,8 +895,10 @@ def admin_counselling():
                 flash('Seats updated.', 'success')
 
         elif action == 'allot_seat':
-            app_id = request.form.get('app_id')
-            quota  = request.form.get('quota')
+            app_id            = request.form.get('app_id')
+            quota             = request.form.get('quota')
+            admit_category_id = request.form.get('admit_category_id')
+
             try:
                 app_id = int(app_id)
             except (TypeError, ValueError):
@@ -920,17 +919,34 @@ def admin_counselling():
                 elif quota == 'management' and seats.mgmt_remaining <= 0:
                     flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
                 else:
+                    # ── Admit category handling ──
+                    admit_cat   = None
+                    seat_number = None
+                    if admit_category_id:
+                        try:
+                            admit_cat = AdmitCategory.query.get(int(admit_category_id))
+                        except (TypeError, ValueError):
+                            admit_cat = None
+                        if admit_cat:
+                            seat_number = admit_cat.seats_used + 1
+                            if seat_number > admit_cat.total_seats:
+                                flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
+                                return redirect(url_for('main.admin_counselling'))
+
                     db.session.add(SeatAllotment(
-                        application_id=appl.id,
-                        category_id=appl.category_id,
-                        quota=quota,
+                        application_id    = appl.id,
+                        category_id       = appl.category_id,
+                        quota             = quota,
+                        admit_category_id = admit_cat.id if admit_cat else None,
+                        admit_seat_number = seat_number,
                     ))
                     if quota == 'government':
                         seats.govt_filled += 1
                     else:
                         seats.mgmt_filled += 1
                     db.session.commit()
-                    flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota)!', 'success')
+                    label = f' — {admit_cat.name}({seat_number})' if admit_cat else ''
+                    flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota){label}!', 'success')
 
         elif action == 'revoke_seat':
             app_id = request.form.get('app_id')
@@ -953,6 +969,7 @@ def admin_counselling():
 
         return redirect(url_for('main.admin_counselling'))
 
+    # ── GET ──
     cs         = CounsellingSettings.get()
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
     cat_seats  = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
@@ -961,12 +978,85 @@ def admin_counselling():
                   .filter(StudentApplication.rank.isnot(None))
                   .order_by(StudentApplication.rank.asc())
                   .all())
-    allotments = {a.application_id: a for a in SeatAllotment.query.all()}
+    allotments        = {a.application_id: a for a in SeatAllotment.query.all()}
+    admit_categories  = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
 
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,
                            cat_seats=cat_seats, students=students,
-                           allotments=allotments)
+                           allotments=allotments,
+                           admit_categories=admit_categories)   # ← new
+
+
+# ─────────────────────────────────────────
+#  Admin — Admit Categories Management    ← NEW
+# ─────────────────────────────────────────
+@main.route('/admin/admit-categories', methods=['GET', 'POST'])
+@admin_required
+def admin_admit_categories():
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'add':
+            name        = request.form.get('name', '').strip().upper()
+            total_seats = int(request.form.get('total_seats', 0))
+            if not name:
+                flash('Category name is required.', 'danger')
+            elif AdmitCategory.query.filter_by(name=name).first():
+                flash(f'Admit category "{name}" already exists.', 'danger')
+            else:
+                db.session.add(AdmitCategory(name=name, total_seats=total_seats))
+                db.session.commit()
+                flash(f'Admit category "{name}" added.', 'success')
+
+        elif action == 'edit':
+            cat_id      = int(request.form.get('cat_id'))
+            name        = request.form.get('name', '').strip().upper()
+            total_seats = int(request.form.get('total_seats', 0))
+            cat         = AdmitCategory.query.get_or_404(cat_id)
+            existing    = AdmitCategory.query.filter_by(name=name).first()
+            if existing and existing.id != cat_id:
+                flash(f'Name "{name}" already in use.', 'danger')
+            else:
+                cat.name        = name
+                cat.total_seats = total_seats
+                db.session.commit()
+                flash('Admit category updated.', 'success')
+
+        elif action == 'delete':
+            cat_id = int(request.form.get('cat_id'))
+            cat    = AdmitCategory.query.get_or_404(cat_id)
+            if cat.seats_used > 0:
+                flash(f'Cannot delete "{cat.name}" — {cat.seats_used} seat(s) already allotted under it.', 'danger')
+            else:
+                db.session.delete(cat)
+                db.session.commit()
+                flash('Admit category deleted.', 'success')
+
+        elif action == 'toggle':
+            cat_id     = int(request.form.get('cat_id'))
+            cat        = AdmitCategory.query.get_or_404(cat_id)
+            cat.is_active = not cat.is_active
+            db.session.commit()
+            flash(f'Admit category {"activated" if cat.is_active else "deactivated"}.', 'success')
+
+        return redirect(url_for('main.admin_admit_categories'))
+
+    categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
+    return render_template('admin_admit_categories.html', categories=categories)
+
+
+# ─────────────────────────────────────────
+#  Admin — Admitted Students              ← NEW
+# ─────────────────────────────────────────
+@main.route('/admin/admitted-students')
+@admin_required
+def admin_admitted_students():
+    allotments = (SeatAllotment.query
+                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
+                  .order_by(SeatAllotment.allotted_at)
+                  .all())
+    return render_template('admin_admitted_students.html', allotments=allotments)
 
 
 # ─────────────────────────────────────────

@@ -39,7 +39,7 @@ class WhatsAppSettings(db.Model):
     id          = db.Column(db.Integer, primary_key=True)
     link        = db.Column(db.String(500), nullable=True)
     description = db.Column(db.Text, nullable=True)
-    is_active   = db.Column(db.Boolean, default=True)
+    is_active   = db.Column(db.Boolean, default=False)
     updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
@@ -160,21 +160,61 @@ class CategorySeats(db.Model):
 
 
 # ─────────────────────────────────────────
+#  Admit Category
+#  Separate classification pool e.g. GM, SC, OBC
+#  Each has a fixed seat count; allotments are numbered sequentially
+# ─────────────────────────────────────────
+class AdmitCategory(db.Model):
+    __tablename__ = 'admit_category'
+    id          = db.Column(db.Integer, primary_key=True)
+    name        = db.Column(db.String(100), unique=True, nullable=False)   # e.g. GM, SC, OBC
+    total_seats = db.Column(db.Integer, default=0)                         # e.g. 30
+    is_active   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # convenience: how many seats are already used
+    @property
+    def seats_used(self):
+        return SeatAllotment.query.filter_by(admit_category_id=self.id).count()
+
+    @property
+    def seats_remaining(self):
+        return max(0, self.total_seats - self.seats_used)
+
+    def __repr__(self):
+        return f'<AdmitCategory {self.name}>'
+
+
+# ─────────────────────────────────────────
 #  Seat Allotment  (one per student)
 # ─────────────────────────────────────────
 class SeatAllotment(db.Model):
     __tablename__ = 'seat_allotment'
-    id              = db.Column(db.Integer, primary_key=True)
-    application_id  = db.Column(db.Integer, db.ForeignKey('student_applications.id'), unique=True)
-    category_id     = db.Column(db.Integer, db.ForeignKey('application_category.id'))
+    id                  = db.Column(db.Integer, primary_key=True)
+    application_id      = db.Column(db.Integer, db.ForeignKey('student_applications.id'), unique=True)
+    category_id         = db.Column(db.Integer, db.ForeignKey('application_category.id'))
 
     # 'government' or 'management'
-    quota           = db.Column(db.String(20), nullable=False)
+    quota               = db.Column(db.String(20), nullable=False)
 
-    allotted_at     = db.Column(db.DateTime, default=datetime.utcnow)
+    # Admit category (e.g. GM, SC, OBC) — optional
+    admit_category_id   = db.Column(db.Integer, db.ForeignKey('admit_category.id'), nullable=True)
 
-    application     = db.relationship('StudentApplication', backref='allotment')
-    category        = db.relationship('ApplicationCategory', backref='allotments')
+    # Sequential seat number within the admit category e.g. GM(1), GM(2)
+    admit_seat_number   = db.Column(db.Integer, nullable=True)
+
+    allotted_at         = db.Column(db.DateTime, default=datetime.utcnow)
+
+    application         = db.relationship('StudentApplication', backref='allotment')
+    category            = db.relationship('ApplicationCategory', backref='allotments')
+    admit_category      = db.relationship('AdmitCategory', backref='allotments')
+
+    @property
+    def admit_seat_label(self):
+        """Returns e.g. GM(1) or None if not assigned"""
+        if self.admit_category and self.admit_seat_number:
+            return f"{self.admit_category.name}({self.admit_seat_number})"
+        return None
 
 
 # ─────────────────────────────────────────

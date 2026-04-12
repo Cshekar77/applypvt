@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% block title %}Admit Categories — Admin{% endblock %}
+{% block content %}
+<style>
+  .ac-page { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+  .ac-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .ac-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; color: #0a1f44; margin: 0;
+  }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
+  }
+  .btn-back:hover { color: #0a1f44; }
+
+  /* ── Layout ── */
+  .ac-layout {
+    display: grid; grid-template-columns: 320px 1fr; gap: 1.75rem;
+  }
+  @media(max-width: 820px) { .ac-layout { grid-template-columns: 1fr; } }
+
+  /* ── Card ── */
+  .ac-card {
+    background: white; border-radius: 18px;
+    border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    padding: 1.5rem;
+  }
+  .ac-card h3 {
+    font-size: .78rem; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: #8a9ab0; margin: 0 0 1.25rem;
+  }
+
+  /* ── Form ── */
+  .form-group { margin-bottom: 1rem; }
+  .form-group label {
+    display: block; font-size: .8rem; font-weight: 600; color: #0a1f44;
+    margin-bottom: .4rem;
+  }
+  .form-group input {
+    width: 100%; padding: .65rem 1rem; border: 2px solid #e2e8f0;
+    border-radius: 10px; font-size: .9rem; font-family: inherit;
+    outline: none; transition: border-color .2s; box-sizing: border-box;
+  }
+  .form-group input:focus { border-color: #7c3aed; }
+
+  .btn-add {
+    width: 100%; padding: .75rem; background: #7c3aed; color: white;
+    border: none; border-radius: 10px; font-size: .9rem; font-weight: 700;
+    cursor: pointer; transition: all .2s; display: flex; align-items: center;
+    justify-content: center; gap: .5rem;
+  }
+  .btn-add:hover { background: #6d28d9; transform: translateY(-1px); }
+
+  /* ── Table ── */
+  .ac-table-wrap { overflow-x: auto; }
+  .ac-table {
+    width: 100%; border-collapse: collapse; font-size: .87rem;
+  }
+  .ac-table thead tr {
+    background: #f8f9fd; border-bottom: 2px solid #eef2f8;
+  }
+  .ac-table th {
+    padding: .7rem 1rem; text-align: left; font-size: .7rem;
+    font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
+  }
+  .ac-table td {
+    padding: .75rem 1rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e;
+    vertical-align: middle;
+  }
+  .ac-table tr:last-child td { border-bottom: none; }
+  .ac-table tr:hover td { background: #fafbff; }
+
+  .cat-badge {
+    display: inline-block; font-size: .75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    background: #ede9fe; color: #7c3aed; letter-spacing: .03em;
+  }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .72rem; font-weight: 600; padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .status-pill.active   { background: #dcfce7; color: #15803d; }
+  .status-pill.inactive { background: #f3f4f6; color: #6b7280; }
+
+  /* Progress bar */
+  .seats-bar-outer {
+    background: #eef2f8; border-radius: 20px; height: 6px;
+    overflow: hidden; width: 80px; margin-top: 4px;
+  }
+  .seats-bar-inner {
+    background: #7c3aed; height: 100%; border-radius: 20px; transition: width .4s;
+  }
+  .seats-bar-inner.full { background: #dc3545; }
+
+  /* Action buttons */
+  .act-btn {
+    padding: .3rem .7rem; border-radius: 7px; border: none;
+    font-size: .76rem; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: .3rem; transition: all .15s;
+  }
+  .act-edit   { background: #fef3c7; color: #92400e; }
+  .act-edit:hover { background: #fde68a; }
+  .act-toggle-on  { background: #dcfce7; color: #15803d; }
+  .act-toggle-on:hover  { background: #bbf7d0; }
+  .act-toggle-off { background: #f3f4f6; color: #6b7280; }
+  .act-toggle-off:hover { background: #e5e7eb; }
+  .act-del    { background: #fee2e2; color: #991b1b; }
+  .act-del:hover { background: #fca5a5; }
+
+  /* Edit inline row */
+  .edit-row { display: none; }
+  .edit-row td { background: #f8f4ff; padding: .75rem 1rem; }
+  .edit-inline { display: flex; gap: .65rem; align-items: center; flex-wrap: wrap; }
+  .edit-inline input {
+    padding: .4rem .8rem; border: 2px solid #e2e8f0; border-radius: 8px;
+    font-size: .85rem; font-family: inherit; outline: none; transition: border-color .2s;
+  }
+  .edit-inline input:focus { border-color: #7c3aed; }
+  .edit-inline input[name="name"] { width: 100px; text-transform: uppercase; }
+  .edit-inline input[name="total_seats"] { width: 80px; }
+  .btn-save-edit {
+    padding: .4rem .9rem; background: #7c3aed; color: white;
+    border: none; border-radius: 8px; font-size: .8rem; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: .3rem;
+  }
+  .btn-save-edit:hover { background: #6d28d9; }
+  .btn-cancel-edit {
+    padding: .4rem .9rem; background: #f3f4f6; color: #6b7280;
+    border: none; border-radius: 8px; font-size: .8rem; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: .3rem;
+  }
+
+  .empty-state {
+    text-align: center; padding: 3rem; color: #8a9ab0;
+    border: 1.5px dashed #e2e8f0; border-radius: 14px;
+  }
+
+  /* Dark mode */
+  body.dark .ac-card          { background: #1a2538; border-color: #2d3e54; }
+  body.dark .ac-card h3       { color: #8a9ab0; }
+  body.dark .ac-header h2     { color: #eef2ff; }
+  body.dark .form-group label { color: #eef2ff; }
+  body.dark .form-group input {
+    background: #0f1c2e; border-color: #2d3e54; color: #eef2ff;
+  }
+  body.dark .ac-table thead tr { background: #131e2e; border-color: #2d3e54; }
+  body.dark .ac-table th       { color: #8a9ab0; }
+  body.dark .ac-table td       { border-color: #1e2e42; color: #eef2ff; }
+  body.dark .ac-table tr:hover td { background: #1e2e42; }
+  body.dark .edit-row td       { background: #0f1c2e; }
+  body.dark .edit-inline input {
+    background: #0f1c2e; border-color: #2d3e54; color: #eef2ff;
+  }
+</style>
+
+<div class="ac-page">
+  <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <div class="ac-header" style="margin-top:1rem">
+    <h2><i class="fas fa-tags" style="color:#7c3aed"></i> Admit Categories</h2>
+  </div>
+
+  <div class="ac-layout">
+
+    {# ── Add Form ── #}
+    <div class="ac-card">
+      <h3><i class="fas fa-plus-circle"></i> Add Admit Category</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add"/>
+        <div class="form-group">
+          <label>Category Name (e.g. GM, SC, OBC)</label>
+          <input type="text" name="name" placeholder="GM" required maxlength="50"
+            style="text-transform:uppercase">
+        </div>
+        <div class="form-group">
+          <label>Total Seats</label>
+          <input type="number" name="total_seats" placeholder="30" min="0" required>
+        </div>
+        <button type="submit" class="btn-add">
+          <i class="fas fa-plus"></i> Add Category
+        </button>
+      </form>
+    </div>
+
+    {# ── Table ── #}
+    <div class="ac-card">
+      <h3><i class="fas fa-list"></i> All Admit Categories ({{ categories|length }})</h3>
+
+      {% if categories %}
+      <div class="ac-table-wrap">
+        <table class="ac-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Category</th>
+              <th>Total Seats</th>
+              <th>Used</th>
+              <th>Remaining</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            <tr id="row-{{ cat.id }}">
+              <td style="color:#8a9ab0;font-size:.8rem">{{ loop.index }}</td>
+              <td><span class="cat-badge">{{ cat.name }}</span></td>
+              <td><strong>{{ cat.total_seats }}</strong></td>
+              <td>{{ cat.seats_used }}</td>
+              <td>
+                <strong style="color:{% if cat.seats_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                  {{ cat.seats_remaining }}
+                </strong>
+                <div class="seats-bar-outer">
+                  <div class="seats-bar-inner {% if cat.seats_remaining == 0 %}full{% endif %}"
+                    style="width:{% if cat.total_seats > 0 %}{{ ((cat.seats_used / cat.total_seats)*100)|int }}{% else %}0{% endif %}%">
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="status-pill {{ 'active' if cat.is_active else 'inactive' }}">
+                  <i class="fas fa-{{ 'check' if cat.is_active else 'times' }}"></i>
+                  {{ 'Active' if cat.is_active else 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+                  <button class="act-btn act-edit"
+                    onclick="toggleEdit({{ cat.id }})">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                  </button>
+                  <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="toggle"/>
+                    <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                    <button type="submit"
+                      class="act-btn {{ 'act-toggle-off' if cat.is_active else 'act-toggle-on' }}">
+                      <i class="fas fa-{{ 'toggle-off' if cat.is_active else 'toggle-on' }}"></i>
+                      {{ 'Deactivate' if cat.is_active else 'Activate' }}
+                    </button>
+                  </form>
+                  <form method="POST" style="display:inline"
+                    onsubmit="return confirm('Delete admit category {{ cat.name }}?')">
+                    <input type="hidden" name="action" value="delete"/>
+                    <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                    <button type="submit" class="act-btn act-del">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {# Inline edit row #}
+            <tr class="edit-row" id="edit-{{ cat.id }}">
+              <td colspan="7">
+                <form method="POST" class="edit-inline">
+                  <input type="hidden" name="action" value="edit"/>
+                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                  <input type="text" name="name" value="{{ cat.name }}"
+                    placeholder="Name" required maxlength="50">
+                  <input type="number" name="total_seats" value="{{ cat.total_seats }}"
+                    placeholder="Seats" min="0" required>
+                  <button type="submit" class="btn-save-edit">
+                    <i class="fas fa-save"></i> Save
+                  </button>
+                  <button type="button" class="btn-cancel-edit"
+                    onclick="toggleEdit({{ cat.id }})">
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="fas fa-tags" style="font-size:2rem;margin-bottom:.85rem;display:block;color:#c4b5fd"></i>
+        No admit categories yet.<br>Add your first one using the form.
+      </div>
+      {% endif %}
+    </div>
+
+  </div>{# /ac-layout #}
+</div>
+
+{% block scripts %}
+<script>
+function toggleEdit(id) {
+  const editRow = document.getElementById('edit-' + id);
+  editRow.style.display = (editRow.style.display === 'table-row') ? 'none' : 'table-row';
+}
+</script>
+{% endblock %}
+{% endblock %}

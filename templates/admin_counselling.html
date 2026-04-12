@@ -249,21 +249,40 @@
 
   /* Allotment area in modal */
   .allot-form {
-    display: flex; gap: .85rem; align-items: center; flex-wrap: wrap;
+    display: flex; gap: .85rem; align-items: flex-end; flex-wrap: wrap;
     padding: 1rem 1.25rem; background: #f0f4ff;
     border-radius: 12px; margin-top: .5rem;
   }
-  .allot-form label { font-size: .82rem; font-weight: 600; color: #0a1f44; }
+  .allot-form-group { display: flex; flex-direction: column; gap: .3rem; }
+  .allot-form-group label {
+    font-size: .75rem; font-weight: 600; color: #0a1f44; text-transform: uppercase;
+    letter-spacing: .04em;
+  }
   .quota-select {
     padding: .55rem 1rem; border: 2px solid #e2e8f0; border-radius: 9px;
     font-size: .88rem; font-family: inherit; outline: none; cursor: pointer; transition: border-color .2s;
   }
   .quota-select:focus { border-color: #0a1f44; }
 
+  /* Admit category select — purple accent */
+  .admit-cat-select {
+    padding: .55rem 1rem; border: 2px solid #e2e8f0; border-radius: 9px;
+    font-size: .88rem; font-family: inherit; outline: none; cursor: pointer;
+    transition: border-color .2s; min-width: 170px;
+  }
+  .admit-cat-select:focus { border-color: #7c3aed; }
+
+  /* Seat remaining hint */
+  .seat-hint {
+    font-size: .72rem; color: #7c3aed; font-weight: 600; margin-top: 2px;
+  }
+  .seat-hint.full { color: #dc3545; }
+
   .btn-allot {
     padding: .6rem 1.3rem; background: #25c26e; color: white;
     border: none; border-radius: 9px; font-weight: 600; font-size: .88rem;
     cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
+    align-self: flex-end;
   }
   .btn-allot:hover { background: #1da85c; }
 
@@ -287,6 +306,13 @@
     border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem;
   }
   .already-allotted p { margin: 0; font-size: .85rem; color: #1a5c3a; }
+
+  .admit-badge-display {
+    display: inline-block; font-size: .78rem; font-weight: 800;
+    padding: 3px 10px; border-radius: 20px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: white; margin-left: .4rem;
+  }
 
   .empty-counsel {
     text-align: center; padding: 3rem; color: #8a9ab0;
@@ -319,11 +345,12 @@
   body.dark .seat-table td   { border-color: #1e2e42; color: #eef2ff; }
   body.dark .rank-input-row input,
   body.dark .rank-input-row textarea,
-  body.dark .quota-select    { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .quota-select,
+  body.dark .admit-cat-select { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
   body.dark .modal-close     { background: #2d3e54; color: #b9c8e8; }
   body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .allot-form      { background: #131e2e; }
-  body.dark .allot-form label { color: #eef2ff; }
+  body.dark .allot-form-group label { color: #eef2ff; }
   body.dark .already-allotted { background: #0a2318; border-color: #1a5c3a; }
   body.dark .btn-close-modal { background: #2d3e54; color: #b9c8e8; }
   body.dark .current-rank-display { color: #eef2ff; }
@@ -552,6 +579,12 @@
           <span class="badge badge-{{ allotment.quota }}">
             <i class="fas fa-check"></i> {{ allotment.quota|title }} Quota
           </span>
+          {% if allotment.admit_seat_label %}
+            <span style="background:#ede9fe;color:#7c3aed;font-size:.68rem;font-weight:700;
+              padding:2px 8px;border-radius:20px;flex-shrink:0">
+              {{ allotment.admit_seat_label }}
+            </span>
+          {% endif %}
         {% else %}
           <span class="badge badge-pending">Not Allotted</span>
         {% endif %}
@@ -607,6 +640,10 @@
               <i class="fas fa-check-circle" style="color:#25c26e;font-size:1.3rem;flex-shrink:0"></i>
               <p>
                 Seat allotted under <strong>{{ allotment.quota|title }} Quota</strong>
+                {% if allotment.admit_seat_label %}
+                  &mdash; Admit Category:
+                  <span class="admit-badge-display">{{ allotment.admit_seat_label }}</span>
+                {% endif %}
                 {% if allotment.allotted_at %}on {{ allotment.allotted_at | ist }}{% endif %}
               </p>
               <form method="POST" style="margin-left:auto"
@@ -622,12 +659,37 @@
             <form method="POST" class="allot-form">
               <input type="hidden" name="action" value="allot_seat"/>
               <input type="hidden" name="app_id" value="{{ appl.id }}"/>
-              <label>Select Quota:</label>
-              <select name="quota" class="quota-select" required>
-                <option value="">— Choose Quota —</option>
-                <option value="government">Government Quota</option>
-                <option value="management">Management Quota</option>
-              </select>
+
+              {# Quota #}
+              <div class="allot-form-group">
+                <label>Quota</label>
+                <select name="quota" class="quota-select" required>
+                  <option value="">— Choose Quota —</option>
+                  <option value="government">Government Quota</option>
+                  <option value="management">Management Quota</option>
+                </select>
+              </div>
+
+              {# Admit Category — NEW #}
+              <div class="allot-form-group">
+                <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category</label>
+                <select name="admit_category_id" class="admit-cat-select"
+                  onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
+                  <option value="">— None —</option>
+                  {% for ac in admit_categories %}
+                  <option value="{{ ac.id }}"
+                    data-remaining="{{ ac.seats_remaining }}"
+                    data-total="{{ ac.total_seats }}"
+                    {% if ac.seats_remaining == 0 %}disabled{% endif %}>
+                    {{ ac.name }}
+                    ({{ ac.seats_remaining }}/{{ ac.total_seats }} left)
+                    {% if ac.seats_remaining == 0 %} — FULL{% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="seat-hint" id="hint-{{ appl.id }}"></div>
+              </div>
+
               <button type="submit" class="btn-allot">
                 <i class="fas fa-check"></i> Allot Seat
               </button>
@@ -680,6 +742,22 @@ document.addEventListener('keydown', function(e) {
     });
   }
 });
+
+// Show remaining seats hint when admit category is selected
+function updateSeatHint(select, hintId) {
+  const hint = document.getElementById(hintId);
+  const opt  = select.options[select.selectedIndex];
+  if (!hint || !opt || !opt.value) { if (hint) hint.textContent = ''; return; }
+  const rem   = parseInt(opt.dataset.remaining);
+  const total = parseInt(opt.dataset.total);
+  if (rem === 0) {
+    hint.textContent = '⚠ No seats remaining!';
+    hint.className   = 'seat-hint full';
+  } else {
+    hint.textContent = `${rem} of ${total} seats available — next: #${total - rem + 1}`;
+    hint.className   = 'seat-hint';
+  }
+}
 </script>
 {% endblock %}
 {% endblock %}
