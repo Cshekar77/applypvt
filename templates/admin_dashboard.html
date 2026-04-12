@@ -8,49 +8,28 @@
     gap: 1.5rem;
     margin: 2rem 0;
   }
-
   .admin-nav-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border: 1px solid #eef2f8;
-    display: block;
+    background: white; border-radius: 20px; padding: 1.5rem;
+    text-decoration: none; transition: all 0.3s ease;
+    border: 1px solid #eef2f8; display: block;
   }
-
   .admin-nav-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     border-color: #c9a03d;
   }
-
-  /* Import card */
   .admin-nav-card.import-card {
-    border-color: #b8d4f0;
-    background: linear-gradient(135deg, #f5faff, #eef4fc);
+    border-color: #b8d4f0; background: linear-gradient(135deg,#f5faff,#eef4fc);
     position: relative; overflow: hidden;
   }
-  .admin-nav-card.import-card:hover {
-    border-color: #2e86de;
-    box-shadow: 0 10px 25px rgba(46,134,222,0.15);
-  }
+  .admin-nav-card.import-card:hover { border-color: #2e86de; box-shadow: 0 10px 25px rgba(46,134,222,0.15); }
   .import-badge {
     display: inline-block; font-size: .7rem; font-weight: 600;
     padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
     background: #dbeafe; color: #1e40af;
   }
-
-  /* WhatsApp card */
-  .admin-nav-card.whatsapp-card {
-    border-color: #25D366;
-    position: relative;
-    overflow: hidden;
-  }
-  .admin-nav-card.whatsapp-card:hover {
-    border-color: #128C7E;
-    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.15);
-  }
+  .admin-nav-card.whatsapp-card { border-color: #25D366; position: relative; overflow: hidden; }
+  .admin-nav-card.whatsapp-card:hover { border-color: #128C7E; box-shadow: 0 10px 25px rgba(37,211,102,0.15); }
   .whatsapp-status-dot {
     position: absolute; top: 1rem; right: 1rem;
     width: 10px; height: 10px; border-radius: 50%; background: #25D366;
@@ -62,109 +41,68 @@
     70%  { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
     100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
   }
-
-  /* Counselling card */
   .admin-nav-card.counselling-card {
-    border-color: #e8d5a0;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #fffdf5, #fff8e8);
+    border-color: #e8d5a0; position: relative; overflow: hidden;
+    background: linear-gradient(135deg,#fffdf5,#fff8e8);
   }
-  .admin-nav-card.counselling-card:hover {
-    border-color: #c9a03d;
-    box-shadow: 0 10px 25px rgba(201,160,61,0.18);
-  }
-  .counselling-status-dot {
-    position: absolute; top: 1rem; right: 1rem;
-    width: 10px; height: 10px; border-radius: 50%;
-  }
+  .admin-nav-card.counselling-card:hover { border-color: #c9a03d; box-shadow: 0 10px 25px rgba(201,160,61,0.18); }
+  .counselling-status-dot { position: absolute; top: 1rem; right: 1rem; width: 10px; height: 10px; border-radius: 50%; }
   .counselling-status-dot.running  { background: #25c26e; animation: pulse-green 2s infinite; }
   .counselling-status-dot.paused   { background: #f0c040; }
   .counselling-status-dot.stopped  { background: #ccc; }
-
-  .counsel-badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
-  }
+  .counsel-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; }
   .counsel-badge.running  { background: #d4edda; color: #155724; }
   .counsel-badge.paused   { background: #fff3cd; color: #856404; }
   .counsel-badge.stopped  { background: #f5f7fa; color: #5a6e82; }
-
-  /* Faculty card */
   .admin-nav-card.faculty-card {
-    border-color: #ddd6fe;
-    background: linear-gradient(135deg, #faf5ff, #f3eeff);
+    border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff);
     position: relative; overflow: hidden;
   }
-  .admin-nav-card.faculty-card:hover {
-    border-color: #7c3aed;
-    box-shadow: 0 10px 25px rgba(124,58,237,0.15);
-  }
-  .faculty-badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
-    background: #ede9fe; color: #5b21b6;
-  }
-
-  /* Payments card */
+  .admin-nav-card.faculty-card:hover { border-color: #7c3aed; box-shadow: 0 10px 25px rgba(124,58,237,0.15); }
+  .faculty-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ede9fe; color: #5b21b6; }
   .admin-nav-card.payments-card {
-    border-color: #99f6e4;
-    background: linear-gradient(135deg, #f0fdfa, #e8faf6);
+    border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6);
     position: relative; overflow: hidden;
   }
-  .admin-nav-card.payments-card:hover {
-    border-color: #0f766e;
-    box-shadow: 0 10px 25px rgba(15,118,110,0.15);
+  .admin-nav-card.payments-card:hover { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,0.15); }
+  .payments-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ccfbf1; color: #0f766e; }
+
+  /* Admit Categories card */
+  .admin-nav-card.admit-cat-card {
+    border-color: #fde68a; background: linear-gradient(135deg,#fffbeb,#fef3c7);
+    position: relative; overflow: hidden;
   }
-  .payments-badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
-    background: #ccfbf1; color: #0f766e;
+  .admin-nav-card.admit-cat-card:hover { border-color: #d97706; box-shadow: 0 10px 25px rgba(217,119,6,0.15); }
+  .admit-cat-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #fef3c7; color: #92400e; }
+
+  /* Admitted Students card */
+  .admin-nav-card.admitted-card {
+    border-color: #bbf7d0; background: linear-gradient(135deg,#f0fdf4,#dcfce7);
+    position: relative; overflow: hidden;
   }
+  .admin-nav-card.admitted-card:hover { border-color: #16a34a; box-shadow: 0 10px 25px rgba(22,163,74,0.15); }
+  .admitted-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #dcfce7; color: #166534; }
 
   .anc-icon { font-size: 2rem; margin-bottom: 1rem; }
   .admin-nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
   .admin-nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
-
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem; margin-bottom: 2rem;
-  }
-  .stat-card {
-    background: white; border-radius: 20px; padding: 1.5rem;
-    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    border-left: 4px solid #c9a03d;
-  }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .stat-card { background: white; border-radius: 20px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.05); border-left: 4px solid #c9a03d; }
   .stat-num { font-size: 2.5rem; font-weight: 700; color: #0a1f44; }
   .stat-lbl { color: #5a6e82; font-size: .85rem; margin-top: .5rem; }
   .stat-gold  { border-left-color: #c9a03d; }
   .stat-warn  { border-left-color: #ffc107; }
   .stat-navy  { border-left-color: #0a1f44; }
   .stat-blue  { border-left-color: #2e86de; }
-
-  .form-status-bar {
-    background: #eef2f8; padding: 1rem; border-radius: 12px;
-    text-align: center; margin-top: 2rem;
-  }
+  .form-status-bar { background: #eef2f8; padding: 1rem; border-radius: 12px; text-align: center; margin-top: 2rem; }
   .form-status-bar.open   { background: #d4edda; color: #155724; }
   .form-status-bar.closed { background: #f8d7da; color: #721c24; }
-  .form-status-bar a      { color: inherit; text-decoration: underline; }
-
-  .page-header-inner {
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
-  }
-  .page-header-inner h2 {
-    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
-  }
+  .form-status-bar a { color: inherit; text-decoration: underline; }
+  .page-header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+  .page-header-inner h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0; }
   .text-muted   { color: #5a6e82; }
   .text-muted a { color: #c9a03d; text-decoration: none; }
-
-  .wa-badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
-    background: #d4edda; color: #155724;
-  }
+  .wa-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #d4edda; color: #155724; }
   .wa-badge.inactive { background: #f8d7da; color: #721c24; }
 
   body.dark .admin-nav-card        { background: #1a2538; border-color: #2d3e54; }
@@ -175,17 +113,17 @@
   body.dark .admin-nav-card.import-card      { background: #131e2e; border-color: #2e5a8a; }
   body.dark .admin-nav-card.faculty-card     { background: #1e1530; border-color: #6d28d9; }
   body.dark .admin-nav-card.payments-card    { background: #0f2420; border-color: #0f766e; }
-  body.dark .stat-card  { background: #1a2538; }
-  body.dark .stat-num   { color: #eef2ff; }
-  body.dark .stat-lbl   { color: #b9c8e8; }
+  body.dark .admin-nav-card.admit-cat-card   { background: #1a1408; border-color: #d97706; }
+  body.dark .admin-nav-card.admitted-card    { background: #0a1f12; border-color: #16a34a; }
+  body.dark .stat-card { background: #1a2538; }
+  body.dark .stat-num  { color: #eef2ff; }
+  body.dark .stat-lbl  { color: #b9c8e8; }
 
   @media (max-width: 768px) {
-    .stats-grid     { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid     { grid-template-columns: repeat(2,1fr); }
     .admin-nav-grid { grid-template-columns: 1fr; }
   }
-  @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
 </style>
 
 {% block navbar_auth %}{% endblock %}
@@ -199,7 +137,6 @@
     </p>
   </div>
 
-  {# Stats #}
   <div class="stats-grid">
     <div class="stat-card">           <div class="stat-num">{{ reg_users }}</div><div class="stat-lbl">Registered Users</div></div>
     <div class="stat-card">           <div class="stat-num">{{ total }}</div>    <div class="stat-lbl">Total Applications</div></div>
@@ -208,7 +145,6 @@
     <div class="stat-card stat-navy"> <div class="stat-num">{{ ranked }}</div>   <div class="stat-lbl">Ranked</div></div>
   </div>
 
-  {# Navigation cards #}
   <div class="admin-nav-grid">
 
     <a href="{{ url_for('main.admin_students') }}" class="admin-nav-card">
@@ -235,7 +171,6 @@
       <p>Assign ranks to verified students</p>
     </a>
 
-    {# ── Import Students ── #}
     <a href="{{ url_for('main.admin_import') }}" class="admin-nav-card import-card">
       <div class="anc-icon" style="color:#2e86de"><i class="fas fa-file-import"></i></div>
       <strong>Import Students</strong>
@@ -243,7 +178,6 @@
       <span class="import-badge"><i class="fas fa-magic"></i> Smart Column Mapping</span>
     </a>
 
-    {# ── Counselling ── #}
     <a href="{{ url_for('main.admin_counselling') }}" class="admin-nav-card counselling-card">
       <div class="counselling-status-dot {{ counselling.status }}"></div>
       <div class="anc-icon" style="color:#c9a03d"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -268,7 +202,6 @@
       <p>Add/Edit/Delete application categories</p>
     </a>
 
-    {# ── WhatsApp Group Link ── #}
     <a href="{{ url_for('main.admin_whatsapp') }}" class="admin-nav-card whatsapp-card">
       <div class="whatsapp-status-dot {% if whatsapp.is_active and whatsapp.link %}active{% else %}inactive{% endif %}"></div>
       <div class="anc-icon" style="color:#25D366"><i class="fab fa-whatsapp"></i></div>
@@ -279,7 +212,6 @@
       </span>
     </a>
 
-    {# ── Faculty Credentials ── #}
     <a href="{{ url_for('main.admin_faculty') }}" class="admin-nav-card faculty-card">
       <div class="anc-icon" style="color:#7c3aed"><i class="fas fa-user-shield"></i></div>
       <strong>Faculty Credentials</strong>
@@ -287,12 +219,27 @@
       <span class="faculty-badge"><i class="fas fa-key"></i> Staff Access</span>
     </a>
 
-    {# ── Payment Overview ── #}
     <a href="{{ url_for('main.admin_payments') }}" class="admin-nav-card payments-card">
       <div class="anc-icon" style="color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
       <strong>Payment Overview</strong>
       <p>View fee details and payment receipts for allotted students</p>
       <span class="payments-badge"><i class="fas fa-receipt"></i> Receipts</span>
+    </a>
+
+    {# ── Admit Categories ── #}
+    <a href="{{ url_for('main.admin_admit_categories') }}" class="admin-nav-card admit-cat-card">
+      <div class="anc-icon" style="color:#d97706"><i class="fas fa-layer-group"></i></div>
+      <strong>Admit Categories</strong>
+      <p>Manage GM, SC, OBC seat pools used during admission</p>
+      <span class="admit-cat-badge"><i class="fas fa-chair"></i> Seat Pools</span>
+    </a>
+
+    {# ── Admitted Students ── #}
+    <a href="{{ url_for('main.admin_admitted_students') }}" class="admin-nav-card admitted-card">
+      <div class="anc-icon" style="color:#16a34a"><i class="fas fa-user-graduate"></i></div>
+      <strong>Admitted Students</strong>
+      <p>View all admitted students with seat, fees and payment status</p>
+      <span class="admitted-badge"><i class="fas fa-list-ol"></i> GM(1), SC(2)…</span>
     </a>
 
     <a href="{{ url_for('main.export_all') }}" class="admin-nav-card">
