@@ -1088,6 +1088,243 @@ def admin_admitted_students():
                            mgmt_count=mgmt_count)
 
 # ─────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════
+# ROUTES SNIPPETS — document verification feature
+# ═══════════════════════════════════════════════════════════════════
+
+# 1. Add to your imports line at top of routes.py:
+#    from models import (..., DocumentCategory, StudentDocument)
+
+# 2. Add all routes below after your admin_admitted_students route.
+
+# ───────────────────────────────────────────────────────────────────
+# ADMIN: Document Categories (CRUD)
+# ───────────────────────────────────────────────────────────────────
+@main.route('/admin/document-categories', methods=['GET', 'POST'])
+@admin_required
+def admin_document_categories():
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'add':
+            name = request.form.get('name', '').strip()
+            desc = request.form.get('description', '').strip()
+            is_required = request.form.get('is_required') == '1'
+            sort_order = int(request.form.get('sort_order', 0))
+            if name:
+                if DocumentCategory.query.filter_by(name=name).first():
+                    flash('A document with that name already exists.', 'warning')
+                else:
+                    doc = DocumentCategory(name=name, description=desc,
+                                          is_required=is_required, sort_order=sort_order)
+                    db.session.add(doc)
+                    db.session.commit()
+                    flash(f'Document "{name}" added.', 'success')
+            else:
+                flash('Name is required.', 'danger')
+
+        elif action == 'edit':
+            doc_id = request.form.get('doc_id')
+            doc = DocumentCategory.query.get_or_404(doc_id)
+            doc.name        = request.form.get('name', doc.name).strip()
+            doc.description = request.form.get('description', '').strip()
+            doc.is_required = request.form.get('is_required') == '1'
+            doc.sort_order  = int(request.form.get('sort_order', 0))
+            db.session.commit()
+            flash('Document updated.', 'success')
+
+        elif action == 'delete':
+            doc_id = request.form.get('doc_id')
+            doc = DocumentCategory.query.get_or_404(doc_id)
+            # Remove all student doc records for this category too
+            StudentDocument.query.filter_by(doc_category_id=doc.id).delete()
+            db.session.delete(doc)
+            db.session.commit()
+            flash(f'Document "{doc.name}" deleted.', 'success')
+
+        elif action == 'toggle':
+            doc_id = request.form.get('doc_id')
+            doc = DocumentCategory.query.get_or_404(doc_id)
+            doc.is_active = not doc.is_active
+            db.session.commit()
+            flash('Status updated.', 'success')
+
+        return redirect(url_for('main.admin_document_categories'))
+
+    docs = DocumentCategory.query.order_by(DocumentCategory.sort_order, DocumentCategory.created_at).all()
+    return render_template('admin_document_categories.html', docs=docs)
+
+
+# ───────────────────────────────────────────────────────────────────
+# ADMIN: Document Verification  (list + popup save)
+# ───────────────────────────────────────────────────────────────────
+@main.route('/admin/document-verification')
+@admin_required
+def admin_document_verification():
+    allotments = (SeatAllotment.query
+                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
+                  .order_by(StudentApplication.rank)
+                  .all())
+    doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
+        DocumentCategory.sort_order, DocumentCategory.id).all()
+
+    # Build doc_map: application_id → {doc_category_id → StudentDocument}
+    all_docs = StudentDocument.query.all()
+    doc_map = {}
+    for d in all_docs:
+        doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
+
+    # Summary per student
+    summaries = {}
+    for a in allotments:
+        appl_docs = doc_map.get(a.application_id, {})
+        total = len(doc_categories)
+        submitted = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
+        approved  = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+        summaries[a.application_id] = {
+            'total': total, 'submitted': submitted, 'approved': approved
+        }
+
+    return render_template('admin_document_verification.html',
+                           allotments=allotments,
+                           doc_categories=doc_categories,
+                           doc_map=doc_map,
+                           summaries=summaries)
+
+
+@main.route('/admin/document-verification/save', methods=['POST'])
+@admin_required
+def admin_save_document():
+    """Save doc statuses + optional approval for one student."""
+    application_id = request.form.get('application_id', type=int)
+    approve_all    = request.form.get('approve_all') == '1'
+    doc_categories = DocumentCategory.query.filter_by(is_active=True).all()
+
+    for dc in doc_categories:
+        status = request.form.get(f'status_{dc.id}', 'not_given')
+        rec = StudentDocument.query.filter_by(
+            application_id=application_id, doc_category_id=dc.id).first()
+        if not rec:
+            rec = StudentDocument(application_id=application_id, doc_category_id=dc.id)
+            db.session.add(rec)
+        rec.status = status
+        if approve_all:
+            rec.is_approved            = True
+            rec.approved_at            = datetime.utcnow()
+            rec.approved_by_role       = 'admin'
+            rec.approved_by_name       = 'Admin'
+            rec.approved_by_faculty_id = None
+
+    db.session.commit()
+    flash('Documents saved successfully.', 'success')
+    return redirect(url_for('main.admin_document_verification'))
+
+
+# ───────────────────────────────────────────────────────────────────
+# ADMIN: Document Overview
+# ───────────────────────────────────────────────────────────────────
+@main.route('/admin/document-overview')
+@admin_required
+def admin_document_overview():
+    allotments = (SeatAllotment.query
+                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
+                  .order_by(StudentApplication.rank)
+                  .all())
+    doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
+        DocumentCategory.sort_order, DocumentCategory.id).all()
+
+    all_docs = StudentDocument.query.all()
+    doc_map = {}
+    for d in all_docs:
+        doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
+
+    summaries = {}
+    for a in allotments:
+        appl_docs = doc_map.get(a.application_id, {})
+        total     = len(doc_categories)
+        submitted = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
+        approved  = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+        summaries[a.application_id] = {
+            'total': total, 'submitted': submitted, 'approved': approved
+        }
+
+    return render_template('admin_document_overview.html',
+                           allotments=allotments,
+                           doc_categories=doc_categories,
+                           doc_map=doc_map,
+                           summaries=summaries)
+
+
+# ───────────────────────────────────────────────────────────────────
+# FACULTY: Document Verification
+# ───────────────────────────────────────────────────────────────────
+@main.route('/faculty/document-verification')
+@faculty_required
+def faculty_document_verification():
+    allotments = (SeatAllotment.query
+                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
+                  .order_by(StudentApplication.rank)
+                  .all())
+    doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
+        DocumentCategory.sort_order, DocumentCategory.id).all()
+
+    all_docs = StudentDocument.query.all()
+    doc_map = {}
+    for d in all_docs:
+        doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
+
+    summaries = {}
+    for a in allotments:
+        appl_docs = doc_map.get(a.application_id, {})
+        total     = len(doc_categories)
+        submitted = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
+        approved  = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+        summaries[a.application_id] = {
+            'total': total, 'submitted': submitted, 'approved': approved
+        }
+
+    return render_template('faculty_document_verification.html',
+                           allotments=allotments,
+                           doc_categories=doc_categories,
+                           doc_map=doc_map,
+                           summaries=summaries)
+
+
+@main.route('/faculty/document-verification/save', methods=['POST'])
+@faculty_required
+def faculty_save_document():
+    """Faculty saves doc statuses + optional approval."""
+    application_id  = request.form.get('application_id', type=int)
+    approve_all     = request.form.get('approve_all') == '1'
+    faculty_id      = session.get('faculty_id')
+    faculty_name    = session.get('faculty_name', 'Faculty')
+    doc_categories  = DocumentCategory.query.filter_by(is_active=True).all()
+
+    for dc in doc_categories:
+        status = request.form.get(f'status_{dc.id}', 'not_given')
+        rec = StudentDocument.query.filter_by(
+            application_id=application_id, doc_category_id=dc.id).first()
+        if not rec:
+            rec = StudentDocument(application_id=application_id, doc_category_id=dc.id)
+            db.session.add(rec)
+        rec.status = status
+        if approve_all:
+            rec.is_approved            = True
+            rec.approved_at            = datetime.utcnow()
+            rec.approved_by_role       = 'faculty'
+            rec.approved_by_name       = faculty_name
+            rec.approved_by_faculty_id = faculty_id
+
+    db.session.commit()
+    flash('Documents saved successfully.', 'success')
+    return redirect(url_for('main.faculty_document_verification'))
+    
 #  Admin — WhatsApp Group Management
 # ─────────────────────────────────────────
 @main.route('/admin/whatsapp', methods=['GET', 'POST'])

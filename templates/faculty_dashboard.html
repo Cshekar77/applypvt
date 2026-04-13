@@ -3,7 +3,7 @@
 
 {% block content %}
 <style>
-  /* ── Faculty navbar override ── */
+  /* ── Suppress base navbar completely ── */
   .faculty-topbar {
     display: flex; justify-content: space-between; align-items: center;
     padding: .75rem 1.5rem; background: white;
@@ -74,6 +74,7 @@
   .panel-link:hover { background: #f5f7fa; }
   .panel-link i { width: 16px; text-align: center; color: #7c3aed; }
   .panel-link.teal i { color: #0f766e; }
+  .panel-link.doc-link i { color: #4f46e5; }
   .panel-link.logout-link { color: #991b1b; margin-top: auto; }
   .panel-link.logout-link i { color: #991b1b; }
   .panel-link.logout-link:hover { background: #fee2e2; }
@@ -111,6 +112,8 @@
   .stat-purple { border-left-color: #7c3aed; }
   .stat-purple .stat-num { color: #7c3aed; }
   .stat-gold   .stat-num { color: #c9a03d; }
+  .stat-indigo { border-left-color: #4f46e5; }
+  .stat-indigo .stat-num { color: #4f46e5; }
 
   .nav-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
@@ -128,10 +131,14 @@
   .nav-card.teal-card:hover   { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,.15); }
   .nav-card.purple-card { border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff); }
   .nav-card.purple-card:hover { border-color: #7c3aed; box-shadow: 0 10px 25px rgba(124,58,237,.15); }
+  .nav-card.indigo-card { border-color: #c7d2fe; background: linear-gradient(135deg,#eef2ff,#e0e7ff); }
+  .nav-card.indigo-card:hover { border-color: #4f46e5; box-shadow: 0 10px 25px rgba(79,70,229,.15); }
 
   .nav-icon { font-size: 2rem; margin-bottom: 1rem; }
   .nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
   .nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
+  .nav-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; }
+  .indigo-badge { background: #e0e7ff; color: #3730a3; }
 
   /* dark mode */
   body.dark .faculty-topbar  { background: #1a2538; border-color: #2d3e54; }
@@ -151,11 +158,13 @@
   body.dark .stat-lbl   { color: #b9c8e8; }
   body.dark .stat-teal   .stat-num { color: #2dd4bf; }
   body.dark .stat-purple .stat-num { color: #a78bfa; }
+  body.dark .stat-indigo .stat-num { color: #818cf8; }
   body.dark .nav-card   { background: #1a2538; border-color: #2d3e54; }
   body.dark .nav-card strong { color: #eef2ff; }
   body.dark .nav-card p { color: #b9c8e8; }
   body.dark .nav-card.teal-card   { background: #0f2420; border-color: #0f766e; }
   body.dark .nav-card.purple-card { background: #1e1530; border-color: #6d28d9; }
+  body.dark .nav-card.indigo-card { background: #0f1240; border-color: #4f46e5; }
 
   @media (max-width: 768px) {
     .faculty-nav-links { display: none; }
@@ -168,7 +177,7 @@
   }
 </style>
 
-{# ── Suppress base navbar for faculty — render our own ── #}
+{# ── Suppress base navbar entirely ── #}
 {% block navbar_auth %}{% endblock %}
 
 {# ── Faculty Topbar ── #}
@@ -178,7 +187,7 @@
     Faculty <span>Portal</span>
   </a>
 
-  {# Desktop links #}
+  {# Desktop links — NO student login link here #}
   <div class="faculty-nav-links">
     <a href="{{ url_for('main.faculty_dashboard') }}">
       <i class="fas fa-home"></i> Dashboard
@@ -188,6 +197,9 @@
     </a>
     <a href="{{ url_for('main.faculty_payments') }}">
       <i class="fas fa-rupee-sign"></i> Payments
+    </a>
+    <a href="{{ url_for('main.faculty_document_verification') }}">
+      <i class="fas fa-file-check"></i> Documents
     </a>
     <a href="{{ url_for('main.faculty_logout') }}" class="nav-logout">
       <i class="fas fa-sign-out-alt"></i> Logout
@@ -216,7 +228,11 @@
   <a href="{{ url_for('main.faculty_payments') }}" class="panel-link teal">
     <i class="fas fa-rupee-sign"></i> Payments &amp; Receipts
   </a>
-  <a href="{{ url_for('main.faculty_logout') }}" class="panel-link logout-link" style="margin-top:auto">
+  <a href="{{ url_for('main.faculty_document_verification') }}" class="panel-link doc-link">
+    <i class="fas fa-file-check"></i> Document Verification
+  </a>
+  {# Logout is ALWAYS last and always visible #}
+  <a href="{{ url_for('main.faculty_logout') }}" class="panel-link logout-link">
     <i class="fas fa-sign-out-alt"></i> Logout
   </a>
 </div>
@@ -260,6 +276,12 @@
       <div class="nav-icon" style="color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
       <strong>Payment &amp; Receipts</strong>
       <p>Set fees, add receipts and track payments</p>
+    </a>
+    <a href="{{ url_for('main.faculty_document_verification') }}" class="nav-card indigo-card">
+      <div class="nav-icon" style="color:#4f46e5"><i class="fas fa-file-check"></i></div>
+      <strong>Document Verification</strong>
+      <p>Mark and approve submitted documents for allotted students</p>
+      <span class="nav-badge indigo-badge"><i class="fas fa-stamp"></i> Verify &amp; Approve</span>
     </a>
   </div>
 </div>

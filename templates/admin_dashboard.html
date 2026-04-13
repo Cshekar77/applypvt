@@ -83,6 +83,30 @@
   .admin-nav-card.admitted-card:hover { border-color: #16a34a; box-shadow: 0 10px 25px rgba(22,163,74,0.15); }
   .admitted-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #dcfce7; color: #166534; }
 
+  /* Document Categories card */
+  .admin-nav-card.doc-cat-card {
+    border-color: #c7d2fe; background: linear-gradient(135deg,#eef2ff,#e0e7ff);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.doc-cat-card:hover { border-color: #4f46e5; box-shadow: 0 10px 25px rgba(79,70,229,0.15); }
+  .doc-cat-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #e0e7ff; color: #3730a3; }
+
+  /* Document Verification card */
+  .admin-nav-card.doc-verify-card {
+    border-color: #fed7aa; background: linear-gradient(135deg,#fff7ed,#ffedd5);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.doc-verify-card:hover { border-color: #ea580c; box-shadow: 0 10px 25px rgba(234,88,12,0.15); }
+  .doc-verify-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ffedd5; color: #9a3412; }
+
+  /* Document Overview card */
+  .admin-nav-card.doc-overview-card {
+    border-color: #e9d5ff; background: linear-gradient(135deg,#fdf4ff,#fae8ff);
+    position: relative; overflow: hidden;
+  }
+  .admin-nav-card.doc-overview-card:hover { border-color: #a21caf; box-shadow: 0 10px 25px rgba(162,28,175,0.15); }
+  .doc-overview-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #fae8ff; color: #701a75; }
+
   .anc-icon { font-size: 2rem; margin-bottom: 1rem; }
   .admin-nav-card strong { display: block; font-size: 1.1rem; color: #0a1f44; margin-bottom: .5rem; }
   .admin-nav-card p { color: #5a6e82; font-size: .85rem; margin: 0; }
@@ -105,6 +129,7 @@
   .wa-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #d4edda; color: #155724; }
   .wa-badge.inactive { background: #f8d7da; color: #721c24; }
 
+  /* dark */
   body.dark .admin-nav-card        { background: #1a2538; border-color: #2d3e54; }
   body.dark .admin-nav-card strong { color: #eef2ff; }
   body.dark .admin-nav-card p      { color: #b9c8e8; }
@@ -115,6 +140,9 @@
   body.dark .admin-nav-card.payments-card    { background: #0f2420; border-color: #0f766e; }
   body.dark .admin-nav-card.admit-cat-card   { background: #1a1408; border-color: #d97706; }
   body.dark .admin-nav-card.admitted-card    { background: #0a1f12; border-color: #16a34a; }
+  body.dark .admin-nav-card.doc-cat-card     { background: #0f1240; border-color: #4f46e5; }
+  body.dark .admin-nav-card.doc-verify-card  { background: #1f0f00; border-color: #ea580c; }
+  body.dark .admin-nav-card.doc-overview-card { background: #1a0020; border-color: #a21caf; }
   body.dark .stat-card { background: #1a2538; }
   body.dark .stat-num  { color: #eef2ff; }
   body.dark .stat-lbl  { color: #b9c8e8; }
@@ -240,6 +268,30 @@
       <strong>Admitted Students</strong>
       <p>View all admitted students with seat, fees and payment status</p>
       <span class="admitted-badge"><i class="fas fa-list-ol"></i> GM(1), SC(2)…</span>
+    </a>
+
+    {# ── Document Categories ── #}
+    <a href="{{ url_for('main.admin_document_categories') }}" class="admin-nav-card doc-cat-card">
+      <div class="anc-icon" style="color:#4f46e5"><i class="fas fa-folder-plus"></i></div>
+      <strong>Document Categories</strong>
+      <p>Define which documents allotted students must submit</p>
+      <span class="doc-cat-badge"><i class="fas fa-list"></i> Required Docs</span>
+    </a>
+
+    {# ── Document Verification ── #}
+    <a href="{{ url_for('main.admin_document_verification') }}" class="admin-nav-card doc-verify-card">
+      <div class="anc-icon" style="color:#ea580c"><i class="fas fa-file-check"></i></div>
+      <strong>Document Verification</strong>
+      <p>Mark Original / Xerox / Attested / Not Given and approve student docs</p>
+      <span class="doc-verify-badge"><i class="fas fa-stamp"></i> Verify & Approve</span>
+    </a>
+
+    {# ── Document Overview ── #}
+    <a href="{{ url_for('main.admin_document_overview') }}" class="admin-nav-card doc-overview-card">
+      <div class="anc-icon" style="color:#a21caf"><i class="fas fa-clipboard-list"></i></div>
+      <strong>Document Overview</strong>
+      <p>Full doc submission summary with approval details and timestamps</p>
+      <span class="doc-overview-badge"><i class="fas fa-history"></i> Audit Trail</span>
     </a>
 
     <a href="{{ url_for('main.export_all') }}" class="admin-nav-card">
