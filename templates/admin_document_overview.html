@@ -127,8 +127,14 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
     <div class="sum-card"><div class="sum-num">{{ total_students }}</div><div class="sum-lbl">Allotted Students</div></div>
     <div class="sum-card sum-green">
       <div class="sum-num">
-        {{ allotments|selectattr('application_id')|map(attribute='application_id')|list|
-           map('extract', summaries)|selectattr('approved')|list|length }}
+        {% set fully_approved_count = namespace(val=0) %}
+        {% for a in allotments %}
+          {% set s = summaries.get(a.application_id, {}) %}
+          {% if s.get('approved', 0) == s.get('total', 0) and s.get('total', 0) > 0 %}
+            {% set fully_approved_count.val = fully_approved_count.val + 1 %}
+          {% endif %}
+        {% endfor %}
+        {{ fully_approved_count.val }}
       </div>
       <div class="sum-lbl">Fully Approved</div>
     </div>
