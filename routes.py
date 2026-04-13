@@ -14,7 +14,8 @@ from datetime import datetime, timedelta, timezone
 from database import db
 from models import (User, FormSettings, StudentApplication, ApplicationCategory,
                     WhatsAppSettings, CounsellingSettings, CategorySeats, SeatAllotment,
-                    Faculty, StudentFees, PaymentReceipt, AdmitCategory)   # ← AdmitCategory added
+                    Faculty, StudentFees, PaymentReceipt, AdmitCategory,
+                    DocumentCategory, StudentDocument)  # ← AdmitCategory added
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel, export_verified_excel
@@ -1324,7 +1325,7 @@ def faculty_save_document():
     db.session.commit()
     flash('Documents saved successfully.', 'success')
     return redirect(url_for('main.faculty_document_verification'))
-    
+
 #  Admin — WhatsApp Group Management
 # ─────────────────────────────────────────
 @main.route('/admin/whatsapp', methods=['GET', 'POST'])
