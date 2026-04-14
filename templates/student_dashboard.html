@@ -187,22 +187,21 @@
   {% endif %}
 
   {# ── Fee mini-card (shown when fee is assigned) ── #}
-  {% set sf = application.student_fee if application else none %}
-  {% if sf %}
+  {% if application and application.fee_details %}
   <div class="fee-mini-card">
-    <div class="fee-mini-icon"><i class="fas fa-dollar-sign"></i></div>
+    <div class="fee-mini-icon"><i class="fas fa-rupee-sign"></i></div>
     <div class="fee-mini-info">
-      <strong>{{ sf.fee_category.name if sf.fee_category else 'Fee Structure' }}</strong>
+      <strong>{{ application.fee_details.fee_category.name if application.fee_details.fee_category else 'Fee Structure' }}</strong>
       <span>
-        {% if sf.additional_fee and sf.additional_fee > 0 %}
-          Base ${{ '%.2f'|format(sf.base_amount) }} + Additional ${{ '%.2f'|format(sf.additional_fee) }}
+        {% if application.fee_details.additional_fee and application.fee_details.additional_fee > 0 %}
+          Base ₹{{ '%.2f'|format(application.fee_details.fee_category.amount if application.fee_details.fee_category else 0) }} + Additional ₹{{ '%.2f'|format(application.fee_details.additional_fee) }}
         {% else %}
           Base fee assigned during counselling
         {% endif %}
       </span>
     </div>
     <div>
-      <div class="fee-mini-total">${{ '%.2f'|format(sf.total_amount) }}</div>
+      <div class="fee-mini-total">₹{{ '%.2f'|format(application.fee_details.total_fee) }}</div>
       <div style="text-align:right;margin-top:2px">
         <span class="fee-mini-pending">Total Payable</span>
       </div>
@@ -251,7 +250,7 @@
       {% if counselling.is_running %}<span class="counsel-live-dot"></span>{% endif %}
     </a>
 
-    <a href="{{ url_for('main.student_fee_structure') }}" class="dash-action-btn btn-fees">
+    <a href="{{ url_for('main.student_fee') }}" class="dash-action-btn btn-fees">
       <i class="fas fa-receipt"></i>
       My Fees
     </a>

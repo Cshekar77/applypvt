@@ -507,6 +507,8 @@ def reset_password():
 @login_required
 def student_dashboard():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
+    if appl:
+        appl.fee_details = appl.student_fees[0] if appl.student_fees else None
     settings    = FormSettings.get()
     whatsapp    = WhatsAppSettings.get()
     counselling = CounsellingSettings.get()
