@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+{% block title %}Fee Categories — Admin{% endblock %}
+{% block content %}
+<style>
+  .fc-page { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  .fc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+  }
+  .fc-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; color: #0a1f44; margin: 0;
+  }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
+  }
+  .btn-back:hover { color: #0a1f44; }
+
+  /* ── Add form card ── */
+  .add-card {
+    background: linear-gradient(135deg, #fffdf5, #fff8e8);
+    border: 1.5px solid #e8d5a0; border-radius: 20px;
+    padding: 1.5rem; margin-bottom: 2rem;
+  }
+  .add-card h3 {
+    font-size: .78rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #8a9ab0; margin: 0 0 1rem;
+  }
+  .add-form-row {
+    display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap;
+  }
+  .add-form-group { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 180px; }
+  .add-form-group label {
+    font-size: .75rem; font-weight: 600; color: #0a1f44;
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .add-form-group input {
+    padding: .65rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: .92rem; font-family: inherit; outline: none; transition: border-color .2s;
+    background: white;
+  }
+  .add-form-group input:focus { border-color: #c9a03d; }
+  .amount-wrap { position: relative; }
+  .amount-wrap .currency-prefix {
+    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+    color: #5a6e82; font-size: .9rem; font-weight: 600; pointer-events: none;
+  }
+  .amount-wrap input { padding-left: 1.75rem; }
+
+  .btn-add {
+    padding: .65rem 1.4rem; background: #c9a03d; color: white;
+    border: none; border-radius: 10px; font-size: .88rem; font-weight: 700;
+    cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
+    white-space: nowrap; align-self: flex-end;
+  }
+  .btn-add:hover { background: #b8902e; transform: translateY(-1px); }
+
+  /* ── Table card ── */
+  .table-card {
+    background: white; border-radius: 20px;
+    border: 1px solid #eef2f8; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  }
+  .table-card-header {
+    padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .table-card-header h4 { font-size: 1rem; color: #0a1f44; margin: 0; font-weight: 700; }
+  .count-pill {
+    background: #eef2f8; color: #5a6e82; font-size: .72rem;
+    font-weight: 700; padding: 2px 10px; border-radius: 20px;
+  }
+
+  .fee-table { width: 100%; border-collapse: collapse; }
+  .fee-table th {
+    text-align: left; padding: .65rem 1.25rem; font-size: .7rem; font-weight: 700;
+    letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
+    background: #fafbfd; border-bottom: 1px solid #eef2f8;
+  }
+  .fee-table td { padding: .75rem 1.25rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .fee-table tr:last-child td { border-bottom: none; }
+  .fee-table tr:hover td { background: #fffdf5; }
+
+  .fee-name { font-weight: 600; color: #0a1f44; font-size: .9rem; }
+  .fee-amount {
+    font-weight: 700; color: #1a5c3a; font-size: .95rem;
+    font-family: 'Courier New', monospace;
+  }
+  .status-pill {
+    display: inline-block; font-size: .68rem; font-weight: 700;
+    padding: 2px 9px; border-radius: 20px;
+  }
+  .status-pill.active   { background: #d4edda; color: #155724; }
+  .status-pill.inactive { background: #f8d7da; color: #721c24; }
+
+  /* action buttons */
+  .action-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .btn-edit {
+    padding: .35rem .8rem; background: #eef2f8; color: #0a1f44;
+    border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-edit:hover { background: #dde3ed; }
+  .btn-toggle {
+    padding: .35rem .8rem; background: #fff3cd; color: #856404;
+    border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-toggle:hover { background: #fde8a0; }
+  .btn-del {
+    padding: .35rem .8rem; background: #fee2e2; color: #991b1b;
+    border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-del:hover { background: #fca5a5; }
+
+  .empty-state {
+    text-align: center; padding: 3rem; color: #8a9ab0;
+  }
+  .empty-state i { font-size: 2rem; margin-bottom: .75rem; display: block; }
+
+  /* Edit modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,31,68,.45);
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white; border-radius: 24px;
+    width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(10,31,68,.2);
+    animation: modal-in .18s ease;
+    overflow: hidden;
+  }
+  @keyframes modal-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-header h4 { font-size: 1rem; font-weight: 700; color: #0a1f44; margin: 0; }
+  .modal-close {
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 32px; height: 32px; cursor: pointer; font-size: 1.1rem;
+    color: #5a6e82; display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .modal-close:hover { background: #fee2e2; color: #991b1b; }
+  .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+  .modal-body label {
+    font-size: .75rem; font-weight: 600; color: #0a1f44;
+    text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: .3rem;
+  }
+  .modal-body input {
+    width: 100%; padding: .65rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: .92rem; font-family: inherit; outline: none; transition: border-color .2s;
+    box-sizing: border-box;
+  }
+  .modal-body input:focus { border-color: #c9a03d; }
+  .modal-footer {
+    padding: 1rem 1.5rem; border-top: 1px solid #eef2f8;
+    display: flex; justify-content: flex-end; gap: .65rem;
+  }
+  .btn-cancel {
+    padding: .6rem 1.2rem; background: #f3f4f6; color: #5a6e82;
+    border: none; border-radius: 9px; font-weight: 600; font-size: .85rem;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-cancel:hover { background: #e5e7eb; }
+  .btn-save {
+    padding: .6rem 1.4rem; background: #c9a03d; color: white;
+    border: none; border-radius: 9px; font-weight: 700; font-size: .85rem;
+    cursor: pointer; transition: all .2s;
+  }
+  .btn-save:hover { background: #b8902e; }
+
+  /* dark */
+  body.dark .add-card      { background: #1a1408; border-color: #c9a03d44; }
+  body.dark .add-card h3   { color: #b9c8e8; }
+  body.dark .add-form-group input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .table-card    { background: #1a2538; border-color: #2d3e54; }
+  body.dark .fee-table th  { background: #131e2e; color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .fee-table td  { border-color: #1e2e42; }
+  body.dark .fee-table tr:hover td { background: #1e2438; }
+  body.dark .fee-name      { color: #eef2ff; }
+  body.dark .modal-box     { background: #1a2538; }
+  body.dark .modal-header  { border-color: #2d3e54; }
+  body.dark .modal-header h4 { color: #eef2ff; }
+  body.dark .modal-body input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .modal-footer  { border-color: #2d3e54; }
+  body.dark .modal-close   { background: #2d3e54; color: #b9c8e8; }
+  body.dark .btn-edit      { background: #2d3e54; color: #eef2ff; }
+  body.dark .btn-cancel    { background: #2d3e54; color: #b9c8e8; }
+  body.dark .fc-header h2  { color: #eef2ff; }
+  body.dark .table-card-header h4 { color: #eef2ff; }
+
+  @media (max-width: 600px) {
+    .add-form-row  { flex-direction: column; }
+    .add-form-group { min-width: unset; }
+    .fee-table th:nth-child(3),
+    .fee-table td:nth-child(3) { display: none; }
+  }
+</style>
+
+<div class="fc-page">
+  <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <div class="fc-header" style="margin-top:1rem">
+    <h2><i class="fas fa-dollar-sign" style="color:#c9a03d"></i> Fee Categories</h2>
+  </div>
+
+  {# ── Add new fee category ── #}
+  <div class="add-card">
+    <h3><i class="fas fa-plus-circle"></i> Add New Fee Category</h3>
+    <form method="POST">
+      <input type="hidden" name="action" value="add"/>
+      <div class="add-form-row">
+        <div class="add-form-group">
+          <label>Fee Category Name</label>
+          <input type="text" name="name" placeholder="e.g. Government Quota Fees" required/>
+        </div>
+        <div class="add-form-group">
+          <label>Amount ($)</label>
+          <div class="amount-wrap">
+            <span class="currency-prefix">$</span>
+            <input type="number" name="amount" min="0" step="0.01" placeholder="0.00" required/>
+          </div>
+        </div>
+        <button type="submit" class="btn-add">
+          <i class="fas fa-plus"></i> Add Category
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ── Fee categories table ── #}
+  <div class="table-card">
+    <div class="table-card-header">
+      <h4><i class="fas fa-list" style="color:#c9a03d"></i> All Fee Categories</h4>
+      <span class="count-pill">{{ categories|length }} total</span>
+    </div>
+
+    {% if categories %}
+    <table class="fee-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td><span class="fee-name">{{ cat.name }}</span></td>
+          <td><span class="fee-amount">${{ '%.2f'|format(cat.amount) }}</span></td>
+          <td>
+            <span class="status-pill {% if cat.is_active %}active{% else %}inactive{% endif %}">
+              {% if cat.is_active %}● Active{% else %}● Inactive{% endif %}
+            </span>
+          </td>
+          <td>
+            <div class="action-btns">
+              {# Edit #}
+              <button class="btn-edit" onclick="openEdit({{ cat.id }}, '{{ cat.name|e }}', {{ cat.amount }})">
+                <i class="fas fa-pen"></i> Edit
+              </button>
+              {# Toggle #}
+              <form method="POST" style="display:inline">
+                <input type="hidden" name="action" value="toggle"/>
+                <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                <button type="submit" class="btn-toggle">
+                  {% if cat.is_active %}<i class="fas fa-eye-slash"></i> Disable
+                  {% else %}<i class="fas fa-eye"></i> Enable{% endif %}
+                </button>
+              </form>
+              {# Delete #}
+              <form method="POST" style="display:inline"
+                onsubmit="return confirm('Delete fee category &quot;{{ cat.name|e }}&quot;?')">
+                <input type="hidden" name="action" value="delete"/>
+                <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                <button type="submit" class="btn-del">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-folder-open"></i>
+      No fee categories yet. Add one above.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Edit Modal ── #}
+<div class="modal-overlay" id="edit-modal" onclick="closeOnOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h4><i class="fas fa-pen" style="color:#c9a03d"></i> Edit Fee Category</h4>
+      <button class="modal-close" onclick="closeEdit()">&times;</button>
+    </div>
+    <form method="POST" id="edit-form">
+      <input type="hidden" name="action" value="edit"/>
+      <input type="hidden" name="cat_id" id="edit-cat-id"/>
+      <div class="modal-body">
+        <div>
+          <label>Fee Category Name</label>
+          <input type="text" name="name" id="edit-name" required/>
+        </div>
+        <div>
+          <label>Amount ($)</label>
+          <div class="amount-wrap">
+            <span class="currency-prefix">$</span>
+            <input type="number" name="amount" id="edit-amount" min="0" step="0.01" required/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeEdit()">Cancel</button>
+        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+function openEdit(id, name, amount) {
+  document.getElementById('edit-cat-id').value = id;
+  document.getElementById('edit-name').value   = name;
+  document.getElementById('edit-amount').value = amount;
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeEdit() {
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOnOverlay(e) {
+  if (e.target === e.currentTarget) closeEdit();
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEdit();
+});
+</script>
+{% endblock %}
+{% endblock %}

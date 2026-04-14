@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}My Fee Structure — BCA Admissions{% endblock %}
+{% block content %}
+<style>
+  .fee-page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+  .btn-back {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
+    margin-bottom: 1.5rem;
+  }
+  .btn-back:hover { color: #0a1f44; }
+
+  .fee-page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; color: #0a1f44; margin: 0 0 1.5rem;
+  }
+
+  /* No fee state */
+  .no-fee-card {
+    background: #f5f7fa; border-radius: 18px; border: 1.5px dashed #dde3ed;
+    padding: 2.5rem; text-align: center; color: #8a9ab0;
+  }
+  .no-fee-card i { font-size: 2rem; margin-bottom: .75rem; display: block; color: #c9a03d; }
+  .no-fee-card p { margin: 0; font-size: .9rem; }
+
+  /* Fee breakdown card */
+  .fee-card {
+    background: white; border-radius: 20px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 4px 20px rgba(10,31,68,.08);
+    overflow: hidden;
+  }
+  .fee-card-header {
+    background: linear-gradient(135deg, #0a1f44, #1e3a60);
+    padding: 1.5rem 1.75rem; color: white;
+  }
+  .fee-card-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; margin: 0 0 .35rem; font-weight: 700;
+  }
+  .fee-card-header p { margin: 0; font-size: .82rem; opacity: .75; }
+
+  .fee-rows { padding: 0; }
+  .fee-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.75rem; border-bottom: 1px solid #f5f7fa;
+    gap: 1rem;
+  }
+  .fee-row:last-child { border-bottom: none; }
+  .fee-row-label {
+    display: flex; align-items: center; gap: .65rem;
+    font-size: .88rem; color: #5a6e82;
+  }
+  .fee-row-label i { color: #c9a03d; width: 16px; text-align: center; }
+  .fee-row-label strong { color: #0a1f44; font-size: .9rem; display: block; }
+  .fee-row-label span  { color: #5a6e82; font-size: .78rem; }
+  .fee-row-amount {
+    font-size: 1rem; font-weight: 700; color: #0a1f44;
+    font-family: 'Courier New', monospace; white-space: nowrap;
+  }
+  .fee-row-amount.additional { color: #b45309; }
+  .fee-row-amount.zero       { color: #9ca3af; }
+
+  /* Total row */
+  .fee-total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    background: linear-gradient(135deg, #fffdf5, #fff8e8);
+    border-top: 2px solid #e8d5a0;
+    gap: 1rem;
+  }
+  .fee-total-label {
+    font-size: 1rem; font-weight: 700; color: #0a1f44;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .fee-total-label i { color: #c9a03d; }
+  .fee-total-amount {
+    font-size: 1.5rem; font-weight: 800; color: #1a5c3a;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Not allotted notice */
+  .notice-card {
+    background: #fffbea; border: 1.5px solid #fde68a;
+    border-radius: 14px; padding: 1rem 1.25rem;
+    font-size: .85rem; color: #92400e; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: .65rem;
+  }
+
+  /* dark */
+  body.dark .fee-page-title { color: #eef2ff; }
+  body.dark .fee-card        { background: #1a2538; border-color: #2d3e54; }
+  body.dark .fee-row         { border-color: #1e2e42; }
+  body.dark .fee-row-label strong { color: #eef2ff; }
+  body.dark .fee-row-label span   { color: #b9c8e8; }
+  body.dark .fee-row-amount  { color: #eef2ff; }
+  body.dark .fee-total-row   { background: #1a1408; border-color: #c9a03d44; }
+  body.dark .fee-total-label { color: #eef2ff; }
+  body.dark .no-fee-card     { background: #1a2538; border-color: #2d3e54; }
+</style>
+
+<div class="fee-page">
+  <a href="{{ url_for('main.student_dashboard') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+  </a>
+
+  <h2 class="fee-page-title"><i class="fas fa-receipt" style="color:#c9a03d"></i> My Fee Structure</h2>
+
+  {% if not allotment %}
+  <div class="notice-card">
+    <i class="fas fa-info-circle"></i>
+    Your seat has not been allotted yet. Fee details will appear here once you are allotted a seat.
+  </div>
+  {% endif %}
+
+  {% if student_fee %}
+  <div class="fee-card">
+    <div class="fee-card-header">
+      <h3>Fee Breakdown</h3>
+      <p>{{ appl.full_name }} &mdash; Rank #{{ appl.rank or '—' }}</p>
+    </div>
+
+    <div class="fee-rows">
+
+      {# Base fee category #}
+      <div class="fee-row">
+        <div class="fee-row-label">
+          <i class="fas fa-tag"></i>
+          <div>
+            <strong>{{ student_fee.fee_category.name if student_fee.fee_category else 'Fee Category' }}</strong>
+            <span>Base fee structure</span>
+          </div>
+        </div>
+        <div class="fee-row-amount {% if student_fee.base_amount == 0 %}zero{% endif %}">
+          ${{ '%.2f'|format(student_fee.base_amount) }}
+        </div>
+      </div>
+
+      {# Additional fee #}
+      {% if student_fee.additional_fee and student_fee.additional_fee > 0 %}
+      <div class="fee-row">
+        <div class="fee-row-label">
+          <i class="fas fa-plus-circle"></i>
+          <div>
+            <strong>Additional Charges</strong>
+            <span>Extra fee applied at the time of counselling</span>
+          </div>
+        </div>
+        <div class="fee-row-amount additional">
+          + ${{ '%.2f'|format(student_fee.additional_fee) }}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    {# Total #}
+    <div class="fee-total-row">
+      <div class="fee-total-label">
+        <i class="fas fa-dollar-sign"></i> Total Fees Payable
+      </div>
+      <div class="fee-total-amount">${{ '%.2f'|format(student_fee.total_amount) }}</div>
+    </div>
+  </div>
+
+  {% elif allotment %}
+  <div class="no-fee-card">
+    <i class="fas fa-hourglass-half"></i>
+    <p>Your seat has been allotted but fee details have not been assigned yet.<br>
+       Please check back later or contact the admissions office.</p>
+  </div>
+
+  {% else %}
+  <div class="no-fee-card">
+    <i class="fas fa-info-circle"></i>
+    <p>Fee structure will be assigned to you during the counselling process.<br>
+       Please attend your counselling session.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

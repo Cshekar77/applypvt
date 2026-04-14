@@ -217,16 +217,13 @@ class StudentDocument(db.Model):
     application_id  = db.Column(db.Integer, db.ForeignKey('student_applications.id'), nullable=False)
     doc_category_id = db.Column(db.Integer, db.ForeignKey('document_category.id'), nullable=False)
 
-    # Status: original | xerox | attested | not_given
     status          = db.Column(db.String(30), default='not_given')
 
-    # Approval
     is_approved     = db.Column(db.Boolean, default=False)
     approved_at     = db.Column(db.DateTime, nullable=True)
 
-    # Who approved
     approved_by_faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.id'), nullable=True)
-    approved_by_role       = db.Column(db.String(20), nullable=True)   # 'admin' or 'faculty'
+    approved_by_role       = db.Column(db.String(20), nullable=True)
     approved_by_name       = db.Column(db.String(120), nullable=True)
 
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
@@ -265,6 +262,49 @@ class StudentDocument(db.Model):
 
 
 # ─────────────────────────────────────────
+#  Fee Category  (admin-defined fee structures)
+# ─────────────────────────────────────────
+class FeeCategory(db.Model):
+    __tablename__ = 'fee_category'
+    id         = db.Column(db.Integer, primary_key=True)
+    name       = db.Column(db.String(200), nullable=False, unique=True)
+    amount     = db.Column(db.Float, nullable=False, default=0.0)
+    is_active  = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<FeeCategory {self.name} ${self.amount}>'
+
+
+# ─────────────────────────────────────────
+#  Student Fee  (one per allotted student)
+# ─────────────────────────────────────────
+class StudentFee(db.Model):
+    __tablename__ = 'student_fee'
+    id               = db.Column(db.Integer, primary_key=True)
+    application_id   = db.Column(db.Integer, db.ForeignKey('student_applications.id'), unique=True, nullable=False)
+    fee_category_id  = db.Column(db.Integer, db.ForeignKey('fee_category.id'), nullable=True)
+    additional_fee   = db.Column(db.Float, default=0.0, nullable=False)
+    created_at       = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at       = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    application  = db.relationship('StudentApplication', backref='student_fee')
+    fee_category = db.relationship('FeeCategory', backref='student_fees')
+
+    @property
+    def base_amount(self):
+        return self.fee_category.amount if self.fee_category else 0.0
+
+    @property
+    def total_amount(self):
+        return self.base_amount + (self.additional_fee or 0.0)
+
+    def __repr__(self):
+        return f'<StudentFee app={self.application_id} total={self.total_amount}>'
+
+
+# ─────────────────────────────────────────
 #  Faculty
 # ─────────────────────────────────────────
 class Faculty(db.Model):
@@ -282,7 +322,7 @@ class Faculty(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Student Fees
+#  Student Fees  (payment tracking — existing)
 # ─────────────────────────────────────────
 class StudentFees(db.Model):
     __tablename__ = 'student_fees'

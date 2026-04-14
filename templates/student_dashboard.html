@@ -2,22 +2,27 @@
 {% block title %}Dashboard — BCA Admissions{% endblock %}
 {% block content %}
 <style>
+  /* ── Action buttons grid — mobile-first ── */
   .dash-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: .75rem;
     margin-top: 1.5rem;
   }
 
+  /* Each action button fills its cell fully */
+  .dash-action-btn {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    padding: .85rem 1rem; border-radius: 12px;
+    font-size: .9rem; font-weight: 600; text-decoration: none;
+    text-align: center; transition: all .25s; cursor: pointer;
+    border: none; font-family: inherit; width: 100%; box-sizing: border-box;
+  }
+
   .btn-whatsapp {
-    display: inline-flex; align-items: center; gap: .5rem;
     background: linear-gradient(135deg, #25D366, #128C7E);
-    color: white; text-decoration: none;
-    padding: .75rem 1.4rem; border-radius: 12px;
-    font-size: .95rem; font-weight: 600;
-    transition: all .25s;
+    color: white;
     box-shadow: 0 3px 10px rgba(37,211,102,.25);
-    position: relative;
   }
   .btn-whatsapp:hover {
     transform: translateY(-2px);
@@ -25,24 +30,10 @@
     color: white;
   }
 
-  .wa-live-dot {
-    width: 7px; height: 7px; background: white;
-    border-radius: 50%; animation: blink 1.5s infinite;
-  }
-  @keyframes blink {
-    0%,100% { opacity: 1; } 50% { opacity: .3; }
-  }
-
-  /* Counselling button */
   .btn-counselling {
-    display: inline-flex; align-items: center; gap: .5rem;
     background: linear-gradient(135deg, #0a1f44, #1e3a60);
-    color: white; text-decoration: none;
-    padding: .75rem 1.4rem; border-radius: 12px;
-    font-size: .95rem; font-weight: 600;
-    transition: all .25s;
+    color: white;
     box-shadow: 0 3px 10px rgba(10,31,68,.2);
-    position: relative;
   }
   .btn-counselling:hover {
     transform: translateY(-2px);
@@ -56,12 +47,62 @@
   .btn-counselling.live:hover {
     box-shadow: 0 6px 18px rgba(37,194,110,.35);
   }
-  .counsel-live-dot {
-    width: 7px; height: 7px; background: white;
-    border-radius: 50%; animation: blink 1.2s infinite;
+
+  .btn-fees {
+    background: linear-gradient(135deg, #92400e, #c9a03d);
+    color: white;
+    box-shadow: 0 3px 10px rgba(201,160,61,.25);
+  }
+  .btn-fees:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(201,160,61,.35);
+    color: white;
   }
 
-  /* Counselling live mini-card on dashboard */
+  .btn-change-pw {
+    background: #f3f4f6; color: #374151;
+    border: 1.5px solid #e5e7eb;
+  }
+  .btn-change-pw:hover {
+    background: #e5e7eb; transform: translateY(-2px);
+    color: #111827;
+  }
+
+  /* Live dots */
+  .wa-live-dot, .counsel-live-dot {
+    width: 7px; height: 7px; background: white;
+    border-radius: 50%; animation: blink 1.5s infinite; flex-shrink: 0;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: .3; }
+  }
+
+  /* ── Fee summary mini-card ── */
+  .fee-mini-card {
+    background: linear-gradient(135deg, #fffdf5, #fff8e8);
+    border: 1.5px solid #e8d5a0; border-radius: 14px;
+    padding: 1rem 1.25rem; margin-top: 1.25rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .fee-mini-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, #c9a03d, #b8902e);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1rem; flex-shrink: 0;
+  }
+  .fee-mini-info { flex: 1; min-width: 0; }
+  .fee-mini-info strong { display: block; font-size: .88rem; color: #0a1f44; }
+  .fee-mini-info span   { font-size: .78rem; color: #5a6e82; }
+  .fee-mini-total {
+    font-size: 1.2rem; font-weight: 800; color: #1a5c3a;
+    font-family: 'Courier New', monospace; white-space: nowrap;
+  }
+  .fee-mini-pending {
+    font-size: .72rem; color: #b45309; font-weight: 600;
+    background: #fef3c7; padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* ── Counselling live mini-card ── */
   .counsel-mini-card {
     background: linear-gradient(135deg, #edf9f2, #f5fdf8);
     border: 1.5px solid #25c26e;
@@ -89,6 +130,27 @@
   }
   .your-turn-dash .yt-icon { font-size: 1.6rem; flex-shrink: 0; }
   .your-turn-dash p { margin: 0; font-size: .88rem; color: #1a5c3a; font-weight: 600; }
+
+  /* dark */
+  body.dark .fee-mini-card    { background: #1a1408; border-color: #c9a03d44; }
+  body.dark .fee-mini-info strong { color: #eef2ff; }
+  body.dark .fee-mini-info span   { color: #b9c8e8; }
+  body.dark .btn-change-pw    { background: #1a2538; color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .btn-change-pw:hover { background: #2d3e54; color: #eef2ff; }
+
+  /* ── Mobile overrides ── */
+  @media (max-width: 480px) {
+    .dash-actions {
+      grid-template-columns: 1fr 1fr;
+    }
+    .dash-action-btn {
+      font-size: .82rem;
+      padding: .75rem .5rem;
+    }
+  }
+  @media (max-width: 340px) {
+    .dash-actions { grid-template-columns: 1fr; }
+  }
 </style>
 
 <div class="page-wrap">
@@ -124,7 +186,31 @@
     <a href="{{ url_for('main.apply') }}" class="btn btn-primary">Start Application &rarr;</a>
   {% endif %}
 
-  {# ── Counselling live mini-card (shown when running) ── #}
+  {# ── Fee mini-card (shown when fee is assigned) ── #}
+  {% set sf = application.student_fee if application else none %}
+  {% if sf %}
+  <div class="fee-mini-card">
+    <div class="fee-mini-icon"><i class="fas fa-dollar-sign"></i></div>
+    <div class="fee-mini-info">
+      <strong>{{ sf.fee_category.name if sf.fee_category else 'Fee Structure' }}</strong>
+      <span>
+        {% if sf.additional_fee and sf.additional_fee > 0 %}
+          Base ${{ '%.2f'|format(sf.base_amount) }} + Additional ${{ '%.2f'|format(sf.additional_fee) }}
+        {% else %}
+          Base fee assigned during counselling
+        {% endif %}
+      </span>
+    </div>
+    <div>
+      <div class="fee-mini-total">${{ '%.2f'|format(sf.total_amount) }}</div>
+      <div style="text-align:right;margin-top:2px">
+        <span class="fee-mini-pending">Total Payable</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── Counselling live mini-card ── #}
   {% if counselling.is_running %}
     {% if application and application.rank and counselling.current_rank and application.rank == counselling.current_rank %}
       <div class="your-turn-dash">
@@ -155,29 +241,34 @@
     {% endif %}
   {% endif %}
 
+  {# ── Action buttons ── #}
   <div class="dash-actions">
 
-    {# Counselling button #}
     <a href="{{ url_for('main.student_counselling') }}"
-       class="btn-counselling {% if counselling.is_running %}live{% endif %}">
+       class="dash-action-btn btn-counselling {% if counselling.is_running %}live{% endif %}">
       <i class="fas fa-chalkboard-teacher"></i>
       Counselling
       {% if counselling.is_running %}<span class="counsel-live-dot"></span>{% endif %}
     </a>
 
-    {# WhatsApp Group button #}
-    <a href="{{ url_for('main.student_whatsapp') }}" class="btn-whatsapp">
+    <a href="{{ url_for('main.student_fee_structure') }}" class="dash-action-btn btn-fees">
+      <i class="fas fa-receipt"></i>
+      My Fees
+    </a>
+
+    <a href="{{ url_for('main.student_whatsapp') }}" class="dash-action-btn btn-whatsapp">
       <i class="fab fa-whatsapp"></i>
-      WhatsApp Group
+      WhatsApp
       {% if whatsapp.is_active and whatsapp.link %}
         <span class="wa-live-dot"></span>
       {% endif %}
     </a>
 
-    {# Change Password button #}
-    <a href="{{ url_for('main.student_change_password') }}" class="btn btn-outline-secondary">
-      🔒 Change Password
+    <a href="{{ url_for('main.student_change_password') }}" class="dash-action-btn btn-change-pw">
+      <i class="fas fa-lock"></i>
+      Change Password
     </a>
+
   </div>
 
 </div>
