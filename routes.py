@@ -508,7 +508,7 @@ def reset_password():
 def student_dashboard():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     if appl:
-        appl.fee_details = appl.student_fees[0] if appl.student_fees else None
+        appl.fee_details = appl.student_fee[0] if appl.student_fee else None
     settings    = FormSettings.get()
     whatsapp    = WhatsAppSettings.get()
     counselling = CounsellingSettings.get()
@@ -700,7 +700,7 @@ def student_change_password():
 # ─────────────────────────────────────────
 @main.route('/my-fees')
 @login_required
-def student_fee_structure():
+def student_fee():
     appl = StudentApplication.query.filter_by(user_id=current_user.id).first()
     if not appl:
         flash('No application found.', 'warning')
