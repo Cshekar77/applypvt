@@ -1,438 +1,494 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard — BCA Admissions</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['DM Sans', 'sans-serif'],
-                        serif: ['Cormorant Garamond', 'serif'],
-                    },
-                    colors: {
-                        navy: {
-                            DEFAULT: '#0A1F44',
-                            200: '#1E3A60',
-                        },
-                        gold: {
-                            DEFAULT: '#C9A03D',
-                            200: '#E8C96A',
-                        },
-                        green: '#1A5C3A',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .bento-grid-bg {
-            background-color: #F7F9FC;
-            background-image: radial-gradient(#eaeff7 1px, transparent 1px);
-            background-size: 30px 30px;
-            background-attachment: fixed;
-        }
-        .bento-shadow {
-            box-shadow: 0 12px 40px rgba(10, 31, 68, 0.05);
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .nav-bottom-shadow {
-            box-shadow: 0 -8px 24px rgba(10, 31, 68, 0.08);
-        }
-        @keyframes ping-soft {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-        .animate-ping-soft {
-            animation: ping-soft 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        /* Mobile menu animation */
-        #mobile-profile {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(100%);
-        }
-        #mobile-profile.open {
-            transform: translateY(0);
-        }
-        /* Dropdown logic */
-        #profile-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 12px);
-            width: 280px;
-            z-index: 100;
-        }
-        #profile-dropdown.open {
-            display: block;
-        }
-        .reveal-up {
-            animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        @keyframes revealUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body class="bento-grid-bg font-sans text-navy selection:bg-navy/5 overflow-x-hidden relative">
+{% extends 'base.html' %}
+{% block title %}Dashboard — BCA Admissions{% endblock %}
+{% block content %}
 
-    <!-- Decorative Background -->
-    <div class="fixed inset-0 pointer-events-none z-0">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gold/5 blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-navy/5 blur-[120px]"></div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy:    #0a1f44;
+    --navy2:   #1e3a60;
+    --gold:    #c9a03d;
+    --gold2:   #e8c96a;
+    --green:   #1a5c3a;
+    --green2:  #25c26e;
+    --amber:   #b45309;
+    --surface: #f7f9fc;
+    --card:    #ffffff;
+    --border:  #eaeff7;
+    --text:    #0a1f44;
+    --muted:   #6b7f99;
+    --radius:  18px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body { background: var(--surface); font-family: 'DM Sans', sans-serif; }
+
+  /* ── TOP BAR ── */
+  .dash-topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem;
+  }
+  .dash-topbar-left { display: flex; align-items: center; gap: .75rem; }
+  .dash-logo-dot {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-size: .85rem;
+  }
+  .dash-topbar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 700; color: var(--navy);
+    line-height: 1.1;
+  }
+  .dash-topbar-title small {
+    display: block; font-family: 'DM Sans', sans-serif;
+    font-size: .68rem; font-weight: 400; color: var(--muted); letter-spacing: .04em;
+  }
+
+  /* Hamburger */
+  .dash-menu-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--navy); font-size: 1rem;
+    transition: background .2s;
+    position: relative;
+  }
+  .dash-menu-btn:hover { background: var(--border); }
+
+  /* Dropdown menu */
+  .dash-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 1.25rem;
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(10,31,68,.14);
+    min-width: 200px; overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s, transform .2s;
+    z-index: 200;
+  }
+  .dash-dropdown.open {
+    opacity: 1; pointer-events: auto; transform: translateY(0);
+  }
+  .dd-header {
+    padding: .85rem 1rem;
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
+    color: white;
+  }
+  .dd-header strong { display: block; font-size: .88rem; }
+  .dd-header span   { font-size: .72rem; opacity: .7; }
+  .dd-item {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .75rem 1rem; font-size: .86rem; color: var(--text);
+    text-decoration: none; transition: background .15s;
+    border-bottom: 1px solid #f5f7fa;
+  }
+  .dd-item:last-child { border-bottom: none; }
+  .dd-item:hover { background: var(--surface); }
+  .dd-item i { width: 16px; text-align: center; color: var(--muted); }
+  .dd-item.danger { color: #dc2626; }
+  .dd-item.danger i { color: #dc2626; }
+
+  /* ── HERO GREETING ── */
+  .dash-hero {
+    margin: 1.25rem 1.25rem 0;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.5rem 1.75rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-hero::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(201,160,61,.12);
+  }
+  .dash-hero::after {
+    content: '';
+    position: absolute; bottom: -20px; right: 40px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(201,160,61,.08);
+  }
+  .dash-hero-label {
+    font-size: .7rem; font-weight: 500; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--gold2); margin-bottom: .35rem;
+  }
+  .dash-hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem; font-weight: 700; line-height: 1.1;
+    margin-bottom: .5rem;
+  }
+  .dash-hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .3rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 600;
+  }
+  .hero-badge.verified   { background: rgba(37,194,110,.15); color: #25c26e; }
+  .hero-badge.pending    { background: rgba(201,160,61,.15);  color: var(--gold2); }
+  .hero-badge.rank       { background: rgba(255,255,255,.1);   color: white; }
+
+  /* ── STATUS CARD ── */
+  .dash-section { margin: 1rem 1.25rem 0; }
+
+  .status-strip {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .status-strip-icon {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .status-strip-icon.submitted { background: #dcfce7; color: #16a34a; }
+  .status-strip-icon.pending   { background: #fef9c3; color: #ca8a04; }
+  .status-strip-body { flex: 1; min-width: 0; }
+  .status-strip-body strong { display: block; font-size: .88rem; color: var(--text); font-weight: 600; }
+  .status-strip-body span   { font-size: .75rem; color: var(--muted); }
+  .btn-view {
+    flex-shrink: 0;
+    background: var(--navy); color: white;
+    padding: .5rem 1rem; border-radius: 10px;
+    font-size: .78rem; font-weight: 600; text-decoration: none;
+    white-space: nowrap; transition: background .2s;
+  }
+  .btn-view:hover { background: var(--navy2); color: white; }
+
+  /* ── FEE MINI CARD ── */
+  .fee-mini-card {
+    background: linear-gradient(135deg, #fffdf5, #fff8e8);
+    border: 1.5px solid #e8d5a0; border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .fee-mini-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1rem; flex-shrink: 0;
+  }
+  .fee-mini-info { flex: 1; min-width: 0; }
+  .fee-mini-info strong { display: block; font-size: .85rem; color: var(--navy); font-weight: 600; }
+  .fee-mini-info span   { font-size: .75rem; color: var(--muted); }
+  .fee-mini-total {
+    font-size: 1.2rem; font-weight: 800; color: var(--green);
+    font-family: 'Courier New', monospace; white-space: nowrap;
+  }
+  .fee-mini-tag {
+    font-size: .68rem; color: var(--amber); font-weight: 600;
+    background: #fef3c7; padding: 2px 8px; border-radius: 20px;
+    display: block; text-align: right; margin-top: 2px;
+  }
+
+  /* ── COUNSELLING LIVE ── */
+  .counsel-live-card {
+    background: linear-gradient(135deg, #edf9f2, #f5fdf8);
+    border: 1.5px solid var(--green2); border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .cmc-rank-box { text-align: center; }
+  .cmc-rank-box .rank-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 700; color: var(--green); line-height: 1;
+  }
+  .cmc-rank-box .rank-lbl { font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; color: #2e7d52; }
+  .cmc-divider { width: 1px; height: 36px; background: #a8dfc0; flex-shrink: 0; }
+  .cmc-info { flex: 1; }
+  .cmc-info strong { font-size: .86rem; color: var(--navy); display: block; font-weight: 600; }
+  .cmc-info span   { font-size: .75rem; color: var(--muted); }
+
+  .your-turn-card {
+    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
+    border: 1.5px solid var(--green2); border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: .85rem;
+  }
+  .your-turn-card .yt-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .your-turn-card p { margin: 0; font-size: .86rem; color: var(--green); font-weight: 600; }
+
+  /* ── ACTION GRID ── */
+  .dash-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+  }
+
+  .action-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1rem;
+    display: flex; flex-direction: column; align-items: flex-start; gap: .5rem;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .action-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(10,31,68,.1);
+  }
+  .action-card .ac-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem; flex-shrink: 0;
+  }
+  .action-card .ac-label {
+    font-size: .82rem; font-weight: 600; color: var(--text); line-height: 1.2;
+  }
+  .action-card .ac-sub {
+    font-size: .7rem; color: var(--muted);
+  }
+  .ac-live-dot {
+    position: absolute; top: .75rem; right: .75rem;
+    width: 7px; height: 7px; border-radius: 50%;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* Card themes */
+  .ac-counselling::before { background: linear-gradient(90deg, var(--navy), var(--navy2)); }
+  .ac-counselling .ac-icon { background: #eef2ff; color: var(--navy); }
+
+  .ac-counselling.live::before { background: linear-gradient(90deg, var(--green), var(--green2)); }
+  .ac-counselling.live .ac-icon { background: #dcfce7; color: var(--green); }
+  .ac-live-dot.green { background: var(--green2); }
+
+  .ac-fees::before { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+  .ac-fees .ac-icon { background: #fef9c3; color: var(--amber); }
+
+  .ac-whatsapp::before { background: linear-gradient(90deg, #128C7E, #25D366); }
+  .ac-whatsapp .ac-icon { background: #dcfce7; color: #16a34a; }
+  .ac-live-dot.whatsapp { background: #25D366; }
+
+  .ac-password::before { background: linear-gradient(90deg, #64748b, #94a3b8); }
+  .ac-password .ac-icon { background: #f1f5f9; color: #64748b; }
+
+  /* Section label */
+  .section-label {
+    font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: .5rem;
+  }
+
+  /* Bottom safe area */
+  .dash-bottom-pad { height: 2rem; }
+
+  /* Dark mode */
+  body.dark {
+    --surface: #0d1a2e;
+    --card:    #1a2538;
+    --border:  #2d3e54;
+    --text:    #eef2ff;
+    --muted:   #7a90b0;
+  }
+  body.dark .dash-topbar { background: rgba(13,26,46,.92); }
+  body.dark .dash-dropdown { background: #1a2538; border-color: #2d3e54; }
+  body.dark .dd-item { border-color: #2d3e54; color: #eef2ff; }
+  body.dark .dd-item:hover { background: #0d1a2e; }
+  body.dark .fee-mini-card { background: #1a1408; border-color: #c9a03d44; }
+  body.dark .fee-mini-info strong { color: #eef2ff; }
+</style>
+
+<div class="dash-topbar">
+  <div class="dash-topbar-left">
+    <div class="dash-logo-dot"><i class="fas fa-graduation-cap"></i></div>
+    <div class="dash-topbar-title">
+      BCA Admissions
+      <small>2026 – 2027</small>
     </div>
-
-    <!-- Header (Desktop) -->
-    <nav id="desktop-nav" class="fixed top-0 left-0 right-0 z-[60] transition-all duration-500 px-6 sm:px-12 hidden sm:block py-8">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4 group cursor-pointer">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-navy to-navy-200 flex items-center justify-center text-gold shadow-xl shadow-navy/20">
-                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold font-serif text-navy tracking-tight leading-none uppercase">BCA Admissions</h1>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5">Elite Candidate Portal</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-4 relative">
-                <button onclick="toggleDropdown()" class="px-6 h-12 rounded-xl bg-white border border-border flex items-center gap-3 text-navy font-black uppercase text-[10px] tracking-widest shadow-sm hover:border-navy transition-all">
-                    <i data-lucide="user" class="w-4 h-4 text-gold"></i>
-                    <span>Portal Options</span>
-                    <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300" id="drop-icon"></i>
-                </button>
-
-                <div id="profile-dropdown" class="glass-panel rounded-[32px] shadow-2xl p-3 overflow-hidden">
-                    <div class="bg-navy text-white p-6 rounded-[24px] mb-3">
-                        <p class="text-xs font-black tracking-tight leading-none mb-1 opacity-60 uppercase">Signed in as</p>
-                        <p class="text-sm font-bold truncate mb-3">Aravind Kesavan</p>
-                        <div class="h-px bg-white/10 mb-3"></div>
-                        <p class="text-[10px] uppercase font-black tracking-widest text-gold-200">aravind.k@example.com</p>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                        <a href="/main/my_application" class="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-[11px] uppercase tracking-[0.15em] text-slate-600 hover:bg-navy/5 hover:text-navy">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> Application
-                        </a>
-                        <a href="/main/student_fee" class="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-[11px] uppercase tracking-[0.15em] text-slate-600 hover:bg-navy/5 hover:text-navy">
-                            <i data-lucide="wallet" class="w-4 h-4"></i> Fee Details
-                        </a>
-                        <a href="/main/student_counselling" class="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-[11px] uppercase tracking-[0.15em] text-slate-600 hover:bg-navy/5 hover:text-navy">
-                            <i data-lucide="users" class="w-4 h-4"></i> Counselling
-                        </a>
-                        <a href="/main/student_change_password" class="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-[11px] uppercase tracking-[0.15em] text-slate-600 hover:bg-navy/5 hover:text-navy">
-                            <i data-lucide="lock" class="w-4 h-4"></i> Security
-                        </a>
-                        <a href="/main/logout" class="flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-[11px] uppercase tracking-[0.15em] text-red-600 hover:bg-red-50">
-                            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Header (Mobile) -->
-    <nav id="mobile-nav" class="fixed top-0 left-0 right-0 z-[60] transition-all duration-500 px-6 sm:hidden bg-transparent py-5">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-navy flex items-center justify-center text-gold">
-                    <i data-lucide="graduation-cap" class="w-[18px] h-[18px]"></i>
-                </div>
-                <h1 class="text-sm font-bold font-serif text-navy uppercase tracking-tighter">BCA Admissions</h1>
-            </div>
-            <button class="w-10 h-10 rounded-full bg-navy/5 flex items-center justify-center text-navy relative">
-                <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
-                <span class="absolute top-2 right-2 w-2 h-2 bg-gold rounded-full border-2 border-white"></span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 sm:px-12 pt-28 sm:pt-48 pb-32 sm:pb-20 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10">
-            
-            <!-- Hero -->
-            <section class="lg:col-span-12 reveal-up" style="animation-delay: 0s">
-                <div class="h-full relative p-10 sm:p-16 rounded-[48px] bg-gradient-to-br from-navy to-navy-200 text-white overflow-hidden shadow-2xl shadow-navy/30 group">
-                    <div class="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-10">
-                        <div class="max-w-2xl">
-                            <div class="flex items-center gap-3 mb-6">
-                                <span class="w-8 h-px bg-gold"></span>
-                                <p class="text-[11px] font-black uppercase tracking-[0.5em] text-gold-200">Candidate Dashboard</p>
-                            </div>
-                            <h2 class="text-5xl sm:text-7xl font-bold font-serif leading-[1.1] tracking-tight mb-10 italic">
-                                Aravind <span class="text-gold-200 not-italic">Kesavan</span>
-                            </h2>
-                            <div class="flex flex-wrap gap-4">
-                                <div class="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gold/20 backdrop-blur-md border border-gold/20 text-gold-200 text-[10px] font-black uppercase tracking-[0.2em]">
-                                    <i data-lucide="sparkles" class="w-3 h-3"></i> Rank #42
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hidden sm:block text-right">
-                           <!-- Portal ID removed as per request -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Status -->
-            <section class="lg:col-span-8 reveal-up" style="animation-delay: 0.1s">
-                <div class="p-10 h-full flex flex-col sm:flex-row items-center justify-between gap-10 border-l-8 border-l-navy bg-white rounded-[32px] bento-shadow transition-all duration-300 hover:shadow-xl">
-                    <div class="flex items-center gap-8 text-center sm:text-left flex-col sm:flex-row">
-                        <div class="w-20 h-20 rounded-3xl bg-green-50 flex items-center justify-center text-green relative overflow-hidden">
-                            <i data-lucide="check" class="w-9 h-9 relative z-10" style="stroke-width: 3"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-black text-navy uppercase tracking-tighter mb-2">Application Submission Date</h4>
-                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center justify-center sm:justify-start gap-2">
-                                <i data-lucide="calendar" class="w-3 h-3"></i> 15 March, 2026
-                            </p>
-                        </div>
-                    </div>
-                    <a href="/main/my_application" class="w-full sm:w-auto px-10 py-5 bg-navy text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-navy/20 active:scale-95 transition-all text-center">My Application</a>
-                </div>
-            </section>
-
-            <!-- Fees -->
-            <section class="lg:col-span-4 reveal-up" style="animation-delay: 0.2s">
-                <div class="p-10 h-full bg-[#FFFDF5] border border-[#E8D5A0] rounded-[32px] bento-shadow flex flex-col transition-all duration-300 hover:shadow-xl">
-                    <div class="flex items-start justify-between mb-10">
-                        <div>
-                            <h4 class="text-sm font-black text-navy uppercase tracking-[0.1em] mb-1">FEE SUMMARY</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Base fee and additional fee details</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center text-gold">
-                            <i data-lucide="indian-rupee" class="w-6 h-6"></i>
-                        </div>
-                    </div>
-                    <div class="mt-auto">
-                        <div class="text-4xl font-black text-navy font-mono tracking-tighter mb-3">₹1,30,000</div>
-                        <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-gold/10 text-[10px] font-black text-gold rounded-full tracking-wider uppercase">Total Amount</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Counselling -->
-            <section class="lg:col-span-12 reveal-up" style="animation-delay: 0.3s">
-                <div class="p-10 sm:p-14 border-2 border-green/30 bg-green-50/20 rounded-[32px] bento-shadow relative overflow-hidden transition-all duration-300 hover:shadow-xl">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-                        <div class="md:col-span-3 border-b md:border-b-0 md:border-r border-green/20 text-center pb-10 md:pb-0 md:pr-10">
-                            <p class="text-[10px] font-black text-green-700 opacity-70 uppercase tracking-[0.4em] mb-4">Live Queue Status</p>
-                            <div class="text-9xl md:text-8xl lg:text-9xl font-black font-serif text-navy leading-none tracking-tighter italic">#38</div>
-                        </div>
-                        <div class="md:col-span-9">
-                            <div class="flex items-center gap-4 mb-6 text-green-700">
-                                <span class="flex h-3 w-3 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                </span>
-                                <span class="text-[11px] font-black uppercase tracking-[0.5em]">Counselling is Live</span>
-                            </div>
-                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                                <div>
-                                    <h3 class="text-3xl sm:text-4xl font-black text-navy uppercase tracking-tight leading-none mb-4 italic">OFFLINE COUNSELLING</h3>
-                                    <p class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-widest leading-loose max-w-xl">
-                                        Rank #42 positioned in queue. Approximately 4 sequences remaining. Stay prepared for verification.
-                                    </p>
-                                </div>
-                                <a href="/main/student_counselling" class="px-10 py-5 bg-green-700 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all text-center">Live Tracker</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Quick Actions -->
-            <section class="lg:col-span-12 reveal-up" style="animation-delay: 0.4s">
-                <div class="mb-8 flex items-center justify-between">
-                    <h4 class="text-[12px] font-black text-navy uppercase tracking-[0.6em] flex items-center gap-4">
-                        <span class="w-10 h-px bg-navy/10"></span> Portal Shortcut
-                    </h4>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    <a href="/main/student_counselling" class="p-8 bg-white rounded-[32px] border border-border bento-shadow flex flex-col items-start gap-4 transition-all duration-300 group border-t-4 border-t-navy hover:-translate-y-2">
-                        <div class="w-14 h-14 rounded-2xl bg-navy/5 text-navy flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                            <i data-lucide="users" class="w-7 h-7"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-navy uppercase tracking-tight mb-1">Counselling</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Now</p>
-                        </div>
-                    </a>
-                    <a href="/main/student_fee" class="p-8 bg-white rounded-[32px] border border-border bento-shadow flex flex-col items-start gap-4 transition-all duration-300 group border-t-4 border-t-amber-500 hover:-translate-y-2">
-                        <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                            <i data-lucide="receipt" class="w-7 h-7"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-navy uppercase tracking-tight mb-1">Fee Details</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">View Statement</p>
-                        </div>
-                    </a>
-                    <a href="https://chat.whatsapp.com/example" class="p-8 bg-white rounded-[32px] border border-border bento-shadow flex flex-col items-start gap-4 transition-all duration-300 group border-t-4 border-t-green hover:-translate-y-2">
-                        <div class="w-14 h-14 rounded-2xl bg-green/5 text-green flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3 text-[#25D366]">
-                            <i data-lucide="message-circle" class="w-7 h-7"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-navy uppercase tracking-tight mb-1">WhatsApp</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Join Group</p>
-                        </div>
-                    </a>
-                    <a href="/main/student_change_password" class="p-8 bg-white rounded-[32px] border border-border bento-shadow flex flex-col items-start gap-4 transition-all duration-300 group border-t-4 border-t-slate-400 hover:-translate-y-2">
-                        <div class="w-14 h-14 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
-                            <i data-lucide="lock" class="w-7 h-7"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-navy uppercase tracking-tight mb-1">Security</h4>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Change Password</p>
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- Mobile Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 z-[60] sm:hidden glass-panel px-6 py-4 nav-bottom-shadow border-t border-border">
-        <div class="flex items-center justify-around">
-            <button class="flex flex-col items-center gap-1.5 text-navy">
-                <div class="p-2 rounded-xl bg-navy text-white shadow-lg shadow-navy/20">
-                    <i data-lucide="layout-dashboard" class="w-[22px] h-[22px]"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Dash</span>
-            </button>
-            <a href="/main/student_counselling" class="flex flex-col items-center gap-1.5 text-slate-400">
-                <div class="p-2">
-                    <i data-lucide="users" class="w-[22px] h-[22px]"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Session</span>
-            </a>
-            <a href="/main/student_fee" class="flex flex-col items-center gap-1.5 text-slate-400">
-                <div class="p-2">
-                    <i data-lucide="wallet" class="w-[22px] h-[22px]"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Fees</span>
-            </a>
-            <button onclick="toggleMobileProfile()" class="flex flex-col items-center gap-1.5 text-slate-400">
-                <div class="p-2">
-                    <i data-lucide="user" class="w-[22px] h-[22px]"></i>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest">Profile</span>
-            </button>
-        </div>
-    </nav>
-
-    <!-- Mobile Profile Sidebar -->
-    <div id="backdrop" onclick="toggleMobileProfile()" class="fixed inset-0 bg-navy/60 backdrop-blur-sm z-[100] hidden opacity-0 transition-opacity duration-300">
-        <div id="mobile-profile" onclick="event.stopPropagation()" class="absolute bottom-0 inset-x-0 bg-white rounded-t-[48px] p-8 pb-32 bento-shadow">
-            <div class="w-16 h-1.5 bg-slate-200 rounded-full mx-auto mb-10"></div>
-            <div class="flex items-center gap-6 mb-10">
-                <div class="w-20 h-20 rounded-[28px] bg-navy flex items-center justify-center text-gold text-2xl font-serif">A</div>
-                <div>
-                    <h3 class="text-2xl font-black text-navy uppercase tracking-tighter">Aravind Kesavan</h3>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">aravind.k@example.com</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4">
-                <a href="/main/my_application" class="flex items-center gap-5 p-6 rounded-3xl bg-slate-50 text-navy font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="file-text" class="w-5 h-5"></i> Application
-                </a>
-                <a href="/main/student_fee" class="flex items-center gap-5 p-6 rounded-3xl bg-slate-50 text-navy font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="wallet" class="w-5 h-5"></i> Fee Details
-                </a>
-                <a href="/main/student_counselling" class="flex items-center gap-5 p-6 rounded-3xl bg-slate-50 text-navy font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="users" class="w-5 h-5"></i> Counselling
-                </a>
-                <a href="/main/student_change_password" class="flex items-center gap-5 p-6 rounded-3xl bg-slate-50 text-navy font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="lock" class="w-5 h-5"></i> Security
-                </a>
-                <a href="/main/logout" class="flex items-center gap-5 p-6 rounded-3xl bg-red-50 text-red-600 font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="log-out" class="w-5 h-5"></i> Logout
-                </a>
-            </div>
-        </div>
+  </div>
+  <div style="position:relative">
+    <div class="dash-menu-btn" id="menuBtn" onclick="toggleMenu()">
+      <i class="fas fa-ellipsis-v"></i>
     </div>
+    <div class="dash-dropdown" id="dashDropdown">
+      <div class="dd-header">
+        <strong>{{ current_user.full_name }}</strong>
+        <span>{{ current_user.email }}</span>
+      </div>
+      <a href="{{ url_for('main.my_application') }}" class="dd-item">
+        <i class="fas fa-file-alt"></i> My Application
+      </a>
+      <a href="{{ url_for('main.student_fee') }}" class="dd-item">
+        <i class="fas fa-receipt"></i> My Fees
+      </a>
+      <a href="{{ url_for('main.student_counselling') }}" class="dd-item">
+        <i class="fas fa-chalkboard-teacher"></i> Counselling
+      </a>
+      <a href="{{ url_for('main.student_change_password') }}" class="dd-item">
+        <i class="fas fa-lock"></i> Change Password
+      </a>
+      <a href="{{ url_for('main.logout') }}" class="dd-item danger">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // Init Lucide Icons
-        lucide.createIcons();
+<!-- Hero -->
+<div class="dash-hero">
+  <div class="dash-hero-label">Student Dashboard</div>
+  <div class="dash-hero-name">{{ current_user.full_name }}</div>
+  <div class="dash-hero-badges">
+    {% if application %}
+      {% if application.is_verified %}
+        <span class="hero-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
+      {% else %}
+        <span class="hero-badge pending"><i class="fas fa-clock"></i> Pending Verification</span>
+      {% endif %}
+      {% if application.rank %}
+        <span class="hero-badge rank"><i class="fas fa-hashtag"></i> Rank {{ application.rank }}</span>
+      {% endif %}
+    {% else %}
+      <span class="hero-badge pending"><i class="fas fa-exclamation-circle"></i> No Application Yet</span>
+    {% endif %}
+  </div>
+</div>
 
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const navs = ['desktop-nav', 'mobile-nav'];
-            navs.forEach(id => {
-                const nav = document.getElementById(id);
-                if (window.scrollY > 20) {
-                    nav.classList.add('bg-white/80', 'backdrop-blur-2xl', 'border-b', 'border-border', 'py-4', 'shadow-sm');
-                    nav.classList.remove('py-8', 'py-5', 'bg-transparent');
-                } else {
-                    nav.classList.remove('bg-white/80', 'backdrop-blur-2xl', 'border-b', 'border-border', 'py-4', 'shadow-sm');
-                    nav.classList.add(id === 'desktop-nav' ? 'py-8' : 'py-5', 'bg-transparent');
-                }
-            });
-        });
+<!-- Application Status -->
+<div class="dash-section">
+  {% if application %}
+    <div class="status-strip">
+      <div class="status-strip-icon submitted"><i class="fas fa-check"></i></div>
+      <div class="status-strip-body">
+        <strong>Application Submitted</strong>
+        <span>{{ application.submitted_at | ist }}</span>
+      </div>
+      <a href="{{ url_for('main.my_application') }}" class="btn-view">View</a>
+    </div>
+  {% else %}
+    <div class="status-strip">
+      <div class="status-strip-icon pending"><i class="fas fa-exclamation"></i></div>
+      <div class="status-strip-body">
+        <strong>Application Not Submitted</strong>
+      </div>
+    </div>
+  {% endif %}
+</div>
 
-        // Toggle Desktop Dropdown
-        function toggleDropdown() {
-            const dropdown = document.getElementById('profile-dropdown');
-            const icon = document.getElementById('drop-icon');
-            const isOpen = dropdown.classList.contains('open');
-            
-            if (isOpen) {
-                dropdown.classList.remove('open');
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                dropdown.classList.add('open');
-                icon.style.transform = 'rotate(180deg)';
-            }
-        }
+<!-- Fee Mini Card -->
+{% if application and application.fee_details %}
+<div class="dash-section">
+  <div class="fee-mini-card">
+    <div class="fee-mini-icon"><i class="fas fa-rupee-sign"></i></div>
+    <div class="fee-mini-info">
+      <strong>{{ application.fee_details.fee_category.name if application.fee_details.fee_category else 'Fee Structure' }}</strong>
+      <span>
+        {% if application.fee_details.additional_fee and application.fee_details.additional_fee > 0 %}
+          Base ₹{{ '%.2f'|format(application.fee_details.fee_category.amount if application.fee_details.fee_category else 0) }} + Additional ₹{{ '%.2f'|format(application.fee_details.additional_fee) }}
+        {% else %}
+          Base fee assigned during counselling
+        {% endif %}
+      </span>
+    </div>
+    <div>
+      <div class="fee-mini-total">₹{{ '%.2f'|format(application.fee_details.total_amount) }}</div>
+      <span class="fee-mini-tag">Total Payable</span>
+    </div>
+  </div>
+</div>
+{% endif %}
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('profile-dropdown');
-            const btn = dropdown.previousElementSibling;
-            if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-                dropdown.classList.remove('open');
-                document.getElementById('drop-icon').style.transform = 'rotate(0deg)';
-            }
-        });
+<!-- Counselling Live -->
+{% if counselling.is_running %}
+<div class="dash-section">
+  {% if application and application.rank and counselling.current_rank and application.rank == counselling.current_rank %}
+    <div class="your-turn-card">
+      <div class="yt-icon">🔔</div>
+      <p>It's your turn! Rank #{{ application.rank }} is being called. Report to the counselling desk now.</p>
+    </div>
+  {% elif counselling.current_rank %}
+    <div class="counsel-live-card">
+      <div class="cmc-rank-box">
+        <div class="rank-lbl">Now Calling</div>
+        <div class="rank-num">#{{ counselling.current_rank }}</div>
+      </div>
+      <div class="cmc-divider"></div>
+      <div class="cmc-info">
+        <strong>Counselling is Live</strong>
+        <span>
+          {% if application and application.rank %}
+            Your rank #{{ application.rank }}
+            {% if application.rank > counselling.current_rank %}
+              — {{ application.rank - counselling.current_rank }} ahead
+            {% endif %}
+          {% else %}
+            Visit the counselling tracker
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endif %}
 
-        // Mobile Profile Toggle
-        function toggleMobileProfile() {
-            const backdrop = document.getElementById('backdrop');
-            const panel = document.getElementById('mobile-profile');
-            
-            if (backdrop.classList.contains('hidden')) {
-                backdrop.classList.remove('hidden');
-                setTimeout(() => {
-                    backdrop.classList.add('opacity-100');
-                    panel.classList.add('open');
-                }, 10);
-            } else {
-                backdrop.classList.remove('opacity-100');
-                panel.classList.remove('open');
-                setTimeout(() => {
-                    backdrop.classList.add('hidden');
-                }, 300);
-            }
-        }
-    </script>
-</body>
-</html>
+<!-- Action Buttons -->
+<div class="dash-section">
+  <div class="section-label">Quick Actions</div>
+  <div class="dash-actions-grid">
+
+    <a href="{{ url_for('main.student_counselling') }}"
+       class="action-card ac-counselling {% if counselling.is_running %}live{% endif %}">
+      {% if counselling.is_running %}<span class="ac-live-dot green"></span>{% endif %}
+      <div class="ac-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+      <div class="ac-label">Counselling</div>
+      <div class="ac-sub">{% if counselling.is_running %}Live now{% else %}Schedule & info{% endif %}</div>
+    </a>
+
+    <a href="{{ url_for('main.student_fee') }}" class="action-card ac-fees">
+      <div class="ac-icon"><i class="fas fa-receipt"></i></div>
+      <div class="ac-label">My Fees</div>
+      <div class="ac-sub">View fee structure</div>
+    </a>
+
+    <a href="{{ url_for('main.student_whatsapp') }}" class="action-card ac-whatsapp">
+      {% if whatsapp.is_active and whatsapp.link %}
+        <span class="ac-live-dot whatsapp"></span>
+      {% endif %}
+      <div class="ac-icon"><i class="fab fa-whatsapp"></i></div>
+      <div class="ac-label">WhatsApp</div>
+      <div class="ac-sub">Join group</div>
+    </a>
+
+    <a href="{{ url_for('main.student_change_password') }}" class="action-card ac-password">
+      <div class="ac-icon"><i class="fas fa-lock"></i></div>
+      <div class="ac-label">Password</div>
+      <div class="ac-sub">Change password</div>
+    </a>
+
+  </div>
+</div>
+
+<div class="dash-bottom-pad"></div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('dashDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('menuBtn').contains(e.target)) {
+      document.getElementById('dashDropdown').classList.remove('open');
+    }
+  });
+</script>
+
+{% endblock %}
