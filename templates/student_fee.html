@@ -133,7 +133,7 @@
           </div>
         </div>
         <div class="fee-row-amount {% if student_fee.base_amount == 0 %}zero{% endif %}">
-          ${{ '%.2f'|format(student_fee.base_amount) }}
+          ₹{{ '%.2f'|format(student_fee.base_amount) }}
         </div>
       </div>
 
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div class="fee-row-amount additional">
-          + ${{ '%.2f'|format(student_fee.additional_fee) }}
+          + ₹{{ '%.2f'|format(student_fee.additional_fee) }}
         </div>
       </div>
       {% endif %}
@@ -158,9 +158,9 @@
     {# Total #}
     <div class="fee-total-row">
       <div class="fee-total-label">
-        <i class="fas fa-dollar-sign"></i> Total Fees Payable
+        <i class="fas fa-rupee-sign"></i> Total Fees Payable
       </div>
-      <div class="fee-total-amount">${{ '%.2f'|format(student_fee.total_amount) }}</div>
+      <div class="fee-total-amount">₹{{ '%.2f'|format(student_fee.total_amount) }}</div>
     </div>
   </div>
 

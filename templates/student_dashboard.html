@@ -1,193 +1,393 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard — BCA Admissions{% endblock %}
 {% block content %}
+
 <style>
-  /* ── Action buttons grid — mobile-first ── */
-  .dash-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: .75rem;
-    margin-top: 1.5rem;
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy:    #0a1f44;
+    --navy2:   #1e3a60;
+    --gold:    #c9a03d;
+    --gold2:   #e8c96a;
+    --green:   #1a5c3a;
+    --green2:  #25c26e;
+    --amber:   #b45309;
+    --surface: #f7f9fc;
+    --card:    #ffffff;
+    --border:  #eaeff7;
+    --text:    #0a1f44;
+    --muted:   #6b7f99;
+    --radius:  18px;
   }
 
-  /* Each action button fills its cell fully */
-  .dash-action-btn {
-    display: flex; align-items: center; justify-content: center; gap: .5rem;
-    padding: .85rem 1rem; border-radius: 12px;
-    font-size: .9rem; font-weight: 600; text-decoration: none;
-    text-align: center; transition: all .25s; cursor: pointer;
-    border: none; font-family: inherit; width: 100%; box-sizing: border-box;
+  * { box-sizing: border-box; }
+
+  body { background: var(--surface); font-family: 'DM Sans', sans-serif; }
+
+  /* ── TOP BAR ── */
+  .dash-topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem;
+  }
+  .dash-topbar-left { display: flex; align-items: center; gap: .75rem; }
+  .dash-logo-dot {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-size: .85rem;
+  }
+  .dash-topbar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 700; color: var(--navy);
+    line-height: 1.1;
+  }
+  .dash-topbar-title small {
+    display: block; font-family: 'DM Sans', sans-serif;
+    font-size: .68rem; font-weight: 400; color: var(--muted); letter-spacing: .04em;
   }
 
-  .btn-whatsapp {
-    background: linear-gradient(135deg, #25D366, #128C7E);
+  /* Hamburger */
+  .dash-menu-btn {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--navy); font-size: 1rem;
+    transition: background .2s;
+    position: relative;
+  }
+  .dash-menu-btn:hover { background: var(--border); }
+
+  /* Dropdown menu */
+  .dash-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 1.25rem;
+    background: white; border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 40px rgba(10,31,68,.14);
+    min-width: 200px; overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s, transform .2s;
+    z-index: 200;
+  }
+  .dash-dropdown.open {
+    opacity: 1; pointer-events: auto; transform: translateY(0);
+  }
+  .dd-header {
+    padding: .85rem 1rem;
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
     color: white;
-    box-shadow: 0 3px 10px rgba(37,211,102,.25);
   }
-  .btn-whatsapp:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(37,211,102,.35);
-    color: white;
+  .dd-header strong { display: block; font-size: .88rem; }
+  .dd-header span   { font-size: .72rem; opacity: .7; }
+  .dd-item {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .75rem 1rem; font-size: .86rem; color: var(--text);
+    text-decoration: none; transition: background .15s;
+    border-bottom: 1px solid #f5f7fa;
   }
+  .dd-item:last-child { border-bottom: none; }
+  .dd-item:hover { background: var(--surface); }
+  .dd-item i { width: 16px; text-align: center; color: var(--muted); }
+  .dd-item.danger { color: #dc2626; }
+  .dd-item.danger i { color: #dc2626; }
 
-  .btn-counselling {
-    background: linear-gradient(135deg, #0a1f44, #1e3a60);
+  /* ── HERO GREETING ── */
+  .dash-hero {
+    margin: 1.25rem 1.25rem 0;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.5rem 1.75rem;
     color: white;
-    box-shadow: 0 3px 10px rgba(10,31,68,.2);
+    position: relative;
+    overflow: hidden;
   }
-  .btn-counselling:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(10,31,68,.3);
-    color: white;
+  .dash-hero::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(201,160,61,.12);
   }
-  .btn-counselling.live {
-    background: linear-gradient(135deg, #1a5c3a, #25c26e);
-    box-shadow: 0 3px 10px rgba(37,194,110,.25);
+  .dash-hero::after {
+    content: '';
+    position: absolute; bottom: -20px; right: 40px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(201,160,61,.08);
   }
-  .btn-counselling.live:hover {
-    box-shadow: 0 6px 18px rgba(37,194,110,.35);
+  .dash-hero-label {
+    font-size: .7rem; font-weight: 500; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--gold2); margin-bottom: .35rem;
   }
+  .dash-hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem; font-weight: 700; line-height: 1.1;
+    margin-bottom: .5rem;
+  }
+  .dash-hero-badges { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .3rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 600;
+  }
+  .hero-badge.verified   { background: rgba(37,194,110,.15); color: #25c26e; }
+  .hero-badge.pending    { background: rgba(201,160,61,.15);  color: var(--gold2); }
+  .hero-badge.rank       { background: rgba(255,255,255,.1);   color: white; }
 
-  .btn-fees {
-    background: linear-gradient(135deg, #92400e, #c9a03d);
-    color: white;
-    box-shadow: 0 3px 10px rgba(201,160,61,.25);
-  }
-  .btn-fees:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(201,160,61,.35);
-    color: white;
-  }
+  /* ── STATUS CARD ── */
+  .dash-section { margin: 1rem 1.25rem 0; }
 
-  .btn-change-pw {
-    background: #f3f4f6; color: #374151;
-    border: 1.5px solid #e5e7eb;
+  .status-strip {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem;
   }
-  .btn-change-pw:hover {
-    background: #e5e7eb; transform: translateY(-2px);
-    color: #111827;
+  .status-strip-icon {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
   }
+  .status-strip-icon.submitted { background: #dcfce7; color: #16a34a; }
+  .status-strip-icon.pending   { background: #fef9c3; color: #ca8a04; }
+  .status-strip-body { flex: 1; min-width: 0; }
+  .status-strip-body strong { display: block; font-size: .88rem; color: var(--text); font-weight: 600; }
+  .status-strip-body span   { font-size: .75rem; color: var(--muted); }
+  .btn-view {
+    flex-shrink: 0;
+    background: var(--navy); color: white;
+    padding: .5rem 1rem; border-radius: 10px;
+    font-size: .78rem; font-weight: 600; text-decoration: none;
+    white-space: nowrap; transition: background .2s;
+  }
+  .btn-view:hover { background: var(--navy2); color: white; }
 
-  /* Live dots */
-  .wa-live-dot, .counsel-live-dot {
-    width: 7px; height: 7px; background: white;
-    border-radius: 50%; animation: blink 1.5s infinite; flex-shrink: 0;
-  }
-  @keyframes blink {
-    0%,100% { opacity: 1; } 50% { opacity: .3; }
-  }
-
-  /* ── Fee summary mini-card ── */
+  /* ── FEE MINI CARD ── */
   .fee-mini-card {
     background: linear-gradient(135deg, #fffdf5, #fff8e8);
-    border: 1.5px solid #e8d5a0; border-radius: 14px;
-    padding: 1rem 1.25rem; margin-top: 1.25rem;
+    border: 1.5px solid #e8d5a0; border-radius: var(--radius);
+    padding: 1rem 1.25rem;
     display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
   }
   .fee-mini-icon {
     width: 42px; height: 42px; border-radius: 12px;
-    background: linear-gradient(135deg, #c9a03d, #b8902e);
+    background: linear-gradient(135deg, var(--gold), var(--amber));
     display: flex; align-items: center; justify-content: center;
     color: white; font-size: 1rem; flex-shrink: 0;
   }
   .fee-mini-info { flex: 1; min-width: 0; }
-  .fee-mini-info strong { display: block; font-size: .88rem; color: #0a1f44; }
-  .fee-mini-info span   { font-size: .78rem; color: #5a6e82; }
+  .fee-mini-info strong { display: block; font-size: .85rem; color: var(--navy); font-weight: 600; }
+  .fee-mini-info span   { font-size: .75rem; color: var(--muted); }
   .fee-mini-total {
-    font-size: 1.2rem; font-weight: 800; color: #1a5c3a;
+    font-size: 1.2rem; font-weight: 800; color: var(--green);
     font-family: 'Courier New', monospace; white-space: nowrap;
   }
-  .fee-mini-pending {
-    font-size: .72rem; color: #b45309; font-weight: 600;
+  .fee-mini-tag {
+    font-size: .68rem; color: var(--amber); font-weight: 600;
     background: #fef3c7; padding: 2px 8px; border-radius: 20px;
+    display: block; text-align: right; margin-top: 2px;
   }
 
-  /* ── Counselling live mini-card ── */
-  .counsel-mini-card {
+  /* ── COUNSELLING LIVE ── */
+  .counsel-live-card {
     background: linear-gradient(135deg, #edf9f2, #f5fdf8);
-    border: 1.5px solid #25c26e;
-    border-radius: 14px; padding: 1rem 1.25rem;
-    margin-top: 1.25rem;
-    display: flex; align-items: center; gap: 1rem;
-    flex-wrap: wrap;
+    border: 1.5px solid var(--green2); border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
   }
-  .counsel-mini-card .cmc-rank {
+  .cmc-rank-box { text-align: center; }
+  .cmc-rank-box .rank-num {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2rem; font-weight: 700; color: #1a5c3a; line-height: 1;
+    font-size: 2rem; font-weight: 700; color: var(--green); line-height: 1;
   }
-  .counsel-mini-card .cmc-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #2e7d52; }
-  .counsel-mini-card .cmc-divider { width: 1px; height: 36px; background: #a8dfc0; flex-shrink: 0; }
-  .counsel-mini-card .cmc-info { flex: 1; }
-  .counsel-mini-card .cmc-info strong { font-size: .88rem; color: #0a1f44; display: block; }
-  .counsel-mini-card .cmc-info span   { font-size: .78rem; color: #5a6e82; }
+  .cmc-rank-box .rank-lbl { font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; color: #2e7d52; }
+  .cmc-divider { width: 1px; height: 36px; background: #a8dfc0; flex-shrink: 0; }
+  .cmc-info { flex: 1; }
+  .cmc-info strong { font-size: .86rem; color: var(--navy); display: block; font-weight: 600; }
+  .cmc-info span   { font-size: .75rem; color: var(--muted); }
 
-  /* Your turn highlight */
-  .your-turn-dash {
+  .your-turn-card {
     background: linear-gradient(135deg, #edf9f2, #d4f0e2);
-    border: 1.5px solid #25c26e; border-radius: 14px;
-    padding: 1rem 1.25rem; margin-top: 1.25rem;
+    border: 1.5px solid var(--green2); border-radius: var(--radius);
+    padding: 1rem 1.25rem;
     display: flex; align-items: center; gap: .85rem;
   }
-  .your-turn-dash .yt-icon { font-size: 1.6rem; flex-shrink: 0; }
-  .your-turn-dash p { margin: 0; font-size: .88rem; color: #1a5c3a; font-weight: 600; }
+  .your-turn-card .yt-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .your-turn-card p { margin: 0; font-size: .86rem; color: var(--green); font-weight: 600; }
 
-  /* dark */
-  body.dark .fee-mini-card    { background: #1a1408; border-color: #c9a03d44; }
+  /* ── ACTION GRID ── */
+  .dash-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+  }
+
+  .action-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1rem;
+    display: flex; flex-direction: column; align-items: flex-start; gap: .5rem;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .action-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(10,31,68,.1);
+  }
+  .action-card .ac-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem; flex-shrink: 0;
+  }
+  .action-card .ac-label {
+    font-size: .82rem; font-weight: 600; color: var(--text); line-height: 1.2;
+  }
+  .action-card .ac-sub {
+    font-size: .7rem; color: var(--muted);
+  }
+  .ac-live-dot {
+    position: absolute; top: .75rem; right: .75rem;
+    width: 7px; height: 7px; border-radius: 50%;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* Card themes */
+  .ac-counselling::before { background: linear-gradient(90deg, var(--navy), var(--navy2)); }
+  .ac-counselling .ac-icon { background: #eef2ff; color: var(--navy); }
+
+  .ac-counselling.live::before { background: linear-gradient(90deg, var(--green), var(--green2)); }
+  .ac-counselling.live .ac-icon { background: #dcfce7; color: var(--green); }
+  .ac-live-dot.green { background: var(--green2); }
+
+  .ac-fees::before { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+  .ac-fees .ac-icon { background: #fef9c3; color: var(--amber); }
+
+  .ac-whatsapp::before { background: linear-gradient(90deg, #128C7E, #25D366); }
+  .ac-whatsapp .ac-icon { background: #dcfce7; color: #16a34a; }
+  .ac-live-dot.whatsapp { background: #25D366; }
+
+  .ac-password::before { background: linear-gradient(90deg, #64748b, #94a3b8); }
+  .ac-password .ac-icon { background: #f1f5f9; color: #64748b; }
+
+  /* Section label */
+  .section-label {
+    font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: .5rem;
+  }
+
+  /* Bottom safe area */
+  .dash-bottom-pad { height: 2rem; }
+
+  /* Dark mode */
+  body.dark {
+    --surface: #0d1a2e;
+    --card:    #1a2538;
+    --border:  #2d3e54;
+    --text:    #eef2ff;
+    --muted:   #7a90b0;
+  }
+  body.dark .dash-topbar { background: rgba(13,26,46,.92); }
+  body.dark .dash-dropdown { background: #1a2538; border-color: #2d3e54; }
+  body.dark .dd-item { border-color: #2d3e54; color: #eef2ff; }
+  body.dark .dd-item:hover { background: #0d1a2e; }
+  body.dark .fee-mini-card { background: #1a1408; border-color: #c9a03d44; }
   body.dark .fee-mini-info strong { color: #eef2ff; }
-  body.dark .fee-mini-info span   { color: #b9c8e8; }
-  body.dark .btn-change-pw    { background: #1a2538; color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .btn-change-pw:hover { background: #2d3e54; color: #eef2ff; }
-
-  /* ── Mobile overrides ── */
-  @media (max-width: 480px) {
-    .dash-actions {
-      grid-template-columns: 1fr 1fr;
-    }
-    .dash-action-btn {
-      font-size: .82rem;
-      padding: .75rem .5rem;
-    }
-  }
-  @media (max-width: 340px) {
-    .dash-actions { grid-template-columns: 1fr; }
-  }
 </style>
 
-<div class="page-wrap">
-  <div class="page-header-inner">
-    <h2>Welcome, {{ current_user.full_name }}</h2>
-    <p class="text-muted">BCA Admissions 2026–2027</p>
+<div class="dash-topbar">
+  <div class="dash-topbar-left">
+    <div class="dash-logo-dot"><i class="fas fa-graduation-cap"></i></div>
+    <div class="dash-topbar-title">
+      BCA Admissions
+      <small>2026 – 2027</small>
+    </div>
   </div>
+  <div style="position:relative">
+    <div class="dash-menu-btn" id="menuBtn" onclick="toggleMenu()">
+      <i class="fas fa-ellipsis-v"></i>
+    </div>
+    <div class="dash-dropdown" id="dashDropdown">
+      <div class="dd-header">
+        <strong>{{ current_user.full_name }}</strong>
+        <span>{{ current_user.email }}</span>
+      </div>
+      <a href="{{ url_for('main.my_application') }}" class="dd-item">
+        <i class="fas fa-file-alt"></i> My Application
+      </a>
+      <a href="{{ url_for('main.student_fee') }}" class="dd-item">
+        <i class="fas fa-receipt"></i> My Fees
+      </a>
+      <a href="{{ url_for('main.student_counselling') }}" class="dd-item">
+        <i class="fas fa-chalkboard-teacher"></i> Counselling
+      </a>
+      <a href="{{ url_for('main.student_change_password') }}" class="dd-item">
+        <i class="fas fa-lock"></i> Change Password
+      </a>
+      <a href="{{ url_for('main.logout') }}" class="dd-item danger">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </div>
+</div>
 
+<!-- Hero -->
+<div class="dash-hero">
+  <div class="dash-hero-label">Student Dashboard</div>
+  <div class="dash-hero-name">{{ current_user.full_name }}</div>
+  <div class="dash-hero-badges">
+    {% if application %}
+      {% if application.is_verified %}
+        <span class="hero-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
+      {% else %}
+        <span class="hero-badge pending"><i class="fas fa-clock"></i> Pending Verification</span>
+      {% endif %}
+      {% if application.rank %}
+        <span class="hero-badge rank"><i class="fas fa-hashtag"></i> Rank {{ application.rank }}</span>
+      {% endif %}
+    {% else %}
+      <span class="hero-badge pending"><i class="fas fa-exclamation-circle"></i> No Application Yet</span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Application Status -->
+<div class="dash-section">
   {% if application %}
-    <div class="status-card status-submitted">
-      <div class="status-icon">&#10003;</div>
-      <div>
+    <div class="status-strip">
+      <div class="status-strip-icon submitted"><i class="fas fa-check"></i></div>
+      <div class="status-strip-body">
         <strong>Application Submitted</strong>
-        <p>Submitted on {{ application.submitted_at | ist }}</p>
-        {% if application.is_verified %}
-          <span class="badge badge-success">Verified</span>
-          {% if application.rank %}<span class="badge badge-gold">Rank #{{ application.rank }}</span>{% endif %}
-        {% else %}
-          <span class="badge badge-warning">Pending Verification</span>
-        {% endif %}
+        <span>{{ application.submitted_at | ist }}</span>
       </div>
+      <a href="{{ url_for('main.my_application') }}" class="btn-view">View</a>
     </div>
-    <a href="{{ url_for('main.my_application') }}" class="btn btn-primary">View My Application</a>
-
   {% else %}
-    <div class="status-card status-pending">
-      <div class="status-icon">&#9888;</div>
-      <div>
+    <div class="status-strip">
+      <div class="status-strip-icon pending"><i class="fas fa-exclamation"></i></div>
+      <div class="status-strip-body">
         <strong>Application Not Submitted</strong>
-        <p>You have not submitted your application yet.</p>
       </div>
     </div>
-    <a href="{{ url_for('main.apply') }}" class="btn btn-primary">Start Application &rarr;</a>
   {% endif %}
+</div>
 
-  {# ── Fee mini-card (shown when fee is assigned) ── #}
-  {% if application and application.fee_details %}
+<!-- Fee Mini Card -->
+{% if application and application.fee_details %}
+<div class="dash-section">
   <div class="fee-mini-card">
     <div class="fee-mini-icon"><i class="fas fa-rupee-sign"></i></div>
     <div class="fee-mini-info">
@@ -202,73 +402,93 @@
     </div>
     <div>
       <div class="fee-mini-total">₹{{ '%.2f'|format(application.fee_details.total_amount) }}</div>
-      <div style="text-align:right;margin-top:2px">
-        <span class="fee-mini-pending">Total Payable</span>
-      </div>
+      <span class="fee-mini-tag">Total Payable</span>
     </div>
   </div>
-  {% endif %}
+</div>
+{% endif %}
 
-  {# ── Counselling live mini-card ── #}
-  {% if counselling.is_running %}
-    {% if application and application.rank and counselling.current_rank and application.rank == counselling.current_rank %}
-      <div class="your-turn-dash">
-        <div class="yt-icon">🔔</div>
-        <p>It's your turn! Rank #{{ application.rank }} is currently being called. Please report to the counselling desk.</p>
+<!-- Counselling Live -->
+{% if counselling.is_running %}
+<div class="dash-section">
+  {% if application and application.rank and counselling.current_rank and application.rank == counselling.current_rank %}
+    <div class="your-turn-card">
+      <div class="yt-icon">🔔</div>
+      <p>It's your turn! Rank #{{ application.rank }} is being called. Report to the counselling desk now.</p>
+    </div>
+  {% elif counselling.current_rank %}
+    <div class="counsel-live-card">
+      <div class="cmc-rank-box">
+        <div class="rank-lbl">Now Calling</div>
+        <div class="rank-num">#{{ counselling.current_rank }}</div>
       </div>
-    {% elif counselling.current_rank %}
-      <div class="counsel-mini-card">
-        <div>
-          <div class="cmc-label">Now Calling</div>
-          <div class="cmc-rank">#{{ counselling.current_rank }}</div>
-        </div>
-        <div class="cmc-divider"></div>
-        <div class="cmc-info">
-          <strong>Counselling is Live</strong>
-          <span>
-            {% if application and application.rank %}
-              Your rank is #{{ application.rank }}
-              {% if application.rank > counselling.current_rank %}
-                — {{ application.rank - counselling.current_rank }} rank(s) ahead of you
-              {% endif %}
-            {% else %}
-              Visit the counselling tracker for details
+      <div class="cmc-divider"></div>
+      <div class="cmc-info">
+        <strong>Counselling is Live</strong>
+        <span>
+          {% if application and application.rank %}
+            Your rank #{{ application.rank }}
+            {% if application.rank > counselling.current_rank %}
+              — {{ application.rank - counselling.current_rank }} ahead
             {% endif %}
-          </span>
-        </div>
+          {% else %}
+            Visit the counselling tracker
+          {% endif %}
+        </span>
       </div>
-    {% endif %}
+    </div>
   {% endif %}
+</div>
+{% endif %}
 
-  {# ── Action buttons ── #}
-  <div class="dash-actions">
+<!-- Action Buttons -->
+<div class="dash-section">
+  <div class="section-label">Quick Actions</div>
+  <div class="dash-actions-grid">
 
     <a href="{{ url_for('main.student_counselling') }}"
-       class="dash-action-btn btn-counselling {% if counselling.is_running %}live{% endif %}">
-      <i class="fas fa-chalkboard-teacher"></i>
-      Counselling
-      {% if counselling.is_running %}<span class="counsel-live-dot"></span>{% endif %}
+       class="action-card ac-counselling {% if counselling.is_running %}live{% endif %}">
+      {% if counselling.is_running %}<span class="ac-live-dot green"></span>{% endif %}
+      <div class="ac-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+      <div class="ac-label">Counselling</div>
+      <div class="ac-sub">{% if counselling.is_running %}Live now{% else %}Schedule & info{% endif %}</div>
     </a>
 
-    <a href="{{ url_for('main.student_fee') }}" class="dash-action-btn btn-fees">
-      <i class="fas fa-receipt"></i>
-      My Fees
+    <a href="{{ url_for('main.student_fee') }}" class="action-card ac-fees">
+      <div class="ac-icon"><i class="fas fa-receipt"></i></div>
+      <div class="ac-label">My Fees</div>
+      <div class="ac-sub">View fee structure</div>
     </a>
 
-    <a href="{{ url_for('main.student_whatsapp') }}" class="dash-action-btn btn-whatsapp">
-      <i class="fab fa-whatsapp"></i>
-      WhatsApp
+    <a href="{{ url_for('main.student_whatsapp') }}" class="action-card ac-whatsapp">
       {% if whatsapp.is_active and whatsapp.link %}
-        <span class="wa-live-dot"></span>
+        <span class="ac-live-dot whatsapp"></span>
       {% endif %}
+      <div class="ac-icon"><i class="fab fa-whatsapp"></i></div>
+      <div class="ac-label">WhatsApp</div>
+      <div class="ac-sub">Join group</div>
     </a>
 
-    <a href="{{ url_for('main.student_change_password') }}" class="dash-action-btn btn-change-pw">
-      <i class="fas fa-lock"></i>
-      Change Password
+    <a href="{{ url_for('main.student_change_password') }}" class="action-card ac-password">
+      <div class="ac-icon"><i class="fas fa-lock"></i></div>
+      <div class="ac-label">Password</div>
+      <div class="ac-sub">Change password</div>
     </a>
 
   </div>
-
 </div>
+
+<div class="dash-bottom-pad"></div>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('dashDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('menuBtn').contains(e.target)) {
+      document.getElementById('dashDropdown').classList.remove('open');
+    }
+  });
+</script>
+
 {% endblock %}
