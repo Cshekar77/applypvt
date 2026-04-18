@@ -3,6 +3,10 @@
 {% block content %}
 
 <style>
+  /* Hide base navbar — this page has its own topbar */
+  .navbar { display: none !important; }
+  .site-main { padding: 0 !important; max-width: 100% !important; }
+
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
   :root {
@@ -165,6 +169,14 @@
     white-space: nowrap; transition: background .2s;
   }
   .btn-view:hover { background: var(--navy2); color: white; }
+  .btn-start {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--gold), var(--amber));
+    color: white;
+    padding: .5rem 1rem; border-radius: 10px;
+    font-size: .78rem; font-weight: 600; text-decoration: none;
+    white-space: nowrap;
+  }
 
   /* ── FEE MINI CARD ── */
   .fee-mini-card {
@@ -379,8 +391,10 @@
     <div class="status-strip">
       <div class="status-strip-icon pending"><i class="fas fa-exclamation"></i></div>
       <div class="status-strip-body">
-        <strong>Application Not Submitted</strong>
+        <strong>Not Submitted</strong>
+        <span>Complete your application</span>
       </div>
+      <a href="{{ url_for('main.apply') }}" class="btn-start">Apply →</a>
     </div>
   {% endif %}
 </div>
