@@ -12,117 +12,284 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ── Base reset ── */
+  /* ── Reset ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 16px; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+
   body {
     font-family: 'DM Sans', sans-serif;
-    background: #f7f9fc;
+    background: #f4f6fb;
     color: #0a1f44;
     min-height: 100vh;
-    display: flex; flex-direction: column;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* ── NAVBAR ── */
+  /* ══════════════════════════════
+     NAVBAR
+  ══════════════════════════════ */
   .navbar {
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid #eaeff7;
-    position: sticky; top: 0; z-index: 999;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid #e8edf6;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 1px 12px rgba(10,31,68,.06);
   }
+
   .nav-inner {
-    max-width: 1100px; margin: 0 auto;
-    padding: .75rem 1.25rem;
-    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
+
+  /* Brand */
   .nav-brand {
-    text-decoration: none; display: flex; align-items: center; gap: .3rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-shrink: 0;
+  }
+  .nav-brand-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #0a1f44, #1e3a60);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #c9a03d; font-size: .8rem;
+    box-shadow: 0 2px 8px rgba(10,31,68,.2);
   }
   .brand-serif {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem; font-weight: 700; color: #0a1f44;
+    font-size: 1.25rem; font-weight: 700; color: #0a1f44;
+    letter-spacing: .01em;
   }
-  .brand-light {
-    font-size: .85rem; font-weight: 400; color: #6b7f99;
-    letter-spacing: .03em;
+  .brand-divider {
+    width: 1px; height: 16px;
+    background: #d1d9e8;
+  }
+  .brand-sub {
+    font-size: .75rem; font-weight: 400; color: #7a90b0;
+    letter-spacing: .02em;
   }
 
   /* Desktop nav links */
   .nav-links {
-    display: flex; align-items: center; gap: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
   }
-  .nav-link {
-    font-size: .85rem; font-weight: 500; color: #0a1f44;
-    text-decoration: none; padding: .4rem .75rem;
-    border-radius: 8px; transition: background .15s, color .15s;
-  }
-  .nav-link:hover { background: #eaeff7; }
-  .nav-btn-outline {
-    border: 1.5px solid #eaeff7; color: #6b7f99;
-  }
-  .nav-btn-outline:hover { border-color: #dc2626; color: #dc2626; background: #fff5f5; }
 
-  /* Mobile hamburger button */
+  .nav-link {
+    font-size: .84rem;
+    font-weight: 500;
+    color: #3a4f6e;
+    text-decoration: none;
+    padding: .45rem .9rem;
+    border-radius: 9px;
+    transition: background .15s, color .15s;
+    display: flex; align-items: center; gap: .4rem;
+    white-space: nowrap;
+  }
+  .nav-link i { font-size: .8rem; }
+  .nav-link:hover {
+    background: #eef2fb;
+    color: #0a1f44;
+  }
+  .nav-btn-outline {
+    border: 1.5px solid #e2e8f4;
+    color: #64748b;
+    margin-left: .25rem;
+  }
+  .nav-btn-outline:hover {
+    border-color: #ef4444;
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  /* ── Hamburger (mobile only) ── */
   .nav-hamburger {
     display: none;
-    width: 36px; height: 36px; border-radius: 8px;
-    background: #f7f9fc; border: 1.5px solid #eaeff7;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: #f4f6fb;
+    border: 1.5px solid #e2e8f4;
     align-items: center; justify-content: center;
-    cursor: pointer; color: #0a1f44; font-size: .95rem;
+    cursor: pointer;
+    color: #0a1f44;
+    font-size: .95rem;
+    transition: background .15s;
+    flex-shrink: 0;
   }
+  .nav-hamburger:hover { background: #e8edf6; }
 
-  /* Mobile nav drawer */
+  /* ── Mobile drawer ── */
   .nav-mobile-drawer {
     display: none;
     flex-direction: column;
     background: white;
-    border-top: 1px solid #eaeff7;
-    padding: .5rem 1.25rem 1rem;
-    gap: .25rem;
+    border-top: 1px solid #e8edf6;
+    padding: .75rem 1.25rem 1.25rem;
+    gap: .2rem;
+    box-shadow: 0 8px 24px rgba(10,31,68,.08);
   }
+  .nav-mobile-drawer.open { display: flex; }
   .nav-mobile-drawer .nav-link {
-    padding: .65rem .75rem;
+    padding: .7rem .9rem;
     border-radius: 10px;
     font-size: .9rem;
   }
   .nav-mobile-drawer .nav-btn-outline {
-    margin-top: .25rem;
+    margin-top: .35rem;
+    justify-content: center;
+    border-radius: 10px;
   }
-  .nav-mobile-drawer.open { display: flex; }
 
-  @media (max-width: 600px) {
-    .nav-links { display: none; }
+  /* ── Breakpoints ── */
+  @media (max-width: 768px) {
+    .nav-links     { display: none; }
     .nav-hamburger { display: flex; }
+    .nav-inner     { padding: 0 1rem; }
   }
 
-  /* ── MAIN ── */
+  /* ══════════════════════════════
+     MAIN CONTENT
+     - Desktop: full width up to 1280px
+     - Pages that need centering use .page-wrap inside
+  ══════════════════════════════ */
   .site-main {
     flex: 1;
     width: 100%;
-    max-width: 680px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 0 0 2rem;
+    padding: 1.5rem 2rem 3rem;
   }
 
-  /* ── FLASH MESSAGES ── */
-  .flash-wrap { padding: .75rem 1.25rem 0; }
+  @media (max-width: 768px) {
+    .site-main { padding: 1rem 1rem 3rem; }
+  }
+
+  /* Student-facing pages: centered narrow layout */
+  .page-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ══════════════════════════════
+     FLASH MESSAGES
+  ══════════════════════════════ */
+  .flash-wrap { margin-bottom: 1rem; }
   .flash {
-    padding: .75rem 1rem; border-radius: 10px;
-    font-size: .85rem; margin-bottom: .5rem;
+    padding: .8rem 1.1rem;
+    border-radius: 12px;
+    font-size: .85rem;
+    margin-bottom: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    border: 1px solid transparent;
   }
-  .flash-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-  .flash-danger  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-  .flash-warning { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
-  .flash-info    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+  .flash-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+  .flash-danger  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+  .flash-warning { background: #fffbeb; color: #854d0e; border-color: #fde68a; }
+  .flash-info    { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
 
-  /* ── FOOTER ── */
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
   .site-footer {
     text-align: center;
-    padding: 1.25rem;
+    padding: 1.1rem 2rem;
     font-size: .75rem;
-    color: #9ca8ba;
-    border-top: 1px solid #eaeff7;
+    color: #94a3b8;
+    border-top: 1px solid #e8edf6;
     background: white;
+  }
+
+  /* ══════════════════════════════
+     DARK MODE
+  ══════════════════════════════ */
+  body.dark {
+    background: #0d1a2e;
+    color: #eef2ff;
+  }
+  body.dark .navbar {
+    background: rgba(13,26,46,.97);
+    border-color: #1e2e42;
+    box-shadow: 0 1px 12px rgba(0,0,0,.3);
+  }
+  body.dark .brand-serif   { color: #eef2ff; }
+  body.dark .brand-sub     { color: #7a90b0; }
+  body.dark .brand-divider { background: #2d3e54; }
+  body.dark .nav-link      { color: #b9c8e8; }
+  body.dark .nav-link:hover { background: #1a2538; color: #eef2ff; }
+  body.dark .nav-btn-outline { border-color: #2d3e54; color: #7a90b0; }
+  body.dark .nav-hamburger { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .nav-mobile-drawer { background: #0d1a2e; border-color: #1e2e42; }
+  body.dark .site-footer   { background: #0d1a2e; border-color: #1e2e42; color: #4a5568; }
+
+  /* ══════════════════════════════
+     COMMON UTILITIES (shared across templates)
+  ══════════════════════════════ */
+  .text-muted { color: #7a90b0; font-size: .85rem; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: .25rem;
+    font-size: .7rem; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef9c3; color: #854d0e; }
+  .badge-gold    { background: #fef3c7; color: #92400e; }
+
+  .page-header-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+  }
+  .page-header-inner h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.85rem; color: #0a1f44; margin: 0; font-weight: 700;
+  }
+  body.dark .page-header-inner h2 { color: #eef2ff; }
+
+  .status-card {
+    border-radius: 16px; padding: 1.1rem 1.25rem;
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1rem; border: 1px solid transparent;
+  }
+  .status-submitted { background: #f0fdf4; border-color: #bbf7d0; }
+  .status-pending   { background: #fffbeb; border-color: #fde68a; }
+  .status-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0; font-weight: 700;
+  }
+  .status-submitted .status-icon { background: #dcfce7; color: #16a34a; }
+  .status-pending   .status-icon { background: #fef9c3; color: #ca8a04; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .55rem 1.1rem; border-radius: 10px;
+    font-size: .85rem; font-weight: 600;
+    cursor: pointer; border: none; text-decoration: none;
+    transition: all .2s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #0a1f44, #1e3a60);
+    color: white;
+    box-shadow: 0 3px 10px rgba(10,31,68,.2);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(10,31,68,.3);
+    color: white;
   }
 </style>
 </head>
@@ -130,9 +297,12 @@
 
 <nav class="navbar">
   <div class="nav-inner">
+
     <a class="nav-brand" href="{{ url_for('main.index') }}">
+      <div class="nav-brand-icon"><i class="fas fa-graduation-cap"></i></div>
       <span class="brand-serif">BCA</span>
-      <span class="brand-light">Admissions</span>
+      <div class="brand-divider"></div>
+      <span class="brand-sub">Admissions 2026</span>
     </a>
 
     <!-- Desktop links -->
@@ -235,6 +405,16 @@
     drawer.classList.toggle('open');
     icon.className = drawer.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
   }
+  document.addEventListener('click', function(e) {
+    const drawer    = document.getElementById('mobileDrawer');
+    const hamburger = document.getElementById('navHamburger');
+    if (drawer && hamburger &&
+        !drawer.contains(e.target) &&
+        !hamburger.contains(e.target)) {
+      drawer.classList.remove('open');
+      document.getElementById('hamburgerIcon').className = 'fas fa-bars';
+    }
+  });
 </script>
 </body>
 </html>
