@@ -101,7 +101,7 @@
             email: "bca@bub.ernet.in",
             whatsappLink: "https://chat.whatsapp.com/KR5NB9hyneYAFhHa423g7f",
             deadline: "15-05-2026",
-            downloadLink: "https://bangaloreuniversity.karnataka.gov.in/uploads/media_to_upload1775731015.pdf"
+            downloadLink: "{{ url_for('static', filename='uploads/applic.pdf') }}"
         };
 
         function App() {
@@ -195,7 +195,11 @@
                                         <span>${t('Start Admission', 'ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ')}</span>
                                         <${ArrowRight} size=${20} />
                                     </button>
-                                    <a href=${SITE.downloadLink} target="_blank" className="w-full sm:w-auto border-2 border-navy/20 hover:border-navy text-navy px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-4 transition-all">
+                                    <a
+                                        href=${SITE.downloadLink}
+                                        download="Application_Form_BCA_2026.pdf"
+                                        className="w-full sm:w-auto border-2 border-navy/20 hover:border-navy text-navy px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-4 transition-all"
+                                    >
                                         <${Download} size=${20} />
                                         <span>${t('Download Application', 'ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್')}</span>
                                     </a>
@@ -521,7 +525,6 @@
 
                                         ${activeModal === 'fees' && html`
                                             <div className="space-y-12">
-                                                <!-- Annual Admission Fees -->
                                                 <div className="space-y-6">
                                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                                                         <div>
@@ -579,7 +582,6 @@
                                                     </p>
                                                 </div>
 
-                                                <!-- Additional Category Fees -->
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                     <div className="p-8 bg-paper-dark rounded-3xl border border-navy/5">
                                                         <h6 className="font-bold text-navy mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
@@ -622,7 +624,6 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- Examination Fees -->
                                                 <div className="space-y-6 pt-4">
                                                     <h5 className="text-2xl font-bold text-navy">Examination Fees — Semester-wise</h5>
                                                     <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
@@ -682,7 +683,11 @@
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-center">
-                                                    <a href=${SITE.downloadLink} target="_blank" className="bg-navy hover:bg-gold text-white px-12 py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center gap-4 transition-all shadow-lg">
+                                                    <a
+                                                        href=${SITE.downloadLink}
+                                                        download="Application_Form_BCA_2026.pdf"
+                                                        className="bg-navy hover:bg-gold text-white px-12 py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center gap-4 transition-all shadow-lg"
+                                                    >
                                                         <${Download} size=${20} />
                                                         <span>${t('Download Application Form', 'ಅರ್ಜಿ ನಮೂನೆಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ')}</span>
                                                     </a>

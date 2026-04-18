@@ -110,3 +110,728 @@ const SITE = {
             deadline: "15-05-2026",
             downloadLink: "https://bangaloreuniversity.karnataka.gov.in/uploads/media_to_upload1775731015.pdf"
         };
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCA Admissions 2026 | Bangalore University</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+            --font-serif: "Cormorant Garamond", serif;
+            
+            --color-navy: #0c1a35;
+            --color-gold: #c8963c;
+            --color-gold-light: #e8b86d;
+            --color-paper: #fdfdfb;
+            --color-paper-dark: #f5f5f0;
+            --color-text: #1e2d45;
+            --color-text-muted: #6b7a8d;
+        }
+
+        @layer base {
+            body {
+                @apply font-sans bg-paper text-text overflow-x-hidden selection:bg-gold/30;
+            }
+            h1, h2, h3, h4 {
+                @apply font-serif;
+            }
+        }
+
+        @layer utilities {
+            .section-padding {
+                @apply py-16 md:py-24 px-6;
+            }
+            .card-shadow {
+                box-shadow: 0 10px 30px -10px rgba(12, 26, 53, 0.08);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+            }
+            .kannada {
+                font-feature-settings: "kern" 1;
+                line-height: 1.7;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdfdfb; }
+        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8963c; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import React, { useState, useEffect } from 'https://esm.sh/react@19';
+        import ReactDOM from 'https://esm.sh/react-dom@19/client';
+        import { motion, AnimatePresence } from 'https://esm.sh/framer-motion@11';
+        import htm from 'https://esm.sh/htm';
+        import { 
+            GraduationCap, 
+            ListOrdered, 
+            Table, 
+            IndianRupee, 
+            MapPin, 
+            ArrowRight, 
+            X, 
+            Brain, 
+            BarChart3, 
+            Code2, 
+            CheckCircle2, 
+            IdCard, 
+            Download, 
+            Building2, 
+            SortAsc, 
+            Users, 
+            Clock, 
+            MessageSquare,
+            AlertTriangle,
+            Phone,
+            Mail,
+            ChevronRight,
+            ExternalLink
+        } from 'https://esm.sh/lucide-react@0.460.0';
+
+        const html = htm.bind(React.createElement);
+
+        const SITE = {
+            univEN: "B University",
+            univKN: "ದ್ಯಾಲಯ",
+            deptEN: "Departent of Computer Science & Applications",
+            deptKN: "ಕಂಪ್ಯೂಟರ್ ಸೈನ್ಸ್ ಮತ್ತು ಅಪ್ಲಿಕೇಶನ್ಸ್ ವಿಭಾಗ",
+            addrEN: "The e, ",
+            addrKN: "ಸಮನ್ವಯಾಧಿಕಾರಿ, ಬಿಸಿಎ ಕಾಳೂರು-56",
+            phone: "+91 73",
+            email: "frgfsd",
+            whatsappLink: "http23g7f",
+            deadline: "15-05-2026",
+            downloadLink: "https://bpdf"
+        };
+
+        function App() {
+            const [lang, setLang] = useState('en');
+            const [activeModal, setActiveModal] = useState(null);
+
+            useEffect(() => {
+                const savedLang = localStorage.getItem('bcaLang');
+                if (savedLang) setLang(savedLang);
+            }, []);
+
+            const t = (en, kn) => (lang === 'en' ? en : kn);
+
+            const toggleLang = (l) => {
+                setLang(l);
+                localStorage.setItem('bcaLang', l);
+            };
+
+            return html`
+                <div className=${`min-h-screen ${lang === 'kn' ? 'kannada' : ''}`}>
+                    <!-- Navigation -->
+                    <nav className="sticky top-0 z-[100] bg-paper/80 backdrop-blur-md border-b border-navy/5 px-6 py-4">
+                        <div className="max-w-7xl mx-auto flex justify-between items-center">
+                            <div className="flex items-center gap-4">
+                                <div className="flex bg-navy/5 rounded-full p-1 border border-navy/10">
+                                    <button 
+                                        onClick=${() => toggleLang('en')}
+                                        className=${`px-4 py-1.5 text-[0.65rem] font-bold tracking-widest rounded-full transition-all ${lang === 'en' ? 'bg-navy text-white' : 'text-navy/40 hover:text-navy'}`}
+                                    >EN</button>
+                                    <button 
+                                        onClick=${() => toggleLang('kn')}
+                                        className=${`px-4 py-1.5 text-[0.65rem] font-bold tracking-widest rounded-full transition-all ${lang === 'kn' ? 'bg-navy text-white' : 'text-navy/40 hover:text-navy'}`}
+                                    >KN</button>
+                                </div>
+                            </div>
+                            
+                            <div className="hidden lg:flex items-center gap-8 text-[0.7rem] font-bold tracking-[0.2em] uppercase text-navy/40">
+                                <a href="#info" className="hover:text-gold transition-colors">${t('Information', 'ಮಾಹಿತಿ')}</a>
+                                <a href="#process" className="hover:text-gold transition-colors">${t('Process', 'ಪ್ರಕ್ರಿಯೆ')}</a>
+                                <a href="#contact" className="hover:text-gold transition-colors">${t('Contact', 'ಸಂಪರ್ಕ')}</a>
+                            </div>
+
+                            <a 
+                                href="/login"
+                                className="bg-navy text-white px-6 py-2.5 rounded-full text-[0.7rem] font-bold uppercase tracking-widest hover:bg-gold transition-all flex items-center gap-2"
+                            >
+                                <${Users} size=${14} />
+                                ${t('Login', 'ಲಾಗಿನ್')}
+                            </a>
+                        </div>
+                    </nav>
+
+                    <!-- Hero Section -->
+                    <header className="bg-paper-dark border-b border-navy/5 overflow-hidden">
+                        <div className="max-w-7xl mx-auto section-padding flex flex-col lg:flex-row items-center gap-16">
+                            <div className="flex-1 text-center lg:text-left">
+                                <${motion.div}
+                                    initial=${ { opacity: 0, y: 20 } }
+                                    animate=${ { opacity: 1, y: 0 } }
+                                    className="inline-block px-4 py-1 rounded-full bg-gold/10 text-gold text-[0.65rem] font-bold uppercase tracking-[0.2em] mb-6"
+                                >
+                                    ${t(SITE.univEN, SITE.univKN)}
+                                <//>
+                                <${motion.h1}
+                                    initial=${ { opacity: 0, y: 20 } }
+                                    animate=${ { opacity: 1, y: 0 } }
+                                    transition=${ { delay: 0.1 } }
+                                    className="text-5xl md:text-7xl lg:text-8xl font-bold text-navy leading-[1.1] mb-8"
+                                >
+                                    BCA Admissions <br />
+                                    <span className="text-gold italic">2026–2027</span>
+                                <//>
+                                <${motion.p}
+                                    initial=${ { opacity: 0, y: 20 } }
+                                    animate=${ { opacity: 1, y: 0 } }
+                                    transition=${ { delay: 0.2 } }
+                                    className="text-lg md:text-xl text-text-muted font-light leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0"
+                                >
+                                    ${t(
+                                        "Shape your future with our specialized Bachelor of Computer Applications programme. A legacy of academic excellence at Bangalore University.",
+                                        "ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾಲಯದ ಪ್ರತಿಷ್ಠಿತ ಕಂಪ್ಯೂಟರ್ ಅಪ್ಲಿಕೇಶನ್ಸ್ ಪದವಿಯೊಂದಿಗೆ ನಿಮ್ಮ ಭವಿಷ್ಯವನ್ನು ರೂಪಿಸಿ. ಶೈಕ್ಷಣಿಕ ಶ್ರೇಷ್ಠತೆಯ ಪರಂಪರೆ."
+                                    )}
+                                <//>
+                                <${motion.div}
+                                    initial=${ { opacity: 0, y: 20 } }
+                                    animate=${ { opacity: 1, y: 0 } }
+                                    transition=${ { delay: 0.3 } }
+                                    className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+                                >
+                                    <button onClick=${() => setActiveModal('proc')} className="w-full sm:w-auto bg-navy hover:bg-gold text-white px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-4 transition-all shadow-lg">
+                                        <span>${t('Start Admission', 'ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ')}</span>
+                                        <${ArrowRight} size=${20} />
+                                    </button>
+                                    <a href=${SITE.downloadLink} target="_blank" className="w-full sm:w-auto border-2 border-navy/20 hover:border-navy text-navy px-10 py-5 rounded-2xl font-bold text-lg flex items-center justify-center gap-4 transition-all">
+                                        <${Download} size=${20} />
+                                        <span>${t('Download Application', 'ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್')}</span>
+                                    </a>
+                                    <div className="text-left">
+                                        <div className="text-[0.6rem] uppercase tracking-widest text-text-muted mb-1">${t('Deadline', 'ಕೊನೆಯ ದಿನಾಂಕ')}</div>
+                                        <div className="text-navy font-bold flex items-center gap-2">
+                                            <${Clock} size=${16} className="text-gold" />
+                                            ${SITE.deadline}
+                                        </div>
+                                    </div>
+                                <//>
+                            </div>
+                            <div className="flex-1 relative">
+                                <${motion.div}
+                                    initial=${ { opacity: 0, scale: 0.9 } }
+                                    animate=${ { opacity: 1, scale: 1 } }
+                                    transition=${ { duration: 0.8 } }
+                                    className="relative z-10"
+                                >
+                                    <div className="bg-white p-8 rounded-[2.5rem] card-shadow border border-navy/5 relative">
+                                        <div className="grid grid-cols-2 gap-8">
+                                            ${[
+                                                { num: '180', label: t('Total Intake', 'ಒಟ್ಟು ಪ್ರವೇಶ') },
+                                                { num: '3', label: t('Year Degree', 'ವರ್ಷದ ಪದವಿ') },
+                                                { num: 'Merit', label: t('Selection', 'ಆಯ್ಕೆ') },
+                                                { num: '2026', label: t('Batch Start', 'ಬ್ಯಾಚ್ ಆರಂಭ') }
+                                            ].map((stat, i) => html`
+                                                <div key=${i} className="flex flex-col">
+                                                    <span className="text-4xl font-serif text-gold font-bold mb-1">${stat.num}</span>
+                                                    <span className="text-[0.6rem] uppercase tracking-widest text-text-muted">${stat.label}</span>
+                                                </div>
+                                            `)}
+                                        </div>
+                                        <div className="mt-8 pt-8 border-t border-navy/5">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
+                                                    <${AlertTriangle} className="text-gold" size=${18} />
+                                                </div>
+                                                <div className="text-xs font-bold text-navy uppercase tracking-widest">${t('Offline Submission', 'ಆಫ್‌ಲೈನ್ ಸಲ್ಲಿಕೆ')}</div>
+                                            </div>
+                                            <p className="text-xs text-text-muted leading-relaxed">
+                                                ${t('Application must be hand-delivered to the department office before the deadline.', 'ಅರ್ಜಿಯನ್ನು ಗಡುವಿನ ಮೊದಲು ವಿಭಾಗ ಕಚೇರಿಗೆ ಖುದ್ದಾಗಿ ಸಲ್ಲಿಸಬೇಕು.')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                <//>
+                                <div className="absolute -top-12 -right-12 w-64 h-64 bg-gold/5 rounded-full blur-3xl" />
+                                <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-navy/5 rounded-full blur-3xl" />
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Info Grid -->
+                    <section id="info" className="section-padding max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-20">
+                            <h2 className="text-4xl md:text-5xl font-bold text-navy mb-6">${t('Admission Resources', 'ಪ್ರವೇಶ ಸಂಪನ್ಮೂಲಗಳು')}</h2>
+                            <p className="text-text-muted text-lg leading-relaxed">
+                                ${t('Detailed information to guide you through the 2026-27 admission cycle.', '೨೦೨೬-೨೭ರ ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆಗೆ ನಿಮಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡಲು ವಿವರವಾದ ಮಾಹಿತಿ.')}
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            ${[
+                                { id: 'prog', icon: Building2, titleEN: 'Programme', titleKN: 'ಪದವಿ', descEN: 'ML, Data Science & Full Stack specializations.', descKN: 'ML, ಡೇಟಾ ಸೈನ್ಸ್ ಮತ್ತು ಫುಲ್ ಸ್ಟಾಕ್ ವಿಶೇಷತೆಗಳು.' },
+                                { id: 'elig', icon: GraduationCap, titleEN: 'Eligibility', titleKN: 'ಅರ್ಹತೆ', descEN: 'Academic criteria and required documents.', descKN: 'ಶೈಕ್ಷಣಿಕ ಮಾನದಂಡಗಳು ಮತ್ತು ಅಗತ್ಯ ದಾಖಲೆಗಳು.' },
+                                { id: 'proc', icon: ListOrdered, titleEN: 'Process', titleKN: 'ಪ್ರಕ್ರಿಯೆ', descEN: '10-step offline admission roadmap.', descKN: '೧೦-ಹಂತದ ಆಫ್‌ಲೈನ್ ಪ್ರವೇಶ ಮಾರ್ಗಸೂಚಿ.' },
+                                { id: 'seats', icon: Table, titleEN: 'Seat Matrix', titleKN: 'ಶ್ರೇಣಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್', descEN: 'Category-wise distribution of 180 seats.', descKN: '೧೮೦ ಸ್ಥಾನಗಳ ವರ್ಗವಾರು ವಿತರಣೆ.' },
+                                { id: 'fees', icon: IndianRupee, titleEN: 'Fees', titleKN: 'ಶುಲ್ಕ', descEN: 'Annual structure and examination charges.', descKN: 'ವಾರ್ಷಿಕ ರಚನೆ ಮತ್ತು ಪರೀಕ್ಷಾ ಶುಲ್ಕಗಳು.' },
+                                { id: 'contact', icon: MapPin, titleEN: 'Contact', titleKN: 'ಸಂಪರ್ಕ', descEN: 'Office location, hours, and support.', descKN: 'ಕಚೇರಿ ಸ್ಥಳ, ಸಮಯ ಮತ್ತು ಬೆಂಬಲ.' }
+                            ].map((item) => html`
+                                <button 
+                                    onClick=${() => setActiveModal(item.id)}
+                                    className="group bg-white p-10 text-left flex flex-col gap-6 rounded-[2rem] card-shadow card-hover border border-navy/5"
+                                >
+                                    <div className="w-14 h-14 rounded-2xl bg-paper-dark flex items-center justify-center group-hover:bg-navy group-hover:text-white transition-colors">
+                                        <${item.icon} size=${24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl font-bold text-navy mb-2">${t(item.titleEN, item.titleKN)}</h4>
+                                        <p className="text-sm text-text-muted leading-relaxed">${t(item.descEN, item.descKN)}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-widest text-gold">
+                                        ${t('View Details', 'ವಿವರಗಳನ್ನು ನೋಡಿ')}
+                                        <${ChevronRight} size=${14} />
+                                    </div>
+                                </button>
+                            `)}
+                        </div>
+                    </section>
+
+                    <!-- Notices -->
+                    <section className="bg-paper-dark py-24 px-6">
+                        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            <div className="bg-white p-10 md:p-12 rounded-[2.5rem] card-shadow border border-navy/5 flex flex-col md:flex-row gap-8 items-center text-center md:text-left">
+                                <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                                    <${MessageSquare} className="text-green-600" size=${32} />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-bold text-navy mb-4">${t('WhatsApp Updates', 'ವಾಟ್ಸಾಪ್ ಅಪ್‌ಡೇಟ್‌ಗಳು')}</h4>
+                                    <p className="text-text-muted text-sm leading-relaxed mb-6">
+                                        ${t('Join our official group for instant notifications on merit lists and counselling dates.', 'ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಕೌನ್ಸೆಲಿಂಗ್ ದಿನಾಂಕಗಳ ಬಗ್ಗೆ ತಕ್ಷಣದ ಮಾಹಿತಿಗಾಗಿ ನಮ್ಮ ವಾಟ್ಸಾಪ್ ಗ್ರೂಪ್ ಸೇರಿ.')}
+                                    </p>
+                                    <a href=${SITE.whatsappLink} target="_blank" className="inline-flex items-center gap-2 text-green-600 font-bold uppercase tracking-widest text-[0.7rem] hover:underline">
+                                        ${t('Join Official Group', 'ಗ್ರೂಪ್ ಸೇರಿ')}
+                                        <${ExternalLink} size=${14} />
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="bg-navy p-10 md:p-12 rounded-[2.5rem] text-white flex flex-col md:flex-row gap-8 items-center text-center md:text-left">
+                                <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                    <${AlertTriangle} className="text-gold" size=${32} />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-bold text-white mb-4">${t('Offline Protocol', 'ಆಫ್‌ಲೈನ್ ಪ್ರೋಟೋಕಾಲ್')}</h4>
+                                    <p className="text-white/60 text-sm leading-relaxed mb-6">
+                                        ${t('No online submission. Hand-deliver printed forms to the department office before the deadline.', 'ಆನ್‌ಲೈನ್ ಸಲ್ಲಿಕೆ ಇಲ್ಲ. ಗಡುವಿನ ಮೊದಲು ಮುದ್ರಿತ ಫಾರ್ಮ್‌ಗಳನ್ನು ವಿಭಾಗ ಕಚೇರಿಗೆ ತಲುಪಿಸಿ.')}
+                                    </p>
+                                    <div className="text-gold font-bold uppercase tracking-widest text-[0.7rem]">
+                                        ${t('Deadline: 15-05-2026', 'ಗಡುವು: 15-05-2026')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Modals -->
+                    <${AnimatePresence}>
+                        ${activeModal && html`
+                            <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 md:p-8">
+                                <${motion.div} 
+                                    initial=${ { opacity: 0 } }
+                                    animate=${ { opacity: 1 } }
+                                    exit=${ { opacity: 0 } }
+                                    onClick=${() => setActiveModal(null)}
+                                    className="absolute inset-0 bg-navy/60 backdrop-blur-sm"
+                                />
+                                <${motion.div}
+                                    initial=${ { opacity: 0, scale: 0.95, y: 20 } }
+                                    animate=${ { opacity: 1, scale: 1, y: 0 } }
+                                    exit=${ { opacity: 0, scale: 0.95, y: 20 } }
+                                    className="relative w-full max-w-4xl max-h-full bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col"
+                                >
+                                    <div className="p-6 md:p-8 border-b border-navy/5 flex justify-between items-center bg-paper-dark">
+                                        <h3 className="text-2xl md:text-3xl font-bold text-navy">
+                                            ${activeModal === 'prog' && t('Programme Structure', 'ಪದವಿ ರಚನೆ')}
+                                            ${activeModal === 'elig' && t('Eligibility Criteria', 'ಅರ್ಹತಾ ಮಾನದಂಡಗಳು')}
+                                            ${activeModal === 'proc' && t('Admission Process', 'ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ')}
+                                            ${activeModal === 'seats' && t('Seat Matrix 2026', 'ಶ್ರೇಣಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ೨೦೨೬')}
+                                            ${activeModal === 'fees' && t('Fee Structure', 'ಶುಲ್ಕ ರಚನೆ')}
+                                            ${activeModal === 'contact' && t('Office Info', 'ಕಚೇರಿ ಮಾಹಿತಿ')}
+                                        </h3>
+                                        <button onClick=${() => setActiveModal(null)} className="w-10 h-10 rounded-full bg-navy/5 flex items-center justify-center hover:bg-navy/10 transition-colors">
+                                            <${X} size=${20} />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-6 md:p-10">
+                                        ${activeModal === 'prog' && html`
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                ${[
+                                                    { icon: Brain, title: 'Machine Learning', desc: t('Advanced algorithms and intelligent systems.', 'ಸುಧಾರಿತ ಅಲ್ಗಾರಿದಮ್‌ಗಳು ಮತ್ತು ಬುದ್ಧಿವಂತ ವ್ಯವಸ್ಥೆಗಳು.') },
+                                                    { icon: BarChart3, title: 'Data Science', desc: t('Big data analytics and visualization.', 'ಬಿಗ್ ಡೇಟಾ ಅನಾಲಿಟಿಕ್ಸ್ ಮತ್ತು ವಿಶ್ಯುವಲೈಸೇಶನ್.') },
+                                                    { icon: Code2, title: 'Full Stack', desc: t('End-to-end web engineering.', 'ಸಂಪೂರ್ಣ ವೆಬ್ ಎಂಜಿನಿಯರಿಂಗ್.') }
+                                                ].map((s, i) => html`
+                                                    <div key=${i} className="bg-paper-dark p-6 rounded-2xl border border-navy/5">
+                                                        <${s.icon} className="text-gold mb-4" size=${28} />
+                                                        <h5 className="font-bold text-navy mb-2">${s.title}</h5>
+                                                        <p className="text-xs text-text-muted leading-relaxed">${s.desc}</p>
+                                                    </div>
+                                                `)}
+                                            </div>
+                                        `}
+
+                                        ${activeModal === 'elig' && html`
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                <div className="space-y-6">
+                                                    <h5 className="text-xl font-bold text-navy">${t('Academic Requirements', 'ಶೈಕ್ಷಣಿಕ ಅವಶ್ಯಕತೆಗಳು')}</h5>
+                                                    <ul className="space-y-4">
+                                                        ${[
+                                                            { en: 'Completed 2-year PUC or equivalent (Arts / Science / Commerce)', kn: '೨ ವರ್ಷದ PUC ಅಥವಾ ಸಮಾನ (ಕಲೆ / ವಿಜ್ಞಾನ / ವಾಣಿಜ್ಯ)' },
+                                                            { en: 'Minimum 50% aggregate marks in Class 12', kn: '೧೨ನೇ ತರಗತಿಯಲ್ಲಿ ಕನಿಷ್ಠ ೫೦% ಅಂಕ' },
+                                                            { en: '45% for SC/ST & Category-I (Karnataka domicile)', kn: 'SC/ST ಮತ್ತು ವರ್ಗ-I ಗೆ ೪೫% (ಕರ್ನಾಟಕದವರು)' },
+                                                            { en: 'Selection based on qualifying exam score (merit basis)', kn: 'ಅರ್ಹತಾ ಪರೀಕ್ಷೆಯ ಅಂಕಗಳ ಆಧಾರದ ಮೇಲೆ ಆಯ್ಕೆ (ಅರ್ಹತೆ ಆಧಾರಿತ)' },
+                                                            { en: 'Local students will be preferred', kn: 'ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ ನೀಡಲಾಗುವುದು' }
+                                                        ].map((item, i) => html`
+                                                            <li key=${i} className="flex gap-3 text-sm text-text-muted">
+                                                                <${CheckCircle2} className="text-gold shrink-0" size=${18} />
+                                                                ${t(item.en, item.kn)}
+                                                            </li>
+                                                        `)}
+                                                    </ul>
+                                                    <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex flex-col gap-2">
+                                                        <div className="flex gap-3">
+                                                            <${AlertTriangle} className="text-red-500 shrink-0" size=${18} />
+                                                            <p className="text-xs text-red-800 font-bold uppercase tracking-widest">${t('Hostel Facility', 'ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ')}</p>
+                                                        </div>
+                                                        <p className="text-xs text-red-800 leading-relaxed pl-7">
+                                                            ${t('Hostel is not available for UG students. Local students will be preferred.', 'ಪದವಿ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹಾಸ್ಟೆಲ್ ಸೌಲಭ್ಯ ಲಭ್ಯವಿಲ್ಲ. ಸ್ಥಳೀಯ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಆದ್ಯತೆ ನೀಡಲಾಗುವುದು.')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-6">
+                                                    <h5 className="text-xl font-bold text-navy">${t('Required Documents', 'ಅಗತ್ಯ ದಾಖಲೆಗಳು')}</h5>
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        ${[
+                                                            'Class 10 & 12 Marksheets (Original + Copies)',
+                                                            'Caste & Income Certificate (from Tahsildar)',
+                                                            'Transfer Certificate (TC)',
+                                                            'Freeship Card (for SC/ST students)',
+                                                            'Valid Photo ID & Passport Size Photos',
+                                                            'Migration Certificate (for Non-Karnataka)'
+                                                        ].map((doc, i) => html`
+                                                            <div key=${i} className="p-3 bg-paper-dark rounded-xl text-xs text-navy/70 border border-navy/5 flex items-center gap-3">
+                                                                <div className="w-5 h-5 rounded-full bg-navy/5 flex items-center justify-center text-[0.6rem] font-bold">${i+1}</div>
+                                                                ${doc}
+                                                            </div>
+                                                        `)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `}
+
+                                        ${activeModal === 'proc' && html`
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                                ${[
+                                                    { num: '01', title: t('Download Application', 'ಅರ್ಜಿ ಡೌನ್‌ಲೋಡ್'), desc: t('From official university website.', 'ಅಧಿಕೃತ ವಿಶ್ವವಿದ್ಯಾಲಯದ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ.') },
+                                                    { num: '02', title: t('Fill All Details', 'ವಿವರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ'), desc: t('Name, DOB, category, academic marks.', 'ಹೆಸರು, ಜನ್ಮ ದಿನಾಂಕ, ವರ್ಗ, ಶೈಕ್ಷಣಿಕ ಅಂಕಗಳು.') },
+                                                    { num: '03', title: t('Attach Documents', 'ದಾಖಲೆಗಳನ್ನು ಲಗತ್ತಿಸಿ'), desc: t('Self-attested copies of all required docs.', 'ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ದಾಖಲೆಗಳ ಸ್ವಯಂ-ದೃಢೀಕೃತ ಪ್ರತಿಗಳು.') },
+                                                    { num: '04', title: t('Submit (Offline)', 'ಸಲ್ಲಿಸಿ (ಆಫ್‌ಲೈನ್)'), desc: t(`Hand-deliver before ${SITE.deadline}.`, `${SITE.deadline} ಮೊದಲು ಖುದ್ದಾಗಿ ಸಲ್ಲಿಸಿ.`) },
+                                                    { num: '05', title: t('Verification', 'ದಾಖಲೆ ಪರಿಶೀಲನೆ'), desc: t('Status visible on portal after check.', 'ಪರಿಶೀಲನೆಯ ನಂತರ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಸ್ಥಿತಿ ಲಭ್ಯ.') },
+                                                    { num: '06', title: t('Merit List & Rank', 'ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಶ್ರೇಣಿ'), desc: t('Rank visible on dashboard after publication.', 'ಪ್ರಕಟಣೆಯ ನಂತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಶ್ರೇಣಿ ಲಭ್ಯ.') },
+                                                    { num: '07', title: t('Track Seats', 'ಸ್ಥಾನಗಳ ಲಭ್ಯತೆ'), desc: t('Monitor live seat counts per category.', 'ವರ್ಗವಾರು ಲೈವ್ ಸ್ಥಾನಗಳ ಲಭ್ಯತೆಯನ್ನು ಗಮನಿಸಿ.') },
+                                                    { num: '08', title: t('Counselling', 'ಕೌನ್ಸೆಲಿಂಗ್'), desc: t('Attend in person at department office.', 'ವಿಭಾಗ ಕಚೇರಿಯಲ್ಲಿ ಖುದ್ದಾಗಿ ಹಾಜರಾಗಿ.') },
+                                                    { num: '09', title: t('Seat Allotment', 'ಸ್ಥಾನ ಹಂಚಿಕೆ'), desc: t('Allotted by category from Govt/Mgmt quota.', 'ಸರ್ಕಾರಿ/ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಕೋಟಾದಿಂದ ಹಂಚಿಕೆ.') },
+                                                    { num: '10', title: t('Pay & Confirm', 'ಶುಲ್ಕ ಪಾವತಿಸಿ'), desc: t('Pay fees and submit originals at office.', 'ಶುಲ್ಕ ಪಾವತಿಸಿ ಮತ್ತು ಅಸಲಿ ದಾಖಲೆಗಳನ್ನು ಸಲ್ಲಿಸಿ.') }
+                                                ].map((step, i) => html`
+                                                    <div key=${i} className="bg-paper-dark p-5 rounded-2xl border border-navy/5 flex flex-col items-center text-center group hover:border-gold/30 transition-colors">
+                                                        <div className="w-10 h-10 rounded-full bg-navy text-white font-bold text-xs flex items-center justify-center mb-4 group-hover:bg-gold transition-colors">${step.num}</div>
+                                                        <div className="font-bold text-navy text-sm mb-2">${step.title}</div>
+                                                        <div className="text-[0.65rem] text-text-muted leading-relaxed">${step.desc}</div>
+                                                    </div>
+                                                `)}
+                                            </div>
+                                        `}
+
+                                        ${activeModal === 'seats' && html`
+                                            <div className="space-y-6">
+                                                <div className="flex justify-center mb-4">
+                                                    <h4 className="text-xl font-bold text-navy border-b-2 border-gold pb-1 uppercase tracking-widest">Provisional Seat Matrix</h4>
+                                                </div>
+                                                <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
+                                                    <table className="w-full text-xs text-left border-collapse min-w-[1000px]">
+                                                        <thead className="bg-navy text-white uppercase tracking-widest font-mono text-[0.55rem]">
+                                                            <tr>
+                                                                <th className="p-3 border-r border-white/10 text-center">Sl. No.</th>
+                                                                <th className="p-3 border-r border-white/10 min-w-[200px]">
+                                                                    B.C.A. Under Graduate programme<br/>
+                                                                    (a) Machine Learning,<br/>
+                                                                    (b) Data Science<br/>
+                                                                    (c) Full Stack Development.
+                                                                </th>
+                                                                <th className="p-3 border-r border-white/10 text-center">GM<br/>44%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">SC<br/>17%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">ST<br/>7%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">Cat-I<br/>4%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">IIA<br/>15%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">IIB<br/>4%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">IIIA<br/>4%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">IIIB<br/>5%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">HK<br/>8%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">PWD<br/>5%</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">KM</th>
+                                                                <th className="p-3 border-r border-white/10 text-center">RL</th>
+                                                                <th className="p-3 text-center bg-gold text-navy font-bold">Total intake</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-navy/5 text-navy/80 font-mono">
+                                                            <tr className="hover:bg-paper-dark transition-colors">
+                                                                <td className="p-3 text-center border-r border-navy/5">1.</td>
+                                                                <td className="p-3 font-bold border-r border-navy/5">Regular fees</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">33</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">13</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">5</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">11</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">4</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">7*</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">4*</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
+                                                                <td className="p-3 text-center font-bold text-navy bg-gold/5">90</td>
+                                                            </tr>
+                                                            <tr className="hover:bg-paper-dark transition-colors">
+                                                                <td className="p-3 text-center border-r border-navy/5">2.</td>
+                                                                <td className="p-3 font-bold border-r border-navy/5">Payment fees</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">32</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">12</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">5</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">11</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">4</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">8*</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">5*</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
+                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
+                                                                <td className="p-3 text-center font-bold text-navy bg-gold/5">90</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div className="flex flex-wrap gap-4 text-[0.65rem] text-text-muted italic px-2 font-medium">
+                                                    <span><b>HK</b>—Hyderabad Karnataka</span>
+                                                    <span><b>RL</b>—Rural</span>
+                                                    <span><b>PWD</b>—Persons with Disabilities</span>
+                                                    <span><b>KM</b>—Kannada Medium Quota</span>
+                                                </div>
+                                            </div>
+                                        `}
+
+                                        ${activeModal === 'fees' && html`
+                                            <div className="space-y-12">
+                                                <!-- Annual Admission Fees -->
+                                                <div className="space-y-6">
+                                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                                                        <div>
+                                                            <h5 className="text-2xl font-bold text-navy mb-1">Annual Admission Fees</h5>
+                                                            <p className="text-xs text-text-muted uppercase tracking-widest font-bold">B.C.A. (Regular Category) | V.C. Approval: 08.04.2026</p>
+                                                        </div>
+                                                        <div className="px-4 py-2 bg-gold/10 border border-gold/20 rounded-full text-gold text-[0.65rem] font-bold uppercase tracking-widest">
+                                                            Academic Year 2026-27
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
+                                                        <table className="w-full text-xs text-left border-collapse min-w-[600px]">
+                                                            <thead className="bg-navy text-white uppercase tracking-widest font-mono text-[0.6rem]">
+                                                                <tr>
+                                                                    <th className="p-4 border-r border-white/10">Fee Type</th>
+                                                                    <th className="p-4 text-center border-r border-white/10">1st Yr (₹)</th>
+                                                                    <th className="p-4 text-center border-r border-white/10">2nd Yr (₹)</th>
+                                                                    <th className="p-4 text-center">3rd Yr (₹)</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-navy/5 text-navy/80">
+                                                                ${[
+                                                                    { type: 'Registration Fee', y1: '1,000', y2: '—', y3: '—' },
+                                                                    { type: 'Admission Fee', y1: '1,000', y2: '—', y3: '—' },
+                                                                    { type: 'Tuition Fee', y1: '24,700', y2: '24,700', y3: '24,700' },
+                                                                    { type: 'Laboratory Fee', y1: '10,000', y2: '10,000', y3: '10,000' },
+                                                                    { type: 'Library Fee', y1: '1,000', y2: '1,000', y3: '1,000' },
+                                                                    { type: 'Sports Development', y1: '620', y2: '620', y3: '620' },
+                                                                    { type: 'Medical Examination', y1: '200', y2: '200', y3: '200' },
+                                                                    { type: 'Student Activity Fee *', y1: '100', y2: '100', y3: '100' },
+                                                                    { type: 'Identity Card', y1: '150', y2: '150', y3: '150' },
+                                                                    { type: 'Cultural Activity Fee *', y1: '200', y2: '200', y3: '200' },
+                                                                    { type: 'Twithers Benefit Fund', y1: '25', y2: '25', y3: '25' },
+                                                                    { type: 'Students Benefit Fund', y1: '25', y2: '25', y3: '25' }
+                                                                ].map((row, i) => html`
+                                                                    <tr key=${i} className="hover:bg-paper-dark transition-colors">
+                                                                        <td className="p-4 font-medium border-r border-navy/5">${row.type}</td>
+                                                                        <td className="p-4 text-center border-r border-navy/5 font-mono">${row.y1}</td>
+                                                                        <td className="p-4 text-center border-r border-navy/5 font-mono">${row.y2}</td>
+                                                                        <td className="p-4 text-center font-mono">${row.y3}</td>
+                                                                    </tr>
+                                                                `)}
+                                                                <tr className="bg-navy text-gold font-bold text-sm">
+                                                                    <td className="p-5 border-r border-white/10 uppercase tracking-widest">Total Annual Fee</td>
+                                                                    <td className="p-5 text-center border-r border-white/10 font-mono">₹39,020</td>
+                                                                    <td className="p-5 text-center border-r border-white/10 font-mono">₹37,020</td>
+                                                                    <td className="p-5 text-center font-mono">₹37,020</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <p className="text-[0.65rem] text-text-muted italic">
+                                                        * Not reimbursable by Social Welfare Dept (SC/ST): Cultural Activity ₹200 + Student Activity ₹100.
+                                                    </p>
+                                                </div>
+
+                                                <!-- Additional Category Fees -->
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                    <div className="p-8 bg-paper-dark rounded-3xl border border-navy/5">
+                                                        <h6 className="font-bold text-navy mb-6 text-sm uppercase tracking-widest flex items-center gap-2">
+                                                            <div className="w-2 h-2 rounded-full bg-gold" />
+                                                            Additional Category Fees
+                                                        </h6>
+                                                        <div className="space-y-4 font-mono text-sm">
+                                                            <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-navy/5">
+                                                                <span className="text-text-muted">Non-Karnataka</span>
+                                                                <span className="font-bold text-navy">₹2,000</span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-navy/5">
+                                                                <span className="text-text-muted">NRI Student</span>
+                                                                <span className="font-bold text-navy">₹4,000</span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-navy/5">
+                                                                <span className="text-text-muted">Foreign Student</span>
+                                                                <span className="font-bold text-navy">₹12,870</span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-4 bg-navy text-gold rounded-xl shadow-lg">
+                                                                <span className="font-bold uppercase tracking-widest text-[0.65rem]">Payment Seat</span>
+                                                                <span className="font-bold">₹75,000 + Eligibility</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-8 bg-gold/5 rounded-3xl border border-gold/10 flex flex-col justify-center">
+                                                        <h6 className="font-bold text-navy mb-4 text-sm uppercase tracking-widest flex items-center gap-2">
+                                                            <span className="text-xl">🎓</span>
+                                                            SC/ST Freeship Card
+                                                        </h6>
+                                                        <p className="text-xs text-text-muted leading-relaxed mb-6">
+                                                            From 2023–24, SC/ST students with family income below <b>₹2.5 Lakhs</b> may be admitted without pre-paying compulsory fees on submission of a <b>Freeship Card</b>.
+                                                        </p>
+                                                        <div className="space-y-3 text-[0.7rem] text-navy/70 leading-relaxed">
+                                                            <p>• Submit scholarship status (2025–26) / Freeship card (SSP Portal).</p>
+                                                            <p>• Income & Caste certificate from Tahsildar required.</p>
+                                                            <p className="text-red-600 font-bold">• Note: Cultural (₹200) + Student Activity (₹100) must still be paid.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Examination Fees -->
+                                                <div className="space-y-6 pt-4">
+                                                    <h5 className="text-2xl font-bold text-navy">Examination Fees — Semester-wise</h5>
+                                                    <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
+                                                        <table className="w-full text-xs text-left border-collapse min-w-[500px]">
+                                                            <thead className="bg-paper-dark text-navy uppercase tracking-widest font-mono text-[0.6rem]">
+                                                                <tr>
+                                                                    <th className="p-4 border-r border-navy/5">Semester</th>
+                                                                    <th className="p-4 text-center border-r border-navy/5">Exam Fee (₹)</th>
+                                                                    <th className="p-4 text-center border-r border-navy/5">NAD (₹)</th>
+                                                                    <th className="p-4 text-center border-r border-navy/5">Conv (₹)</th>
+                                                                    <th className="p-4 text-center bg-navy text-white">Total (₹)</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-navy/5 text-navy/80">
+                                                                ${[
+                                                                    { sem: 'I', exam: '4,950', nad: '275', conv: '—', total: '5,225' },
+                                                                    { sem: 'II', exam: '4,950', nad: '275', conv: '—', total: '5,225' },
+                                                                    { sem: 'III', exam: '5,445', nad: '275', conv: '—', total: '5,720' },
+                                                                    { sem: 'IV', exam: '5,445', nad: '275', conv: '—', total: '5,720' },
+                                                                    { sem: 'V', exam: '6,589', nad: '275', conv: '—', total: '6,864' },
+                                                                    { sem: 'VI', exam: '6,589', nad: '275', conv: '2,305', total: '9,169' }
+                                                                ].map((row, i) => html`
+                                                                    <tr key=${i} className="hover:bg-paper-dark transition-colors">
+                                                                        <td className="p-4 font-bold border-r border-navy/5">Semester ${row.sem}</td>
+                                                                        <td className="p-4 text-center border-r border-navy/5 font-mono">${row.exam}</td>
+                                                                        <td className="p-4 text-center border-r border-navy/5 font-mono">${row.nad}</td>
+                                                                        <td className="p-4 text-center border-r border-navy/5 font-mono">${row.conv}</td>
+                                                                        <td className="p-4 text-center font-bold font-mono ${row.sem === 'VI' ? 'text-gold bg-navy/90' : 'text-navy'}">${row.total}</td>
+                                                                    </tr>
+                                                                `)}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `}
+
+                                        ${activeModal === 'contact' && html`
+                                            <div className="space-y-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div className="p-8 bg-paper-dark rounded-2xl border border-navy/5 flex gap-6">
+                                                        <${MapPin} className="text-gold shrink-0" size=${24} />
+                                                        <div>
+                                                            <h5 className="font-bold text-navy mb-2">Office Address</h5>
+                                                            <p className="text-sm text-text-muted leading-relaxed">${t(SITE.addrEN, SITE.addrKN)}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-8 bg-paper-dark rounded-2xl border border-navy/5 flex gap-6">
+                                                        <${Phone} className="text-gold shrink-0" size=${24} />
+                                                        <div>
+                                                            <h5 className="font-bold text-navy mb-2">Support</h5>
+                                                            <div className="text-sm text-text-muted space-y-1">
+                                                                <p>${SITE.phone}</p>
+                                                                <p className="text-navy font-medium">${SITE.email}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-center">
+                                                    <a href=${SITE.downloadLink} target="_blank" className="bg-navy hover:bg-gold text-white px-12 py-4 rounded-2xl font-bold text-sm uppercase tracking-widest flex items-center gap-4 transition-all shadow-lg">
+                                                        <${Download} size=${20} />
+                                                        <span>${t('Download Application Form', 'ಅರ್ಜಿ ನಮೂನೆಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ')}</span>
+                                                    </a>
+                                                </div>
+                                                <p className="text-center text-[0.65rem] text-text-muted italic">
+                                                    Available on the official university website.
+                                                </p>
+                                            </div>
+                                        `}
+                                    </div>
+                                <//>
+                            </div>
+                        `}
+                    <//>
+
+                    <!-- Footer -->
+                    <footer id="contact" className="bg-navy py-20 px-6 text-white/40">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
+                            <div>
+                                <h3 className="text-2xl font-bold text-gold mb-4">${t(SITE.univEN, SITE.univKN)}</h3>
+                                <p className="text-sm max-w-md leading-relaxed">${t(SITE.deptEN, SITE.deptKN)}</p>
+                            </div>
+                            <div className="flex gap-8 text-[0.6rem] font-bold uppercase tracking-widest">
+                                <a href="#" className="hover:text-gold transition-colors">Privacy</a>
+                                <a href="#" className="hover:text-gold transition-colors">Terms</a>
+                                <span>© 2026 Admissions</span>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            `;
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
