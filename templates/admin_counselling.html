@@ -2,15 +2,15 @@
 {% block title %}Counselling — Admin{% endblock %}
 {% block content %}
 <style>
-  .cl-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  .cl-page { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
 
   .cl-header {
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
   }
   .cl-header h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.9rem; color: #0a1f44; margin: 0;
+    font-size: 1.7rem; color: #0a1f44; margin: 0;
   }
   .btn-back {
     display: inline-flex; align-items: center; gap: .4rem;
@@ -20,17 +20,17 @@
 
   /* ── Status banner ── */
   .status-banner {
-    border-radius: 16px; padding: 1.4rem 1.75rem;
+    border-radius: 14px; padding: 1rem 1.5rem;
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
     border: 1.5px solid transparent;
   }
-  .status-banner.running  { background: #edf9f2; border-color: #25c26e; }
-  .status-banner.paused   { background: #fffbea; border-color: #f0c040; }
-  .status-banner.stopped  { background: #f5f7fa; border-color: #dde3ed; }
+  .status-banner.running { background: #edf9f2; border-color: #25c26e; }
+  .status-banner.paused  { background: #fffbea; border-color: #f0c040; }
+  .status-banner.stopped { background: #f5f7fa; border-color: #dde3ed; }
 
   .status-left { display: flex; align-items: center; gap: .85rem; }
-  .status-dot  { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .running .status-dot { background: #25c26e; animation: pulse-g 1.8s infinite; }
   .paused  .status-dot { background: #f0c040; }
   .stopped .status-dot { background: #b0bac8; }
@@ -38,114 +38,89 @@
     0%,100% { box-shadow: 0 0 0 0 rgba(37,194,110,.5); }
     50%     { box-shadow: 0 0 0 8px rgba(37,194,110,0); }
   }
-  .status-label { font-size: 1rem; font-weight: 700; color: #0a1f44; }
-  .status-sub   { font-size: .82rem; color: #5a6e82; margin-top: .15rem; }
-  .status-actions { display: flex; gap: .65rem; flex-wrap: wrap; }
+  .status-label { font-size: .95rem; font-weight: 700; color: #0a1f44; }
+  .status-sub   { font-size: .78rem; color: #5a6e82; margin-top: .1rem; }
+  .status-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
 
   .btn-start  { background: #25c26e; color: white; }
   .btn-stop   { background: #dc3545; color: white; }
   .btn-resume { background: #0a1f44; color: white; }
   .btn-pause  { background: #f0c040; color: #0a1f44; }
   .btn-ctrl {
-    padding: .6rem 1.3rem; border-radius: 10px; border: none;
-    font-size: .85rem; font-weight: 600; cursor: pointer;
+    padding: .5rem 1.1rem; border-radius: 9px; border: none;
+    font-size: .82rem; font-weight: 600; cursor: pointer;
     display: inline-flex; align-items: center; gap: .4rem; transition: all .2s;
   }
   .btn-ctrl:hover { opacity: .88; transform: translateY(-1px); }
 
-  /* ── Top grid ── */
-  .cl-top-grid {
-    display: grid; grid-template-columns: 340px 1fr;
-    gap: 1.5rem; margin-bottom: 2rem;
+  /* ── TWO COLUMN LAYOUT ── */
+  .cl-body {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.25rem;
+    align-items: start;
   }
-  @media(max-width:860px) { .cl-top-grid { grid-template-columns: 1fr; } }
+  @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } }
+
+  /* ── LEFT PANEL ── */
+  .cl-left { display: flex; flex-direction: column; gap: 1rem; }
 
   .cl-card {
-    background: white; border-radius: 18px;
-    border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05); padding: 1.5rem;
+    background: white; border-radius: 16px;
+    border: 1px solid #eef2f8; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    padding: 1.25rem;
   }
-  .cl-card h3 {
-    font-size: .8rem; font-weight: 700; letter-spacing: .08em;
-    text-transform: uppercase; color: #8a9ab0; margin: 0 0 1.1rem;
+  .cl-card-title {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #8a9ab0; margin: 0 0 1rem;
+    display: flex; align-items: center; gap: .4rem;
   }
 
-  .rank-input-row { display: flex; gap: .65rem; align-items: flex-end; flex-wrap: wrap; }
-  .rank-input-row input {
-    padding: .7rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: 1rem; font-family: inherit; width: 130px; outline: none; transition: border-color .2s;
-  }
-  .rank-input-row input:focus { border-color: #0a1f44; }
-  .rank-input-row textarea {
-    padding: .7rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: .88rem; font-family: inherit; resize: none; width: 100%;
-    outline: none; transition: border-color .2s;
-  }
-  .rank-input-row textarea:focus { border-color: #0a1f44; }
-
-  .current-rank-display {
+  .rank-display {
     font-family: 'Playfair Display', serif;
-    font-size: 3.5rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem;
+    font-size: 3rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem;
   }
-  .current-rank-display span { font-size: 1rem; color: #8a9ab0; font-family: inherit; }
+  .rank-display span { font-size: .95rem; color: #8a9ab0; font-family: inherit; }
+
+  .rank-input-row { display: flex; flex-direction: column; gap: .6rem; }
+  .rank-input-row input, .rank-input-row textarea {
+    padding: .6rem .9rem; border: 2px solid #e2e8f0; border-radius: 9px;
+    font-size: .9rem; font-family: inherit; outline: none; transition: border-color .2s; width: 100%;
+  }
+  .rank-input-row input:focus, .rank-input-row textarea:focus { border-color: #0a1f44; }
+  .rank-input-row textarea { resize: none; }
 
   .btn-next-rank {
-    padding: .6rem 1.3rem; background: #c9a03d; color: white;
-    border: none; border-radius: 10px; font-size: .88rem; font-weight: 700; cursor: pointer;
+    padding: .55rem 1.1rem; background: #c9a03d; color: white;
+    border: none; border-radius: 9px; font-size: .85rem; font-weight: 700; cursor: pointer;
     display: inline-flex; align-items: center; gap: .4rem; transition: all .2s;
-    box-shadow: 0 3px 10px rgba(201,160,61,.3);
+    box-shadow: 0 3px 10px rgba(201,160,61,.3); width: 100%; justify-content: center;
+    margin-bottom: .5rem;
   }
-  .btn-next-rank:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(201,160,61,.4); }
+  .btn-next-rank:hover { transform: translateY(-2px); }
 
-  /* Seat tables */
-  .seats-section { display: flex; flex-direction: column; gap: 1.25rem; }
-  .quota-table-card {
-    background: white; border-radius: 16px; border: 1px solid #eef2f8;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04); overflow: hidden;
+  /* Seat tracking button */
+  .btn-seat-track {
+    width: 100%; padding: .65rem 1rem;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: white; border: none; border-radius: 12px;
+    font-size: .85rem; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    transition: all .2s; box-shadow: 0 3px 12px rgba(124,58,237,.25);
   }
-  .quota-table-header {
-    display: flex; align-items: center; gap: .6rem; padding: .9rem 1.25rem;
-    font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  .btn-seat-track:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124,58,237,.35); }
+  .seat-track-badge {
+    background: rgba(255,255,255,.25); padding: 1px 7px;
+    border-radius: 20px; font-size: .72rem; font-weight: 700;
   }
-  .quota-table-header.govt { background: #eef6ff; color: #004085; border-bottom: 1px solid #cce0ff; }
-  .quota-table-header.mgmt { background: #fffbea; color: #856404; border-bottom: 1px solid #ffe9a0; }
-  .quota-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .govt .quota-dot { background: #004085; }
-  .mgmt .quota-dot { background: #b8860b; }
 
-  .seat-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-  .seat-table th {
-    text-align: left; padding: .55rem .9rem; font-size: .7rem; font-weight: 600;
-    letter-spacing: .05em; text-transform: uppercase; color: #8a9ab0;
-    background: #fafbfd; border-bottom: 1px solid #eef2f8;
-  }
-  .seat-table td { padding: .6rem .9rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
-  .seat-table tr:last-child td { border-bottom: none; }
+  /* ── RIGHT PANEL ── */
+  .cl-right { display: flex; flex-direction: column; gap: 1rem; }
 
-  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: .3rem; overflow: hidden; width: 80px; }
-  .seats-bar-govt { background: #3a7bd5; height: 100%; border-radius: 20px; transition: width .4s; }
-  .seats-bar-mgmt { background: #e8c060; height: 100%; border-radius: 20px; transition: width .4s; }
-
-  .seat-input-inline { display: flex; gap: .4rem; align-items: center; }
-  .seat-input-inline input {
-    padding: .35rem .65rem; border: 1.5px solid #e2e8f0; border-radius: 7px;
-    font-size: .82rem; width: 72px; outline: none;
-  }
-  .seat-input-inline input:focus { border-color: #0a1f44; }
-  .btn-sm-set {
-    padding: .35rem .8rem; background: #0a1f44; color: white;
-    border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
-    cursor: pointer; transition: background .2s;
-  }
-  .btn-sm-set:hover { background: #1e3a60; }
-
-  /* ── Search bar ── */
-  .search-bar-wrap {
-    margin-bottom: 1.25rem;
-  }
   .search-bar {
     display: flex; align-items: center; gap: .65rem;
     background: white; border: 2px solid #e2e8f0; border-radius: 12px;
-    padding: .6rem 1rem; transition: border-color .2s;
+    padding: .65rem 1rem; transition: border-color .2s;
   }
   .search-bar:focus-within { border-color: #c9a03d; }
   .search-bar i { color: #8a9ab0; flex-shrink: 0; }
@@ -154,34 +129,22 @@
     width: 100%; background: transparent; color: #0a1f44;
   }
   .search-bar input::placeholder { color: #b0bac8; }
-  .search-count {
-    font-size: .78rem; color: #5a6e82; margin-top: .4rem; margin-left: .25rem;
-  }
-
-  /* ── Students list section ── */
-  .students-section { margin-top: 2rem; }
-  .students-section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1rem; flex-wrap: wrap; gap: .5rem;
-  }
-  .students-section-header h3 {
-    font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #0a1f44; margin: 0;
-  }
+  .search-count { font-size: .75rem; color: #5a6e82; margin-top: .35rem; margin-left: .25rem; }
 
   .list-card {
-    background: white; border-radius: 20px;
+    background: white; border-radius: 16px;
     border: 1px solid #eef2f8; overflow: hidden;
   }
   .list-card-header {
-    padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    padding: .9rem 1.25rem; border-bottom: 1px solid #f5f7fa;
     display: flex; align-items: center; gap: .5rem;
   }
-  .list-card-header h4 { font-size: 1rem; color: #0a1f44; margin: 0; }
+  .list-card-header h4 { font-size: .95rem; color: #0a1f44; margin: 0; }
   .list-card-header i  { color: #c9a03d; }
 
   .stu-row {
-    display: flex; align-items: center; gap: 1rem;
-    padding: .85rem 1.5rem; border-bottom: 1px solid #f5f7fa;
+    display: flex; align-items: center; gap: .85rem;
+    padding: .8rem 1.25rem; border-bottom: 1px solid #f5f7fa;
     cursor: pointer; transition: background .15s;
   }
   .stu-row:last-child { border-bottom: none; }
@@ -189,34 +152,37 @@
   .stu-row.hidden { display: none; }
 
   .rank-pill {
-    background: #0a1f44; color: white; font-size: .7rem;
-    font-weight: 700; padding: 3px 9px; border-radius: 20px;
-    min-width: 36px; text-align: center; flex-shrink: 0;
+    background: #0a1f44; color: white; font-size: .68rem;
+    font-weight: 700; padding: 3px 8px; border-radius: 20px;
+    min-width: 34px; text-align: center; flex-shrink: 0;
   }
   .stu-info { flex: 1; min-width: 0; }
   .stu-name {
-    font-weight: 600; color: #0a1f44; font-size: .9rem;
+    font-weight: 600; color: #0a1f44; font-size: .875rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .stu-sub  { color: #5a6e82; font-size: .76rem; margin-top: 1px; }
+  .stu-sub  { color: #5a6e82; font-size: .73rem; margin-top: 1px; }
 
   .badge {
-    display: inline-block; font-size: .68rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
+    display: inline-block; font-size: .66rem; font-weight: 600;
+    padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
   }
   .badge-govt    { background: #cce5ff; color: #004085; }
   .badge-mgmt    { background: #fff3cd; color: #856404; }
   .badge-pending { background: #f3f4f6; color: #6b7280; }
 
-  .row-arrow { color: #c9a03d; font-size: .8rem; flex-shrink: 0; }
+  .row-arrow { color: #c9a03d; font-size: .75rem; flex-shrink: 0; }
 
   .no-results {
-    text-align: center; padding: 2.5rem; color: #8a9ab0;
-    display: none;
+    text-align: center; padding: 2rem; color: #8a9ab0; display: none;
   }
-  .no-results i { font-size: 1.5rem; display: block; margin-bottom: .5rem; }
 
-  /* ── Modal ── */
+  .empty-counsel {
+    text-align: center; padding: 3rem; color: #8a9ab0;
+    background: white; border-radius: 16px; border: 1.5px dashed #dde3ed;
+  }
+
+  /* ── SEAT TRACKING MODAL ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
     background: rgba(10,31,68,.45);
@@ -225,12 +191,14 @@
   .modal-overlay.open { display: flex; }
 
   .modal-box {
-    background: white; border-radius: 24px;
-    width: 100%; max-width: 660px;
+    background: white; border-radius: 22px;
+    width: 100%; max-width: 720px;
     max-height: 90vh; overflow-y: auto;
     box-shadow: 0 20px 60px rgba(10,31,68,.2);
     animation: modal-in .18s ease;
   }
+  .modal-box.student-modal { max-width: 660px; }
+
   @keyframes modal-in {
     from { transform: translateY(20px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
@@ -240,11 +208,10 @@
     padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
     display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
     position: sticky; top: 0; background: white; z-index: 2;
-    border-radius: 24px 24px 0 0;
+    border-radius: 22px 22px 0 0;
   }
   .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; }
-  .modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 3px; }
-
+  .modal-sub   { font-size: .78rem; color: #5a6e82; margin-top: 3px; }
   .modal-close {
     background: #f3f4f6; border: none; border-radius: 50%;
     width: 32px; height: 32px; cursor: pointer; font-size: 1rem;
@@ -252,169 +219,194 @@
     flex-shrink: 0; transition: background .15s;
   }
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
-
   .modal-body { padding: 1.5rem; }
 
+  /* Seat tracking content */
+  .seat-track-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  @media(max-width:600px) { .seat-track-grid { grid-template-columns: 1fr; } }
+
+  .quota-track-card {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid #eef2f8;
+  }
+  .quota-track-header {
+    padding: .7rem 1rem; font-size: .75rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .quota-track-header.govt { background: #eef6ff; color: #004085; border-bottom: 1px solid #cce0ff; }
+  .quota-track-header.mgmt { background: #fffbea; color: #856404; border-bottom: 1px solid #ffe9a0; }
+
+  .seat-track-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+  .seat-track-table th {
+    padding: .45rem .85rem; text-align: left; font-size: .67rem;
+    font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: #8a9ab0; background: #fafbfd; border-bottom: 1px solid #eef2f8;
+  }
+  .seat-track-table td { padding: .55rem .85rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
+  .seat-track-table tr:last-child td { border-bottom: none; }
+
+  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: 3px; overflow: hidden; width: 70px; }
+  .seats-bar-govt { background: #3a7bd5; height: 100%; border-radius: 20px; }
+  .seats-bar-mgmt { background: #e8c060; height: 100%; border-radius: 20px; }
+
+  .seat-input-inline { display: flex; gap: .35rem; align-items: center; }
+  .seat-input-inline input {
+    padding: .3rem .55rem; border: 1.5px solid #e2e8f0; border-radius: 7px;
+    font-size: .8rem; width: 65px; outline: none;
+  }
+  .seat-input-inline input:focus { border-color: #0a1f44; }
+  .btn-sm-set {
+    padding: .3rem .7rem; background: #0a1f44; color: white;
+    border: none; border-radius: 7px; font-size: .75rem; font-weight: 600;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-sm-set:hover { background: #1e3a60; }
+
+  /* Student modal specific */
   .section-divider {
-    font-size: .72rem; font-weight: 600; color: #5a6e82;
+    font-size: .7rem; font-weight: 600; color: #5a6e82;
     text-transform: uppercase; letter-spacing: .05em;
-    margin: 1.25rem 0 .75rem; padding-bottom: .4rem;
+    margin: 1.1rem 0 .65rem; padding-bottom: .35rem;
     border-bottom: 1px solid #f5f7fa;
   }
   .section-divider:first-child { margin-top: 0; }
 
   .detail-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .75rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .65rem;
   }
-  .detail-item span {
-    font-size: .7rem; text-transform: uppercase; color: #5a6e82;
-    letter-spacing: .04em; display: block; margin-bottom: 2px;
-  }
-  .detail-item strong { font-size: .88rem; color: #0a1f44; }
+  .detail-item span { font-size: .68rem; text-transform: uppercase; color: #5a6e82; letter-spacing: .04em; display: block; margin-bottom: 2px; }
+  .detail-item strong { font-size: .85rem; color: #0a1f44; }
 
-  /* Allotment form */
   .allot-form {
     background: #f8faff; border-radius: 14px;
-    border: 1px solid #e2e8f0; padding: 1.25rem;
-    margin-top: .5rem; display: flex; flex-direction: column; gap: 1rem;
+    border: 1px solid #e2e8f0; padding: 1.1rem;
+    margin-top: .5rem; display: flex; flex-direction: column; gap: .85rem;
   }
-  .allot-form-row { display: flex; gap: .85rem; flex-wrap: wrap; align-items: flex-start; }
-  .allot-form-group { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 150px; }
+  .allot-form-row { display: flex; gap: .75rem; flex-wrap: wrap; align-items: flex-start; }
+  .allot-form-group { display: flex; flex-direction: column; gap: .28rem; flex: 1; min-width: 140px; }
   .allot-form-group label {
-    font-size: .72rem; font-weight: 700; color: #0a1f44; text-transform: uppercase;
-    letter-spacing: .04em;
+    font-size: .7rem; font-weight: 700; color: #0a1f44;
+    text-transform: uppercase; letter-spacing: .04em;
   }
   .quota-select, .admit-cat-select, .fee-cat-select {
-    padding: .55rem 1rem; border: 2px solid #e2e8f0; border-radius: 9px;
-    font-size: .88rem; font-family: inherit; outline: none; cursor: pointer;
+    padding: .5rem .85rem; border: 2px solid #e2e8f0; border-radius: 9px;
+    font-size: .85rem; font-family: inherit; outline: none; cursor: pointer;
     transition: border-color .2s; width: 100%;
   }
-  .quota-select:focus      { border-color: #0a1f44; }
-  .admit-cat-select:focus  { border-color: #7c3aed; }
-  .fee-cat-select:focus    { border-color: #c9a03d; }
+  .quota-select:focus     { border-color: #0a1f44; }
+  .admit-cat-select:focus { border-color: #7c3aed; }
+  .fee-cat-select:focus   { border-color: #c9a03d; }
 
-  .seat-hint { font-size: .72rem; color: #7c3aed; font-weight: 600; margin-top: 2px; }
+  .seat-hint { font-size: .7rem; color: #7c3aed; font-weight: 600; margin-top: 2px; }
   .seat-hint.full { color: #dc3545; }
 
-  /* Additional fee input */
   .additional-fee-wrap { position: relative; }
   .additional-fee-wrap .currency-prefix {
     position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
-    color: #5a6e82; font-size: .9rem; font-weight: 600; pointer-events: none;
+    color: #5a6e82; font-size: .88rem; font-weight: 600; pointer-events: none;
   }
   .additional-fee-input {
-    padding: .55rem 1rem .55rem 1.75rem; border: 2px solid #e2e8f0; border-radius: 9px;
-    font-size: .88rem; font-family: inherit; outline: none; transition: border-color .2s;
+    padding: .5rem .85rem .5rem 1.9rem; border: 2px solid #e2e8f0; border-radius: 9px;
+    font-size: .85rem; font-family: inherit; outline: none; transition: border-color .2s;
     width: 100%; box-sizing: border-box;
   }
   .additional-fee-input:focus { border-color: #c9a03d; }
 
-  /* Fee total preview */
   .fee-total-preview {
     background: linear-gradient(135deg, #fffdf5, #fff8e8);
     border: 1.5px solid #e8d5a0; border-radius: 12px;
-    padding: .85rem 1.25rem;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 1rem; flex-wrap: wrap;
+    padding: .85rem 1.1rem;
+    display: flex; flex-direction: column; gap: .2rem;
   }
-  .fee-total-preview .fee-preview-label {
-    font-size: .78rem; color: #5a6e82; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .04em;
-  }
-  .fee-total-preview .fee-preview-rows { display: flex; flex-direction: column; gap: .2rem; flex: 1; }
   .fee-preview-row { display: flex; justify-content: space-between; font-size: .82rem; color: #5a6e82; }
-  .fee-preview-row.total-row { font-weight: 800; color: #1a5c3a; font-size: 1rem; margin-top: .2rem; border-top: 1px solid #e8d5a0; padding-top: .3rem; }
+  .fee-preview-row.total-row {
+    font-weight: 800; color: #1a5c3a; font-size: .95rem;
+    margin-top: .2rem; border-top: 1px solid #e8d5a0; padding-top: .3rem;
+  }
 
   .btn-allot {
-    padding: .65rem 1.4rem; background: #25c26e; color: white;
-    border: none; border-radius: 9px; font-weight: 700; font-size: .88rem;
+    padding: .6rem 1.3rem; background: #25c26e; color: white;
+    border: none; border-radius: 9px; font-weight: 700; font-size: .85rem;
     cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
   }
   .btn-allot:hover { background: #1da85c; }
 
   .btn-revoke {
-    padding: .5rem 1rem; background: white; color: #dc3545;
-    border: 1.5px solid #dc3545; border-radius: 9px; font-weight: 600; font-size: .82rem;
-    cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
+    padding: .45rem .9rem; background: white; color: #dc3545;
+    border: 1.5px solid #dc3545; border-radius: 9px; font-weight: 600; font-size: .8rem;
+    cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem;
   }
   .btn-revoke:hover { background: #dc3545; color: white; }
 
   .btn-close-modal {
-    padding: .5rem 1rem; background: #f3f4f6; color: #5a6e82;
-    border: none; border-radius: 9px; font-weight: 600; font-size: .82rem;
-    cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
+    padding: .45rem .9rem; background: #f3f4f6; color: #5a6e82;
+    border: none; border-radius: 9px; font-weight: 600; font-size: .8rem;
+    cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem;
   }
   .btn-close-modal:hover { background: #e5e7eb; }
 
   .already-allotted {
-    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-    padding: .85rem 1.25rem; background: #edf9f2;
+    display: flex; align-items: center; gap: .85rem; flex-wrap: wrap;
+    padding: .85rem 1.1rem; background: #edf9f2;
     border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem;
   }
-  .already-allotted p { margin: 0; font-size: .85rem; color: #1a5c3a; }
+  .already-allotted p { margin: 0; font-size: .83rem; color: #1a5c3a; flex: 1; }
 
   .admit-badge-display {
-    display: inline-block; font-size: .78rem; font-weight: 800;
-    padding: 3px 10px; border-radius: 20px;
+    display: inline-block; font-size: .75rem; font-weight: 800;
+    padding: 2px 9px; border-radius: 20px;
     background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    color: white; margin-left: .4rem;
-  }
-
-  .empty-counsel {
-    text-align: center; padding: 3rem; color: #8a9ab0;
-    background: white; border-radius: 16px; border: 1.5px dashed #dde3ed;
+    color: white; margin-left: .3rem;
   }
 
   /* Dark mode */
   body.dark .cl-card,
-  body.dark .quota-table-card,
   body.dark .list-card,
   body.dark .modal-box,
-  body.dark .modal-header   { background: #1a2538; border-color: #2d3e54; }
-  body.dark .modal-header   { background: #1a2538; }
-  body.dark .cl-card h3,
+  body.dark .modal-header,
+  body.dark .quota-track-card { background: #1a2538; border-color: #2d3e54; }
+  body.dark .modal-header { background: #1a2538; }
+  body.dark .cl-card-title,
   body.dark .status-label,
   body.dark .modal-title,
   body.dark .stu-name,
   body.dark .detail-item strong,
   body.dark .list-card-header h4 { color: #eef2ff; }
-  body.dark .status-sub,
-  body.dark .modal-sub,
-  body.dark .stu-sub,
-  body.dark .detail-item span,
+  body.dark .status-sub, body.dark .modal-sub,
+  body.dark .stu-sub, body.dark .detail-item span,
   body.dark .section-divider { color: #b9c8e8; }
   body.dark .section-divider { border-color: #2d3e54; }
-  body.dark .stu-row         { border-color: #1e2e42; }
-  body.dark .stu-row:hover   { background: #1e2e42; }
+  body.dark .stu-row { border-color: #1e2e42; }
+  body.dark .stu-row:hover { background: #1e2e42; }
   body.dark .list-card-header { border-color: #2d3e54; }
-  body.dark .seat-table th   { background: #131e2e; color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .seat-table td   { border-color: #1e2e42; color: #eef2ff; }
   body.dark .rank-input-row input,
   body.dark .rank-input-row textarea,
   body.dark .quota-select,
   body.dark .admit-cat-select,
   body.dark .fee-cat-select,
   body.dark .additional-fee-input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .modal-close     { background: #2d3e54; color: #b9c8e8; }
-  body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
-  body.dark .allot-form      { background: #131e2e; border-color: #2d3e54; }
+  body.dark .seat-track-table th { background: #131e2e; color: #8a9ab0; border-color: #2d3e54; }
+  body.dark .seat-track-table td { border-color: #1e2e42; color: #eef2ff; }
+  body.dark .allot-form { background: #131e2e; border-color: #2d3e54; }
   body.dark .allot-form-group label { color: #eef2ff; }
   body.dark .already-allotted { background: #0a2318; border-color: #1a5c3a; }
-  body.dark .btn-close-modal { background: #2d3e54; color: #b9c8e8; }
-  body.dark .current-rank-display { color: #eef2ff; }
-  body.dark .quota-table-header.govt { background: #0a1a2e; border-color: #2d3e54; }
-  body.dark .quota-table-header.mgmt { background: #1a1408; border-color: #2d3e54; }
   body.dark .fee-total-preview { background: #1a1408; border-color: #c9a03d44; }
-  body.dark .fee-preview-row.total-row { border-color: #c9a03d44; }
   body.dark .search-bar { background: #1a2538; border-color: #2d3e54; }
   body.dark .search-bar input { color: #eef2ff; }
-  body.dark .students-section-header h3 { color: #eef2ff; }
+  body.dark .modal-close { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
+  body.dark .rank-display { color: #eef2ff; }
+  body.dark .quota-track-header.govt { background: #0a1a2e; border-color: #2d3e54; }
+  body.dark .quota-track-header.mgmt { background: #1a1408; border-color: #2d3e54; }
+  body.dark .btn-close-modal { background: #2d3e54; color: #b9c8e8; }
+  body.dark .seat-input-inline input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
 
-  @media (max-width: 600px) {
+  @media(max-width:600px) {
     .badge { display: none; }
     .modal-box { border-radius: 18px; }
-    .detail-grid { grid-template-columns: repeat(2, 1fr); }
-    .allot-form-row { flex-direction: column; }
   }
 </style>
 
@@ -447,7 +439,7 @@
       {% if cs.is_stopped %}
         <form method="POST">
           <input type="hidden" name="action" value="start"/>
-          <button type="submit" class="btn-ctrl btn-start"><i class="fas fa-play"></i> Start Counselling</button>
+          <button type="submit" class="btn-ctrl btn-start"><i class="fas fa-play"></i> Start</button>
         </form>
       {% elif cs.is_running %}
         <form method="POST">
@@ -471,367 +463,384 @@
     </div>
   </div>
 
-  {# ── Top grid ── #}
-  <div class="cl-top-grid">
+  {# ── BODY: LEFT + RIGHT ── #}
+  <div class="cl-body">
 
-    {# Live Rank Card #}
-    <div class="cl-card">
-      <h3><i class="fas fa-broadcast-tower"></i> Update Live Rank</h3>
-      <div class="current-rank-display">
-        {% if cs.current_rank %}{{ cs.current_rank }}<span>&nbsp;current rank</span>
-        {% else %}<span style="font-size:1.1rem;color:#b0bac8">Not set</span>{% endif %}
+    {# ══ LEFT PANEL ══ #}
+    <div class="cl-left">
+
+      {# Live Rank Card #}
+      <div class="cl-card">
+        <div class="cl-card-title"><i class="fas fa-broadcast-tower"></i> Live Rank</div>
+        <div class="rank-display">
+          {% if cs.current_rank %}{{ cs.current_rank }}<span>&nbsp;calling</span>
+          {% else %}<span style="font-size:1rem;color:#b0bac8">Not set</span>{% endif %}
+        </div>
+        {% if cs.message %}
+          <p style="font-size:.78rem;color:#5a6e82;margin:.35rem 0 .85rem">📢 {{ cs.message }}</p>
+        {% endif %}
+        {% if cs.current_rank %}
+        <form method="POST" style="margin-bottom:.65rem">
+          <input type="hidden" name="action" value="next_rank"/>
+          <button type="submit" class="btn-next-rank">
+            <i class="fas fa-forward"></i> Next → #{{ cs.current_rank + 1 }}
+          </button>
+        </form>
+        {% endif %}
+        <form method="POST">
+          <input type="hidden" name="action" value="update_rank"/>
+          <div class="rank-input-row">
+            <input type="number" name="current_rank" min="1"
+              value="{{ cs.current_rank or '' }}" placeholder="Enter rank number">
+            <textarea name="message" rows="2"
+              placeholder="Optional message to students…">{{ cs.message or '' }}</textarea>
+            <button type="submit" class="btn-ctrl btn-resume" style="width:100%;justify-content:center">
+              <i class="fas fa-sync-alt"></i> Update Rank
+            </button>
+          </div>
+        </form>
       </div>
-      {% if cs.message %}
-        <p style="font-size:.82rem;color:#5a6e82;margin:.4rem 0 1rem">📢 {{ cs.message }}</p>
+
+      {# Seat Tracking Button #}
+      {% set total_seats_all = 0 %}
+      {% set filled_seats_all = 0 %}
+      {% for cat in categories %}
+        {% set s = cat_seats[cat.id] %}
+        {% set total_seats_all = total_seats_all + s.govt_total + s.mgmt_total %}
+        {% set filled_seats_all = filled_seats_all + s.govt_filled + s.mgmt_filled %}
+      {% endfor %}
+      <button class="btn-seat-track" onclick="openModal('seat-track-modal')">
+        <i class="fas fa-chair"></i>
+        Seat Tracking
+        <span class="seat-track-badge">{{ filled_seats_all }}/{{ total_seats_all }}</span>
+      </button>
+
+    </div>
+
+    {# ══ RIGHT PANEL ══ #}
+    <div class="cl-right">
+
+      {% if students %}
+      {# Search #}
+      <div>
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="student-search"
+            placeholder="Search by rank or name…"
+            oninput="filterStudents(this.value)"/>
+        </div>
+        <div class="search-count" id="search-count"></div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-card-header">
+          <i class="fas fa-users"></i>
+          <h4>Ranked Students (<span id="visible-count">{{ students|length }}</span>)</h4>
+        </div>
+
+        <div id="no-results" class="no-results">
+          <i class="fas fa-search-minus"></i>
+          No students match your search.
+        </div>
+
+        {% for appl in students %}
+        {% set allotment = allotments.get(appl.id) %}
+        <div class="stu-row" id="row-{{ appl.id }}"
+          data-rank="{{ appl.rank }}" data-name="{{ appl.full_name|lower }}"
+          onclick="openModal('cs-modal-{{ appl.id }}')">
+          <span class="rank-pill">#{{ appl.rank }}</span>
+          <div class="stu-info">
+            <div class="stu-name">{{ appl.full_name }}</div>
+            <div class="stu-sub">{{ appl.category_name or '—' }} &bull; {{ appl.email }}</div>
+          </div>
+          {% if allotment %}
+            <span class="badge badge-{{ allotment.quota }}">
+              <i class="fas fa-check"></i> {{ allotment.quota|title }}
+            </span>
+            {% if allotment.admit_seat_label %}
+              <span style="background:#ede9fe;color:#7c3aed;font-size:.66rem;font-weight:700;
+                padding:2px 7px;border-radius:20px;flex-shrink:0">
+                {{ allotment.admit_seat_label }}
+              </span>
+            {% endif %}
+          {% else %}
+            <span class="badge badge-pending">Not Allotted</span>
+          {% endif %}
+          <span class="row-arrow"><i class="fas fa-chevron-right"></i></span>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="empty-counsel">
+        <i class="fas fa-users-slash" style="font-size:2rem;margin-bottom:.85rem;display:block"></i>
+        No ranked students yet. Assign ranks from Rank Management.
+      </div>
       {% endif %}
-      {% if cs.current_rank %}
-      <form method="POST" style="margin-bottom:.9rem">
-        <input type="hidden" name="action" value="next_rank"/>
-        <button type="submit" class="btn-next-rank">
-          <i class="fas fa-forward"></i> Next Rank &rarr; #{{ cs.current_rank + 1 }}
-        </button>
-      </form>
-      {% endif %}
-      <form method="POST">
-        <input type="hidden" name="action" value="update_rank"/>
-        <div class="rank-input-row" style="flex-direction:column;align-items:flex-start">
-          <input type="number" name="current_rank" min="1"
-            value="{{ cs.current_rank or '' }}" placeholder="Enter rank number">
-          <textarea name="message" rows="2"
-            placeholder="Optional message to students…"
-            style="margin-top:.6rem">{{ cs.message or '' }}</textarea>
-          <button type="submit" class="btn-ctrl btn-resume" style="margin-top:.6rem">
-            <i class="fas fa-sync-alt"></i> Update Rank
+
+    </div>{# /cl-right #}
+  </div>{# /cl-body #}
+</div>
+
+{# ══════════════════════════════════════════ #}
+{# SEAT TRACKING MODAL                        #}
+{# ══════════════════════════════════════════ #}
+<div class="modal-overlay" id="seat-track-modal"
+  onclick="closeOnOverlay(event, 'seat-track-modal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title"><i class="fas fa-chair" style="color:#7c3aed"></i> Seat Tracking</div>
+        <div class="modal-sub">View & update seat allocations per category</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('seat-track-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="seat-track-grid">
+
+        {# Government Quota #}
+        <div class="quota-track-card">
+          <div class="quota-track-header govt">
+            <i class="fas fa-landmark"></i> Government Quota
+          </div>
+          <table class="seat-track-table">
+            <thead>
+              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th><th>Set</th></tr>
+            </thead>
+            <tbody>
+              {% for cat in categories %}{% set s = cat_seats[cat.id] %}
+              <tr>
+                <td><strong>{{ cat.name }}</strong></td>
+                <td>{{ s.govt_total }}</td>
+                <td>{{ s.govt_filled }}</td>
+                <td>
+                  <strong style="color:{% if s.govt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                    {{ s.govt_remaining }}
+                  </strong>
+                  <div class="seats-bar-wrap">
+                    <div class="seats-bar-govt"
+                      style="width:{% if s.govt_total > 0 %}{{ ((s.govt_filled/s.govt_total)*100)|int }}{% else %}0{% endif %}%">
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <form method="POST" class="seat-input-inline">
+                    <input type="hidden" name="action" value="set_seats"/>
+                    <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                    <input type="hidden" name="quota" value="government"/>
+                    <input type="number" name="total_seats" min="0" value="{{ s.govt_total }}" placeholder="0">
+                    <button type="submit" class="btn-sm-set">Set</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {# Management Quota #}
+        <div class="quota-track-card">
+          <div class="quota-track-header mgmt">
+            <i class="fas fa-building"></i> Management Quota
+          </div>
+          <table class="seat-track-table">
+            <thead>
+              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th><th>Set</th></tr>
+            </thead>
+            <tbody>
+              {% for cat in categories %}{% set s = cat_seats[cat.id] %}
+              <tr>
+                <td><strong>{{ cat.name }}</strong></td>
+                <td>{{ s.mgmt_total }}</td>
+                <td>{{ s.mgmt_filled }}</td>
+                <td>
+                  <strong style="color:{% if s.mgmt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                    {{ s.mgmt_remaining }}
+                  </strong>
+                  <div class="seats-bar-wrap">
+                    <div class="seats-bar-mgmt"
+                      style="width:{% if s.mgmt_total > 0 %}{{ ((s.mgmt_filled/s.mgmt_total)*100)|int }}{% else %}0{% endif %}%">
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <form method="POST" class="seat-input-inline">
+                    <input type="hidden" name="action" value="set_seats"/>
+                    <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                    <input type="hidden" name="quota" value="management"/>
+                    <input type="number" name="total_seats" min="0" value="{{ s.mgmt_total }}" placeholder="0">
+                    <button type="submit" class="btn-sm-set">Set</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══════════════════════════════════════════ #}
+{# STUDENT MODALS                             #}
+{# ══════════════════════════════════════════ #}
+{% for appl in students %}
+{% set allotment = allotments.get(appl.id) %}
+<div class="modal-overlay" id="cs-modal-{{ appl.id }}"
+  onclick="closeOnOverlay(event, 'cs-modal-{{ appl.id }}')">
+  <div class="modal-box student-modal">
+
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">
+          <span class="rank-pill" style="margin-right:.5rem">#{{ appl.rank }}</span>
+          {{ appl.full_name }}
+        </div>
+        <div class="modal-sub">
+          {{ appl.email }} &bull; {{ appl.phone or '—' }} &bull; {{ appl.category_name or '—' }}
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('cs-modal-{{ appl.id }}')">&times;</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="section-divider"><i class="fas fa-user"></i> Student Details</div>
+      <div class="detail-grid">
+        <div class="detail-item"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
+        <div class="detail-item"><span>Email</span><strong>{{ appl.email }}</strong></div>
+        <div class="detail-item"><span>Phone</span><strong>{{ appl.phone or '—' }}</strong></div>
+        <div class="detail-item"><span>Date of Birth</span><strong>{{ appl.dob or '—' }}</strong></div>
+        <div class="detail-item"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
+        <div class="detail-item"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
+        <div class="detail-item"><span>Category</span><strong>{{ appl.category_name or '—' }}</strong></div>
+        <div class="detail-item"><span>Specialization</span><strong>{{ appl.specialization_display or appl.specialization or '—' }}</strong></div>
+        <div class="detail-item"><span>Address</span><strong>{{ appl.address or '—' }}</strong></div>
+        <div class="detail-item"><span>10th %</span><strong>{{ '%.2f'|format(appl.percent_10) if appl.percent_10 else '—' }}{% if appl.percent_10 %}%{% endif %}</strong></div>
+        <div class="detail-item"><span>12th %</span><strong>{{ '%.2f'|format(appl.percent_12) if appl.percent_12 else '—' }}{% if appl.percent_12 %}%{% endif %}</strong></div>
+        <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
+      </div>
+
+      <div class="section-divider"><i class="fas fa-chair"></i> Seat Allotment</div>
+
+      {% if allotment %}
+      <div class="already-allotted">
+        <i class="fas fa-check-circle" style="color:#25c26e;font-size:1.2rem;flex-shrink:0"></i>
+        <p>
+          Allotted under <strong>{{ allotment.quota|title }} Quota</strong>
+          {% if allotment.admit_seat_label %}
+            &mdash; <span class="admit-badge-display">{{ allotment.admit_seat_label }}</span>
+          {% endif %}
+          {% if allotment.allotted_at %}on {{ allotment.allotted_at | ist }}{% endif %}
+        </p>
+        <form method="POST"
+          onsubmit="return confirm('Revoke allotment for {{ appl.full_name }}?')">
+          <input type="hidden" name="action" value="revoke_seat"/>
+          <input type="hidden" name="app_id" value="{{ appl.id }}"/>
+          <button type="submit" class="btn-revoke">
+            <i class="fas fa-undo"></i> Revoke
+          </button>
+        </form>
+      </div>
+
+      {% else %}
+      <form method="POST" class="allot-form" id="allot-form-{{ appl.id }}">
+        <input type="hidden" name="action" value="allot_seat"/>
+        <input type="hidden" name="app_id" value="{{ appl.id }}"/>
+
+        <div class="allot-form-row">
+          <div class="allot-form-group">
+            <label><i class="fas fa-landmark"></i> Quota</label>
+            <select name="quota" class="quota-select" required>
+              <option value="">— Choose Quota —</option>
+              <option value="government">Government Quota</option>
+              <option value="management">Management Quota</option>
+            </select>
+          </div>
+          <div class="allot-form-group">
+            <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category</label>
+            <select name="admit_category_id" class="admit-cat-select"
+              onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
+              <option value="">— None —</option>
+              {% for ac in admit_categories %}
+              <option value="{{ ac.id }}"
+                data-remaining="{{ ac.seats_remaining }}"
+                data-total="{{ ac.total_seats }}"
+                {% if ac.seats_remaining == 0 %}disabled{% endif %}>
+                {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left)
+                {% if ac.seats_remaining == 0 %} — FULL{% endif %}
+              </option>
+              {% endfor %}
+            </select>
+            <div class="seat-hint" id="hint-{{ appl.id }}"></div>
+          </div>
+        </div>
+
+        <div class="allot-form-row">
+          <div class="allot-form-group">
+            <label><i class="fas fa-rupee-sign" style="color:#c9a03d"></i> Fee Structure</label>
+            <select name="fee_category_id" class="fee-cat-select"
+              onchange="updateFeePreview('{{ appl.id }}', this.value, null)">
+              <option value="">— No Fee Assigned —</option>
+              {% for fc in fee_categories %}
+              <option value="{{ fc.id }}" data-amount="{{ fc.amount }}">
+                {{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="allot-form-group">
+            <label><i class="fas fa-plus-circle" style="color:#b45309"></i> Additional Fee (₹)</label>
+            <div class="additional-fee-wrap">
+              <span class="currency-prefix">₹</span>
+              <input type="number" name="additional_fee" min="0" step="0.01"
+                value="0" placeholder="0.00"
+                class="additional-fee-input"
+                oninput="updateFeePreview('{{ appl.id }}', null, this.value)"
+                id="add-fee-{{ appl.id }}"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="fee-total-preview" id="fee-preview-{{ appl.id }}" style="display:none">
+          <div class="fee-preview-row">
+            <span>Base Fee</span>
+            <span id="preview-base-{{ appl.id }}">₹0.00</span>
+          </div>
+          <div class="fee-preview-row">
+            <span>Additional</span>
+            <span id="preview-add-{{ appl.id }}">₹0.00</span>
+          </div>
+          <div class="fee-preview-row total-row">
+            <span><i class="fas fa-equals"></i> Total Fees</span>
+            <span id="preview-total-{{ appl.id }}">₹0.00</span>
+          </div>
+        </div>
+
+        <div>
+          <button type="submit" class="btn-allot">
+            <i class="fas fa-check"></i> Allot Seat
           </button>
         </div>
       </form>
-    </div>
-
-    {# Seat Tables #}
-    <div class="seats-section">
-      <div class="quota-table-card">
-        <div class="quota-table-header govt">
-          <span class="quota-dot"></span>
-          <i class="fas fa-landmark"></i> Government Quota Seats
-        </div>
-        <table class="seat-table">
-          <thead>
-            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th><th>Set Total</th></tr>
-          </thead>
-          <tbody>
-            {% for cat in categories %}{% set s = cat_seats[cat.id] %}
-            <tr>
-              <td><strong>{{ cat.name }}</strong></td>
-              <td>{{ s.govt_total }}</td>
-              <td>{{ s.govt_filled }}</td>
-              <td>
-                <strong style="color:{% if s.govt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
-                  {{ s.govt_remaining }}
-                </strong>
-                <div class="seats-bar-wrap">
-                  <div class="seats-bar-govt"
-                    style="width:{% if s.govt_total > 0 %}{{ ((s.govt_filled/s.govt_total)*100)|int }}{% else %}0{% endif %}%">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <form method="POST" class="seat-input-inline">
-                  <input type="hidden" name="action" value="set_seats"/>
-                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                  <input type="hidden" name="quota" value="government"/>
-                  <input type="number" name="total_seats" min="0" value="{{ s.govt_total }}" placeholder="0">
-                  <button type="submit" class="btn-sm-set">Set</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="quota-table-card">
-        <div class="quota-table-header mgmt">
-          <span class="quota-dot"></span>
-          <i class="fas fa-building"></i> Management Quota Seats
-        </div>
-        <table class="seat-table">
-          <thead>
-            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th><th>Set Total</th></tr>
-          </thead>
-          <tbody>
-            {% for cat in categories %}{% set s = cat_seats[cat.id] %}
-            <tr>
-              <td><strong>{{ cat.name }}</strong></td>
-              <td>{{ s.mgmt_total }}</td>
-              <td>{{ s.mgmt_filled }}</td>
-              <td>
-                <strong style="color:{% if s.mgmt_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
-                  {{ s.mgmt_remaining }}
-                </strong>
-                <div class="seats-bar-wrap">
-                  <div class="seats-bar-mgmt"
-                    style="width:{% if s.mgmt_total > 0 %}{{ ((s.mgmt_filled/s.mgmt_total)*100)|int }}{% else %}0{% endif %}%">
-                  </div>
-                </div>
-              </td>
-              <td>
-                <form method="POST" class="seat-input-inline">
-                  <input type="hidden" name="action" value="set_seats"/>
-                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                  <input type="hidden" name="quota" value="management"/>
-                  <input type="number" name="total_seats" min="0" value="{{ s.mgmt_total }}" placeholder="0">
-                  <button type="submit" class="btn-sm-set">Set</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  {# ── Students List ── #}
-  <div class="students-section">
-    <div class="students-section-header">
-      <h3>Ranked Students</h3>
-      {% if students %}
-      <span style="font-size:.82rem;color:#5a6e82">
-        {{ students|length }} student(s) — click a row to allot seat
-      </span>
       {% endif %}
+
+      <div style="margin-top:1rem">
+        <button type="button" class="btn-close-modal"
+          onclick="closeModal('cs-modal-{{ appl.id }}')">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+
     </div>
-
-    {% if students %}
-
-    {# ── Search bar ── #}
-    <div class="search-bar-wrap">
-      <div class="search-bar">
-        <i class="fas fa-search"></i>
-        <input type="text" id="student-search"
-          placeholder="Search by rank number or student name…"
-          oninput="filterStudents(this.value)"/>
-      </div>
-      <div class="search-count" id="search-count"></div>
-    </div>
-
-    <div class="list-card">
-      <div class="list-card-header">
-        <i class="fas fa-list"></i>
-        <h4>Students (<span id="visible-count">{{ students|length }}</span>)</h4>
-      </div>
-
-      <div id="no-results" class="no-results">
-        <i class="fas fa-search-minus"></i>
-        No students match your search.
-      </div>
-
-      {% for appl in students %}
-      {% set allotment = allotments.get(appl.id) %}
-
-      <div class="stu-row"
-        id="row-{{ appl.id }}"
-        data-rank="{{ appl.rank }}"
-        data-name="{{ appl.full_name|lower }}"
-        onclick="openModal('cs-modal-{{ appl.id }}')">
-        <span class="rank-pill">#{{ appl.rank }}</span>
-        <div class="stu-info">
-          <div class="stu-name">{{ appl.full_name }}</div>
-          <div class="stu-sub">{{ appl.category_name or '—' }} &bull; {{ appl.email }}</div>
-        </div>
-        {% if allotment %}
-          <span class="badge badge-{{ allotment.quota }}">
-            <i class="fas fa-check"></i> {{ allotment.quota|title }} Quota
-          </span>
-          {% if allotment.admit_seat_label %}
-            <span style="background:#ede9fe;color:#7c3aed;font-size:.68rem;font-weight:700;
-              padding:2px 8px;border-radius:20px;flex-shrink:0">
-              {{ allotment.admit_seat_label }}
-            </span>
-          {% endif %}
-        {% else %}
-          <span class="badge badge-pending">Not Allotted</span>
-        {% endif %}
-        <span class="row-arrow"><i class="fas fa-chevron-right"></i></span>
-      </div>
-
-      {# ── Modal ── #}
-      <div class="modal-overlay" id="cs-modal-{{ appl.id }}"
-        onclick="closeOnOverlay(event, 'cs-modal-{{ appl.id }}')">
-        <div class="modal-box">
-
-          <div class="modal-header">
-            <div>
-              <div class="modal-title">
-                <span class="rank-pill" style="margin-right:.5rem">#{{ appl.rank }}</span>
-                {{ appl.full_name }}
-              </div>
-              <div class="modal-sub">
-                {{ appl.email }} &bull; {{ appl.phone or '—' }} &bull; {{ appl.category_name or '—' }}
-              </div>
-            </div>
-            <button class="modal-close" onclick="closeModal('cs-modal-{{ appl.id }}')">&times;</button>
-          </div>
-
-          <div class="modal-body">
-
-            <div class="section-divider"><i class="fas fa-user"></i> Student Details</div>
-            <div class="detail-grid">
-              <div class="detail-item"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
-              <div class="detail-item"><span>Email</span><strong>{{ appl.email }}</strong></div>
-              <div class="detail-item"><span>Phone</span><strong>{{ appl.phone or '—' }}</strong></div>
-              <div class="detail-item"><span>Date of Birth</span><strong>{{ appl.dob or '—' }}</strong></div>
-              <div class="detail-item"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
-              <div class="detail-item"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
-              <div class="detail-item"><span>Category</span><strong>{{ appl.category_name or '—' }}</strong></div>
-              <div class="detail-item"><span>Specialization</span><strong>{{ appl.specialization_display or appl.specialization or '—' }}</strong></div>
-              <div class="detail-item"><span>Address</span><strong>{{ appl.address or '—' }}</strong></div>
-              <div class="detail-item"><span>10th %</span><strong>{{ '%.2f'|format(appl.percent_10) if appl.percent_10 else '—' }}{% if appl.percent_10 %}%{% endif %}</strong></div>
-              <div class="detail-item"><span>12th %</span><strong>{{ '%.2f'|format(appl.percent_12) if appl.percent_12 else '—' }}{% if appl.percent_12 %}%{% endif %}</strong></div>
-              <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
-            </div>
-
-            <div class="section-divider"><i class="fas fa-chair"></i> Seat Allotment</div>
-
-            {% if allotment %}
-            <div class="already-allotted">
-              <i class="fas fa-check-circle" style="color:#25c26e;font-size:1.3rem;flex-shrink:0"></i>
-              <p>
-                Seat allotted under <strong>{{ allotment.quota|title }} Quota</strong>
-                {% if allotment.admit_seat_label %}
-                  &mdash; Admit Category:
-                  <span class="admit-badge-display">{{ allotment.admit_seat_label }}</span>
-                {% endif %}
-                {% if allotment.allotted_at %}on {{ allotment.allotted_at | ist }}{% endif %}
-              </p>
-              <form method="POST" style="margin-left:auto"
-                onsubmit="return confirm('Revoke seat allotment for {{ appl.full_name }}?')">
-                <input type="hidden" name="action" value="revoke_seat"/>
-                <input type="hidden" name="app_id" value="{{ appl.id }}"/>
-                <button type="submit" class="btn-revoke">
-                  <i class="fas fa-undo"></i> Revoke Allotment
-                </button>
-              </form>
-            </div>
-
-            {% else %}
-            <form method="POST" class="allot-form" id="allot-form-{{ appl.id }}">
-              <input type="hidden" name="action" value="allot_seat"/>
-              <input type="hidden" name="app_id" value="{{ appl.id }}"/>
-
-              <div class="allot-form-row">
-                {# Quota #}
-                <div class="allot-form-group">
-                  <label><i class="fas fa-landmark"></i> Quota</label>
-                  <select name="quota" class="quota-select" required>
-                    <option value="">— Choose Quota —</option>
-                    <option value="government">Government Quota</option>
-                    <option value="management">Management Quota</option>
-                  </select>
-                </div>
-
-                {# Admit Category #}
-                <div class="allot-form-group">
-                  <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category</label>
-                  <select name="admit_category_id" class="admit-cat-select"
-                    onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
-                    <option value="">— None —</option>
-                    {% for ac in admit_categories %}
-                    <option value="{{ ac.id }}"
-                      data-remaining="{{ ac.seats_remaining }}"
-                      data-total="{{ ac.total_seats }}"
-                      {% if ac.seats_remaining == 0 %}disabled{% endif %}>
-                      {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left)
-                      {% if ac.seats_remaining == 0 %} — FULL{% endif %}
-                    </option>
-                    {% endfor %}
-                  </select>
-                  <div class="seat-hint" id="hint-{{ appl.id }}"></div>
-                </div>
-              </div>
-
-              <div class="allot-form-row">
-                {# Fee Category #}
-                <div class="allot-form-group">
-                  <label><i class="fas fa-dollar-sign" style="color:#c9a03d"></i> Fee Structure</label>
-                  <select name="fee_category_id" class="fee-cat-select"
-                    onchange="updateFeePreview('{{ appl.id }}', this.value, null)">
-                    <option value="">— No Fee Assigned —</option>
-                    {% for fc in fee_categories %}
-                    <option value="{{ fc.id }}" data-amount="{{ fc.amount }}">
-                      {{ fc.name }} — ${{ '%.2f'|format(fc.amount) }}
-                    </option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                {# Additional Fee #}
-                <div class="allot-form-group">
-                  <label><i class="fas fa-plus-circle" style="color:#b45309"></i> Additional Fee ($)</label>
-                  <div class="additional-fee-wrap">
-                    <span class="currency-prefix">$</span>
-                    <input type="number" name="additional_fee" min="0" step="0.01"
-                      value="0" placeholder="0.00"
-                      class="additional-fee-input"
-                      oninput="updateFeePreview('{{ appl.id }}', null, this.value)"
-                      id="add-fee-{{ appl.id }}"/>
-                  </div>
-                </div>
-              </div>
-
-              {# Fee total preview #}
-              <div class="fee-total-preview" id="fee-preview-{{ appl.id }}" style="display:none">
-                <div class="fee-preview-rows">
-                  <div class="fee-preview-row">
-                    <span>Base Fee</span>
-                    <span id="preview-base-{{ appl.id }}">$0.00</span>
-                  </div>
-                  <div class="fee-preview-row">
-                    <span>Additional</span>
-                    <span id="preview-add-{{ appl.id }}">$0.00</span>
-                  </div>
-                  <div class="fee-preview-row total-row">
-                    <span><i class="fas fa-equals"></i> Total Fees</span>
-                    <span id="preview-total-{{ appl.id }}">$0.00</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <button type="submit" class="btn-allot">
-                  <i class="fas fa-check"></i> Allot Seat
-                </button>
-              </div>
-            </form>
-            {% endif %}
-
-            <div style="margin-top:1.25rem">
-              <button type="button" class="btn-close-modal"
-                onclick="closeModal('cs-modal-{{ appl.id }}')">
-                <i class="fas fa-times"></i> Close
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {% endfor %}
-    </div>
-
-    {% else %}
-    <div class="empty-counsel">
-      <i class="fas fa-users-slash" style="font-size:2rem;margin-bottom:.85rem;display:block"></i>
-      No ranked students yet. Assign ranks first from Rank Management.
-    </div>
-    {% endif %}
   </div>
-
 </div>
+{% endfor %}
 
 {% block scripts %}
 <script>
-// ── Modal helpers ──
 function openModal(id) {
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -852,7 +861,6 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// ── Seat hint ──
 function updateSeatHint(select, hintId) {
   const hint = document.getElementById(hintId);
   const opt  = select.options[select.selectedIndex];
@@ -863,12 +871,11 @@ function updateSeatHint(select, hintId) {
     hint.textContent = '⚠ No seats remaining!';
     hint.className   = 'seat-hint full';
   } else {
-    hint.textContent = `${rem} of ${total} seats available — next: #${total - rem + 1}`;
+    hint.textContent = `${rem} of ${total} seats available`;
     hint.className   = 'seat-hint';
   }
 }
 
-// ── Fee preview ──
 function updateFeePreview(appId, feeCatValue, addFeeValue) {
   const feeSelect = document.querySelector(`#allot-form-${appId} .fee-cat-select`);
   const addInput  = document.getElementById(`add-fee-${appId}`);
@@ -882,38 +889,30 @@ function updateFeePreview(appId, feeCatValue, addFeeValue) {
 
   if (base > 0 || additional > 0) {
     preview.style.display = 'flex';
-    document.getElementById(`preview-base-${appId}`).textContent  = `$${base.toFixed(2)}`;
-    document.getElementById(`preview-add-${appId}`).textContent   = `$${additional.toFixed(2)}`;
-    document.getElementById(`preview-total-${appId}`).textContent = `$${total.toFixed(2)}`;
+    document.getElementById(`preview-base-${appId}`).textContent  = `₹${base.toFixed(2)}`;
+    document.getElementById(`preview-add-${appId}`).textContent   = `₹${additional.toFixed(2)}`;
+    document.getElementById(`preview-total-${appId}`).textContent = `₹${total.toFixed(2)}`;
   } else {
     preview.style.display = 'none';
   }
 }
 
-// ── Search / filter ──
 function filterStudents(query) {
   const q     = query.trim().toLowerCase();
   const rows  = document.querySelectorAll('.stu-row[id^="row-"]');
   let visible = 0;
-
   rows.forEach(function(row) {
-    const rank = String(row.dataset.rank || '');
-    const name = row.dataset.name || '';
+    const rank  = String(row.dataset.rank || '');
+    const name  = row.dataset.name || '';
     const match = !q || rank === q || name.includes(q);
     row.classList.toggle('hidden', !match);
     if (match) visible++;
   });
-
   document.getElementById('visible-count').textContent = visible;
   const noResults = document.getElementById('no-results');
   if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
-
   const countEl = document.getElementById('search-count');
-  if (countEl) {
-    countEl.textContent = q
-      ? `Showing ${visible} of ${rows.length} student(s)`
-      : '';
-  }
+  if (countEl) countEl.textContent = q ? `Showing ${visible} of ${rows.length} student(s)` : '';
 }
 </script>
 {% endblock %}
