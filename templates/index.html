@@ -266,7 +266,7 @@
                                 { id: 'prog', icon: Building2, titleEN: 'Programme', titleKN: 'ಪದವಿ', descEN: 'ML, Data Science & Full Stack specializations.', descKN: 'ML, ಡೇಟಾ ಸೈನ್ಸ್ ಮತ್ತು ಫುಲ್ ಸ್ಟಾಕ್ ವಿಶೇಷತೆಗಳು.' },
                                 { id: 'elig', icon: GraduationCap, titleEN: 'Eligibility', titleKN: 'ಅರ್ಹತೆ', descEN: 'Academic criteria and required documents.', descKN: 'ಶೈಕ್ಷಣಿಕ ಮಾನದಂಡಗಳು ಮತ್ತು ಅಗತ್ಯ ದಾಖಲೆಗಳು.' },
                                 { id: 'proc', icon: ListOrdered, titleEN: 'Process', titleKN: 'ಪ್ರಕ್ರಿಯೆ', descEN: '10-step offline admission roadmap.', descKN: '೧೦-ಹಂತದ ಆಫ್‌ಲೈನ್ ಪ್ರವೇಶ ಮಾರ್ಗಸೂಚಿ.' },
-                                { id: 'seats', icon: Table, titleEN: 'Seat Matrix', titleKN: 'ಶ್ರೇಣಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್', descEN: 'Category-wise distribution of 180 seats.', descKN: '೧೮೦ ಸ್ಥಾನಗಳ ವರ್ಗವಾರು ವಿತರಣೆ.' },
+                                { id: 'seats', icon: Table, titleEN: 'Seat Matrix', titleKN: 'Rank ಮ್ಯಾಟ್ರಿಕ್ಸ್', descEN: 'Category-wise distribution of 180 seats.', descKN: '೧೮೦ ಸ್ಥಾನಗಳ ವರ್ಗವಾರು ವಿತರಣೆ.' },
                                 { id: 'fees', icon: IndianRupee, titleEN: 'Fees', titleKN: 'ಶುಲ್ಕ', descEN: 'Annual structure and examination charges.', descKN: 'ವಾರ್ಷಿಕ ರಚನೆ ಮತ್ತು ಪರೀಕ್ಷಾ ಶುಲ್ಕಗಳು.' },
                                 { id: 'contact', icon: MapPin, titleEN: 'Contact', titleKN: 'ಸಂಪರ್ಕ', descEN: 'Office location, hours, and support.', descKN: 'ಕಚೇರಿ ಸ್ಥಳ, ಸಮಯ ಮತ್ತು ಬೆಂಬಲ.' }
                             ].map((item) => html`
@@ -347,7 +347,7 @@
                                             ${activeModal === 'prog' && t('Programme Structure', 'ಪದವಿ ರಚನೆ')}
                                             ${activeModal === 'elig' && t('Eligibility Criteria', 'ಅರ್ಹತಾ ಮಾನದಂಡಗಳು')}
                                             ${activeModal === 'proc' && t('Admission Process', 'ಪ್ರವೇಶ ಪ್ರಕ್ರಿಯೆ')}
-                                            ${activeModal === 'seats' && t('Seat Matrix 2026', 'ಶ್ರೇಣಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ೨೦೨೬')}
+                                            ${activeModal === 'seats' && t('Seat Matrix 2026', 'Rank ಮ್ಯಾಟ್ರಿಕ್ಸ್ ೨೦೨೬')}
                                             ${activeModal === 'fees' && t('Fee Structure', 'ಶುಲ್ಕ ರಚನೆ')}
                                             ${activeModal === 'contact' && t('Office Info', 'ಕಚೇರಿ ಮಾಹಿತಿ')}
                                         </h3>
@@ -430,7 +430,7 @@
                                                     { num: '03', title: t('Attach Documents', 'ದಾಖಲೆಗಳನ್ನು ಲಗತ್ತಿಸಿ'), desc: t('Self-attested copies of all required docs.', 'ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ದಾಖಲೆಗಳ ಸ್ವಯಂ-ದೃಢೀಕೃತ ಪ್ರತಿಗಳು.') },
                                                     { num: '04', title: t('Submit (Offline)', 'ಸಲ್ಲಿಸಿ (ಆಫ್‌ಲೈನ್)'), desc: t(`Hand-deliver before ${SITE.deadline}.`, `${SITE.deadline} ಮೊದಲು ಖುದ್ದಾಗಿ ಸಲ್ಲಿಸಿ.`) },
                                                     { num: '05', title: t('Verification', 'ದಾಖಲೆ ಪರಿಶೀಲನೆ'), desc: t('Status visible on portal after check.', 'ಪರಿಶೀಲನೆಯ ನಂತರ ಪೋರ್ಟಲ್‌ನಲ್ಲಿ ಸ್ಥಿತಿ ಲಭ್ಯ.') },
-                                                    { num: '06', title: t('Merit List & Rank', 'ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು ಶ್ರೇಣಿ'), desc: t('Rank visible on dashboard after publication.', 'ಪ್ರಕಟಣೆಯ ನಂತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಶ್ರೇಣಿ ಲಭ್ಯ.') },
+                                                    { num: '06', title: t('Merit List & Rank', 'ಅರ್ಹತಾ ಪಟ್ಟಿ ಮತ್ತು Rank'), desc: t('Rank visible on dashboard after publication.', 'ಪ್ರಕಟಣೆಯ ನಂತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ rank ಲಭ್ಯ.') },
                                                     { num: '07', title: t('Track Seats', 'ಸ್ಥಾನಗಳ ಲಭ್ಯತೆ'), desc: t('Monitor live seat counts per category.', 'ವರ್ಗವಾರು ಲೈವ್ ಸ್ಥಾನಗಳ ಲಭ್ಯತೆಯನ್ನು ಗಮನಿಸಿ.') },
                                                     { num: '08', title: t('Counselling', 'ಕೌನ್ಸೆಲಿಂಗ್'), desc: t('Attend in person at department office.', 'ವಿಭಾಗ ಕಚೇರಿಯಲ್ಲಿ ಖುದ್ದಾಗಿ ಹಾಜರಾಗಿ.') },
                                                     { num: '09', title: t('Seat Allotment', 'ಸ್ಥಾನ ಹಂಚಿಕೆ'), desc: t('Allotted by category from Govt/Mgmt quota.', 'ಸರ್ಕಾರಿ/ಮ್ಯಾನೇಜ್‌ಮೆಂಟ್ ಕೋಟಾದಿಂದ ಹಂಚಿಕೆ.') },
