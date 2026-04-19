@@ -26,6 +26,16 @@
   .sum-teal .sum-num { color: #0f766e; }
   .sum-red  .sum-num { color: #dc2626; }
 
+  /* ── Export bar ── */
+  .export-bar {
+    display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    align-items: center;
+  }
+  .export-bar-label {
+    font-size: .78rem; font-weight: 600; color: #5a6e82;
+    text-transform: uppercase; letter-spacing: .05em; margin-right: .25rem;
+  }
+
   /* ── List card ── */
   .list-card {
     background: white; border-radius: 20px;
@@ -161,11 +171,16 @@
     display: inline-flex; align-items: center; gap: .35rem;
     padding: .5rem 1rem; border-radius: 10px; font-size: .82rem;
     font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+    text-decoration: none;
   }
   .btn-teal  { background: #0f766e; color: white; }
   .btn-teal:hover  { background: #0d6560; }
   .btn-navy  { background: #0a1f44; color: white; }
   .btn-navy:hover  { background: #142d5c; }
+  .btn-indigo { background: #4338ca; color: white; }
+  .btn-indigo:hover { background: #3730a3; }
+  .btn-emerald { background: #059669; color: white; }
+  .btn-emerald:hover { background: #047857; }
   .btn-warning { background: #fef3c7; color: #92400e; }
   .btn-warning:hover { background: #fde68a; }
   .btn-danger  { background: #fee2e2; color: #991b1b; }
@@ -326,6 +341,20 @@
     </div>
   </div>
 
+  {# ── Export Buttons ── #}
+  <div class="export-bar">
+    <span class="export-bar-label"><i class="fas fa-file-excel"></i> Export:</span>
+    <a href="{{ url_for('main.export_payments') }}" class="btn btn-navy">
+      <i class="fas fa-table"></i> Payment Overview
+    </a>
+    <a href="{{ url_for('main.export_payment_receipts') }}" class="btn btn-indigo">
+      <i class="fas fa-receipt"></i> Receipt Details
+    </a>
+    <a href="{{ url_for('main.export_document_overview') }}" class="btn btn-emerald">
+      <i class="fas fa-folder-open"></i> Document Overview
+    </a>
+  </div>
+
   {# ── Student List ── #}
   {% if students_data %}
   <div class="list-card">
@@ -412,10 +441,10 @@
           </div>
           {% endif %}
 
-          {# Set / update fees #}
+          {# Set / update fees — FIXED: uses admin_set_fees #}
           <div class="section-label">{{ 'Update' if s.fees else 'Set' }} Total Fees</div>
           <form method="POST"
-            action="{{ url_for('main.faculty_set_fees', app_id=s.appl.id) }}">
+            action="{{ url_for('main.admin_set_fees', app_id=s.appl.id) }}">
             <div class="set-fees-row">
               <input type="number" name="total_fees" min="0" step="0.01"
                 value="{{ s.fees.total_fees if s.fees else '' }}"
@@ -460,8 +489,9 @@
                       onclick="toggleEdit('{{ r.id }}')">
                       <i class="fas fa-pencil-alt"></i> Edit
                     </button>
+                    {# FIXED: uses admin_delete_receipt #}
                     <form method="POST"
-                      action="{{ url_for('main.faculty_delete_receipt', receipt_id=r.id) }}"
+                      action="{{ url_for('main.admin_delete_receipt', receipt_id=r.id) }}"
                       style="display:inline"
                       onsubmit="return confirm('Delete receipt #{{ r.receipt_number }}?')">
                       <button type="submit" class="btn btn-sm btn-danger">
@@ -473,8 +503,9 @@
               </tr>
               <tr class="edit-receipt-row" id="er-{{ r.id }}">
                 <td colspan="4">
+                  {# FIXED: uses admin_edit_receipt #}
                   <form method="POST"
-                    action="{{ url_for('main.faculty_edit_receipt', receipt_id=r.id) }}">
+                    action="{{ url_for('main.admin_edit_receipt', receipt_id=r.id) }}">
                     <div class="edit-inner">
                       <input type="text" name="receipt_number"
                         value="{{ r.receipt_number }}" placeholder="Receipt #" required>
@@ -496,12 +527,12 @@
           </table>
           {% endif %}
 
-          {# Add receipt #}
+          {# Add receipt — FIXED: uses admin_add_receipt #}
           {% if s.fees %}
           <div class="add-receipt-form">
             <h5><i class="fas fa-plus"></i> Add New Receipt</h5>
             <form method="POST"
-              action="{{ url_for('main.faculty_add_receipt', app_id=s.appl.id) }}">
+              action="{{ url_for('main.admin_add_receipt', app_id=s.appl.id) }}">
               <div class="add-row">
                 <div class="field">
                   <label>Receipt Number</label>

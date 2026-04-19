@@ -16,7 +16,7 @@ from models import (User, FormSettings, StudentApplication, ApplicationCategory,
                     WhatsAppSettings, CounsellingSettings, CategorySeats, SeatAllotment,
                     Faculty, StudentFees, PaymentReceipt, AdmitCategory,
                     DocumentCategory, StudentDocument,
-                    FeeCategory, StudentFee)          # ← fee models added
+                    FeeCategory, StudentFee)
 from forms.application_form import ApplicationForm
 from utils.helpers import save_pdf, calc_percent, generate_otp, send_otp_email
 from utils.exports import export_excel, export_verified_excel
@@ -943,6 +943,121 @@ def admin_payments():
 
 
 # ─────────────────────────────────────────
+#  Admin — Set / Update Total Fees (mirrors faculty route, admin-guarded)
+# ─────────────────────────────────────────
+@main.route('/admin/payments/<int:app_id>/set-fees', methods=['POST'])
+@admin_required
+def admin_set_fees(app_id):
+    appl = StudentApplication.query.get_or_404(app_id)
+    if not SeatAllotment.query.filter_by(application_id=appl.id).first():
+        flash('This student does not have a seat allotment.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    total_fees_str = request.form.get('total_fees', '').strip()
+    try:
+        total_fees = float(total_fees_str)
+        if total_fees < 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid fee amount.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    fees = StudentFees.query.filter_by(application_id=appl.id).first()
+    if fees:
+        fees.total_fees = total_fees
+        fees.updated_at = datetime.utcnow()
+    else:
+        fees = StudentFees(application_id=appl.id, total_fees=total_fees)
+        db.session.add(fees)
+    db.session.commit()
+    flash(f'Total fees updated for {appl.full_name}.', 'success')
+    return redirect(url_for('main.admin_payments'))
+
+
+# ─────────────────────────────────────────
+#  Admin — Add Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/admin/payments/<int:app_id>/add-receipt', methods=['POST'])
+@admin_required
+def admin_add_receipt(app_id):
+    appl = StudentApplication.query.get_or_404(app_id)
+    fees = StudentFees.query.filter_by(application_id=appl.id).first()
+    if not fees:
+        flash('Please set total fees for this student first.', 'warning')
+        return redirect(url_for('main.admin_payments'))
+
+    receipt_number = request.form.get('receipt_number', '').strip()
+    amount_str     = request.form.get('amount_paid', '').strip()
+
+    if not receipt_number:
+        flash('Receipt number is required.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    try:
+        amount_paid = float(amount_str)
+        if amount_paid <= 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid amount.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    db.session.add(PaymentReceipt(
+        fees_id        = fees.id,
+        application_id = appl.id,
+        faculty_id     = None,
+        receipt_number = receipt_number,
+        amount_paid    = amount_paid,
+    ))
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} added for {appl.full_name}.', 'success')
+    return redirect(url_for('main.admin_payments'))
+
+
+# ─────────────────────────────────────────
+#  Admin — Edit Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/admin/payments/receipt/<int:receipt_id>/edit', methods=['POST'])
+@admin_required
+def admin_edit_receipt(receipt_id):
+    receipt        = PaymentReceipt.query.get_or_404(receipt_id)
+    receipt_number = request.form.get('receipt_number', '').strip()
+    amount_str     = request.form.get('amount_paid', '').strip()
+
+    if not receipt_number:
+        flash('Receipt number is required.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    try:
+        amount_paid = float(amount_str)
+        if amount_paid <= 0:
+            raise ValueError
+    except ValueError:
+        flash('Please enter a valid amount.', 'danger')
+        return redirect(url_for('main.admin_payments'))
+
+    receipt.receipt_number = receipt_number
+    receipt.amount_paid    = amount_paid
+    receipt.updated_at     = datetime.utcnow()
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} updated.', 'success')
+    return redirect(url_for('main.admin_payments'))
+
+
+# ─────────────────────────────────────────
+#  Admin — Delete Payment Receipt
+# ─────────────────────────────────────────
+@main.route('/admin/payments/receipt/<int:receipt_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_receipt(receipt_id):
+    receipt        = PaymentReceipt.query.get_or_404(receipt_id)
+    receipt_number = receipt.receipt_number
+    db.session.delete(receipt)
+    db.session.commit()
+    flash(f'Receipt #{receipt_number} deleted.', 'info')
+    return redirect(url_for('main.admin_payments'))
+
+
+# ─────────────────────────────────────────
 #  Admin — Export: Payment Overview Excel
 # ─────────────────────────────────────────
 @main.route('/admin/export/payments')
@@ -963,9 +1078,8 @@ def export_payments():
         receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
                      .order_by(PaymentReceipt.created_at.asc()).all()
 
-        # Admit category info
-        admit_cat_name   = ''
-        admit_seat_num   = ''
+        admit_cat_name = ''
+        admit_seat_num = ''
         if a.admit_category_id:
             ac = AdmitCategory.query.get(a.admit_category_id)
             if ac:
@@ -973,7 +1087,6 @@ def export_payments():
         if a.admit_seat_number:
             admit_seat_num = a.admit_seat_number
 
-        # Fee info
         fee_cat_name    = ''
         fee_base_amount = ''
         additional_fee  = ''
@@ -988,34 +1101,32 @@ def export_payments():
             additional_fee = sf.additional_fee or 0
             total_fee      = (fee_base_amount if fee_base_amount != '' else 0) + additional_fee
 
-        total_paid    = sum(r.amount_paid for r in receipts) if receipts else 0
-        balance       = (float(fees.total_fees) - total_paid) if fees and fees.total_fees else ''
-
-        receipt_nos   = ', '.join(r.receipt_number for r in receipts) if receipts else ''
-        receipt_amts  = ', '.join(str(r.amount_paid) for r in receipts) if receipts else ''
-
+        total_paid   = sum(r.amount_paid for r in receipts) if receipts else 0
+        balance      = (float(fees.total_fees) - total_paid) if fees and fees.total_fees else ''
+        receipt_nos  = ', '.join(r.receipt_number for r in receipts) if receipts else ''
+        receipt_amts = ', '.join(str(r.amount_paid) for r in receipts) if receipts else ''
         allotted_ist = utc_to_ist(a.allotted_at)
 
         rows.append({
-            'Rank':                    appl.rank or '',
-            'Full Name':               appl.full_name,
-            'Email':                   appl.email,
-            'Phone':                   appl.phone or '',
-            'Category':                appl.category_name or '',
-            'Quota':                   a.quota.title() if a.quota else '',
-            'Admit Category':          admit_cat_name,
-            'Admit Seat No':           admit_seat_num,
-            'Allotted At':             allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
-            'Fee Structure':           fee_cat_name,
-            'Base Fee (₹)':            fee_base_amount if fee_base_amount != '' else '',
-            'Additional Fee (₹)':      additional_fee if additional_fee != '' else '',
-            'Total Fee (₹)':           total_fee if total_fee != '' else '',
-            'Total Fees Set (₹)':      float(fees.total_fees) if fees and fees.total_fees else '',
-            'Total Paid (₹)':          total_paid if receipts else '',
-            'Balance Remaining (₹)':   balance,
-            'Receipt Numbers':         receipt_nos,
-            'Receipt Amounts':         receipt_amts,
-            'No. of Receipts':         len(receipts),
+            'Rank':                  appl.rank or '',
+            'Full Name':             appl.full_name,
+            'Email':                 appl.email,
+            'Phone':                 appl.phone or '',
+            'Category':              appl.category_name or '',
+            'Quota':                 a.quota.title() if a.quota else '',
+            'Admit Category':        admit_cat_name,
+            'Admit Seat No':         admit_seat_num,
+            'Allotted At':           allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
+            'Fee Structure':         fee_cat_name,
+            'Base Fee (₹)':          fee_base_amount if fee_base_amount != '' else '',
+            'Additional Fee (₹)':    additional_fee if additional_fee != '' else '',
+            'Total Fee (₹)':         total_fee if total_fee != '' else '',
+            'Total Fees Set (₹)':    float(fees.total_fees) if fees and fees.total_fees else '',
+            'Total Paid (₹)':        total_paid if receipts else '',
+            'Balance Remaining (₹)': balance,
+            'Receipt Numbers':       receipt_nos,
+            'Receipt Amounts':       receipt_amts,
+            'No. of Receipts':       len(receipts),
         })
 
     rows.sort(key=lambda x: (x['Rank'] if isinstance(x['Rank'], int) else 9999))
@@ -1031,14 +1142,13 @@ def export_payments():
         top=Side(style='thin'),  bottom=Side(style='thin')
     )
 
-    if rows:
-        headers = list(rows[0].keys())
-    else:
-        headers = ['Rank', 'Full Name', 'Email', 'Phone', 'Category', 'Quota',
-                   'Admit Category', 'Admit Seat No', 'Allotted At', 'Fee Structure',
-                   'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
-                   'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
-                   'Receipt Numbers', 'Receipt Amounts', 'No. of Receipts']
+    headers = list(rows[0].keys()) if rows else [
+        'Rank', 'Full Name', 'Email', 'Phone', 'Category', 'Quota',
+        'Admit Category', 'Admit Seat No', 'Allotted At', 'Fee Structure',
+        'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
+        'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
+        'Receipt Numbers', 'Receipt Amounts', 'No. of Receipts'
+    ]
 
     for col_idx, header in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col_idx, value=header)
@@ -1046,7 +1156,6 @@ def export_payments():
         cell.fill      = header_fill
         cell.border    = thin_border
         cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-
     ws.row_dimensions[1].height = 30
 
     alt_fill = PatternFill('solid', fgColor='EEF2FF')
@@ -1059,7 +1168,6 @@ def export_payments():
             if fill:
                 cell.fill = fill
 
-    # Auto column widths
     for col_idx, header in enumerate(headers, 1):
         col_letter = get_column_letter(col_idx)
         max_len    = len(str(header))
@@ -1072,12 +1180,279 @@ def export_payments():
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name='payment_overview.xlsx'
+    return send_file(output,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     as_attachment=True, download_name='payment_overview.xlsx')
+
+
+# ─────────────────────────────────────────
+#  Admin — Export: Payment Receipts Detail Excel  (NEW)
+# ─────────────────────────────────────────
+@main.route('/admin/export/payment-receipts')
+@admin_required
+def export_payment_receipts():
+    import io
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    allotments = SeatAllotment.query.all()
+    rows = []
+
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        fees     = StudentFees.query.filter_by(application_id=appl.id).first()
+        receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
+                     .order_by(PaymentReceipt.created_at.asc()).all()
+
+        total_paid = sum(r.amount_paid for r in receipts) if receipts else 0
+        total_fees = float(fees.total_fees) if fees and fees.total_fees else 0
+        remaining  = total_fees - total_paid if fees and fees.total_fees else ''
+
+        # One row per receipt; if no receipts, still show a summary row
+        if receipts:
+            for r in receipts:
+                receipt_ist = utc_to_ist(r.created_at)
+                rows.append({
+                    'Rank':              appl.rank or '',
+                    'Student Name':      appl.full_name,
+                    'Email':             appl.email,
+                    'Phone':             appl.phone or '',
+                    'Quota':             a.quota.title() if a.quota else '',
+                    'Category':          appl.category_name or '',
+                    'Total Fees (₹)':    total_fees if fees and fees.total_fees else '',
+                    'Receipt No':        r.receipt_number,
+                    'Amount Paid (₹)':   r.amount_paid,
+                    'Receipt Date':      receipt_ist.strftime('%d %b %Y') if receipt_ist else '',
+                    'Receipt Time':      receipt_ist.strftime('%I:%M %p') if receipt_ist else '',
+                    'Total Paid So Far (₹)': total_paid,
+                    'Remaining (₹)':     remaining if remaining != '' else '',
+                })
+        else:
+            rows.append({
+                'Rank':              appl.rank or '',
+                'Student Name':      appl.full_name,
+                'Email':             appl.email,
+                'Phone':             appl.phone or '',
+                'Quota':             a.quota.title() if a.quota else '',
+                'Category':          appl.category_name or '',
+                'Total Fees (₹)':    total_fees if fees and fees.total_fees else '',
+                'Receipt No':        '—',
+                'Amount Paid (₹)':   0,
+                'Receipt Date':      '—',
+                'Receipt Time':      '—',
+                'Total Paid So Far (₹)': 0,
+                'Remaining (₹)':     remaining if remaining != '' else '',
+            })
+
+    rows.sort(key=lambda x: (x['Rank'] if isinstance(x['Rank'], int) else 9999))
+
+    wb  = Workbook()
+    ws  = wb.active
+    ws.title = 'Payment Receipts'
+
+    header_fill = PatternFill('solid', fgColor='0F4C75')
+    header_font = Font(color='FFFFFF', bold=True, size=11)
+    thin_border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'),  bottom=Side(style='thin')
     )
+
+    headers = list(rows[0].keys()) if rows else [
+        'Rank', 'Student Name', 'Email', 'Phone', 'Quota', 'Category',
+        'Total Fees (₹)', 'Receipt No', 'Amount Paid (₹)',
+        'Receipt Date', 'Receipt Time', 'Total Paid So Far (₹)', 'Remaining (₹)'
+    ]
+
+    for col_idx, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        cell.font      = header_font
+        cell.fill      = header_fill
+        cell.border    = thin_border
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws.row_dimensions[1].height = 30
+
+    alt_fill     = PatternFill('solid', fgColor='E8F4FD')
+    cleared_fill = PatternFill('solid', fgColor='D1FAE5')
+    for row_idx, row_data in enumerate(rows, 2):
+        rem = row_data.get('Remaining (₹)', '')
+        if rem != '' and isinstance(rem, (int, float)) and rem <= 0:
+            fill = cleared_fill
+        elif row_idx % 2 == 0:
+            fill = alt_fill
+        else:
+            fill = None
+
+        for col_idx, key in enumerate(headers, 1):
+            cell        = ws.cell(row=row_idx, column=col_idx, value=row_data.get(key, ''))
+            cell.border = thin_border
+            cell.alignment = Alignment(vertical='center')
+            if fill:
+                cell.fill = fill
+
+    for col_idx, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_idx)
+        max_len    = len(str(header))
+        for row in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
+            for cell in row:
+                if cell.value:
+                    max_len = max(max_len, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = min(max_len + 3, 38)
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(output,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     as_attachment=True, download_name='payment_receipts_detail.xlsx')
+
+
+# ─────────────────────────────────────────
+#  Admin — Export: Document Overview Excel  (NEW)
+# ─────────────────────────────────────────
+@main.route('/admin/export/document-overview')
+@admin_required
+def export_document_overview():
+    import io
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    allotments = (SeatAllotment.query
+                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
+                  .order_by(StudentApplication.rank)
+                  .all())
+    doc_categories = DocumentCategory.query.filter_by(is_active=True)\
+                       .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+
+    all_docs = StudentDocument.query.all()
+    doc_map  = {}
+    for d in all_docs:
+        doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
+
+    STATUS_LABELS = {
+        'not_given':  'Not Given',
+        'submitted':  'Submitted',
+        'original':   'Original',
+        'photocopy':  'Photocopy',
+    }
+
+    rows = []
+    for a in allotments:
+        appl      = StudentApplication.query.get(a.application_id)
+        appl_docs = doc_map.get(a.application_id, {})
+
+        total     = len(doc_categories)
+        submitted = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
+        approved  = sum(1 for dc in doc_categories
+                        if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+
+        row = {
+            'Rank':           appl.rank or '',
+            'Student Name':   appl.full_name,
+            'Email':          appl.email,
+            'Phone':          appl.phone or '',
+            'Quota':          a.quota.title() if a.quota else '',
+            'Category':       appl.category_name or '',
+            'Total Docs':     total,
+            'Submitted':      submitted,
+            'Approved':       approved,
+            'Pending':        total - approved,
+        }
+
+        for dc in doc_categories:
+            doc = appl_docs.get(dc.id)
+            if doc:
+                status_label   = STATUS_LABELS.get(doc.status, doc.status or 'Not Given')
+                approved_label = 'Yes' if doc.is_approved else 'No'
+                approved_by    = doc.approved_by_name or ''
+                approved_at    = ''
+                if doc.approved_at:
+                    approved_at = utc_to_ist(doc.approved_at).strftime('%d %b %Y') if doc.approved_at else ''
+            else:
+                status_label   = 'Not Given'
+                approved_label = 'No'
+                approved_by    = ''
+                approved_at    = ''
+
+            row[f'{dc.name} — Status']      = status_label
+            row[f'{dc.name} — Approved']    = approved_label
+            row[f'{dc.name} — Approved By'] = approved_by
+            row[f'{dc.name} — Approved At'] = approved_at
+
+        rows.append(row)
+
+    wb  = Workbook()
+    ws  = wb.active
+    ws.title = 'Document Overview'
+
+    header_fill     = PatternFill('solid', fgColor='145A32')
+    sub_header_fill = PatternFill('solid', fgColor='1E8449')
+    header_font     = Font(color='FFFFFF', bold=True, size=11)
+    sub_font        = Font(color='FFFFFF', bold=True, size=10)
+    thin_border     = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'),  bottom=Side(style='thin')
+    )
+
+    headers = list(rows[0].keys()) if rows else ['Rank', 'Student Name', 'Email', 'Phone',
+                                                  'Quota', 'Category', 'Total Docs',
+                                                  'Submitted', 'Approved', 'Pending']
+
+    fixed_cols = ['Rank', 'Student Name', 'Email', 'Phone', 'Quota', 'Category',
+                  'Total Docs', 'Submitted', 'Approved', 'Pending']
+
+    for col_idx, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        if header in fixed_cols:
+            cell.font = header_font
+            cell.fill = header_fill
+        else:
+            cell.font = sub_font
+            cell.fill = sub_header_fill
+        cell.border    = thin_border
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws.row_dimensions[1].height = 36
+
+    alt_fill      = PatternFill('solid', fgColor='EAFAF1')
+    complete_fill = PatternFill('solid', fgColor='D5F5E3')
+
+    for row_idx, row_data in enumerate(rows, 2):
+        is_complete = row_data.get('Pending', 1) == 0
+        base_fill   = complete_fill if is_complete else (alt_fill if row_idx % 2 == 0 else None)
+
+        for col_idx, key in enumerate(headers, 1):
+            val  = row_data.get(key, '')
+            cell = ws.cell(row=row_idx, column=col_idx, value=val)
+            cell.border    = thin_border
+            cell.alignment = Alignment(vertical='center', wrap_text=True)
+            if base_fill:
+                cell.fill = base_fill
+            # colour approved/not approved cells
+            if key.endswith('— Approved'):
+                if val == 'Yes':
+                    cell.font = Font(color='145A32', bold=True)
+                else:
+                    cell.font = Font(color='922B21')
+
+    for col_idx, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_idx)
+        max_len    = len(str(header))
+        for row in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
+            for cell in row:
+                if cell.value:
+                    max_len = max(max_len, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = min(max_len + 3, 30)
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(output,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     as_attachment=True, download_name='document_overview.xlsx')
 
 
 # ─────────────────────────────────────────
@@ -1108,7 +1483,6 @@ def export_admitted_students():
             if ac:
                 admit_cat_name = ac.name
 
-        # Fee info
         fee_cat_name    = ''
         fee_base_amount = ''
         additional_fee  = 0
@@ -1124,23 +1498,21 @@ def export_admitted_students():
             base           = fee_base_amount if fee_base_amount != '' else 0
             total_fee      = base + additional_fee
 
-        # Payment info
         fees     = StudentFees.query.filter_by(application_id=appl.id).first()
         receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
                      .order_by(PaymentReceipt.created_at.asc()).all()
         total_paid = sum(r.amount_paid for r in receipts) if receipts else 0
         balance    = (float(fees.total_fees) - total_paid) if fees and fees.total_fees else ''
 
-        # Documents
-        doc_categories  = DocumentCategory.query.filter_by(is_active=True).all()
+        doc_categories   = DocumentCategory.query.filter_by(is_active=True).all()
         all_student_docs = StudentDocument.query.filter_by(application_id=appl.id).all()
-        doc_status_map  = {d.doc_category_id: d for d in all_student_docs}
-        submitted_docs  = sum(1 for dc in doc_categories
-                              if doc_status_map.get(dc.id) and
-                              doc_status_map[dc.id].status != 'not_given')
-        approved_docs   = sum(1 for dc in doc_categories
-                              if doc_status_map.get(dc.id) and
-                              doc_status_map[dc.id].is_approved)
+        doc_status_map   = {d.doc_category_id: d for d in all_student_docs}
+        submitted_docs   = sum(1 for dc in doc_categories
+                               if doc_status_map.get(dc.id) and
+                               doc_status_map[dc.id].status != 'not_given')
+        approved_docs    = sum(1 for dc in doc_categories
+                               if doc_status_map.get(dc.id) and
+                               doc_status_map[dc.id].is_approved)
 
         allotted_ist = utc_to_ist(a.allotted_at)
 
@@ -1179,8 +1551,8 @@ def export_admitted_students():
             'Docs Approved':         approved_docs,
         })
 
-    wb = Workbook()
-    ws = wb.active
+    wb  = Workbook()
+    ws  = wb.active
     ws.title = 'Admitted Students'
 
     header_fill = PatternFill('solid', fgColor='145A32')
@@ -1190,17 +1562,16 @@ def export_admitted_students():
         top=Side(style='thin'),  bottom=Side(style='thin')
     )
 
-    if rows:
-        headers = list(rows[0].keys())
-    else:
-        headers = ['Admit Category', 'Seat No', 'Rank', 'Full Name', 'Email', 'Phone',
-                   'DOB', 'Gender', 'Category', 'Quota', 'Address', 'Nationality',
-                   '10th School', '10th Board', '10th Year', '10th %',
-                   '12th School', '12th Board', '12th Stream', '12th Year', '12th %',
-                   'Specialization', 'Allotted At', 'Fee Structure',
-                   'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
-                   'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
-                   'Docs Submitted', 'Docs Approved']
+    headers = list(rows[0].keys()) if rows else [
+        'Admit Category', 'Seat No', 'Rank', 'Full Name', 'Email', 'Phone',
+        'DOB', 'Gender', 'Category', 'Quota', 'Address', 'Nationality',
+        '10th School', '10th Board', '10th Year', '10th %',
+        '12th School', '12th Board', '12th Stream', '12th Year', '12th %',
+        'Specialization', 'Allotted At', 'Fee Structure',
+        'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
+        'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
+        'Docs Submitted', 'Docs Approved'
+    ]
 
     for col_idx, header in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col_idx, value=header)
@@ -1208,7 +1579,6 @@ def export_admitted_students():
         cell.fill      = header_fill
         cell.border    = thin_border
         cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-
     ws.row_dimensions[1].height = 30
 
     alt_fill = PatternFill('solid', fgColor='EAFAF1')
@@ -1233,12 +1603,9 @@ def export_admitted_students():
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
-    return send_file(
-        output,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        as_attachment=True,
-        download_name='admitted_students.xlsx'
-    )
+    return send_file(output,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     as_attachment=True, download_name='admitted_students.xlsx')
 
 
 # ─────────────────────────────────────────
@@ -1312,6 +1679,7 @@ def admin_counselling():
             admit_category_id = request.form.get('admit_category_id')
             fee_category_id   = request.form.get('fee_category_id')
             additional_fee    = request.form.get('additional_fee', '0').strip()
+            is_edit           = request.form.get('is_edit') == '1'
 
             try:
                 app_id = int(app_id)
@@ -1322,72 +1690,143 @@ def admin_counselling():
             appl = StudentApplication.query.get(app_id)
             if not appl:
                 flash('Student not found.', 'danger')
-            elif not quota or quota not in ('government', 'management'):
-                flash('Please select a quota.', 'danger')
-            elif SeatAllotment.query.filter_by(application_id=appl.id).first():
-                flash(f'Seat already allotted to {appl.full_name}.', 'warning')
-            else:
-                seats = CategorySeats.get_for_category(appl.category_id)
-                if quota == 'government' and seats.govt_remaining <= 0:
-                    flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
-                elif quota == 'management' and seats.mgmt_remaining <= 0:
-                    flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
-                else:
-                    # ── Admit category handling ──
-                    admit_cat   = None
-                    seat_number = None
-                    if admit_category_id:
-                        try:
-                            admit_cat = AdmitCategory.query.get(int(admit_category_id))
-                        except (TypeError, ValueError):
-                            admit_cat = None
-                        if admit_cat:
-                            seat_number = admit_cat.seats_used + 1
-                            if seat_number > admit_cat.total_seats:
-                                flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
-                                return redirect(url_for('main.admin_counselling'))
+                return redirect(url_for('main.admin_counselling'))
 
-                    db.session.add(SeatAllotment(
-                        application_id    = appl.id,
-                        category_id       = appl.category_id,
-                        quota             = quota,
-                        admit_category_id = admit_cat.id if admit_cat else None,
-                        admit_seat_number = seat_number,
-                    ))
+            if not quota or quota not in ('government', 'management'):
+                flash('Please select a quota.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
+            existing_allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+
+            if is_edit and existing_allotment:
+                # ── EDIT MODE: update existing allotment ──
+                old_quota = existing_allotment.quota
+
+                # Adjust seat counts if quota changed
+                if old_quota != quota:
+                    seats = CategorySeats.get_for_category(appl.category_id)
+                    if old_quota == 'government':
+                        seats.govt_filled = max(0, seats.govt_filled - 1)
+                    else:
+                        seats.mgmt_filled = max(0, seats.mgmt_filled - 1)
                     if quota == 'government':
                         seats.govt_filled += 1
                     else:
                         seats.mgmt_filled += 1
 
-                    # ── Fee assignment ──
+                # Update admit category
+                admit_cat   = None
+                seat_number = existing_allotment.admit_seat_number
+                if admit_category_id:
                     try:
-                        add_fee = float(additional_fee) if additional_fee else 0.0
-                    except ValueError:
-                        add_fee = 0.0
+                        admit_cat = AdmitCategory.query.get(int(admit_category_id))
+                    except (TypeError, ValueError):
+                        admit_cat = None
+                    if admit_cat and admit_cat.id != existing_allotment.admit_category_id:
+                        # New admit category selected — assign next seat number
+                        seat_number = admit_cat.seats_used + 1
+                        if seat_number > admit_cat.total_seats:
+                            flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
+                            return redirect(url_for('main.admin_counselling'))
 
-                    fee_cat = None
-                    if fee_category_id:
-                        try:
-                            fee_cat = FeeCategory.query.get(int(fee_category_id))
-                        except (TypeError, ValueError):
-                            pass
+                existing_allotment.quota             = quota
+                existing_allotment.admit_category_id = admit_cat.id if admit_cat else existing_allotment.admit_category_id
+                existing_allotment.admit_seat_number = seat_number
 
-                    if fee_cat or add_fee > 0:
-                        existing_sf = StudentFee.query.filter_by(application_id=appl.id).first()
-                        if existing_sf:
-                            existing_sf.fee_category_id = fee_cat.id if fee_cat else None
-                            existing_sf.additional_fee  = add_fee
-                            existing_sf.updated_at      = datetime.utcnow()
-                        else:
-                            db.session.add(StudentFee(
-                                application_id  = appl.id,
-                                fee_category_id = fee_cat.id if fee_cat else None,
-                                additional_fee  = add_fee,
-                            ))
+                # Update fee assignment
+                try:
+                    add_fee = float(additional_fee) if additional_fee else 0.0
+                except ValueError:
+                    add_fee = 0.0
 
-                    db.session.commit()
-                    label = f' — {admit_cat.name}({seat_number})' if admit_cat else ''
-                    flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota){label}!', 'success')
+                fee_cat = None
+                if fee_category_id:
+                    try:
+                        fee_cat = FeeCategory.query.get(int(fee_category_id))
+                    except (TypeError, ValueError):
+                        pass
+
+                existing_sf = StudentFee.query.filter_by(application_id=appl.id).first()
+                if existing_sf:
+                    existing_sf.fee_category_id = fee_cat.id if fee_cat else existing_sf.fee_category_id
+                    existing_sf.additional_fee  = add_fee
+                    existing_sf.updated_at      = datetime.utcnow()
+                elif fee_cat or add_fee > 0:
+                    db.session.add(StudentFee(
+                        application_id  = appl.id,
+                        fee_category_id = fee_cat.id if fee_cat else None,
+                        additional_fee  = add_fee,
+                    ))
+
+                db.session.commit()
+                flash(f'Allotment updated for {appl.full_name}.', 'success')
+
+            elif not is_edit and existing_allotment:
+                flash(f'Seat already allotted to {appl.full_name}. Use the Edit button to change.', 'warning')
+
+            else:
+                # ── NEW ALLOTMENT ──
+                seats = CategorySeats.get_for_category(appl.category_id)
+                if quota == 'government' and seats.govt_remaining <= 0:
+                    flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
+                    return redirect(url_for('main.admin_counselling'))
+                elif quota == 'management' and seats.mgmt_remaining <= 0:
+                    flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
+                    return redirect(url_for('main.admin_counselling'))
+
+                admit_cat   = None
+                seat_number = None
+                if admit_category_id:
+                    try:
+                        admit_cat = AdmitCategory.query.get(int(admit_category_id))
+                    except (TypeError, ValueError):
+                        admit_cat = None
+                    if admit_cat:
+                        seat_number = admit_cat.seats_used + 1
+                        if seat_number > admit_cat.total_seats:
+                            flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
+                            return redirect(url_for('main.admin_counselling'))
+
+                db.session.add(SeatAllotment(
+                    application_id    = appl.id,
+                    category_id       = appl.category_id,
+                    quota             = quota,
+                    admit_category_id = admit_cat.id if admit_cat else None,
+                    admit_seat_number = seat_number,
+                ))
+                if quota == 'government':
+                    seats.govt_filled += 1
+                else:
+                    seats.mgmt_filled += 1
+
+                try:
+                    add_fee = float(additional_fee) if additional_fee else 0.0
+                except ValueError:
+                    add_fee = 0.0
+
+                fee_cat = None
+                if fee_category_id:
+                    try:
+                        fee_cat = FeeCategory.query.get(int(fee_category_id))
+                    except (TypeError, ValueError):
+                        pass
+
+                if fee_cat or add_fee > 0:
+                    existing_sf = StudentFee.query.filter_by(application_id=appl.id).first()
+                    if existing_sf:
+                        existing_sf.fee_category_id = fee_cat.id if fee_cat else None
+                        existing_sf.additional_fee  = add_fee
+                        existing_sf.updated_at      = datetime.utcnow()
+                    else:
+                        db.session.add(StudentFee(
+                            application_id  = appl.id,
+                            fee_category_id = fee_cat.id if fee_cat else None,
+                            additional_fee  = add_fee,
+                        ))
+
+                db.session.commit()
+                label = f' — {admit_cat.name}({seat_number})' if admit_cat else ''
+                flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota){label}!', 'success')
 
         elif action == 'revoke_seat':
             app_id = request.form.get('app_id')
@@ -1416,7 +1855,6 @@ def admin_counselling():
     cat_seats      = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
     fee_categories = FeeCategory.query.filter_by(is_active=True).order_by(FeeCategory.name).all()
 
-    # Search by rank or name
     search_q  = request.args.get('q', '').strip()
     query     = StudentApplication.query.filter_by(is_verified=True)\
                     .filter(StudentApplication.rank.isnot(None))
@@ -1519,9 +1957,9 @@ def admin_admitted_students():
         appl     = a.application
         fees_obj = StudentFees.query.filter_by(application_id=appl.id).first()
         a._has_fees     = fees_obj is not None
-        a._fees_total   = float(fees_obj.total_fees)         if fees_obj and fees_obj.total_fees   else 0.0
-        a._fees_paid    = float(fees_obj.total_paid)         if fees_obj else 0.0
-        a._fees_pending = float(fees_obj.balance_remaining)  if fees_obj else 0.0
+        a._fees_total   = float(fees_obj.total_fees)        if fees_obj and fees_obj.total_fees  else 0.0
+        a._fees_paid    = float(fees_obj.total_paid)        if fees_obj else 0.0
+        a._fees_pending = float(fees_obj.balance_remaining) if fees_obj else 0.0
         key = (a.admit_category_id, a.admit_seat_number)
         seat_map[key] = a
 
