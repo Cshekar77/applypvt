@@ -93,6 +93,25 @@ def _dob_to_password(dob_raw):
 
 
 # ─────────────────────────────────────────
+#  Helper: sync StudentFee total → StudentFees
+#  Called after every new allotment or edit so
+#  the payment overview always shows the correct total.
+# ─────────────────────────────────────────
+def _sync_student_fees(application_id):
+    sf = StudentFee.query.filter_by(application_id=application_id).first()
+    if not sf:
+        return
+    total = sf.total_amount          # model property: base_amount + additional_fee
+    fees  = StudentFees.query.filter_by(application_id=application_id).first()
+    if fees:
+        fees.total_fees = total
+        fees.updated_at = datetime.utcnow()
+    else:
+        db.session.add(StudentFees(application_id=application_id, total_fees=total))
+    # caller must call db.session.commit()
+
+
+# ─────────────────────────────────────────
 #  Welcome Email via Apps Script
 # ─────────────────────────────────────────
 def send_welcome_email(email, full_name, password_plain, dob_display):
@@ -1211,7 +1230,6 @@ def export_payment_receipts():
         total_fees = float(fees.total_fees) if fees and fees.total_fees else 0
         remaining  = total_fees - total_paid if fees and fees.total_fees else ''
 
-        # One row per receipt; if no receipts, still show a summary row
         if receipts:
             for r in receipts:
                 receipt_ist = utc_to_ist(r.created_at)
@@ -1431,7 +1449,6 @@ def export_document_overview():
             cell.alignment = Alignment(vertical='center', wrap_text=True)
             if base_fill:
                 cell.fill = base_fill
-            # colour approved/not approved cells
             if key.endswith('— Approved'):
                 if val == 'Yes':
                     cell.font = Font(color='145A32', bold=True)
@@ -1723,7 +1740,6 @@ def admin_counselling():
                     except (TypeError, ValueError):
                         admit_cat = None
                     if admit_cat and admit_cat.id != existing_allotment.admit_category_id:
-                        # New admit category selected — assign next seat number
                         seat_number = admit_cat.seats_used + 1
                         if seat_number > admit_cat.total_seats:
                             flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
@@ -1758,6 +1774,9 @@ def admin_counselling():
                         additional_fee  = add_fee,
                     ))
 
+                # ── FIX: sync fee total into StudentFees ──
+                db.session.flush()
+                _sync_student_fees(appl.id)
                 db.session.commit()
                 flash(f'Allotment updated for {appl.full_name}.', 'success')
 
@@ -1824,6 +1843,9 @@ def admin_counselling():
                             additional_fee  = add_fee,
                         ))
 
+                # ── FIX: sync fee total into StudentFees ──
+                db.session.flush()
+                _sync_student_fees(appl.id)
                 db.session.commit()
                 label = f' — {admit_cat.name}({seat_number})' if admit_cat else ''
                 flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota){label}!', 'success')
@@ -2059,8 +2081,17 @@ def admin_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+        # Count how many are marked as 'original'
+        all_original = (
+            total > 0 and
+            all(
+                appl_docs.get(dc.id) and appl_docs[dc.id].status == 'original'
+                for dc in doc_categories
+            )
+        )
         summaries[a.application_id] = {
-            'total': total, 'submitted': submitted, 'approved': approved
+            'total': total, 'submitted': submitted, 'approved': approved,
+            'all_original': all_original,
         }
 
     return render_template('admin_document_verification.html',
@@ -2160,8 +2191,17 @@ def faculty_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
+        # Count how many are marked as 'original'
+        all_original = (
+            total > 0 and
+            all(
+                appl_docs.get(dc.id) and appl_docs[dc.id].status == 'original'
+                for dc in doc_categories
+            )
+        )
         summaries[a.application_id] = {
-            'total': total, 'submitted': submitted, 'approved': approved
+            'total': total, 'submitted': submitted, 'approved': approved,
+            'all_original': all_original,
         }
 
     return render_template('faculty_document_verification.html',

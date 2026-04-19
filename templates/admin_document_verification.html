@@ -68,8 +68,24 @@ input.status-radio { display: none; }
 .btn-cancel:hover { background: #e5e7eb; }
 .btn-save-only { background: #eef2f8; color: #0a1f44; padding: .55rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; }
 .btn-save-only:hover { background: #dbe4f0; }
-.btn-approve { background: #10b981; color: white; padding: .55rem 1.4rem; border-radius: 10px; border: none; font-weight: 700; font-size: .875rem; cursor: pointer; }
-.btn-approve:hover { background: #059669; }
+/* Approve button — enabled state */
+.btn-approve {
+  background: #10b981; color: white; padding: .55rem 1.4rem;
+  border-radius: 10px; border: none; font-weight: 700; font-size: .875rem; cursor: pointer;
+  transition: background .2s;
+}
+.btn-approve:hover:not(:disabled) { background: #059669; }
+/* Approve button — disabled state */
+.btn-approve:disabled {
+  background: #d1d5db; color: #9ca3af; cursor: not-allowed;
+  box-shadow: none;
+}
+/* Approve lock notice */
+.approve-notice {
+  font-size: .75rem; color: #92400e; background: #fef3c7;
+  border-radius: 8px; padding: .4rem .75rem;
+  display: none; /* shown by JS when not all original */
+}
 
 /* Flash */
 .flash-msg { padding: .75rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: .875rem; }
@@ -99,6 +115,7 @@ body.dark .btn-close { background: #2d3e54; color: #b9c8e8; }
 body.dark .status-btn { background: #2d3e54; color: #b9c8e8; }
 body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
 body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
+body.dark .approve-notice { background: #3b2a0a; color: #fbbf24; }
 </style>
 
 {% block navbar_auth %}{% endblock %}
@@ -166,7 +183,7 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
   {% endif %}
 </div>
 
-<!-- Verification Modal (single shared, loaded via JS) -->
+<!-- Verification Modal -->
 <div class="modal-bg" id="verifyModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -209,13 +226,23 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <div style="display:flex;gap:.75rem">
-          <button type="submit" class="btn-save-only" onclick="document.getElementById('approveAllFlag').value='0'">
-            <i class="fas fa-save"></i> Save Only
-          </button>
-          <button type="submit" class="btn-approve" onclick="document.getElementById('approveAllFlag').value='1'">
-            <i class="fas fa-check-double"></i> Save & Approve All
-          </button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+          <!-- Notice shown when not all docs are original -->
+          <div class="approve-notice" id="approveNotice">
+            <i class="fas fa-lock"></i>
+            All documents must be marked <strong>Original</strong> to approve.
+          </div>
+          <div style="display:flex;gap:.75rem">
+            <button type="submit" class="btn-save-only" onclick="document.getElementById('approveAllFlag').value='0'">
+              <i class="fas fa-save"></i> Save Only
+            </button>
+            <button type="submit" class="btn-approve" id="approveBtn"
+              onclick="document.getElementById('approveAllFlag').value='1'"
+              disabled
+              title="All documents must be marked as Original to approve">
+              <i class="fas fa-check-double"></i> Save & Approve All
+            </button>
+          </div>
         </div>
       </div>
     </form>
@@ -223,7 +250,10 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
 </div>
 
 <script>
-// Student data map from Jinja
+// Total number of doc categories
+const TOTAL_DOCS = {{ doc_categories|length }};
+
+// Student data map from Jinja — includes per-student all_original flag from server
 const studentData = {
   {% for a in allotments %}
   {% set appl = a.application %}
@@ -240,6 +270,29 @@ const studentData = {
   {% endfor %}
 };
 
+// Track current statuses in the open modal
+const currentStatuses = {};
+
+function _allOriginal() {
+  if (TOTAL_DOCS === 0) return false;
+  return Object.values(currentStatuses).length === TOTAL_DOCS &&
+         Object.values(currentStatuses).every(v => v === 'original');
+}
+
+function _refreshApproveBtn() {
+  const btn    = document.getElementById('approveBtn');
+  const notice = document.getElementById('approveNotice');
+  if (_allOriginal()) {
+    btn.disabled       = false;
+    btn.title          = 'Save and approve all documents';
+    notice.style.display = 'none';
+  } else {
+    btn.disabled       = true;
+    btn.title          = 'All documents must be marked as Original to approve';
+    notice.style.display = 'block';
+  }
+}
+
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
@@ -247,20 +300,24 @@ function openModal(appId) {
   document.getElementById('modalStudentMeta').textContent = d.meta;
   document.getElementById('modalAppId').value = appId;
 
+  // Reset tracking object
+  for (const k in currentStatuses) delete currentStatuses[k];
+
   // Reset all buttons first
   document.querySelectorAll('.status-btn').forEach(b => {
     b.className = 'status-btn';
   });
 
-  // Set current statuses
+  // Set current statuses from saved data
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
-    // Activate correct button
+    currentStatuses[docId] = status;
     const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${status}"]`);
     if (btn) btn.classList.add('active-' + status);
   }
 
+  _refreshApproveBtn();
   document.getElementById('verifyModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -277,6 +334,10 @@ function setStatus(docId, val, btn) {
   });
   btn.classList.add('active-' + val);
   document.getElementById('status_input_' + docId).value = val;
+
+  // Update live tracking and re-check approve eligibility
+  currentStatuses[String(docId)] = val;
+  _refreshApproveBtn();
 }
 
 function filterStudents() {
