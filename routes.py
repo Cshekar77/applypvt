@@ -83,7 +83,8 @@ def _dob_to_password(dob_raw):
     if not dob_raw or str(dob_raw).strip() in ('', 'nan', 'NaT'):
         return None
     try:
-        ts = pd.Timestamp(dob_raw)
+        # dayfirst=True ensures dd/mm/yyyy is parsed correctly
+        ts = pd.to_datetime(dob_raw, dayfirst=True)
         if not pd.isna(ts):
             return ts.strftime('%d%m%Y')
     except Exception:
@@ -302,11 +303,17 @@ def api_register_student():
         db.session.add(appl)
         db.session.commit()
 
+        # Format DOB as dd/mm/yyyy for display in welcome email
+        try:
+            dob_display = pd.to_datetime(dob_raw, dayfirst=True).strftime('%d/%m/%Y')
+        except Exception:
+            dob_display = dob_raw
+
         send_welcome_email(
             email          = email,
             full_name      = full_name,
             password_plain = password_plain,
-            dob_display    = dob_raw,
+            dob_display    = dob_display,
         )
 
         return jsonify({
