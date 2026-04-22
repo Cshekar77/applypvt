@@ -116,7 +116,7 @@ def _sync_student_fees(application_id):
 #  Welcome Email via Apps Script
 # ─────────────────────────────────────────
 def send_welcome_email(email, full_name, password_plain, dob_display):
-    APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwExa3gOK26Vm4y4nZjHl87Oo3IZPV_Zr3TFFbsuGYpV2w_FiVp_wPNXeEfUZwamLSY/exec"
+    APPS_SCRIPT_URL = "exec"
     WEBSITE_URL     = "https://applybcabu.pythonanywhere.com/"
     payload = {
         "action":   "sendWelcome",
