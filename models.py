@@ -192,7 +192,7 @@ class SeatAllotment(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Document Category  (admin-defined list of required docs)
+#  Document Category
 # ─────────────────────────────────────────
 class DocumentCategory(db.Model):
     __tablename__ = 'document_category'
@@ -209,26 +209,21 @@ class DocumentCategory(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Student Document  (per-student per-doc verification)
+#  Student Document
 # ─────────────────────────────────────────
 class StudentDocument(db.Model):
     __tablename__ = 'student_document'
     id              = db.Column(db.Integer, primary_key=True)
     application_id  = db.Column(db.Integer, db.ForeignKey('student_applications.id'), nullable=False)
     doc_category_id = db.Column(db.Integer, db.ForeignKey('document_category.id'), nullable=False)
-
     status          = db.Column(db.String(30), default='not_given')
-
     is_approved     = db.Column(db.Boolean, default=False)
     approved_at     = db.Column(db.DateTime, nullable=True)
-
     approved_by_faculty_id = db.Column(db.Integer, db.ForeignKey('faculty.id'), nullable=True)
     approved_by_role       = db.Column(db.String(20), nullable=True)
     approved_by_name       = db.Column(db.String(120), nullable=True)
-
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
     application         = db.relationship('StudentApplication', backref='documents')
     doc_category        = db.relationship('DocumentCategory', backref='student_docs')
     approved_by_faculty = db.relationship('Faculty', backref='verified_docs')
@@ -262,7 +257,7 @@ class StudentDocument(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Fee Category  (admin-defined fee structures)
+#  Fee Category
 # ─────────────────────────────────────────
 class FeeCategory(db.Model):
     __tablename__ = 'fee_category'
@@ -278,7 +273,7 @@ class FeeCategory(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Student Fee  (one per allotted student)
+#  Student Fee
 # ─────────────────────────────────────────
 class StudentFee(db.Model):
     __tablename__ = 'student_fee'
@@ -288,7 +283,6 @@ class StudentFee(db.Model):
     additional_fee   = db.Column(db.Float, default=0.0, nullable=False)
     created_at       = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at       = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
     application  = db.relationship('StudentApplication', backref='student_fee')
     fee_category = db.relationship('FeeCategory', backref='student_fees')
 
@@ -322,7 +316,7 @@ class Faculty(db.Model):
 
 
 # ─────────────────────────────────────────
-#  Student Fees  (payment tracking — existing)
+#  Student Fees  (payment tracking)
 # ─────────────────────────────────────────
 class StudentFees(db.Model):
     __tablename__ = 'student_fees'
@@ -374,61 +368,65 @@ class StudentApplication(db.Model):
     user_id         = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
     submitted_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
-    first_name      = db.Column(db.String(80))
-    last_name       = db.Column(db.String(80))
-    dob             = db.Column(db.String(20))
-    gender          = db.Column(db.String(30))
-    nationality     = db.Column(db.String(60))
-    email           = db.Column(db.String(120))
-    phone           = db.Column(db.String(20))
-    address         = db.Column(db.Text)
+    # ── Personal details ──────────────────
+    candidate_name      = db.Column(db.String(160))          # Name of the Candidate
+    mother_name         = db.Column(db.String(120))           # Mother's Name
+    father_name         = db.Column(db.String(120))           # Father's Name
+    dob                 = db.Column(db.String(20))            # Date of Birth
+    gender              = db.Column(db.String(30))
+    parent_mobile       = db.Column(db.String(20))            # Mobile Number of Parent
+    phone               = db.Column(db.String(20))            # Mobile Number of Candidate
+    email               = db.Column(db.String(120))           # E-mail Id
+    address             = db.Column(db.Text)                  # Address
+    nationality         = db.Column(db.String(60))            # Nationality
+    religion            = db.Column(db.String(60))            # Religion
 
-    school_10       = db.Column(db.String(150))
-    board_10        = db.Column(db.String(80))
-    board_10_other  = db.Column(db.String(80))
-    year_10         = db.Column(db.String(10))
-    total_10        = db.Column(db.Float)
-    obtained_10     = db.Column(db.Float)
-    percent_10      = db.Column(db.Float)
-    marksheet_10    = db.Column(db.String(200))
+    # ── Category / background ─────────────
+    category_id         = db.Column(db.Integer, db.ForeignKey('application_category.id'))
+    category            = db.relationship('ApplicationCategory', backref='applications')
+    hk_region           = db.Column(db.Boolean, default=False)   # Candidate Belongs to HK Region
+    kannada_medium      = db.Column(db.Boolean, default=False)   # Kannada Medium
+    rural_background    = db.Column(db.Boolean, default=False)   # Rural Background
+    caste_certificate_no    = db.Column(db.String(100))          # Caste Certificate No.
+    parent_annual_income    = db.Column(db.String(100))          # Parent's Annual Income
+    income_certificate_no   = db.Column(db.String(100))          # Income Certificate No.
 
-    school_12       = db.Column(db.String(150))
-    board_12        = db.Column(db.String(80))
-    board_12_other  = db.Column(db.String(80))
-    stream_12       = db.Column(db.String(60))
-    year_12         = db.Column(db.String(10))
-    total_12        = db.Column(db.Float)
-    obtained_12     = db.Column(db.Float)
-    percent_12      = db.Column(db.Float)
-    marksheet_12    = db.Column(db.String(200))
+    # ── 10th Standard ─────────────────────
+    board_10        = db.Column(db.String(80))                # 10th Standard Board
+    percent_10      = db.Column(db.Float)                     # 10th Standard Percentage
 
-    specialization       = db.Column(db.String(100))
-    specialization_other = db.Column(db.String(200))
-    category_id          = db.Column(db.Integer, db.ForeignKey('application_category.id'))
-    category             = db.relationship('ApplicationCategory', backref='applications')
+    # ── 12th Standard ─────────────────────
+    board_12        = db.Column(db.String(80))                # 12th Standard Board
+    stream_12       = db.Column(db.String(60))                # 12th Standard Stream
+    combination_12  = db.Column(db.String(100))               # 12th Standard Combination
+    total_12        = db.Column(db.Float)                     # 12th Standard Max. Marks
+    obtained_12     = db.Column(db.Float)                     # 12th Standard Marks Scored
+    percent_12      = db.Column(db.Float)                     # 12th Standard Percentage
 
+    # ── Declaration (student-only) ────────
+    declaration     = db.Column(db.Boolean, default=False)
+
+    # ── Admin fields ──────────────────────
     is_verified     = db.Column(db.Boolean, default=False)
     verified_at     = db.Column(db.DateTime, nullable=True)
     rank            = db.Column(db.Integer, nullable=True)
-    admin_notes     = db.Column(db.Text, default='')
+
+    # ── Application number (auto from id) ─
+    @property
+    def application_number(self):
+        return f'BCA{str(self.id).zfill(5)}'
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}"
+        return self.candidate_name or ''
 
     @property
     def board_10_display(self):
-        return self.board_10_other if self.board_10 == 'Other' else self.board_10
+        return self.board_10 or ''
 
     @property
     def board_12_display(self):
-        return self.board_12_other if self.board_12 == 'Other' else self.board_12
-
-    @property
-    def specialization_display(self):
-        if self.specialization == 'Other' and self.specialization_other:
-            return self.specialization_other
-        return self.specialization
+        return self.board_12 or ''
 
     @property
     def category_name(self):

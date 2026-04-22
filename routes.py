@@ -248,10 +248,6 @@ def api_register_student():
         db.session.add(user)
         db.session.flush()
 
-        parts      = full_name.split(' ', 1)
-        first_name = parts[0]
-        last_name  = parts[1] if len(parts) > 1 else ''
-
         cat_id  = None
         cat_raw = _str(data.get('category')).lower()
         if cat_raw:
@@ -260,45 +256,42 @@ def api_register_student():
             ).first()
             cat_id = cat.id if cat else None
 
-        total_10    = _flt(data.get('total_10'))
-        obtained_10 = _flt(data.get('obtained_10'))
-        percent_10  = _flt(data.get('percent_10'))
-        if total_10 and obtained_10 and not percent_10:
-            percent_10 = round((obtained_10 / total_10) * 100, 2)
-
         total_12    = _flt(data.get('total_12'))
         obtained_12 = _flt(data.get('obtained_12'))
         percent_12  = _flt(data.get('percent_12'))
         if total_12 and obtained_12 and not percent_12:
             percent_12 = round((obtained_12 / total_12) * 100, 2)
 
+        # PATCH 2 — updated StudentApplication fields
         appl = StudentApplication(
-            user_id        = user.id,
-            first_name     = first_name,
-            last_name      = last_name,
-            dob            = dob_raw,
-            email          = email,
-            phone          = _str(data.get('student_mobile')),
-            gender         = _str(data.get('gender')),
-            address        = _str(data.get('address')),
-            nationality    = _str(data.get('nationality')) or 'Indian',
-            category_id    = cat_id,
-            school_10      = _str(data.get('school_10')),
-            board_10       = _str(data.get('board_10')),
-            year_10        = _str(data.get('year_10')),
-            total_10       = total_10,
-            obtained_10    = obtained_10,
-            percent_10     = percent_10,
-            school_12      = _str(data.get('school_12')),
-            board_12       = _str(data.get('board_12')),
-            stream_12      = _str(data.get('stream_12')),
-            year_12        = _str(data.get('year_12')),
-            total_12       = total_12,
-            obtained_12    = obtained_12,
-            percent_12     = percent_12,
-            specialization = _str(data.get('combination_12')),
-            marksheet_10   = None,
-            marksheet_12   = None,
+            user_id              = user.id,
+            candidate_name       = full_name,
+            dob                  = dob_raw,
+            email                = email,
+            phone                = _str(data.get('student_mobile')),
+            parent_mobile        = _str(data.get('parent_mobile')),
+            gender               = _str(data.get('gender')),
+            address              = _str(data.get('address')),
+            nationality          = _str(data.get('nationality')) or 'Indian',
+            religion             = _str(data.get('religion')),
+            mother_name          = _str(data.get('mother_name')),
+            father_name          = _str(data.get('father_name')),
+            hk_region            = bool(data.get('hk_region', False)),
+            kannada_medium       = bool(data.get('kannada_medium', False)),
+            rural_background     = bool(data.get('rural_background', False)),
+            caste_certificate_no = _str(data.get('caste_certificate_no')),
+            parent_annual_income = _str(data.get('parent_annual_income')),
+            income_certificate_no= _str(data.get('income_certificate_no')),
+            category_id          = cat_id,
+            board_10             = _str(data.get('board_10')),
+            percent_10           = _flt(data.get('percent_10')),
+            board_12             = _str(data.get('board_12')),
+            stream_12            = _str(data.get('stream_12')),
+            combination_12       = _str(data.get('combination_12')),
+            total_12             = total_12,
+            obtained_12          = obtained_12,
+            percent_12           = percent_12,
+            declaration          = False,
         )
         db.session.add(appl)
         db.session.commit()
@@ -648,34 +641,45 @@ def apply():
         return render_template('form_closed.html', settings=settings)
     form       = ApplicationForm()
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
+
+    # PATCH 1 — updated StudentApplication fields
     if form.validate_on_submit():
-        p10 = calc_percent(form.total_10.data, form.obtained_10.data)
         p12 = calc_percent(form.total_12.data, form.obtained_12.data)
-        specialization       = form.specialization.data
-        specialization_other = None
-        if specialization == 'Other':
-            specialization_other = form.specialization_other.data
+
         category_id = request.form.get('category_id')
         if not category_id:
             flash('Please select a category.', 'danger')
             return render_template('application_form.html', form=form, categories=categories)
+
         appl = StudentApplication(
-            user_id=current_user.id,
-            first_name=form.first_name.data, last_name=form.last_name.data,
-            dob=form.dob.data, gender=form.gender.data,
-            nationality=form.nationality.data, email=form.email.data,
-            phone=form.phone.data, address=form.address.data,
-            school_10=form.school_10.data, board_10=form.board_10.data,
-            board_10_other=form.board_10_other.data, year_10=form.year_10.data,
-            total_10=form.total_10.data, obtained_10=form.obtained_10.data, percent_10=p10,
-            marksheet_10=None,
-            school_12=form.school_12.data, board_12=form.board_12.data,
-            board_12_other=form.board_12_other.data, stream_12=form.stream_12.data,
-            year_12=form.year_12.data, total_12=form.total_12.data,
-            obtained_12=form.obtained_12.data, percent_12=p12,
-            marksheet_12=None,
-            specialization=specialization, specialization_other=specialization_other,
-            category_id=int(category_id),
+            user_id              = current_user.id,
+            candidate_name       = form.candidate_name.data,
+            mother_name          = form.mother_name.data,
+            father_name          = form.father_name.data,
+            dob                  = form.dob.data,
+            gender               = form.gender.data,
+            parent_mobile        = form.parent_mobile.data,
+            phone                = form.phone.data,
+            email                = form.email.data,
+            address              = form.address.data,
+            nationality          = form.nationality.data,
+            religion             = form.religion.data,
+            hk_region            = (form.hk_region.data == 'Yes'),
+            kannada_medium       = (form.kannada_medium.data == 'Yes'),
+            rural_background     = (form.rural_background.data == 'Yes'),
+            caste_certificate_no = form.caste_certificate_no.data,
+            parent_annual_income = form.parent_annual_income.data,
+            income_certificate_no= form.income_certificate_no.data,
+            board_10             = form.board_10.data,
+            percent_10           = form.percent_10.data,
+            board_12             = form.board_12.data,
+            stream_12            = form.stream_12.data,
+            combination_12       = form.combination_12.data,
+            total_12             = form.total_12.data,
+            obtained_12          = form.obtained_12.data,
+            percent_12           = p12,
+            declaration          = form.declaration.data,
+            category_id          = int(category_id),
         )
         db.session.add(appl)
         db.session.commit()
@@ -1086,16 +1090,13 @@ def admin_delete_receipt(receipt_id):
 # ─────────────────────────────────────────
 #  Admin — Export: Payment Overview Excel
 # ─────────────────────────────────────────
+# PATCH 4 — delegate to export_payments_excel utility
 @main.route('/admin/export/payments')
 @admin_required
 def export_payments():
-    import io
-    from openpyxl import Workbook
-    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-    from openpyxl.utils import get_column_letter
-
-    allotments = SeatAllotment.query.all()
-    rows = []
+    from utils.exports import export_payments_excel
+    allotments    = SeatAllotment.query.all()
+    students_data = []
     for a in allotments:
         appl = StudentApplication.query.get(a.application_id)
         if not appl:
@@ -1103,116 +1104,17 @@ def export_payments():
         fees     = StudentFees.query.filter_by(application_id=appl.id).first()
         receipts = PaymentReceipt.query.filter_by(application_id=appl.id)\
                      .order_by(PaymentReceipt.created_at.asc()).all()
-
-        admit_cat_name = ''
-        admit_seat_num = ''
-        if a.admit_category_id:
-            ac = AdmitCategory.query.get(a.admit_category_id)
-            if ac:
-                admit_cat_name = ac.name
-        if a.admit_seat_number:
-            admit_seat_num = a.admit_seat_number
-
-        fee_cat_name    = ''
-        fee_base_amount = ''
-        additional_fee  = ''
-        total_fee       = ''
-        sf = StudentFee.query.filter_by(application_id=appl.id).first()
-        if sf:
-            if sf.fee_category_id:
-                fc = FeeCategory.query.get(sf.fee_category_id)
-                if fc:
-                    fee_cat_name    = fc.name
-                    fee_base_amount = fc.amount
-            additional_fee = sf.additional_fee or 0
-            total_fee      = (fee_base_amount if fee_base_amount != '' else 0) + additional_fee
-
-        total_paid   = sum(r.amount_paid for r in receipts) if receipts else 0
-        balance      = (float(fees.total_fees) - total_paid) if fees and fees.total_fees else ''
-        receipt_nos  = ', '.join(r.receipt_number for r in receipts) if receipts else ''
-        receipt_amts = ', '.join(str(r.amount_paid) for r in receipts) if receipts else ''
-        allotted_ist = utc_to_ist(a.allotted_at)
-
-        rows.append({
-            'Rank':                  appl.rank or '',
-            'Full Name':             appl.full_name,
-            'Email':                 appl.email,
-            'Phone':                 appl.phone or '',
-            'Category':              appl.category_name or '',
-            'Quota':                 a.quota.title() if a.quota else '',
-            'Admit Category':        admit_cat_name,
-            'Admit Seat No':         admit_seat_num,
-            'Allotted At':           allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
-            'Fee Structure':         fee_cat_name,
-            'Base Fee (₹)':          fee_base_amount if fee_base_amount != '' else '',
-            'Additional Fee (₹)':    additional_fee if additional_fee != '' else '',
-            'Total Fee (₹)':         total_fee if total_fee != '' else '',
-            'Total Fees Set (₹)':    float(fees.total_fees) if fees and fees.total_fees else '',
-            'Total Paid (₹)':        total_paid if receipts else '',
-            'Balance Remaining (₹)': balance,
-            'Receipt Numbers':       receipt_nos,
-            'Receipt Amounts':       receipt_amts,
-            'No. of Receipts':       len(receipts),
+        students_data.append({
+            'appl':      appl,
+            'allotment': a,
+            'fees':      fees,
+            'receipts':  receipts,
         })
-
-    rows.sort(key=lambda x: (x['Rank'] if isinstance(x['Rank'], int) else 9999))
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = 'Payment Overview'
-
-    header_fill = PatternFill('solid', fgColor='1F3864')
-    header_font = Font(color='FFFFFF', bold=True, size=11)
-    thin_border = Border(
-        left=Side(style='thin'), right=Side(style='thin'),
-        top=Side(style='thin'),  bottom=Side(style='thin')
-    )
-
-    headers = list(rows[0].keys()) if rows else [
-        'Rank', 'Full Name', 'Email', 'Phone', 'Category', 'Quota',
-        'Admit Category', 'Admit Seat No', 'Allotted At', 'Fee Structure',
-        'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
-        'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
-        'Receipt Numbers', 'Receipt Amounts', 'No. of Receipts'
-    ]
-
-    for col_idx, header in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=col_idx, value=header)
-        cell.font      = header_font
-        cell.fill      = header_fill
-        cell.border    = thin_border
-        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    ws.row_dimensions[1].height = 30
-
-    alt_fill = PatternFill('solid', fgColor='EEF2FF')
-    for row_idx, row_data in enumerate(rows, 2):
-        fill = alt_fill if row_idx % 2 == 0 else None
-        for col_idx, key in enumerate(headers, 1):
-            cell        = ws.cell(row=row_idx, column=col_idx, value=row_data.get(key, ''))
-            cell.border = thin_border
-            cell.alignment = Alignment(vertical='center')
-            if fill:
-                cell.fill = fill
-
-    for col_idx, header in enumerate(headers, 1):
-        col_letter = get_column_letter(col_idx)
-        max_len    = len(str(header))
-        for row in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
-            for cell in row:
-                if cell.value:
-                    max_len = max(max_len, len(str(cell.value)))
-        ws.column_dimensions[col_letter].width = min(max_len + 3, 35)
-
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)
-    return send_file(output,
-                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                     as_attachment=True, download_name='payment_overview.xlsx')
+    return export_payments_excel(students_data, 'payment_overview.xlsx')
 
 
 # ─────────────────────────────────────────
-#  Admin — Export: Payment Receipts Detail Excel  (NEW)
+#  Admin — Export: Payment Receipts Detail Excel
 # ─────────────────────────────────────────
 @main.route('/admin/export/payment-receipts')
 @admin_required
@@ -1335,7 +1237,7 @@ def export_payment_receipts():
 
 
 # ─────────────────────────────────────────
-#  Admin — Export: Document Overview Excel  (NEW)
+#  Admin — Export: Document Overview Excel
 # ─────────────────────────────────────────
 @main.route('/admin/export/document-overview')
 @admin_required
@@ -1553,16 +1455,6 @@ def export_admitted_students():
             'Quota':                 a.quota.title() if a.quota else '',
             'Address':               appl.address or '',
             'Nationality':           appl.nationality or '',
-            '10th School':           appl.school_10 or '',
-            '10th Board':            appl.board_10 or '',
-            '10th Year':             appl.year_10 or '',
-            '10th %':                appl.percent_10 or '',
-            '12th School':           appl.school_12 or '',
-            '12th Board':            appl.board_12 or '',
-            '12th Stream':           appl.stream_12 or '',
-            '12th Year':             appl.year_12 or '',
-            '12th %':                appl.percent_12 or '',
-            'Specialization':        appl.specialization or '',
             'Allotted At':           allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
             'Fee Structure':         fee_cat_name,
             'Base Fee (₹)':          fee_base_amount if fee_base_amount != '' else '',
@@ -1589,9 +1481,7 @@ def export_admitted_students():
     headers = list(rows[0].keys()) if rows else [
         'Admit Category', 'Seat No', 'Rank', 'Full Name', 'Email', 'Phone',
         'DOB', 'Gender', 'Category', 'Quota', 'Address', 'Nationality',
-        '10th School', '10th Board', '10th Year', '10th %',
-        '12th School', '12th Board', '12th Stream', '12th Year', '12th %',
-        'Specialization', 'Allotted At', 'Fee Structure',
+        'Allotted At', 'Fee Structure',
         'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
         'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
         'Docs Submitted', 'Docs Approved'
@@ -1887,15 +1777,17 @@ def admin_counselling():
     search_q  = request.args.get('q', '').strip()
     query     = StudentApplication.query.filter_by(is_verified=True)\
                     .filter(StudentApplication.rank.isnot(None))
+
+    # PATCH 5 — use candidate_name instead of first_name/last_name
     if search_q:
         if search_q.isdigit():
             query = query.filter(StudentApplication.rank == int(search_q))
         else:
             like  = f'%{search_q}%'
-            query = query.filter(db.or_(
-                StudentApplication.first_name.ilike(like),
-                StudentApplication.last_name.ilike(like),
-            ))
+            query = query.filter(
+                StudentApplication.candidate_name.ilike(like)
+            )
+
     students = query.order_by(StudentApplication.rank.asc()).all()
 
     allotments       = {a.application_id: a for a in SeatAllotment.query.all()}
@@ -2088,7 +1980,6 @@ def admin_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        # Count how many are marked as 'original'
         all_original = (
             total > 0 and
             all(
@@ -2198,7 +2089,6 @@ def faculty_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        # Count how many are marked as 'original'
         all_original = (
             total > 0 and
             all(
@@ -2318,11 +2208,12 @@ def admin_change_password():
 def admin_students():
     q     = request.args.get('q', '').strip()
     query = StudentApplication.query
+
+    # PATCH 3 — use candidate_name instead of first_name/last_name
     if q:
         like  = f'%{q}%'
         query = query.filter(db.or_(
-            StudentApplication.first_name.ilike(like),
-            StudentApplication.last_name.ilike(like),
+            StudentApplication.candidate_name.ilike(like),
             StudentApplication.email.ilike(like),
         ))
     students = query.order_by(StudentApplication.submitted_at.desc()).all()
@@ -2343,7 +2234,7 @@ def verify_student(app_id):
     appl             = StudentApplication.query.get_or_404(app_id)
     appl.is_verified = True
     appl.verified_at = datetime.utcnow()
-    appl.admin_notes = request.form.get('notes', appl.admin_notes)
+    # PATCH 6 — removed appl.admin_notes line
     db.session.commit()
     flash(f'{appl.full_name} verified.', 'success')
     return redirect(url_for('main.admin_verification'))

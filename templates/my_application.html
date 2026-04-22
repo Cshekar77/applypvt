@@ -2,195 +2,35 @@
 {% block title %}My Application — BCA Admissions{% endblock %}
 {% block content %}
 <style>
-  .page-wrap {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  
-  .page-header-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .page-header-inner h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: #0a1f44;
-    margin: 0;
-  }
-  
-  .text-muted {
-    color: #5a6e82;
-    font-size: 0.9rem;
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 40px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-  
-  .badge-success {
-    background: #d4edda;
-    color: #155724;
-  }
-  
-  .badge-warning {
-    background: #fff3cd;
-    color: #856404;
-  }
-  
-  .badge-gold {
-    background: #c9a03d;
-    color: #0a1f44;
-  }
-  
-  .view-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eef2f8;
-  }
-  
-  .view-section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #0a1f44;
-    border-left: 4px solid #c9a03d;
-    padding-left: 1rem;
-    margin-bottom: 1.2rem;
-  }
-  
-  .view-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-  
-  .view-field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-  
-  .view-field span {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #5a6e82;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-  }
-  
-  .view-field strong {
-    font-size: 1rem;
-    color: #1a2c3e;
-  }
-  
-  .view-field.full {
-    grid-column: 1 / -1;
-    margin-top: 0.5rem;
-  }
-  
-  .btn-outline {
-    background: transparent;
-    border: 1px solid #c9a03d;
-    color: #c9a03d;
-    padding: 0.4rem 1rem;
-    border-radius: 30px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 0.8rem;
-  }
-  
-  .btn-outline:hover {
-    background: #c9a03d;
-    color: white;
-  }
-  
-  .specialization-badge {
-    background: #eef2ff;
-    color: #0a1f44;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    display: inline-block;
-  }
-  
-  .category-badge {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    display: inline-block;
-  }
-  
-  .info-note {
-    background: #eef2ff;
-    padding: 0.8rem 1rem;
-    border-radius: 12px;
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    color: #0a1f44;
-  }
-  
-  .info-note i {
-    color: #c9a03d;
-    margin-right: 0.5rem;
-  }
-  
-  body.dark .view-card {
-    background: #1a2538;
-    border-color: #2d3e54;
-  }
-  
-  body.dark .view-section-title {
-    color: #eef2ff;
-  }
-  
-  body.dark .view-field strong {
-    color: #eef2ff;
-  }
-  
-  body.dark .specialization-badge {
-    background: #2d3e54;
-    color: #eef2ff;
-  }
-  
-  body.dark .category-badge {
-    background: #1e3a2f;
-    color: #81c784;
-  }
-  
-  body.dark .info-note {
-    background: #0f1a24;
-    color: #eef2ff;
-  }
-  
+  .page-wrap { max-width: 1000px; margin: 0 auto; }
+  .page-header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+  .page-header-inner h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
+  .text-muted { color: #5a6e82; font-size: 0.9rem; }
+  .badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .badge-success { background: #d4edda; color: #155724; }
+  .badge-warning { background: #fff3cd; color: #856404; }
+  .badge-gold { background: #c9a03d; color: #0a1f44; }
+  .view-card { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #eef2f8; }
+  .view-section-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: #0a1f44; border-left: 4px solid #c9a03d; padding-left: 1rem; margin-bottom: 1.2rem; }
+  .view-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .view-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .view-field span { font-size: 0.75rem; text-transform: uppercase; color: #5a6e82; letter-spacing: 0.5px; font-weight: 600; }
+  .view-field strong { font-size: 1rem; color: #1a2c3e; }
+  .view-field.full { grid-column: 1 / -1; margin-top: 0.5rem; }
+  .bool-badge-yes { background: #d4edda; color: #155724; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.82rem; font-weight: 600; display: inline-block; }
+  .bool-badge-no  { background: #f1f3f5; color: #6c757d; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.82rem; display: inline-block; }
+  .category-badge { background: #e8f5e9; color: #2e7d32; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; display: inline-block; }
+  .info-note { background: #eef2ff; padding: 0.8rem 1rem; border-radius: 12px; margin-top: 1rem; font-size: 0.85rem; color: #0a1f44; }
+  .info-note i { color: #c9a03d; margin-right: 0.5rem; }
+  body.dark .view-card { background: #1a2538; border-color: #2d3e54; }
+  body.dark .view-section-title { color: #eef2ff; }
+  body.dark .view-field strong { color: #eef2ff; }
+  body.dark .category-badge { background: #1e3a2f; color: #81c784; }
+  body.dark .info-note { background: #0f1a24; color: #eef2ff; }
   @media (max-width: 768px) {
-    .view-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .page-header-inner {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    
-    .view-card {
-      padding: 1rem;
-    }
+    .view-grid { grid-template-columns: 1fr; }
+    .page-header-inner { flex-direction: column; align-items: flex-start; }
+    .view-card { padding: 1rem; }
   }
 </style>
 
@@ -200,9 +40,10 @@
       <h2><i class="fas fa-file-alt"></i> My Application</h2>
       <p class="text-muted">
         <i class="fas fa-calendar"></i> Submitted on {{ appl.submitted_at | ist }}
+        &nbsp;|&nbsp; <strong>Application No:</strong> {{ appl.application_number }}
       </p>
     </div>
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
       {% if appl.is_verified %}
         <span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified</span>
         {% if appl.rank %}<span class="badge badge-gold"><i class="fas fa-trophy"></i> Rank #{{ appl.rank }}</span>{% endif %}
@@ -211,99 +52,95 @@
       {% endif %}
     </div>
   </div>
-  
+
   <!-- Personal Information -->
   <div class="view-card">
     <div class="view-section-title"><i class="fas fa-user"></i> Personal Information</div>
     <div class="view-grid">
-      <div class="view-field"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
-      <div class="view-field"><span>Date of Birth</span><strong>{{ appl.dob }}</strong></div>
+      <div class="view-field"><span>Name of the Candidate</span><strong>{{ appl.candidate_name or '—' }}</strong></div>
+      <div class="view-field"><span>Mother's Name</span><strong>{{ appl.mother_name or '—' }}</strong></div>
+      <div class="view-field"><span>Father's Name</span><strong>{{ appl.father_name or '—' }}</strong></div>
+      <div class="view-field"><span>Date of Birth</span><strong>{{ appl.dob or '—' }}</strong></div>
       <div class="view-field"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
-      <div class="view-field"><span>Nationality</span><strong>{{ appl.nationality }}</strong></div>
-      <div class="view-field"><span>Email</span><strong>{{ appl.email }}</strong></div>
-      <div class="view-field"><span>Phone</span><strong>{{ appl.phone }}</strong></div>
+      <div class="view-field"><span>Mobile Number of Parent</span><strong>{{ appl.parent_mobile or '—' }}</strong></div>
+      <div class="view-field"><span>Mobile Number of Candidate</span><strong>{{ appl.phone or '—' }}</strong></div>
+      <div class="view-field"><span>E-mail Id</span><strong>{{ appl.email or '—' }}</strong></div>
+      <div class="view-field"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
+      <div class="view-field"><span>Religion</span><strong>{{ appl.religion or '—' }}</strong></div>
     </div>
-    {% if appl.address %}<div class="view-field full"><span>Address</span><strong>{{ appl.address }}</strong></div>{% endif %}
-  </div>
-  
-  <!-- Grade 10 Details -->
-  <div class="view-card">
-    <div class="view-section-title"><i class="fas fa-school"></i> Grade 10 Details</div>
-    <div class="view-grid">
-      <div class="view-field"><span>School</span><strong>{{ appl.school_10 }}</strong></div>
-      <div class="view-field"><span>Board</span><strong>{{ appl.board_10_display }}</strong></div>
-      <div class="view-field"><span>Year</span><strong>{{ appl.year_10 }}</strong></div>
-      <div class="view-field"><span>Total Marks</span><strong>{{ appl.total_10|int }}</strong></div>
-      <div class="view-field"><span>Marks Obtained</span><strong>{{ appl.obtained_10|int }}</strong></div>
-      <div class="view-field"><span>Percentage</span><strong>{{ "%.2f"|format(appl.percent_10) if appl.percent_10 else '—' }}%</strong></div>
-    </div>
-    {% if appl.marksheet_10 %}
-      <a href="{{ url_for('static', filename='uploads/' + appl.marksheet_10) }}" target="_blank" class="btn-outline btn-sm">
-        <i class="fas fa-file-pdf"></i> View Marksheet (10)
-      </a>
+    {% if appl.address %}
+    <div class="view-field full" style="margin-top:0.8rem;"><span>Address</span><strong>{{ appl.address }}</strong></div>
     {% endif %}
   </div>
-  
-  <!-- Grade 12 Details -->
+
+  <!-- Category & Background -->
   <div class="view-card">
-    <div class="view-section-title"><i class="fas fa-university"></i> Grade 12 Details</div>
+    <div class="view-section-title"><i class="fas fa-id-card"></i> Category &amp; Background</div>
     <div class="view-grid">
-      <div class="view-field"><span>School / College</span><strong>{{ appl.school_12 }}</strong></div>
-      <div class="view-field"><span>Board</span><strong>{{ appl.board_12_display }}</strong></div>
-      <div class="view-field"><span>Stream</span><strong>{{ appl.stream_12 }}</strong></div>
-      <div class="view-field"><span>Year</span><strong>{{ appl.year_12 or '—' }}</strong></div>
-      <div class="view-field"><span>Total Marks</span><strong>{{ appl.total_12|int }}</strong></div>
-      <div class="view-field"><span>Marks Obtained</span><strong>{{ appl.obtained_12|int }}</strong></div>
-      <div class="view-field"><span>Percentage</span><strong>{{ "%.2f"|format(appl.percent_12) if appl.percent_12 else '—' }}%</strong></div>
-    </div>
-    {% if appl.marksheet_12 %}
-      <a href="{{ url_for('static', filename='uploads/' + appl.marksheet_12) }}" target="_blank" class="btn-outline btn-sm">
-        <i class="fas fa-file-pdf"></i> View Marksheet (12)
-      </a>
-    {% endif %}
-  </div>
-  
-  <!-- Programme Details (NEW - Specialization & Category) -->
-  <div class="view-card">
-    <div class="view-section-title"><i class="fas fa-laptop-code"></i> Programme Details</div>
-    <div class="view-grid">
-      <div class="view-field"><span>Programme</span><strong>Bachelor of Computer Applications (BCA)</strong></div>
-      <div class="view-field"><span>Specialization</span>
-        <strong>
-          {% if appl.specialization %}
-            {% if appl.specialization == 'Other' and appl.specialization_other %}
-              <span class="specialization-badge">
-                <i class="fas fa-code"></i> {{ appl.specialization_other }}
-              </span>
-            {% else %}
-              <span class="specialization-badge">
-                <i class="fas fa-code"></i> {{ appl.specialization }}
-              </span>
-            {% endif %}
-          {% else %}
-            —
-          {% endif %}
-        </strong>
-      </div>
-      <div class="view-field"><span>Category</span>
+      <div class="view-field">
+        <span>Category</span>
         <strong>
           {% if appl.category %}
-            <span class="category-badge">
-              <i class="fas fa-tag"></i> {{ appl.category.name }}
-            </span>
-          {% else %}
-            —
-          {% endif %}
+            <span class="category-badge"><i class="fas fa-tag"></i> {{ appl.category.name }}</span>
+          {% else %}—{% endif %}
         </strong>
+      </div>
+      <div class="view-field">
+        <span>Candidate Belongs to HK Region</span>
+        <strong>{% if appl.hk_region %}<span class="bool-badge-yes">Yes</span>{% else %}<span class="bool-badge-no">No</span>{% endif %}</strong>
+      </div>
+      <div class="view-field">
+        <span>Kannada Medium</span>
+        <strong>{% if appl.kannada_medium %}<span class="bool-badge-yes">Yes</span>{% else %}<span class="bool-badge-no">No</span>{% endif %}</strong>
+      </div>
+      <div class="view-field">
+        <span>Rural Background</span>
+        <strong>{% if appl.rural_background %}<span class="bool-badge-yes">Yes</span>{% else %}<span class="bool-badge-no">No</span>{% endif %}</strong>
+      </div>
+      <div class="view-field"><span>Caste Certificate No.</span><strong>{{ appl.caste_certificate_no or '—' }}</strong></div>
+      <div class="view-field"><span>Parent's Annual Income</span><strong>{{ appl.parent_annual_income or '—' }}</strong></div>
+      <div class="view-field"><span>Income Certificate No.</span><strong>{{ appl.income_certificate_no or '—' }}</strong></div>
+    </div>
+  </div>
+
+  <!-- 10th Standard -->
+  <div class="view-card">
+    <div class="view-section-title"><i class="fas fa-school"></i> 10th Standard</div>
+    <div class="view-grid">
+      <div class="view-field"><span>10th Standard Board</span><strong>{{ appl.board_10 or '—' }}</strong></div>
+      <div class="view-field"><span>10th Standard Percentage</span><strong>{{ "%.2f"|format(appl.percent_10) if appl.percent_10 else '—' }}%</strong></div>
+    </div>
+  </div>
+
+  <!-- 12th Standard -->
+  <div class="view-card">
+    <div class="view-section-title"><i class="fas fa-university"></i> 12th Standard</div>
+    <div class="view-grid">
+      <div class="view-field"><span>12th Standard Board</span><strong>{{ appl.board_12 or '—' }}</strong></div>
+      <div class="view-field"><span>12th Standard Stream</span><strong>{{ appl.stream_12 or '—' }}</strong></div>
+      <div class="view-field"><span>12th Standard Combination</span><strong>{{ appl.combination_12 or '—' }}</strong></div>
+      <div class="view-field"><span>12th Standard Max. Marks</span><strong>{{ appl.total_12|int if appl.total_12 else '—' }}</strong></div>
+      <div class="view-field"><span>12th Standard Marks Scored</span><strong>{{ appl.obtained_12|int if appl.obtained_12 else '—' }}</strong></div>
+      <div class="view-field"><span>12th Standard Percentage</span><strong>{{ "%.2f"|format(appl.percent_12) if appl.percent_12 else '—' }}%</strong></div>
+    </div>
+  </div>
+
+  <!-- Declaration -->
+  <div class="view-card">
+    <div class="view-section-title"><i class="fas fa-check-square"></i> Declaration</div>
+    <div class="view-grid">
+      <div class="view-field">
+        <span>Declaration Submitted</span>
+        <strong>{% if appl.declaration %}<span class="bool-badge-yes"><i class="fas fa-check"></i> Agreed</span>{% else %}<span class="bool-badge-no">Not submitted</span>{% endif %}</strong>
       </div>
     </div>
   </div>
-  
+
   <!-- Info Note -->
   <div class="info-note">
-    <i class="fas fa-info-circle"></i> 
+    <i class="fas fa-info-circle"></i>
     {% if appl.is_verified %}
-      Your application has been verified. Rank will be announced after counselling.
+      Your application has been verified. Your rank will be announced before counselling.
     {% else %}
       Your application is under review. You will be notified once verified.
     {% endif %}

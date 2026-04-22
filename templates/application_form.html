@@ -16,50 +16,56 @@
     <div class="prog-line done"></div>
     <div class="prog-dot done">2</div><span class="prog-lbl done">Education</span>
     <div class="prog-line done"></div>
-    <div class="prog-dot done">3</div><span class="prog-lbl done">Programme</span>
+    <div class="prog-dot done">3</div><span class="prog-lbl done">Declaration</span>
   </div>
+
   <form method="POST" enctype="multipart/form-data" class="app-form" novalidate>
     {{ form.hidden_tag() }}
+
+    <!-- ── SECTION 1: Personal Information ── -->
     <div class="form-card">
       <div class="sec-head">
         <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
         <div class="sec-title">Personal Information</div>
       </div>
+
+      <div class="field {% if form.candidate_name.errors %}has-error{% endif %}">
+        <label>{{ form.candidate_name.label.text }} <span class="req">*</span></label>
+        {{ form.candidate_name(placeholder='Full name as per documents', required=True) }}
+        {% for e in form.candidate_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
+
       <div class="grid-2">
-        <div class="field {% if form.first_name.errors %}has-error{% endif %}">
-          <label>{{ form.first_name.label.text }} <span class="req">*</span></label>
-          {{ form.first_name(placeholder='e.g. Priya', required=True) }}
-          {% for e in form.first_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        <div class="field {% if form.mother_name.errors %}has-error{% endif %}">
+          <label>{{ form.mother_name.label.text }} <span class="req">*</span></label>
+          {{ form.mother_name(placeholder="Mother's full name", required=True) }}
+          {% for e in form.mother_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
-        <div class="field {% if form.last_name.errors %}has-error{% endif %}">
-          <label>{{ form.last_name.label.text }} <span class="req">*</span></label>
-          {{ form.last_name(placeholder='e.g. Sharma', required=True) }}
-          {% for e in form.last_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        <div class="field {% if form.father_name.errors %}has-error{% endif %}">
+          <label>{{ form.father_name.label.text }} <span class="req">*</span></label>
+          {{ form.father_name(placeholder="Father's full name", required=True) }}
+          {% for e in form.father_name.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
+
       <div class="grid-2">
         <div class="field {% if form.dob.errors %}has-error{% endif %}">
-          <label>Date of birth <span class="req">*</span></label>
+          <label>{{ form.dob.label.text }} <span class="req">*</span></label>
           {{ form.dob(type='date', required=True) }}
           {% for e in form.dob.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
         <div class="field {% if form.gender.errors %}has-error{% endif %}">
-          <label>Gender <span class="req">*</span></label>
+          <label>{{ form.gender.label.text }} <span class="req">*</span></label>
           {{ form.gender(required=True) }}
           {% for e in form.gender.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
-      <div class="field {% if form.nationality.errors %}has-error{% endif %}">
-        <label>{{ form.nationality.label.text }} <span class="req">*</span></label>
-        {{ form.nationality(placeholder='e.g. Indian', required=True) }}
-        {% for e in form.nationality.errors %}<span class="err">{{ e }}</span>{% endfor %}
-      </div>
-      <hr class="divider">
+
       <div class="grid-2">
-        <div class="field {% if form.email.errors %}has-error{% endif %}">
-          <label>{{ form.email.label.text }} <span class="req">*</span></label>
-          {{ form.email(placeholder='you@example.com', required=True) }}
-          {% for e in form.email.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        <div class="field {% if form.parent_mobile.errors %}has-error{% endif %}">
+          <label>{{ form.parent_mobile.label.text }} <span class="req">*</span></label>
+          {{ form.parent_mobile(placeholder='+91 98765 43210', required=True) }}
+          {% for e in form.parent_mobile.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
         <div class="field {% if form.phone.errors %}has-error{% endif %}">
           <label>{{ form.phone.label.text }} <span class="req">*</span></label>
@@ -67,125 +73,38 @@
           {% for e in form.phone.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
+
+      <div class="field {% if form.email.errors %}has-error{% endif %}">
+        <label>{{ form.email.label.text }} <span class="req">*</span></label>
+        {{ form.email(placeholder='you@example.com', required=True) }}
+        {% for e in form.email.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
+
       <div class="field {% if form.address.errors %}has-error{% endif %}">
-        <label>Residential address <span class="req">*</span></label>
+        <label>{{ form.address.label.text }} <span class="req">*</span></label>
         {{ form.address(placeholder='Street, City, State, PIN code', required=True) }}
         {% for e in form.address.errors %}<span class="err">{{ e }}</span>{% endfor %}
       </div>
-    </div>
 
-    <div class="form-card">
-      <div class="sec-head">
-        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
-        <div class="sec-title">Education Background</div>
-      </div>
-      <div class="edu-entry">
-        <div class="entry-label">Secondary Education — Grade 10</div>
-        <div class="grid-2">
-          <div class="field {% if form.school_10.errors %}has-error{% endif %}">
-            <label>School name <span class="req">*</span></label>
-            {{ form.school_10(placeholder='School name', required=True) }}
-            {% for e in form.school_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.board_10.errors %}has-error{% endif %}">
-            <label>Board <span class="req">*</span></label>
-            {{ form.board_10(onchange='toggleOther(this,"ob10")', required=True) }}
-            <div class="other-board" id="ob10" style="display:none;margin-top:.5rem">
-              {{ form.board_10_other(placeholder='Please specify your board name') }}
-            </div>
-            {% for e in form.board_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
+      <div class="grid-2">
+        <div class="field {% if form.nationality.errors %}has-error{% endif %}">
+          <label>{{ form.nationality.label.text }} <span class="req">*</span></label>
+          {{ form.nationality(placeholder='e.g. Indian', required=True) }}
+          {% for e in form.nationality.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
-        <div class="grid-4">
-          <div class="field {% if form.year_10.errors %}has-error{% endif %}">
-            <label>Year of passing <span class="req">*</span></label>
-            {{ form.year_10(type='number', placeholder='e.g. 2022', min='2000', max='2026', required=True) }}
-            {% for e in form.year_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.total_10.errors %}has-error{% endif %}">
-            <label>Total marks <span class="req">*</span></label>
-            {{ form.total_10(id='t10', placeholder='e.g. 500', oninput="calcPct('t10','o10','p10')", required=True) }}
-            {% for e in form.total_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.obtained_10.errors %}has-error{% endif %}">
-            <label>Marks obtained <span class="req">*</span></label>
-            {{ form.obtained_10(id='o10', placeholder='e.g. 450', oninput="calcPct('t10','o10','p10')", required=True) }}
-            {% for e in form.obtained_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field">
-            <label>Percentage <span class="opt">(auto)</span></label>
-            <div class="pct-display" id="p10">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="edu-entry">
-        <div class="entry-label">Senior Secondary Education — Grade 12</div>
-        <div class="grid-2">
-          <div class="field {% if form.school_12.errors %}has-error{% endif %}">
-            <label>School / College name <span class="req">*</span></label>
-            {{ form.school_12(placeholder='School or college name', required=True) }}
-            {% for e in form.school_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.board_12.errors %}has-error{% endif %}">
-            <label>Board <span class="req">*</span></label>
-            {{ form.board_12(onchange='toggleOther(this,"ob12")', required=True) }}
-            <div class="other-board" id="ob12" style="display:none;margin-top:.5rem">
-              {{ form.board_12_other(placeholder='Please specify your board name') }}
-            </div>
-            {% for e in form.board_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-        </div>
-        <div class="field {% if form.stream_12.errors %}has-error{% endif %}">
-          <label>Stream <span class="req">*</span></label>
-          {{ form.stream_12(required=True) }}
-          {% for e in form.stream_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-        </div>
-        <div class="grid-4">
-          <div class="field {% if form.year_12.errors %}has-error{% endif %}">
-            <label>Year of passing <span class="req">*</span></label>
-            {{ form.year_12(type='number', placeholder='e.g. 2024', min='2000', max='2026', required=True) }}
-            {% for e in form.year_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.total_12.errors %}has-error{% endif %}">
-            <label>Total marks <span class="req">*</span></label>
-            {{ form.total_12(id='t12', placeholder='e.g. 500', oninput="calcPct('t12','o12','p12')", required=True) }}
-            {% for e in form.total_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field {% if form.obtained_12.errors %}has-error{% endif %}">
-            <label>Marks obtained <span class="req">*</span></label>
-            {{ form.obtained_12(id='o12', placeholder='e.g. 430', oninput="calcPct('t12','o12','p12')", required=True) }}
-            {% for e in form.obtained_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
-          </div>
-          <div class="field">
-            <label>Percentage <span class="opt">(auto)</span></label>
-            <div class="pct-display" id="p12">—</div>
-          </div>
+        <div class="field {% if form.religion.errors %}has-error{% endif %}">
+          <label>{{ form.religion.label.text }} <span class="req">*</span></label>
+          {{ form.religion(placeholder='e.g. Hindu, Muslim, Christian...', required=True) }}
+          {% for e in form.religion.errors %}<span class="err">{{ e }}</span>{% endfor %}
         </div>
       </div>
     </div>
 
+    <!-- ── SECTION 2: Category & Background ── -->
     <div class="form-card">
       <div class="sec-head">
-        <div class="sec-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-        <div class="sec-title">Programme Details</div>
-      </div>
-      <div class="field">
-        <label>Programme <span class="req">*</span></label>
-        <input type="text" value="Bachelor of Computer Applications (BCA)" readonly>
-      </div>
-
-      <div class="field {% if form.specialization.errors %}has-error{% endif %}">
-        <label>Which specialization are you interested in? <span class="req">*</span></label>
-        {{ form.specialization(id='specialization', onchange='toggleOtherSpecialization()', required=True) }}
-        {% for e in form.specialization.errors %}<span class="err">{{ e }}</span>{% endfor %}
-      </div>
-
-      <div id="otherSpecializationDiv" style="display:none; margin-top: 0.5rem;">
-        <div class="field">
-          <label>Please specify your specialization <span class="req">*</span></label>
-          {{ form.specialization_other(placeholder='e.g. Cloud Computing, Cyber Security, etc.', id='specialization_other') }}
-        </div>
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="sec-title">Category &amp; Background</div>
       </div>
 
       <div class="field">
@@ -197,6 +116,121 @@
           {% endfor %}
         </select>
       </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>{{ form.hk_region.label.text }}</label>
+          {{ form.hk_region() }}
+        </div>
+        <div class="field">
+          <label>{{ form.kannada_medium.label.text }}</label>
+          {{ form.kannada_medium() }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label>{{ form.rural_background.label.text }}</label>
+        {{ form.rural_background() }}
+      </div>
+
+      <div class="grid-2">
+        <div class="field {% if form.caste_certificate_no.errors %}has-error{% endif %}">
+          <label>{{ form.caste_certificate_no.label.text }}</label>
+          {{ form.caste_certificate_no(placeholder='Certificate number') }}
+          {% for e in form.caste_certificate_no.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+        <div class="field {% if form.parent_annual_income.errors %}has-error{% endif %}">
+          <label>{{ form.parent_annual_income.label.text }}</label>
+          {{ form.parent_annual_income(placeholder='e.g. 3,00,000') }}
+          {% for e in form.parent_annual_income.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+      </div>
+
+      <div class="field {% if form.income_certificate_no.errors %}has-error{% endif %}">
+        <label>{{ form.income_certificate_no.label.text }}</label>
+        {{ form.income_certificate_no(placeholder='Income certificate number') }}
+        {% for e in form.income_certificate_no.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Education Background ── -->
+    <div class="form-card">
+      <div class="sec-head">
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="sec-title">Education Background</div>
+      </div>
+
+      <!-- 10th Standard -->
+      <div class="edu-entry">
+        <div class="entry-label">10th Standard</div>
+        <div class="grid-2">
+          <div class="field {% if form.board_10.errors %}has-error{% endif %}">
+            <label>{{ form.board_10.label.text }} <span class="req">*</span></label>
+            {{ form.board_10(required=True) }}
+            {% for e in form.board_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.percent_10.errors %}has-error{% endif %}">
+            <label>{{ form.percent_10.label.text }} <span class="req">*</span></label>
+            {{ form.percent_10(placeholder='e.g. 85.50', required=True) }}
+            {% for e in form.percent_10.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 12th Standard -->
+      <div class="edu-entry">
+        <div class="entry-label">12th Standard</div>
+        <div class="grid-2">
+          <div class="field {% if form.board_12.errors %}has-error{% endif %}">
+            <label>{{ form.board_12.label.text }} <span class="req">*</span></label>
+            {{ form.board_12(required=True) }}
+            {% for e in form.board_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.stream_12.errors %}has-error{% endif %}">
+            <label>{{ form.stream_12.label.text }} <span class="req">*</span></label>
+            {{ form.stream_12(required=True) }}
+            {% for e in form.stream_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+        </div>
+
+        <div class="field {% if form.combination_12.errors %}has-error{% endif %}">
+          <label>{{ form.combination_12.label.text }} <span class="req">*</span></label>
+          {{ form.combination_12(required=True) }}
+          {% for e in form.combination_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+        </div>
+
+        <div class="grid-4">
+          <div class="field {% if form.total_12.errors %}has-error{% endif %}">
+            <label>{{ form.total_12.label.text }} <span class="req">*</span></label>
+            {{ form.total_12(id='t12', placeholder='e.g. 600', oninput="calcPct('t12','o12','p12')", required=True) }}
+            {% for e in form.total_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field {% if form.obtained_12.errors %}has-error{% endif %}">
+            <label>{{ form.obtained_12.label.text }} <span class="req">*</span></label>
+            {{ form.obtained_12(id='o12', placeholder='e.g. 510', oninput="calcPct('t12','o12','p12')", required=True) }}
+            {% for e in form.obtained_12.errors %}<span class="err">{{ e }}</span>{% endfor %}
+          </div>
+          <div class="field">
+            <label>12th Standard Percentage <span class="opt">(auto)</span></label>
+            <div class="pct-display" id="p12">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: Declaration ── -->
+    <div class="form-card">
+      <div class="sec-head">
+        <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div class="sec-title">Declaration</div>
+      </div>
+      <div class="field {% if form.declaration.errors %}has-error{% endif %}">
+        <label class="checkbox-label">
+          {{ form.declaration(required=True) }}
+          <span>I hereby declare that all the information provided in this application is true and correct to the best of my knowledge. I understand that any false information may result in cancellation of my application.</span>
+        </label>
+        {% for e in form.declaration.errors %}<span class="err">{{ e }}</span>{% endfor %}
+      </div>
     </div>
 
     <div class="form-footer-row">
@@ -207,36 +241,10 @@
 </div>
 
 <script>
-  function toggleOtherSpecialization() {
-    const specSelect = document.getElementById('specialization');
-    const otherDiv = document.getElementById('otherSpecializationDiv');
-    const otherInput = document.getElementById('specialization_other');
-    if (specSelect.value === 'Other') {
-      otherDiv.style.display = 'block';
-      otherInput.required = true;
-    } else {
-      otherDiv.style.display = 'none';
-      otherInput.required = false;
-      otherInput.value = '';
-    }
-  }
-
-  function toggleOther(selectElement, divId) {
-    const otherDiv = document.getElementById(divId);
-    const input = otherDiv.querySelector('input');
-    if (selectElement.value === 'Other') {
-      otherDiv.style.display = 'block';
-      if (input) input.required = true;
-    } else {
-      otherDiv.style.display = 'none';
-      if (input) { input.required = false; input.value = ''; }
-    }
-  }
-
   function calcPct(totalId, obtainedId, displayId) {
-    const total = document.getElementById(totalId);
+    const total    = document.getElementById(totalId);
     const obtained = document.getElementById(obtainedId);
-    const display = document.getElementById(displayId);
+    const display  = document.getElementById(displayId);
     if (total && obtained && display) {
       const t = parseFloat(total.value);
       const o = parseFloat(obtained.value);
