@@ -2,40 +2,124 @@
 {% block title %}All Students — Admin{% endblock %}
 {% block content %}
 <style>
-  .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-  .admin-table th { background: #0a1f44; color: white; padding: 1rem; text-align: left; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
-  .admin-table td { padding: 0.8rem 1rem; border-bottom: 1px solid #eef2f8; color: #1a2c3e; vertical-align: top; }
-  .admin-table tr:hover { background: #f8f9fa; }
-  .badge-success { background: #d4edda; color: #155724; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-  .badge-warning { background: #fff3cd; color: #856404; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-  .bool-yes { background: #d4edda; color: #155724; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.72rem; font-weight: 600; display: inline-block; }
-  .bool-no  { background: #f1f3f5; color: #6c757d; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.72rem; display: inline-block; }
-  .category-badge { background: #e8f5e9; color: #2e7d32; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.7rem; display: inline-block; white-space: nowrap; }
-  .search-bar { display: flex; gap: 0.5rem; margin: 1.5rem 0; flex-wrap: wrap; }
+  /* ── List View ── */
+  .page-header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
+  .page-header-inner h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
+  .search-bar { display: flex; gap: 0.5rem; margin: 1rem 0 1.2rem; flex-wrap: wrap; }
   .search-bar input { flex: 1; padding: 0.6rem 1rem; border: 2px solid #e2e8f0; border-radius: 40px; font-size: 0.9rem; }
   .search-bar input:focus { outline: none; border-color: #c9a03d; }
-  .table-wrap { overflow-x: auto; margin: 1rem 0; }
   .btn-outline { background: transparent; border: 1px solid #c9a03d; color: #c9a03d; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block; }
   .btn-outline:hover { background: #c9a03d; color: white; }
-  .btn-primary { background: #c9a03d; color: #0a1f44; border: none; padding: 0.4rem 1rem; border-radius: 40px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #c9a03d; color: #0a1f44; border: none; padding: 0.4rem 1rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
   .btn-primary:hover { background: #b58c2e; }
   .btn-sm { font-size: 0.8rem; padding: 0.3rem 0.8rem; }
-  .page-header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
-  .page-header-inner h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
-  body.dark .admin-table { background: #1a2538; }
-  body.dark .admin-table td { color: #eef2ff; border-bottom-color: #2d3e54; }
-  body.dark .admin-table tr:hover { background: #2d3e54; }
-  body.dark .category-badge { background: #1e3a2f; color: #81c784; }
+
+  /* ── Student List ── */
+  .student-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
+  .student-row {
+    display: flex; align-items: center; gap: 1rem;
+    background: white; border-radius: 12px;
+    padding: 0.75rem 1.1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    cursor: pointer; transition: box-shadow 0.18s, transform 0.15s;
+    border: 1.5px solid transparent;
+  }
+  .student-row:hover { box-shadow: 0 4px 16px rgba(10,31,68,0.10); border-color: #c9a03d33; transform: translateY(-1px); }
+  .student-row .sno { font-size: 0.78rem; color: #aab; min-width: 28px; font-weight: 600; }
+  .student-row .appno { font-size: 0.75rem; color: #888; min-width: 90px; font-family: monospace; }
+  .student-row .sname { font-weight: 700; color: #0a1f44; font-size: 0.95rem; flex: 1; min-width: 140px; }
+  .student-row .semail { font-size: 0.82rem; color: #555; flex: 1; min-width: 160px; }
+  .student-row .scat { min-width: 90px; }
+  .student-row .stime { font-size: 0.75rem; color: #888; white-space: nowrap; min-width: 130px; }
+  .student-row .sstatus { min-width: 85px; text-align: right; }
+
+  .badge-success { background: #d4edda; color: #155724; padding: 0.22rem 0.6rem; border-radius: 20px; font-size: 0.73rem; font-weight: 600; display: inline-block; }
+  .badge-warning { background: #fff3cd; color: #856404; padding: 0.22rem 0.6rem; border-radius: 20px; font-size: 0.73rem; font-weight: 600; display: inline-block; }
+  .category-badge { background: #e8f5e9; color: #2e7d32; padding: 0.18rem 0.5rem; border-radius: 12px; font-size: 0.7rem; display: inline-block; white-space: nowrap; }
+  .bool-yes { background: #d4edda; color: #155724; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+  .bool-no  { background: #f1f3f5; color: #aaa; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; display: inline-block; }
+
+  .list-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.4rem 1.1rem; font-size: 0.72rem; font-weight: 700;
+    color: #0a1f44; text-transform: uppercase; letter-spacing: 0.04em;
+    opacity: 0.6;
+  }
+  .list-header .sno  { min-width: 28px; }
+  .list-header .appno { min-width: 90px; }
+  .list-header .sname { flex: 1; min-width: 140px; }
+  .list-header .semail { flex: 1; min-width: 160px; }
+  .list-header .scat { min-width: 90px; }
+  .list-header .stime { min-width: 130px; }
+  .list-header .sstatus { min-width: 85px; text-align: right; }
+
+  .empty-state { text-align: center; padding: 3rem; color: #888; background: white; border-radius: 12px; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);
+    z-index: 9999; align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: white; border-radius: 18px;
+    width: 100%; max-width: 720px; max-height: 90vh;
+    overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: modalIn 0.22s ease;
+    position: relative;
+  }
+  @keyframes modalIn { from { transform: translateY(24px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-header {
+    position: sticky; top: 0; background: #0a1f44;
+    padding: 1.1rem 1.4rem; border-radius: 18px 18px 0 0;
+    display: flex; align-items: center; justify-content: space-between; z-index: 1;
+  }
+  .modal-header h3 { color: white; font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0; }
+  .modal-close {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.28); }
+  .modal-body { padding: 1.4rem; }
+
+  .detail-section { margin-bottom: 1.4rem; }
+  .detail-section-title {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #c9a03d; margin-bottom: 0.6rem;
+    padding-bottom: 0.3rem; border-bottom: 1px solid #f0e8d5;
+  }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.2rem; }
+  .detail-item { display: flex; flex-direction: column; gap: 0.1rem; }
+  .detail-label { font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+  .detail-value { font-size: 0.9rem; color: #1a2c3e; font-weight: 500; word-break: break-word; }
+  .detail-value.—  { color: #ccc; }
+
+  /* Dark mode */
+  body.dark .student-row { background: #1a2538; }
+  body.dark .student-row .sname { color: #eef2ff; }
+  body.dark .student-row .semail, body.dark .student-row .stime { color: #aab; }
+  body.dark .modal-box { background: #1a2538; }
+  body.dark .detail-value { color: #eef2ff; }
   body.dark .search-bar input { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
-  @media (max-width: 768px) {
-    .admin-table th, .admin-table td { padding: 0.5rem; font-size: 0.75rem; }
+  body.dark .empty-state { background: #1a2538; }
+
+  @media (max-width: 600px) {
+    .student-row .semail, .student-row .stime, .student-row .appno { display: none; }
+    .list-header .semail, .list-header .stime, .list-header .appno { display: none; }
+    .detail-grid { grid-template-columns: 1fr; }
   }
 </style>
 
 <div class="page-wrap">
   <div class="page-header-inner">
-    <h2><i class="fas fa-users"></i> All Applications</h2>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline btn-sm">
+    <h2><i class="fas fa-users"></i> All Applications
+      <span style="font-size:0.9rem; font-weight:400; color:#888; font-family:sans-serif; margin-left:0.5rem;">({{ students|length }})</span>
+    </h2>
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm">
       <i class="fas fa-arrow-left"></i> Dashboard
     </a>
   </div>
@@ -46,108 +130,196 @@
     {% if q %}<a href="{{ url_for('main.admin_students') }}" class="btn-outline btn-sm"><i class="fas fa-times"></i> Clear</a>{% endif %}
   </form>
 
-  <div class="table-wrap">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Application Number</th>
-          <th>Timestamp</th>
-          <th>Name of the Candidate</th>
-          <th>Mother's Name</th>
-          <th>Father's Name</th>
-          <th>Date of Birth</th>
-          <th>Gender</th>
-          <th>Mobile Number of Parent</th>
-          <th>Mobile Number of Candidate</th>
-          <th>E-mail Id</th>
-          <th>Address</th>
-          <th>Nationality</th>
-          <th>Religion</th>
-          <th>Category</th>
-          <th>HK Region</th>
-          <th>Kannada Medium</th>
-          <th>Rural Background</th>
-          <th>Caste Certificate No.</th>
-          <th>Parent's Annual Income</th>
-          <th>Income Certificate No.</th>
-          <th>10th Standard Board</th>
-          <th>10th Standard Percentage</th>
-          <th>12th Standard Board</th>
-          <th>12th Standard Stream</th>
-          <th>12th Standard Combination</th>
-          <th>12th Standard Max. Marks</th>
-          <th>12th Standard Marks Scored</th>
-          <th>12th Standard Percentage</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for s in students %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td><strong>{{ s.application_number }}</strong></td>
-          <td style="white-space:nowrap;">{{ s.submitted_at | ist }}</td>
-          <td><strong>{{ s.candidate_name or '—' }}</strong></td>
-          <td>{{ s.mother_name or '—' }}</td>
-          <td>{{ s.father_name or '—' }}</td>
-          <td style="white-space:nowrap;">{{ s.dob or '—' }}</td>
-          <td>{{ s.gender or '—' }}</td>
-          <td>{{ s.parent_mobile or '—' }}</td>
-          <td>{{ s.phone or '—' }}</td>
-          <td>{{ s.email or '—' }}</td>
-          <td style="max-width:180px; word-break:break-word;">{{ s.address or '—' }}</td>
-          <td>{{ s.nationality or '—' }}</td>
-          <td>{{ s.religion or '—' }}</td>
-          <td>
-            {% if s.category %}
-              <span class="category-badge"><i class="fas fa-tag"></i> {{ s.category.name }}</span>
-            {% else %}—{% endif %}
-          </td>
-          <td>{% if s.hk_region %}<span class="bool-yes">Yes</span>{% else %}<span class="bool-no">No</span>{% endif %}</td>
-          <td>{% if s.kannada_medium %}<span class="bool-yes">Yes</span>{% else %}<span class="bool-no">No</span>{% endif %}</td>
-          <td>{% if s.rural_background %}<span class="bool-yes">Yes</span>{% else %}<span class="bool-no">No</span>{% endif %}</td>
-          <td>{{ s.caste_certificate_no or '—' }}</td>
-          <td>{{ s.parent_annual_income or '—' }}</td>
-          <td>{{ s.income_certificate_no or '—' }}</td>
-          <td>{{ s.board_10 or '—' }}</td>
-          <td>{{ "%.2f"|format(s.percent_10) if s.percent_10 else '—' }}{% if s.percent_10 %}%{% endif %}</td>
-          <td>{{ s.board_12 or '—' }}</td>
-          <td>{{ s.stream_12 or '—' }}</td>
-          <td>{{ s.combination_12 or '—' }}</td>
-          <td>{{ s.total_12|int if s.total_12 else '—' }}</td>
-          <td>{{ s.obtained_12|int if s.obtained_12 else '—' }}</td>
-          <td><strong>{{ "%.2f"|format(s.percent_12) if s.percent_12 else '—' }}{% if s.percent_12 %}%{% endif %}</strong></td>
-          <td>
-            {% if s.is_verified %}
-              <span class="badge-success"><i class="fas fa-check-circle"></i> Verified</span>
-            {% else %}
-              <span class="badge-warning"><i class="fas fa-clock"></i> Pending</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% else %}
-        <tr>
-          <td colspan="30" style="text-align:center; padding:3rem; color:#888;">
-            <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:0.5rem; display:block;"></i>
-            No applications found.
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  {% if students %}
+  <div class="list-header">
+    <span class="sno">#</span>
+    <span class="appno">App No.</span>
+    <span class="sname">Name</span>
+    <span class="semail">Email</span>
+    <span class="scat">Category</span>
+    <span class="stime">Submitted</span>
+    <span class="sstatus">Status</span>
   </div>
 
+  <div class="student-list">
+    {% for s in students %}
+    <div class="student-row" onclick="openModal({{ loop.index0 }})">
+      <span class="sno">{{ loop.index }}</span>
+      <span class="appno">{{ s.application_number or '—' }}</span>
+      <span class="sname"><i class="fas fa-user-circle" style="color:#c9a03d; margin-right:0.3rem;"></i>{{ s.candidate_name or '—' }}</span>
+      <span class="semail">{{ s.email or '—' }}</span>
+      <span class="scat">
+        {% if s.category %}
+          <span class="category-badge">{{ s.category.name }}</span>
+        {% else %}—{% endif %}
+      </span>
+      <span class="stime">{{ s.submitted_at | ist if s.submitted_at else '—' }}</span>
+      <span class="sstatus">
+        {% if s.is_verified %}
+          <span class="badge-success"><i class="fas fa-check-circle"></i> Verified</span>
+        {% else %}
+          <span class="badge-warning"><i class="fas fa-clock"></i> Pending</span>
+        {% endif %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:0.5rem; display:block; color:#ccc;"></i>
+    No applications found.
+  </div>
+  {% endif %}
+
   <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
-    <a href="{{ url_for('main.export_all') }}" class="btn-outline btn-sm">
-      <i class="fas fa-file-excel"></i> Export All (Excel)
-    </a>
-    <a href="{{ url_for('main.export_verified') }}" class="btn-outline btn-sm">
-      <i class="fas fa-file-excel"></i> Export Verified (Excel)
-    </a>
-    <a href="{{ url_for('main.admin_verification') }}" class="btn-outline btn-sm">
-      <i class="fas fa-clock"></i> Pending Verification
-    </a>
+    <a href="{{ url_for('main.export_all') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export All (Excel)</a>
+    <a href="{{ url_for('main.export_verified') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export Verified (Excel)</a>
+    <a href="{{ url_for('main.admin_verification') }}" class="btn-outline btn-sm"><i class="fas fa-clock"></i> Pending Verification</a>
   </div>
 </div>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="studentModal" onclick="closeModalOutside(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-header">
+      <h3 id="modalName">Student Details</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  var students = [
+    {% for s in students %}
+    {
+      name:               {{ (s.candidate_name or '—') | tojson }},
+      app_number:         {{ (s.application_number or '—') | tojson }},
+      submitted_at:       {{ (s.submitted_at | ist if s.submitted_at else '—') | tojson }},
+      email:              {{ (s.email or '—') | tojson }},
+      phone:              {{ (s.phone or '—') | tojson }},
+      parent_mobile:      {{ (s.parent_mobile or '—') | tojson }},
+      dob:                {{ (s.dob or '—') | tojson }},
+      gender:             {{ (s.gender or '—') | tojson }},
+      mother_name:        {{ (s.mother_name or '—') | tojson }},
+      father_name:        {{ (s.father_name or '—') | tojson }},
+      address:            {{ (s.address or '—') | tojson }},
+      nationality:        {{ (s.nationality or '—') | tojson }},
+      religion:           {{ (s.religion or '—') | tojson }},
+      category:           {{ (s.category.name if s.category else '—') | tojson }},
+      hk_region:          {{ s.hk_region | tojson }},
+      kannada_medium:     {{ s.kannada_medium | tojson }},
+      rural_background:   {{ s.rural_background | tojson }},
+      caste_cert:         {{ (s.caste_certificate_no or '—') | tojson }},
+      annual_income:      {{ (s.parent_annual_income or '—') | tojson }},
+      income_cert:        {{ (s.income_certificate_no or '—') | tojson }},
+      board_10:           {{ (s.board_10 or '—') | tojson }},
+      percent_10:         {{ ('%.2f'|format(s.percent_10) ~ '%' if s.percent_10 else '—') | tojson }},
+      board_12:           {{ (s.board_12 or '—') | tojson }},
+      stream_12:          {{ (s.stream_12 or '—') | tojson }},
+      combination_12:     {{ (s.combination_12 or '—') | tojson }},
+      total_12:           {{ (s.total_12|int|string if s.total_12 else '—') | tojson }},
+      obtained_12:        {{ (s.obtained_12|int|string if s.obtained_12 else '—') | tojson }},
+      percent_12:         {{ ('%.2f'|format(s.percent_12) ~ '%' if s.percent_12 else '—') | tojson }},
+      is_verified:        {{ s.is_verified | tojson }},
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  function bool(v) {
+    return v
+      ? '<span class="bool-yes">Yes</span>'
+      : '<span class="bool-no">No</span>';
+  }
+
+  function row(label, value) {
+    return `<div class="detail-item"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`;
+  }
+
+  function openModal(idx) {
+    var s = students[idx];
+    document.getElementById('modalName').textContent = s.name;
+
+    var html = '';
+
+    // Personal
+    html += '<div class="detail-section">';
+    html += '<div class="detail-section-title"><i class="fas fa-id-card"></i> Personal Information</div>';
+    html += '<div class="detail-grid">';
+    html += row('Application No.', s.app_number);
+    html += row('Submitted At', s.submitted_at);
+    html += row('Full Name', s.name);
+    html += row('Date of Birth', s.dob);
+    html += row('Gender', s.gender);
+    html += row('Mother\'s Name', s.mother_name);
+    html += row('Father\'s Name', s.father_name);
+    html += row('Religion', s.religion);
+    html += row('Nationality', s.nationality);
+    html += row('Address', s.address);
+    html += '</div></div>';
+
+    // Contact
+    html += '<div class="detail-section">';
+    html += '<div class="detail-section-title"><i class="fas fa-phone"></i> Contact Details</div>';
+    html += '<div class="detail-grid">';
+    html += row('Email', s.email);
+    html += row('Candidate Mobile', s.phone);
+    html += row('Parent Mobile', s.parent_mobile);
+    html += '</div></div>';
+
+    // Category & Reservation
+    html += '<div class="detail-section">';
+    html += '<div class="detail-section-title"><i class="fas fa-tag"></i> Category & Reservation</div>';
+    html += '<div class="detail-grid">';
+    html += row('Category', s.category);
+    html += row('HK Region', bool(s.hk_region));
+    html += row('Kannada Medium', bool(s.kannada_medium));
+    html += row('Rural Background', bool(s.rural_background));
+    html += row('Caste Certificate No.', s.caste_cert);
+    html += row('Parent\'s Annual Income', s.annual_income);
+    html += row('Income Certificate No.', s.income_cert);
+    html += '</div></div>';
+
+    // Academics
+    html += '<div class="detail-section">';
+    html += '<div class="detail-section-title"><i class="fas fa-graduation-cap"></i> Academic Details</div>';
+    html += '<div class="detail-grid">';
+    html += row('10th Board', s.board_10);
+    html += row('10th Percentage', s.percent_10);
+    html += row('12th Board', s.board_12);
+    html += row('12th Stream', s.stream_12);
+    html += row('12th Combination', s.combination_12);
+    html += row('12th Max. Marks', s.total_12);
+    html += row('12th Marks Scored', s.obtained_12);
+    html += row('12th Percentage', `<strong>${s.percent_12}</strong>`);
+    html += '</div></div>';
+
+    // Status
+    var statusBadge = s.is_verified
+      ? '<span class="badge-success"><i class="fas fa-check-circle"></i> Verified</span>'
+      : '<span class="badge-warning"><i class="fas fa-clock"></i> Pending Verification</span>';
+    html += '<div class="detail-section">';
+    html += '<div class="detail-section-title"><i class="fas fa-info-circle"></i> Application Status</div>';
+    html += `<div style="padding:0.3rem 0;">${statusBadge}</div>`;
+    html += '</div>';
+
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('studentModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('studentModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('studentModal')) closeModal();
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
 {% endblock %}
