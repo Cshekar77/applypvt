@@ -219,6 +219,7 @@ def api_register_student():
         return jsonify({"error": "Unauthorized"}), 401
 
     data = request.get_json()
+    print(data)
     if not data:
         return jsonify({"error": "Invalid or missing JSON body"}), 400
 
