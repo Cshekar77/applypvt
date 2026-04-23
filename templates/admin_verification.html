@@ -37,7 +37,7 @@
 
   .btn-sm { font-size: .8rem; padding: .35rem .8rem; }
 
-  /* ── List card ── */
+  /* List card */
   .list-card {
     background: white; border-radius: 20px;
     border: 1px solid #eef2f8; overflow: hidden; margin-bottom: 1.5rem;
@@ -49,7 +49,7 @@
   .list-card-header h3 { font-size: 1rem; color: #0a1f44; margin: 0; }
   .list-card-header i  { color: #c9a03d; }
 
-  /* ── Student rows ── */
+  /* Student rows */
   .stu-row {
     display: flex; align-items: center; gap: 1rem;
     padding: .9rem 1.5rem; border-bottom: 1px solid #f5f7fa;
@@ -79,7 +79,7 @@
 
   .row-arrow { color: #c9a03d; font-size: .8rem; flex-shrink: 0; }
 
-  /* ── Modal ── */
+  /* Modal */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
     background: rgba(10,31,68,.45);
@@ -89,7 +89,7 @@
 
   .modal-box {
     background: white; border-radius: 24px;
-    width: 100%; max-width: 660px;
+    width: 100%; max-width: 760px;
     max-height: 90vh; overflow-y: auto;
     box-shadow: 0 20px 60px rgba(10,31,68,.2);
     animation: modal-in .18s ease;
@@ -120,7 +120,7 @@
 
   /* Detail grid */
   .detail-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: .75rem; margin-bottom: 1.25rem;
   }
   .detail-item span {
@@ -136,40 +136,8 @@
     border-bottom: 1px solid #f5f7fa;
   }
 
-  /* Marksheet links */
-  .marksheet-row { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-  .marksheet-btn {
-    display: inline-flex; align-items: center; gap: .4rem;
-    padding: .45rem .9rem; border-radius: 10px; font-size: .82rem;
-    font-weight: 600; text-decoration: none; border: 1px solid #dde3ef;
-    color: #0a1f44; background: #f5f7fa; transition: all .2s;
-  }
-  .marksheet-btn:hover { background: #eef2f8; border-color: #c9a03d; color: #c9a03d; }
-  .marksheet-btn i { color: #c9a03d; }
+  .modal-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
 
-  /* Notes + verify form */
-  .notes-field { margin-bottom: 1rem; }
-  .notes-field label {
-    font-size: .78rem; font-weight: 600; color: #5a6e82;
-    text-transform: uppercase; letter-spacing: .04em;
-    display: block; margin-bottom: .4rem;
-  }
-  .notes-field input {
-    width: 100%; padding: .55rem .9rem; border: 1px solid #dde3ef;
-    border-radius: 12px; font-size: .88rem; color: #0a1f44;
-    box-sizing: border-box;
-  }
-  .notes-field input:focus { outline: none; border-color: #c9a03d; }
-
-  .modal-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
-
-  .sop-box {
-    background: #f5f7fa; border-radius: 12px; padding: .75rem 1rem;
-    font-size: .85rem; color: #5a6e82; font-style: italic;
-    margin-bottom: 1.25rem; border-left: 3px solid #c9a03d;
-  }
-
-  /* Empty state */
   .empty-state {
     text-align: center; padding: 3rem 1rem; color: #aab4c8;
     background: white; border-radius: 20px; border: 1px solid #eef2f8;
@@ -195,11 +163,6 @@
   body.dark .modal-close   { background: #2d3e54; color: #b9c8e8; }
   body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .section-divider { color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .detail-grid   { }
-  body.dark .notes-field label { color: #b9c8e8; }
-  body.dark .notes-field input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .marksheet-btn { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .sop-box { background: #0f1c2e; color: #b9c8e8; }
   body.dark .empty-state { background: #1a2538; border-color: #2d3e54; }
 
   @media (max-width: 600px) {
@@ -249,15 +212,15 @@
     </div>
 
     {% for s in students %}
-    {# ── List row ── #}
+    {# List row #}
     <div class="stu-row" onclick="openModal('ver-modal-{{ s.id }}')">
       <span class="serial-num">{{ loop.index }}</span>
       <div class="stu-info">
-        <div class="stu-name">{{ s.full_name }}</div>
-        <div class="stu-sub">{{ s.email }} &bull; {{ s.phone or '—' }}</div>
+        <div class="stu-name">{{ s.candidate_name or s.full_name }}</div>
+        <div class="stu-sub">{{ s.email }} &bull; {{ s.phone or s.parent_mobile or '—' }}</div>
       </div>
       <span class="badge badge-submitted">
-        {{ s.submitted_at.strftime('%d %b %Y') if s.submitted_at else '—' }}
+        {{ s.submitted_at.strftime('%d %b %Y, %I:%M %p') if s.submitted_at else '—' }}
       </span>
       <span class="badge badge-warning">
         <i class="fas fa-hourglass-half"></i> Pending
@@ -265,7 +228,7 @@
       <span class="row-arrow"><i class="fas fa-chevron-right"></i></span>
     </div>
 
-    {# ── Modal ── #}
+    {# Modal #}
     <div class="modal-overlay" id="ver-modal-{{ s.id }}"
       onclick="closeOnOverlay(event, 'ver-modal-{{ s.id }}')">
       <div class="modal-box">
@@ -273,9 +236,9 @@
         {# Header #}
         <div class="modal-header">
           <div>
-            <div class="modal-title">{{ s.full_name }}</div>
+            <div class="modal-title">{{ s.candidate_name or s.full_name }}</div>
             <div class="modal-sub">
-              {{ s.email }} &bull; {{ s.phone or '—' }}
+              {{ s.email }} &bull; {{ s.phone or s.parent_mobile or '—' }}
               {% if s.submitted_at %}
                 &bull; Submitted {{ s.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
               {% endif %}
@@ -292,6 +255,18 @@
           <div class="section-divider"><i class="fas fa-user"></i> Personal Details</div>
           <div class="detail-grid">
             <div class="detail-item">
+              <span>Candidate Name</span>
+              <strong>{{ s.candidate_name or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Mother's Name</span>
+              <strong>{{ s.mother_name or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Father's Name</span>
+              <strong>{{ s.father_name or '—' }}</strong>
+            </div>
+            <div class="detail-item">
               <span>Date of Birth</span>
               <strong>{{ s.dob or '—' }}</strong>
             </div>
@@ -300,12 +275,24 @@
               <strong>{{ s.gender or '—' }}</strong>
             </div>
             <div class="detail-item">
-              <span>Nationality</span>
-              <strong>{{ s.nationality or '—' }}</strong>
+              <span>Parent Mobile</span>
+              <strong>{{ s.parent_mobile or '—' }}</strong>
             </div>
             <div class="detail-item">
-              <span>Category</span>
-              <strong>{{ s.category_name or '—' }}</strong>
+              <span>Student Mobile</span>
+              <strong>{{ s.phone or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Email</span>
+              <strong>{{ s.email or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Nationality</span>
+              <strong>{{ s.nationality or 'Indian' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Religion</span>
+              <strong>{{ s.religion or '—' }}</strong>
             </div>
             <div class="detail-item">
               <span>Address</span>
@@ -313,29 +300,49 @@
             </div>
           </div>
 
+          {# Category & Background #}
+          <div class="section-divider"><i class="fas fa-tags"></i> Category & Background</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>Application Category</span>
+              <strong>{{ s.category_name or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>HK Region</span>
+              <strong>{{ 'Yes' if s.hk_region else 'No' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Kannada Medium</span>
+              <strong>{{ 'Yes' if s.kannada_medium else 'No' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Rural Background</span>
+              <strong>{{ 'Yes' if s.rural_background else 'No' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Caste Certificate No.</span>
+              <strong>{{ s.caste_certificate_no or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Parent Annual Income</span>
+              <strong>{{ s.parent_annual_income or '—' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Income Certificate No.</span>
+              <strong>{{ s.income_certificate_no or '—' }}</strong>
+            </div>
+          </div>
+
           {# Class 10 #}
           <div class="section-divider"><i class="fas fa-graduation-cap"></i> Class 10</div>
           <div class="detail-grid">
             <div class="detail-item">
-              <span>School</span>
-              <strong>{{ s.school_10 or '—' }}</strong>
-            </div>
-            <div class="detail-item">
               <span>Board</span>
-              <strong>{{ s.board_10_display or s.board_10 or '—' }}</strong>
+              <strong>{{ s.board_10 or '—' }}</strong>
             </div>
             <div class="detail-item">
-              <span>Year</span>
-              <strong>{{ s.year_10 or '—' }}</strong>
-            </div>
-            <div class="detail-item">
-              <span>Marks</span>
-              <strong>
-                {% if s.obtained_10 and s.total_10 %}
-                  {{ s.obtained_10|int }} / {{ s.total_10|int }}
-                  {% if s.percent_10 %}({{ s.percent_10 }}%){% endif %}
-                {% else %}—{% endif %}
-              </strong>
+              <span>Percentage</span>
+              <strong>{% if s.percent_10 %}{{ s.percent_10 }}%{% else %}—{% endif %}</strong>
             </div>
           </div>
 
@@ -343,69 +350,43 @@
           <div class="section-divider"><i class="fas fa-graduation-cap"></i> Class 12</div>
           <div class="detail-grid">
             <div class="detail-item">
-              <span>College</span>
-              <strong>{{ s.school_12 or '—' }}</strong>
-            </div>
-            <div class="detail-item">
               <span>Board</span>
-              <strong>{{ s.board_12_display or s.board_12 or '—' }}</strong>
+              <strong>{{ s.board_12 or '—' }}</strong>
             </div>
             <div class="detail-item">
               <span>Stream</span>
               <strong>{{ s.stream_12 or '—' }}</strong>
             </div>
             <div class="detail-item">
-              <span>Year</span>
-              <strong>{{ s.year_12 or '—' }}</strong>
+              <span>Combination</span>
+              <strong>{{ s.combination_12 or '—' }}</strong>
             </div>
             <div class="detail-item">
-              <span>Marks</span>
-              <strong>
-                {% if s.obtained_12 and s.total_12 %}
-                  {{ s.obtained_12|int }} / {{ s.total_12|int }}
-                  {% if s.percent_12 %}({{ s.percent_12 }}%){% endif %}
-                {% else %}—{% endif %}
-              </strong>
+              <span>Total Marks</span>
+              <strong>{% if s.total_12 %}{{ s.total_12|int }}{% else %}—{% endif %}</strong>
             </div>
             <div class="detail-item">
-              <span>Specialization</span>
-              <strong>{{ s.specialization or '—' }}</strong>
+              <span>Obtained Marks</span>
+              <strong>{% if s.obtained_12 %}{{ s.obtained_12|int }}{% else %}—{% endif %}</strong>
+            </div>
+            <div class="detail-item">
+              <span>Percentage</span>
+              <strong>{% if s.percent_12 %}{{ s.percent_12 }}%{% else %}—{% endif %}</strong>
             </div>
           </div>
 
-          {# Marksheets #}
-          {% if s.marksheet_10 or s.marksheet_12 %}
-          <div class="section-divider"><i class="fas fa-file-alt"></i> Documents</div>
-          <div class="marksheet-row">
-            {% if s.marksheet_10 %}
-            <a href="{{ url_for('static', filename='uploads/' + s.marksheet_10) }}"
-              target="_blank" class="marksheet-btn">
-              <i class="fas fa-file-pdf"></i> View Class 10 Marksheet
-            </a>
-            {% endif %}
-            {% if s.marksheet_12 %}
-            <a href="{{ url_for('static', filename='uploads/' + s.marksheet_12) }}"
-              target="_blank" class="marksheet-btn">
-              <i class="fas fa-file-pdf"></i> View Class 12 Marksheet
-            </a>
-            {% endif %}
+          {# Declaration #}
+          <div class="section-divider"><i class="fas fa-file-signature"></i> Declaration</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>Declaration Accepted</span>
+              <strong>{{ 'Yes' if s.declaration else 'No' }}</strong>
+            </div>
           </div>
-          {% endif %}
-
-          {# SOP / Why BCA #}
-          {% if s.why_bca %}
-          <div class="section-divider"><i class="fas fa-comment"></i> Statement of Purpose</div>
-          <div class="sop-box">{{ s.why_bca }}</div>
-          {% endif %}
 
           {# Verify form #}
           <div class="section-divider"><i class="fas fa-check-circle"></i> Verification Action</div>
           <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}">
-            <div class="notes-field">
-              <label>Admin Notes (optional)</label>
-              <input type="text" name="notes"
-                placeholder="Any notes about this applicant…">
-            </div>
             <div class="modal-actions">
               <button type="submit" class="btn-primary">
                 <i class="fas fa-check"></i> Mark as Verified
