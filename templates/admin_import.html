@@ -2,7 +2,7 @@
 {% block title %}Import Students — Admin{% endblock %}
 {% block content %}
 <style>
-.imp-page { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+.imp-page { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 
 .imp-header {
   display: flex; align-items: center; gap: 1rem;
@@ -290,42 +290,56 @@ body.dark .field-name   { color: #eef2ff; }
         </thead>
         <tbody>
           {% set fields = [
-            ('email',        'Email Address',        True,  'Used as login username'),
-            ('full_name',    'Full Name',            True,  'Student full name (or use first+last name columns)'),
-            ('first_name',   'First Name',           False, 'If you have separate first/last name columns'),
-            ('last_name',    'Last Name',            False, 'If you have separate first/last name columns'),
-            ('dob',          'Date of Birth',        True,  'Used as password (format: dd-mm-yyyy or dd/mm/yyyy)'),
-            ('phone',        'Phone Number',         False, 'Mobile/contact number'),
-            ('gender',       'Gender',               False, 'Male / Female / Other'),
-            ('address',      'Address',              False, 'Residential address'),
-            ('nationality',  'Nationality',          False, 'Default: Indian'),
-            ('category',     'Category',             False, 'General / SC / ST / OBC / EWS / PWD'),
-            ('school_10',    'Class 10 School',      False, 'School/institution name'),
-            ('board_10',     'Class 10 Board',       False, 'e.g. CBSE, ICSE, State Board'),
-            ('year_10',      'Class 10 Year',        False, 'Passing year'),
-            ('total_10',     'Class 10 Total Marks', False, 'Maximum marks'),
-            ('obtained_10',  'Class 10 Obtained',    False, 'Marks obtained'),
-            ('percent_10',   'Class 10 Percentage',  False, 'Will be auto-calculated if total+obtained given'),
-            ('school_12',    'Class 12 School',      False, 'School/institution name'),
-            ('board_12',     'Class 12 Board',       False, 'e.g. CBSE, ICSE, State Board'),
-            ('stream_12',    'Class 12 Stream',      False, 'Science / Commerce / Arts'),
-            ('year_12',      'Class 12 Year',        False, 'Passing year'),
-            ('total_12',     'Class 12 Total Marks', False, 'Maximum marks'),
-            ('obtained_12',  'Class 12 Obtained',    False, 'Marks obtained'),
-            ('percent_12',   'Class 12 Percentage',  False, 'Will be auto-calculated if total+obtained given'),
-            ('specialization','Specialization',      False, 'BCA specialization preference'),
+            # Required fields
+            ('email',            'Email Address',         True,  'Used as login username'),
+            ('full_name',        'Candidate Name',        True,  'Full name of the candidate'),
+            ('dob',              'Date of Birth',         True,  'Used as password (format: dd-mm-yyyy or dd/mm/yyyy)'),
+            
+            # Personal details
+            ('mother_name',      "Mother's Name",         False, 'Mother\'s full name'),
+            ('father_name',      "Father's Name",         False, 'Father\'s full name'),
+            ('gender',           'Gender',                False, 'Male / Female / Other'),
+            ('parent_mobile',    'Parent Mobile Number',  False, 'Parent/Guardian mobile number'),
+            ('phone',            'Student Mobile Number', False, 'Student\'s own mobile number'),
+            ('address',          'Address',               False, 'Residential address'),
+            ('nationality',      'Nationality',           False, 'Default: Indian'),
+            ('religion',         'Religion',              False, 'Religion/Caste category'),
+            
+            # Category & Background
+            ('category',         'Category',              False, 'General / SC / ST / OBC / EWS / PWD'),
+            ('hk_region',        'HK Region',             False, 'Hyderabad-Karnataka region (Yes/No)'),
+            ('kannada_medium',   'Kannada Medium',        False, 'Studied in Kannada medium (Yes/No)'),
+            ('rural_background', 'Rural Background',      False, 'From rural area (Yes/No)'),
+            ('caste_certificate_no', 'Caste Certificate No.', False, 'Caste certificate number'),
+            ('parent_annual_income', 'Parent Annual Income', False, 'Parent\'s annual income'),
+            ('income_certificate_no', 'Income Certificate No.', False, 'Income certificate number'),
+            
+            # 10th Standard
+            ('board_10',         '10th Board',            False, 'e.g. CBSE, ICSE, State Board'),
+            ('percent_10',       '10th Percentage',       False, '10th standard percentage'),
+            
+            # 12th Standard
+            ('board_12',         '12th Board',            False, 'e.g. CBSE, ICSE, State Board'),
+            ('stream_12',        '12th Stream',           False, 'Science / Commerce / Arts'),
+            ('combination_12',   '12th Combination',      False, 'PCM, PCB, Commerce with Maths, etc.'),
+            ('total_12',         '12th Total Marks',      False, 'Maximum marks in 12th'),
+            ('obtained_12',      '12th Obtained Marks',   False, 'Marks obtained in 12th'),
+            ('percent_12',       '12th Percentage',       False, '12th standard percentage (auto-calculated if total+obtained given)'),
+            
+            # Declaration
+            ('declaration',      'Declaration',           False, 'Student declaration (Yes/No)'),
           ] %}
 
           {% for field_key, field_label, required, desc in fields %}
           <tr>
-            <td>
+            <td style="width: 35%">
               <div class="field-name">
                 {{ field_label }}
                 {% if required %}<span class="field-req">Required</span>{% else %}<span class="field-opt">Optional</span>{% endif %}
               </div>
               <div class="field-desc">{{ desc }}</div>
             </td>
-            <td>
+            <td style="width: 65%">
               <select name="map_{{ field_key }}" class="map-select">
                 <option value="">— Skip this field —</option>
                 {% for col in columns %}
@@ -394,8 +408,17 @@ body.dark .field-name   { color: #eef2ff; }
       <i class="fas fa-info-circle"></i>
       <div>
         <strong>How it works:</strong> Upload any Excel file → We detect your column names → You map them to our fields → We import the data and auto-create student accounts.
-        <br><strong>Password:</strong> Each student's password will be their Date of Birth (e.g. <code>15-08-2001</code>).
-        <strong>Username:</strong> Their email address.
+        <br><br>
+        <strong>Required columns in your Excel file:</strong>
+        <ul style="margin-top: .5rem; margin-bottom: 0;">
+          <li><strong>Email Address</strong> - Student's email (will be used as username)</li>
+          <li><strong>Candidate Name</strong> - Full name of the student</li>
+          <li><strong>Date of Birth</strong> - Will be used as password (format: DD-MM-YYYY)</li>
+        </ul>
+        <br>
+        <strong>Optional but recommended:</strong> Mother's Name, Father's Name, Category, 10th/12th details, etc.
+        <br><br>
+        <strong>Password:</strong> Each student's password will be their Date of Birth (e.g. <code>15-08-2001</code> → <code>15082001</code>).
       </div>
     </div>
 
@@ -429,10 +452,12 @@ body.dark .field-name   { color: #eef2ff; }
       <li>Make sure the <strong>first row</strong> of your Excel file contains column headers</li>
       <li>Each student must have a unique <strong>email address</strong></li>
       <li>Date of birth should be in <strong>DD-MM-YYYY</strong> or <strong>DD/MM/YYYY</strong> format</li>
-      <li>Category names should match exactly: <strong>General, SC, ST, OBC, EWS, PWD</strong></li>
+      <li><strong>Category names</strong> should match your admin categories: General, SC, ST, OBC, Cat-I, 2A, 2B, 3A, 3B</li>
+      <li><strong>Yes/No fields</strong> (HK Region, Kannada Medium, Rural Background, Declaration) accept: Yes/No, True/False, 1/0</li>
       <li>Percentage can be auto-calculated if you provide Total Marks and Obtained Marks</li>
       <li>Students already in the system (same email) will be <strong>skipped</strong>, not duplicated</li>
       <li>All imported students will be marked as <strong>email-verified</strong> automatically</li>
+      <li>After import, you'll need to <strong>verify</strong> students and assign ranks manually in admin panel</li>
     </ul>
   </div>
   {% endif %}
