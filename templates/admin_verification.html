@@ -220,7 +220,7 @@
         <div class="stu-sub">{{ s.email }} &bull; {{ s.phone or s.parent_mobile or '—' }}</div>
       </div>
       <span class="badge badge-submitted">
-        {{ s.submitted_at.strftime('%d %b %Y, %I:%M %p') if s.submitted_at else '—' }}
+        {{ s.submitted_at | ist if s.submitted_at else '—' }}
       </span>
       <span class="badge badge-warning">
         <i class="fas fa-hourglass-half"></i> Pending
@@ -240,7 +240,7 @@
             <div class="modal-sub">
               {{ s.email }} &bull; {{ s.phone or s.parent_mobile or '—' }}
               {% if s.submitted_at %}
-                &bull; Submitted {{ s.submitted_at.strftime('%d %b %Y, %I:%M %p') }}
+                &bull; Submitted {{ s.submitted_at | ist }}
               {% endif %}
             </div>
           </div>
@@ -268,7 +268,20 @@
             </div>
             <div class="detail-item">
               <span>Date of Birth</span>
-              <strong>{{ s.dob or '—' }}</strong>
+              <strong>
+                {% if s.dob %}
+                  {% set parts = s.dob.split('-') %}
+                  {% if parts|length == 3 %}
+                    {{ parts[2] }}-{{ parts[1] }}-{{ parts[0] }}
+                  {% elif s.dob %}
+                    {{ s.dob }}
+                  {% else %}
+                    —
+                  {% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </strong>
             </div>
             <div class="detail-item">
               <span>Gender</span>
