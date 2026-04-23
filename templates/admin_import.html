@@ -290,12 +290,9 @@ body.dark .field-name   { color: #eef2ff; }
         </thead>
         <tbody>
           {% set fields = [
-            # Required fields
             ('email',            'Email Address',         True,  'Used as login username'),
             ('full_name',        'Candidate Name',        True,  'Full name of the candidate'),
-            ('dob',              'Date of Birth',         True,  'Used as password (format: dd-mm-yyyy or dd/mm/yyyy)'),
-            
-            # Personal details
+            ('dob',              'Date of Birth',         True,  'Used as password (dd-mm-yyyy or dd/mm/yyyy)'),
             ('mother_name',      "Mother's Name",         False, 'Mother\'s full name'),
             ('father_name',      "Father's Name",         False, 'Father\'s full name'),
             ('gender',           'Gender',                False, 'Male / Female / Other'),
@@ -304,8 +301,6 @@ body.dark .field-name   { color: #eef2ff; }
             ('address',          'Address',               False, 'Residential address'),
             ('nationality',      'Nationality',           False, 'Default: Indian'),
             ('religion',         'Religion',              False, 'Religion/Caste category'),
-            
-            # Category & Background
             ('category',         'Category',              False, 'General / SC / ST / OBC / EWS / PWD'),
             ('hk_region',        'HK Region',             False, 'Hyderabad-Karnataka region (Yes/No)'),
             ('kannada_medium',   'Kannada Medium',        False, 'Studied in Kannada medium (Yes/No)'),
@@ -313,21 +308,15 @@ body.dark .field-name   { color: #eef2ff; }
             ('caste_certificate_no', 'Caste Certificate No.', False, 'Caste certificate number'),
             ('parent_annual_income', 'Parent Annual Income', False, 'Parent\'s annual income'),
             ('income_certificate_no', 'Income Certificate No.', False, 'Income certificate number'),
-            
-            # 10th Standard
             ('board_10',         '10th Board',            False, 'e.g. CBSE, ICSE, State Board'),
             ('percent_10',       '10th Percentage',       False, '10th standard percentage'),
-            
-            # 12th Standard
             ('board_12',         '12th Board',            False, 'e.g. CBSE, ICSE, State Board'),
             ('stream_12',        '12th Stream',           False, 'Science / Commerce / Arts'),
             ('combination_12',   '12th Combination',      False, 'PCM, PCB, Commerce with Maths, etc.'),
             ('total_12',         '12th Total Marks',      False, 'Maximum marks in 12th'),
             ('obtained_12',      '12th Obtained Marks',   False, 'Marks obtained in 12th'),
-            ('percent_12',       '12th Percentage',       False, '12th standard percentage (auto-calculated if total+obtained given)'),
-            
-            # Declaration
-            ('declaration',      'Declaration',           False, 'Student declaration (Yes/No)'),
+            ('percent_12',       '12th Percentage',       False, '12th percentage (auto-calculated)'),
+            ('declaration',      'Declaration',           False, 'Student declaration (Yes/No)')
           ] %}
 
           {% for field_key, field_label, required, desc in fields %}
@@ -355,7 +344,6 @@ body.dark .field-name   { color: #eef2ff; }
         </tbody>
       </table>
 
-      <!-- Preview section -->
       {% if preview_rows %}
       <div style="margin-top:2rem">
         <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#0a1f44;margin-bottom:.5rem">
@@ -418,7 +406,7 @@ body.dark .field-name   { color: #eef2ff; }
         <br>
         <strong>Optional but recommended:</strong> Mother's Name, Father's Name, Category, 10th/12th details, etc.
         <br><br>
-        <strong>Password:</strong> Each student's password will be their Date of Birth (e.g. <code>15-08-2001</code> → <code>15082001</code>).
+        <strong>Password:</strong> Each student's password will be their Date of Birth (e.g. 15-08-2001 → 15082001).
       </div>
     </div>
 
@@ -465,21 +453,19 @@ body.dark .field-name   { color: #eef2ff; }
 </div>
 
 <script>
-// File input handling - FIXED FOR MOBILE
-const uploadZone = document.getElementById('uploadZone');
-const fileInput = document.getElementById('fileInput');
-const fileChosen = document.getElementById('fileChosen');
-const fileName = document.getElementById('fileName');
+// File input handling
+var uploadZone = document.getElementById('uploadZone');
+var fileInput = document.getElementById('fileInput');
+var fileChosen = document.getElementById('fileChosen');
+var fileName = document.getElementById('fileName');
 
 if (uploadZone && fileInput) {
-  // Click on upload zone triggers file picker on both desktop AND mobile
-  uploadZone.addEventListener('click', (e) => {
-    // Don't trigger if clicking inside file-chosen area
+  uploadZone.addEventListener('click', function(e) {
     if (e.target.closest('.file-chosen')) return;
     fileInput.click();
   });
   
-  fileInput.addEventListener('change', () => {
+  fileInput.addEventListener('change', function() {
     if (fileInput.files.length > 0) {
       fileName.textContent = fileInput.files[0].name;
       fileChosen.style.display = 'block';
@@ -491,12 +477,12 @@ if (uploadZone && fileInput) {
 
 // Drag & drop
 if (uploadZone) {
-  uploadZone.addEventListener('dragover', e => { 
+  uploadZone.addEventListener('dragover', function(e) { 
     e.preventDefault(); 
     uploadZone.classList.add('dragover'); 
   });
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-  uploadZone.addEventListener('drop', e => {
+  uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('dragover'); });
+  uploadZone.addEventListener('drop', function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
     if (e.dataTransfer.files.length > 0) {
@@ -508,31 +494,30 @@ if (uploadZone) {
 }
 
 // Show spinner on submit
-const uploadForm = document.getElementById('uploadForm');
-const uploadBtn  = document.getElementById('uploadBtn');
-const uploadSpinner = document.getElementById('uploadSpinner');
+var uploadForm = document.getElementById('uploadForm');
+var uploadBtn  = document.getElementById('uploadBtn');
+var uploadSpinner = document.getElementById('uploadSpinner');
 if (uploadForm) {
-  uploadForm.addEventListener('submit', () => {
+  uploadForm.addEventListener('submit', function() {
     if (uploadSpinner) uploadSpinner.style.display = 'block';
     if (uploadBtn) uploadBtn.disabled = true;
   });
 }
 
-const importForm = document.getElementById('mapForm');
-const importBtn  = document.getElementById('importBtn');
-const importSpinner = document.getElementById('importSpinner');
+var importForm = document.getElementById('mapForm');
+var importBtn  = document.getElementById('importBtn');
+var importSpinner = document.getElementById('importSpinner');
 if (importForm) {
-  importForm.addEventListener('submit', () => {
+  importForm.addEventListener('submit', function() {
     if (importSpinner) importSpinner.style.display = 'block';
     if (importBtn) importBtn.disabled = true;
   });
 }
 
 // Highlight active step
-const stepMap = { 1: 'step-ind-1', 2: 'step-ind-2', 3: 'step-ind-3', 4: 'step-ind-4' };
-const currentStep = {{ 3 if columns else (4 if result else 1) }};
-for (let i = 1; i <= 4; i++) {
-  const el = document.getElementById('step-ind-' + i);
+var currentStep = {{ 3 if columns else (4 if result else 1) }};
+for (var i = 1; i <= 4; i++) {
+  var el = document.getElementById('step-ind-' + i);
   if (!el) continue;
   if (i < currentStep) el.classList.add('done');
   else if (i === currentStep) el.classList.add('active');
