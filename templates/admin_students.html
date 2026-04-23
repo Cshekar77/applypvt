@@ -191,6 +191,20 @@
 </div>
 
 <script>
+  // Helper function to format DOB
+  function formatDOB(dob) {
+    if (!dob || dob === '—') return '—';
+    var dobClean = dob.split(' ')[0];
+    var parts = dobClean.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      // YYYY-MM-DD to DD-MM-YYYY
+      return parts[2] + '-' + parts[1] + '-' + parts[0];
+    } else if (parts.length === 3) {
+      return parts[0] + '-' + parts[1] + '-' + parts[2];
+    }
+    return dobClean;
+  }
+
   var students = [
     {% for s in students %}
     {
@@ -250,7 +264,7 @@
     html += row('Application No.', s.app_number);
     html += row('Submitted At', s.submitted_at);
     html += row('Full Name', s.name);
-    html += row('Date of Birth', s.dob);
+    html += row('Date of Birth', formatDOB(s.dob));
     html += row('Gender', s.gender);
     html += row('Mother\'s Name', s.mother_name);
     html += row('Father\'s Name', s.father_name);
