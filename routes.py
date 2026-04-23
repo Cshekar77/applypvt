@@ -35,6 +35,10 @@ def utc_to_ist(dt):
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.astimezone(IST)
 
+def ist_now_naive():
+    """Return current IST time as naive datetime (for DB storage)."""
+    return datetime.now(IST).replace(tzinfo=None)
+
 
 # ─────────────────────────────────────────
 #  Admin guard
@@ -79,11 +83,18 @@ def _flt(val):
     except (TypeError, ValueError):
         return None
 
+def _bool_field(val):
+    """Parse Yes/No/True/False/1/0 → bool"""
+    if val is None:
+        return False
+    s = str(val).strip().lower()
+    return s in ('yes', 'true', '1', 'y')
+
 def _dob_to_password(dob_raw):
+    """Convert DOB to password: 06/11/2006 → 06112006"""
     if not dob_raw or str(dob_raw).strip() in ('', 'nan', 'NaT'):
         return None
     try:
-        # dayfirst=True ensures dd/mm/yyyy is parsed correctly
         ts = pd.to_datetime(dob_raw, dayfirst=True)
         if not pd.isna(ts):
             return ts.strftime('%d%m%Y')
@@ -95,21 +106,18 @@ def _dob_to_password(dob_raw):
 
 # ─────────────────────────────────────────
 #  Helper: sync StudentFee total → StudentFees
-#  Called after every new allotment or edit so
-#  the payment overview always shows the correct total.
 # ─────────────────────────────────────────
 def _sync_student_fees(application_id):
     sf = StudentFee.query.filter_by(application_id=application_id).first()
     if not sf:
         return
-    total = sf.total_amount          # model property: base_amount + additional_fee
+    total = sf.total_amount
     fees  = StudentFees.query.filter_by(application_id=application_id).first()
     if fees:
         fees.total_fees = total
-        fees.updated_at = datetime.utcnow()
+        fees.updated_at = ist_now_naive()
     else:
         db.session.add(StudentFees(application_id=application_id, total_fees=total))
-    # caller must call db.session.commit()
 
 
 # ─────────────────────────────────────────
@@ -263,7 +271,6 @@ def api_register_student():
         if total_12 and obtained_12 and not percent_12:
             percent_12 = round((obtained_12 / total_12) * 100, 2)
 
-        # PATCH 2 — updated StudentApplication fields
         appl = StudentApplication(
             user_id              = user.id,
             candidate_name       = full_name,
@@ -297,7 +304,6 @@ def api_register_student():
         db.session.add(appl)
         db.session.commit()
 
-        # Format DOB as dd/mm/yyyy for display in welcome email
         try:
             dob_display = pd.to_datetime(dob_raw, dayfirst=True).strftime('%d/%m/%Y')
         except Exception:
@@ -643,7 +649,6 @@ def apply():
     form       = ApplicationForm()
     categories = ApplicationCategory.query.filter_by(is_active=True).all()
 
-    # PATCH 1 — updated StudentApplication fields
     if form.validate_on_submit():
         p12 = calc_percent(form.total_12.data, form.obtained_12.data)
 
@@ -843,7 +848,7 @@ def admin_fee_categories():
                 else:
                     cat.name       = name
                     cat.amount     = amt
-                    cat.updated_at = datetime.utcnow()
+                    cat.updated_at = ist_now_naive()
                     db.session.commit()
                     flash('Fee category updated.', 'success')
 
@@ -974,7 +979,7 @@ def admin_payments():
 
 
 # ─────────────────────────────────────────
-#  Admin — Set / Update Total Fees (mirrors faculty route, admin-guarded)
+#  Admin — Set / Update Total Fees
 # ─────────────────────────────────────────
 @main.route('/admin/payments/<int:app_id>/set-fees', methods=['POST'])
 @admin_required
@@ -996,7 +1001,7 @@ def admin_set_fees(app_id):
     fees = StudentFees.query.filter_by(application_id=appl.id).first()
     if fees:
         fees.total_fees = total_fees
-        fees.updated_at = datetime.utcnow()
+        fees.updated_at = ist_now_naive()
     else:
         fees = StudentFees(application_id=appl.id, total_fees=total_fees)
         db.session.add(fees)
@@ -1068,7 +1073,7 @@ def admin_edit_receipt(receipt_id):
 
     receipt.receipt_number = receipt_number
     receipt.amount_paid    = amount_paid
-    receipt.updated_at     = datetime.utcnow()
+    receipt.updated_at     = ist_now_naive()
     db.session.commit()
     flash(f'Receipt #{receipt_number} updated.', 'success')
     return redirect(url_for('main.admin_payments'))
@@ -1091,7 +1096,6 @@ def admin_delete_receipt(receipt_id):
 # ─────────────────────────────────────────
 #  Admin — Export: Payment Overview Excel
 # ─────────────────────────────────────────
-# PATCH 4 — delegate to export_payments_excel utility
 @main.route('/admin/export/payments')
 @admin_required
 def export_payments():
@@ -1154,7 +1158,7 @@ def export_payment_receipts():
                     'Receipt No':        r.receipt_number,
                     'Amount Paid (₹)':   r.amount_paid,
                     'Receipt Date':      receipt_ist.strftime('%d %b %Y') if receipt_ist else '',
-                    'Receipt Time':      receipt_ist.strftime('%I:%M %p') if receipt_ist else '',
+                    'Receipt Time (IST)':receipt_ist.strftime('%I:%M %p') if receipt_ist else '',
                     'Total Paid So Far (₹)': total_paid,
                     'Remaining (₹)':     remaining if remaining != '' else '',
                 })
@@ -1170,7 +1174,7 @@ def export_payment_receipts():
                 'Receipt No':        '—',
                 'Amount Paid (₹)':   0,
                 'Receipt Date':      '—',
-                'Receipt Time':      '—',
+                'Receipt Time (IST)':'—',
                 'Total Paid So Far (₹)': 0,
                 'Remaining (₹)':     remaining if remaining != '' else '',
             })
@@ -1191,7 +1195,7 @@ def export_payment_receipts():
     headers = list(rows[0].keys()) if rows else [
         'Rank', 'Student Name', 'Email', 'Phone', 'Quota', 'Category',
         'Total Fees (₹)', 'Receipt No', 'Amount Paid (₹)',
-        'Receipt Date', 'Receipt Time', 'Total Paid So Far (₹)', 'Remaining (₹)'
+        'Receipt Date', 'Receipt Time (IST)', 'Total Paid So Far (₹)', 'Remaining (₹)'
     ]
 
     for col_idx, header in enumerate(headers, 1):
@@ -1299,7 +1303,7 @@ def export_document_overview():
                 approved_by    = doc.approved_by_name or ''
                 approved_at    = ''
                 if doc.approved_at:
-                    approved_at = utc_to_ist(doc.approved_at).strftime('%d %b %Y') if doc.approved_at else ''
+                    approved_at = utc_to_ist(doc.approved_at).strftime('%d %b %Y, %I:%M %p IST') if doc.approved_at else ''
             else:
                 status_label   = 'Not Given'
                 approved_label = 'No'
@@ -1456,7 +1460,7 @@ def export_admitted_students():
             'Quota':                 a.quota.title() if a.quota else '',
             'Address':               appl.address or '',
             'Nationality':           appl.nationality or '',
-            'Allotted At':           allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
+            'Allotted At (IST)':     allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
             'Fee Structure':         fee_cat_name,
             'Base Fee (₹)':          fee_base_amount if fee_base_amount != '' else '',
             'Additional Fee (₹)':    additional_fee,
@@ -1482,7 +1486,7 @@ def export_admitted_students():
     headers = list(rows[0].keys()) if rows else [
         'Admit Category', 'Seat No', 'Rank', 'Full Name', 'Email', 'Phone',
         'DOB', 'Gender', 'Category', 'Quota', 'Address', 'Nationality',
-        'Allotted At', 'Fee Structure',
+        'Allotted At (IST)', 'Fee Structure',
         'Base Fee (₹)', 'Additional Fee (₹)', 'Total Fee (₹)',
         'Total Fees Set (₹)', 'Total Paid (₹)', 'Balance Remaining (₹)',
         'Docs Submitted', 'Docs Approved'
@@ -1535,27 +1539,27 @@ def admin_counselling():
 
         if action == 'start':
             cs.status       = 'running'
-            cs.started_at   = datetime.utcnow()
+            cs.started_at   = ist_now_naive()
             cs.current_rank = None
-            cs.updated_at   = datetime.utcnow()
+            cs.updated_at   = ist_now_naive()
             db.session.commit()
             flash('Counselling started!', 'success')
 
         elif action == 'stop':
             cs.status     = 'stopped'
-            cs.updated_at = datetime.utcnow()
+            cs.updated_at = ist_now_naive()
             db.session.commit()
             flash('Counselling stopped.', 'info')
 
         elif action == 'resume':
             cs.status     = 'running'
-            cs.updated_at = datetime.utcnow()
+            cs.updated_at = ist_now_naive()
             db.session.commit()
             flash('Counselling resumed!', 'success')
 
         elif action == 'pause':
             cs.status     = 'paused'
-            cs.updated_at = datetime.utcnow()
+            cs.updated_at = ist_now_naive()
             db.session.commit()
             flash('Counselling paused.', 'warning')
 
@@ -1564,29 +1568,29 @@ def admin_counselling():
             msg_val         = request.form.get('message', '').strip()
             cs.current_rank = int(rank_val) if rank_val.isdigit() else None
             cs.message      = msg_val or None
-            cs.updated_at   = datetime.utcnow()
+            cs.updated_at   = ist_now_naive()
             db.session.commit()
             flash('Live rank updated.', 'success')
 
         elif action == 'next_rank':
             cs.current_rank = (cs.current_rank or 0) + 1
-            cs.updated_at   = datetime.utcnow()
+            cs.updated_at   = ist_now_naive()
             db.session.commit()
             flash(f'Now calling Rank #{cs.current_rank}', 'success')
 
         elif action == 'set_seats':
-            cat_id    = request.form.get('cat_id')
-            quota     = request.form.get('quota')
-            total_str = request.form.get('total_seats', '0').strip()
-            if cat_id and quota:
-                seats = CategorySeats.get_for_category(int(cat_id))
-                val   = int(total_str) if total_str.isdigit() else 0
-                if quota == 'government':
-                    seats.govt_total = val
-                else:
-                    seats.mgmt_total = val
+            # ── Updated: set BOTH govt and mgmt seats in one action ──
+            cat_id   = request.form.get('cat_id')
+            if cat_id:
+                seats        = CategorySeats.get_for_category(int(cat_id))
+                govt_str     = request.form.get('govt_seats', '').strip()
+                mgmt_str     = request.form.get('mgmt_seats', '').strip()
+                if govt_str.isdigit():
+                    seats.govt_total = int(govt_str)
+                if mgmt_str.isdigit():
+                    seats.mgmt_total = int(mgmt_str)
                 db.session.commit()
-                flash('Seats updated.', 'success')
+                flash('Seats updated for both quotas.', 'success')
 
         elif action == 'allot_seat':
             app_id            = request.form.get('app_id')
@@ -1614,10 +1618,7 @@ def admin_counselling():
             existing_allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
 
             if is_edit and existing_allotment:
-                # ── EDIT MODE: update existing allotment ──
                 old_quota = existing_allotment.quota
-
-                # Adjust seat counts if quota changed
                 if old_quota != quota:
                     seats = CategorySeats.get_for_category(appl.category_id)
                     if old_quota == 'government':
@@ -1629,7 +1630,6 @@ def admin_counselling():
                     else:
                         seats.mgmt_filled += 1
 
-                # Update admit category
                 admit_cat   = None
                 seat_number = existing_allotment.admit_seat_number
                 if admit_category_id:
@@ -1647,7 +1647,6 @@ def admin_counselling():
                 existing_allotment.admit_category_id = admit_cat.id if admit_cat else existing_allotment.admit_category_id
                 existing_allotment.admit_seat_number = seat_number
 
-                # Update fee assignment
                 try:
                     add_fee = float(additional_fee) if additional_fee else 0.0
                 except ValueError:
@@ -1664,7 +1663,7 @@ def admin_counselling():
                 if existing_sf:
                     existing_sf.fee_category_id = fee_cat.id if fee_cat else existing_sf.fee_category_id
                     existing_sf.additional_fee  = add_fee
-                    existing_sf.updated_at      = datetime.utcnow()
+                    existing_sf.updated_at      = ist_now_naive()
                 elif fee_cat or add_fee > 0:
                     db.session.add(StudentFee(
                         application_id  = appl.id,
@@ -1672,7 +1671,6 @@ def admin_counselling():
                         additional_fee  = add_fee,
                     ))
 
-                # ── FIX: sync fee total into StudentFees ──
                 db.session.flush()
                 _sync_student_fees(appl.id)
                 db.session.commit()
@@ -1682,7 +1680,6 @@ def admin_counselling():
                 flash(f'Seat already allotted to {appl.full_name}. Use the Edit button to change.', 'warning')
 
             else:
-                # ── NEW ALLOTMENT ──
                 seats = CategorySeats.get_for_category(appl.category_id)
                 if quota == 'government' and seats.govt_remaining <= 0:
                     flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
@@ -1733,7 +1730,7 @@ def admin_counselling():
                     if existing_sf:
                         existing_sf.fee_category_id = fee_cat.id if fee_cat else None
                         existing_sf.additional_fee  = add_fee
-                        existing_sf.updated_at      = datetime.utcnow()
+                        existing_sf.updated_at      = ist_now_naive()
                     else:
                         db.session.add(StudentFee(
                             application_id  = appl.id,
@@ -1741,7 +1738,6 @@ def admin_counselling():
                             additional_fee  = add_fee,
                         ))
 
-                # ── FIX: sync fee total into StudentFees ──
                 db.session.flush()
                 _sync_student_fees(appl.id)
                 db.session.commit()
@@ -1779,7 +1775,6 @@ def admin_counselling():
     query     = StudentApplication.query.filter_by(is_verified=True)\
                     .filter(StudentApplication.rank.isnot(None))
 
-    # PATCH 5 — use candidate_name instead of first_name/last_name
     if search_q:
         if search_q.isdigit():
             query = query.filter(StudentApplication.rank == int(search_q))
@@ -1859,6 +1854,102 @@ def admin_admit_categories():
 
     categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
     return render_template('admin_admit_categories.html', categories=categories)
+
+
+# ─────────────────────────────────────────
+#  Admin — Application Categories + Seats
+#  (set both govt & mgmt seats per category)
+# ─────────────────────────────────────────
+@main.route('/admin/categories')
+@admin_required
+def admin_categories():
+    categories = ApplicationCategory.query.order_by(ApplicationCategory.id).all()
+    cat_seats  = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
+    return render_template('admin_categories.html', categories=categories, cat_seats=cat_seats)
+
+
+@main.route('/admin/categories/add', methods=['POST'])
+@admin_required
+def admin_category_add():
+    name = request.form.get('category_name', '').strip()
+    if not name:
+        flash('Category name is required.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    if ApplicationCategory.query.filter_by(name=name).first():
+        flash(f'Category "{name}" already exists.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    new_cat = ApplicationCategory(name=name, is_active=True)
+    db.session.add(new_cat)
+    db.session.flush()
+    # Initialize seats row
+    db.session.add(CategorySeats(category_id=new_cat.id,
+                                 govt_total=0, govt_filled=0,
+                                 mgmt_total=0, mgmt_filled=0))
+    db.session.commit()
+    flash(f'Category "{name}" added!', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/edit/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_edit(cat_id):
+    category = ApplicationCategory.query.get_or_404(cat_id)
+    new_name = request.form.get('category_name', '').strip()
+    if not new_name:
+        flash('Category name is required.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    existing = ApplicationCategory.query.filter_by(name=new_name).first()
+    if existing and existing.id != cat_id:
+        flash(f'Category "{new_name}" already exists.', 'danger')
+        return redirect(url_for('main.admin_categories'))
+    category.name = new_name
+    db.session.commit()
+    flash(f'Category updated to "{new_name}"!', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/set-seats/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_set_seats(cat_id):
+    """Set government and management quota seats for a category."""
+    ApplicationCategory.query.get_or_404(cat_id)
+    seats    = CategorySeats.get_for_category(cat_id)
+    govt_str = request.form.get('govt_seats', '').strip()
+    mgmt_str = request.form.get('mgmt_seats', '').strip()
+    if govt_str.isdigit():
+        seats.govt_total = int(govt_str)
+    if mgmt_str.isdigit():
+        seats.mgmt_total = int(mgmt_str)
+    db.session.commit()
+    flash('Seat allocation updated successfully.', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/delete/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_delete(cat_id):
+    category   = ApplicationCategory.query.get_or_404(cat_id)
+    name       = category.name
+    apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
+    if apps_count > 0:
+        flash(f'Cannot delete "{name}" — {apps_count} student(s) are using this category.', 'danger')
+    else:
+        CategorySeats.query.filter_by(category_id=cat_id).delete()
+        db.session.delete(category)
+        db.session.commit()
+        flash(f'Category "{name}" deleted!', 'success')
+    return redirect(url_for('main.admin_categories'))
+
+
+@main.route('/admin/categories/toggle/<int:cat_id>', methods=['POST'])
+@admin_required
+def admin_category_toggle(cat_id):
+    category           = ApplicationCategory.query.get_or_404(cat_id)
+    category.is_active = not category.is_active
+    db.session.commit()
+    status = "activated" if category.is_active else "deactivated"
+    flash(f'Category "{category.name}" {status}!', 'success')
+    return redirect(url_for('main.admin_categories'))
 
 
 # ─────────────────────────────────────────
@@ -2017,7 +2108,7 @@ def admin_save_document():
         rec.status = status
         if approve_all:
             rec.is_approved            = True
-            rec.approved_at            = datetime.utcnow()
+            rec.approved_at            = ist_now_naive()
             rec.approved_by_role       = 'admin'
             rec.approved_by_name       = 'Admin'
             rec.approved_by_faculty_id = None
@@ -2128,7 +2219,7 @@ def faculty_save_document():
         rec.status = status
         if approve_all:
             rec.is_approved            = True
-            rec.approved_at            = datetime.utcnow()
+            rec.approved_at            = ist_now_naive()
             rec.approved_by_role       = 'faculty'
             rec.approved_by_name       = faculty_name
             rec.approved_by_faculty_id = faculty_id
@@ -2151,7 +2242,7 @@ def admin_whatsapp():
             wa.link        = None
             wa.description = None
             wa.is_active   = False
-            wa.updated_at  = datetime.utcnow()
+            wa.updated_at  = ist_now_naive()
             db.session.commit()
             flash('WhatsApp link cleared.', 'info')
         else:
@@ -2166,7 +2257,7 @@ def admin_whatsapp():
             wa.link        = link
             wa.description = desc
             wa.is_active   = True
-            wa.updated_at  = datetime.utcnow()
+            wa.updated_at  = ist_now_naive()
             db.session.commit()
             flash('WhatsApp group link updated!', 'success')
         return redirect(url_for('main.admin_whatsapp'))
@@ -2210,7 +2301,6 @@ def admin_students():
     q     = request.args.get('q', '').strip()
     query = StudentApplication.query
 
-    # PATCH 3 — use candidate_name instead of first_name/last_name
     if q:
         like  = f'%{q}%'
         query = query.filter(db.or_(
@@ -2234,8 +2324,7 @@ def admin_verification():
 def verify_student(app_id):
     appl             = StudentApplication.query.get_or_404(app_id)
     appl.is_verified = True
-    appl.verified_at = datetime.utcnow()
-    # PATCH 6 — removed appl.admin_notes line
+    appl.verified_at = ist_now_naive()
     db.session.commit()
     flash(f'{appl.full_name} verified.', 'success')
     return redirect(url_for('main.admin_verification'))
@@ -2248,7 +2337,7 @@ def verify_all_students():
     count = 0
     for student in pending_students:
         student.is_verified = True
-        student.verified_at = datetime.utcnow()
+        student.verified_at = ist_now_naive()
         count += 1
     db.session.commit()
     flash(f'Successfully verified {count} student(s)!', 'success')
@@ -2324,76 +2413,6 @@ def admin_form_control():
 
 
 # ─────────────────────────────────────────
-#  Category Management
-# ─────────────────────────────────────────
-@main.route('/admin/categories')
-@admin_required
-def admin_categories():
-    categories = ApplicationCategory.query.order_by(ApplicationCategory.id).all()
-    return render_template('admin_categories.html', categories=categories)
-
-
-@main.route('/admin/categories/add', methods=['POST'])
-@admin_required
-def admin_category_add():
-    name = request.form.get('category_name', '').strip()
-    if not name:
-        flash('Category name is required.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    if ApplicationCategory.query.filter_by(name=name).first():
-        flash(f'Category "{name}" already exists.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    db.session.add(ApplicationCategory(name=name, is_active=True))
-    db.session.commit()
-    flash(f'Category "{name}" added!', 'success')
-    return redirect(url_for('main.admin_categories'))
-
-
-@main.route('/admin/categories/edit/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_edit(cat_id):
-    category = ApplicationCategory.query.get_or_404(cat_id)
-    new_name = request.form.get('category_name', '').strip()
-    if not new_name:
-        flash('Category name is required.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    existing = ApplicationCategory.query.filter_by(name=new_name).first()
-    if existing and existing.id != cat_id:
-        flash(f'Category "{new_name}" already exists.', 'danger')
-        return redirect(url_for('main.admin_categories'))
-    category.name = new_name
-    db.session.commit()
-    flash(f'Category updated to "{new_name}"!', 'success')
-    return redirect(url_for('main.admin_categories'))
-
-
-@main.route('/admin/categories/delete/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_delete(cat_id):
-    category   = ApplicationCategory.query.get_or_404(cat_id)
-    name       = category.name
-    apps_count = StudentApplication.query.filter_by(category_id=cat_id).count()
-    if apps_count > 0:
-        flash(f'Cannot delete "{name}" — {apps_count} student(s) are using this category.', 'danger')
-    else:
-        db.session.delete(category)
-        db.session.commit()
-        flash(f'Category "{name}" deleted!', 'success')
-    return redirect(url_for('main.admin_categories'))
-
-
-@main.route('/admin/categories/toggle/<int:cat_id>', methods=['POST'])
-@admin_required
-def admin_category_toggle(cat_id):
-    category           = ApplicationCategory.query.get_or_404(cat_id)
-    category.is_active = not category.is_active
-    db.session.commit()
-    status = "activated" if category.is_active else "deactivated"
-    flash(f'Category "{category.name}" {status}!', 'success')
-    return redirect(url_for('main.admin_categories'))
-
-
-# ─────────────────────────────────────────
 #  Exports
 # ─────────────────────────────────────────
 @main.route('/admin/export/all')
@@ -2412,65 +2431,126 @@ def export_verified():
 
 
 # ─────────────────────────────────────────
-#  Admin — Import Students from Excel
+#  Admin — Import Students from Excel/Google Form Export
+#
+#  Supported Google Form columns (exact names):
+#  Timestamp, Email Address, Application Number,
+#  Name of the Candidate:, Mother's Name:, Father's Name:,
+#  Date of Birth:, Gender:, Mobile Number of Parent,
+#  Mobile Number of Candidate, E-mail Id:, Address :,
+#  Nationality :, Religion :, Category:,
+#  Candidate Belongs to HK Region, Kannada Medium,
+#  Rural Background, Caste Certificate No. :,
+#  Parent's Annual Income :, Income Certificate No. :,
+#  10th Standard Board, 10th Standard Percentage,
+#  12th Standard Board, 12th Standard Stream,
+#  12th Standard Combination, 12th Standard Max. Marks,
+#  12th Standard Marks Scored, 12th Standard Percentage,
+#  Declaration
 # ─────────────────────────────────────────
 IMPORT_TMP_DIR = '/tmp/bca_imports'
 
 def _ensure_tmp():
     os.makedirs(IMPORT_TMP_DIR, exist_ok=True)
 
+
 def _auto_map(columns):
+    """
+    Auto-map Excel columns to StudentApplication fields.
+    Handles both exact Google Form column names and common variants.
+    """
     mapping = {}
-    HINTS = {
-        'email':          ['email', 'mail', 'e-mail', 'email address', 'emailid', 'email id'],
-        'full_name':      ['full name', 'fullname', 'name', 'student name', 'student_name'],
-        'first_name':     ['first name', 'firstname', 'fname', 'first'],
-        'last_name':      ['last name', 'lastname', 'lname', 'last', 'surname'],
-        'dob':            ['dob', 'date of birth', 'dateofbirth', 'birth date',
-                           'birthdate', 'date_of_birth', 'birth_date'],
-        'phone':          ['phone', 'mobile', 'contact', 'phone number', 'mobile number',
-                           'contact number', 'student mobile', 'student_mobile',
-                           'mob', 'mob no', 'mobile no', 'phone no'],
-        'gender':         ['gender', 'sex'],
-        'address':        ['address', 'residential address', 'addr', 'full address'],
-        'nationality':    ['nationality', 'nation'],
-        'category':       ['category', 'caste', 'cat', 'reservation', 'category name'],
-        'school_10':      ['school 10', 'school10', '10th school', 'class 10 school',
-                           'ssc school', '10 school'],
-        'board_10':       ['board 10', 'board10', '10th board', 'class 10 board',
-                           'ssc board', '10 board'],
-        'year_10':        ['year 10', 'year10', '10th year', 'class 10 year',
-                           'passing year 10', '10 year', 'pass year 10'],
-        'total_10':       ['total 10', 'total10', '10th total', 'class 10 total',
-                           'max marks 10', '10 total', 'total marks 10'],
-        'obtained_10':    ['obtained 10', 'obtained10', '10th obtained',
-                           'marks obtained 10', '10 obtained', 'obtained marks 10'],
-        'percent_10':     ['percent 10', 'percentage 10', '10th percent',
-                           'class 10 percentage', '%10', '10 percent', '10 percentage'],
-        'school_12':      ['school 12', 'school12', '12th school', 'class 12 school',
-                           'hsc school', '12 school'],
-        'board_12':       ['board 12', 'board12', '12th board', 'class 12 board',
-                           'hsc board', '12 board'],
-        'stream_12':      ['stream', 'stream 12', '12th stream', 'class 12 stream',
-                           '12 stream'],
-        'year_12':        ['year 12', 'year12', '12th year', 'class 12 year',
-                           'passing year 12', '12 year', 'pass year 12'],
-        'total_12':       ['total 12', 'total12', '12th total', 'class 12 total',
-                           'max marks 12', '12 total', 'total marks 12'],
-        'obtained_12':    ['obtained 12', 'obtained12', '12th obtained',
-                           'marks obtained 12', '12 obtained', 'obtained marks 12'],
-        'percent_12':     ['percent 12', 'percentage 12', '12th percent',
-                           'class 12 percentage', '%12', '12 percent', '12 percentage'],
-        'specialization': ['specialization', 'specialisation', 'spec',
-                           'programme', 'program', 'combination', 'combination_12',
-                           'combination 12'],
+
+    # ── Exact Google Form column → field name ──────────────────────────────
+    EXACT = {
+        'email address':                  'email',
+        'e-mail id:':                     'email',
+        'name of the candidate:':         'full_name',
+        "mother's name:":                 'mother_name',
+        "father's name:":                 'father_name',
+        'date of birth:':                 'dob',
+        'gender:':                        'gender',
+        'mobile number of parent':        'parent_mobile',
+        'mobile number of candidate':     'phone',
+        'address :':                      'address',
+        'nationality :':                  'nationality',
+        'religion :':                     'religion',
+        'category:':                      'category',
+        'candidate belongs to hk region': 'hk_region',
+        'kannada medium':                 'kannada_medium',
+        'rural background':               'rural_background',
+        'caste certificate no. :':        'caste_certificate_no',
+        "parent's annual income :":       'parent_annual_income',
+        'income certificate no. :':       'income_certificate_no',
+        '10th standard board':            'board_10',
+        '10th standard percentage':       'percent_10',
+        '12th standard board':            'board_12',
+        '12th standard stream':           'stream_12',
+        '12th standard combination':      'combination_12',
+        '12th standard max. marks':       'total_12',
+        '12th standard marks scored':     'obtained_12',
+        '12th standard percentage':       'percent_12',
+        'declaration':                    'declaration',
     }
+
+    # ── Fuzzy / variant hints ──────────────────────────────────────────────
+    HINTS = {
+        'email':               ['email', 'mail', 'e-mail', 'emailid', 'email id'],
+        'full_name':           ['full name', 'fullname', 'name', 'student name',
+                                'student_name', 'candidate name'],
+        'dob':                 ['dob', 'date of birth', 'dateofbirth', 'birth date',
+                                'birthdate', 'date_of_birth', 'birth_date'],
+        'phone':               ['phone', 'mobile', 'contact', 'phone number',
+                                'mobile number', 'contact number', 'student mobile',
+                                'mob', 'mob no', 'mobile no', 'phone no'],
+        'parent_mobile':       ['parent mobile', 'parent_mobile', 'father mobile',
+                                'guardian mobile', 'parent contact'],
+        'gender':              ['gender', 'sex'],
+        'address':             ['address', 'residential address', 'addr'],
+        'nationality':         ['nationality', 'nation'],
+        'religion':            ['religion'],
+        'mother_name':         ['mother name', 'mother', 'mothers name'],
+        'father_name':         ['father name', 'father', 'fathers name'],
+        'category':            ['category', 'caste', 'cat', 'reservation'],
+        'hk_region':           ['hk region', 'hk_region', 'hyderabad karnataka'],
+        'kannada_medium':      ['kannada medium', 'kannada_medium'],
+        'rural_background':    ['rural background', 'rural_background', 'rural'],
+        'caste_certificate_no':['caste certificate', 'caste cert no', 'caste certificate no'],
+        'parent_annual_income':['annual income', 'parent income', 'parent annual income'],
+        'income_certificate_no':['income certificate', 'income cert no'],
+        'board_10':            ['board 10', 'board10', '10th board', '10 board', 'ssc board'],
+        'percent_10':          ['percent 10', 'percentage 10', '10th percent',
+                                '10th percentage', '10 percent', '10 percentage'],
+        'board_12':            ['board 12', 'board12', '12th board', '12 board', 'hsc board'],
+        'stream_12':           ['stream', 'stream 12', '12th stream', '12 stream'],
+        'combination_12':      ['combination', 'combination 12', '12th combination',
+                                'specialization', 'specialisation'],
+        'total_12':            ['total 12', 'total12', '12th total', 'max marks 12',
+                                '12 total', 'total marks 12', 'max marks'],
+        'obtained_12':         ['obtained 12', 'obtained12', '12th obtained',
+                                'marks obtained 12', '12 obtained', 'marks scored'],
+        'percent_12':          ['percent 12', 'percentage 12', '12th percent',
+                                '12 percent', '12 percentage', '12th percentage'],
+    }
+
     col_lower = {c.lower().strip(): c for c in columns}
+
+    # First pass: exact match
+    for col_l, original_col in col_lower.items():
+        if col_l in EXACT:
+            field = EXACT[col_l]
+            if field not in mapping:
+                mapping[field] = original_col
+
+    # Second pass: fuzzy hint match (only for unmapped fields)
     for field, hints in HINTS.items():
+        if field in mapping:
+            continue
         for hint in hints:
             if hint in col_lower:
                 mapping[field] = col_lower[hint]
                 break
+
     return mapping
 
 
@@ -2482,6 +2562,7 @@ def admin_import():
     if request.method == 'POST':
         action = request.form.get('action')
 
+        # ── Step 1: Upload ──────────────────────────────────────────────
         if action == 'upload':
             f = request.files.get('excel_file')
             if not f or not f.filename:
@@ -2515,6 +2596,7 @@ def admin_import():
                 flash(f'Could not read Excel file: {e}', 'danger')
                 return redirect(url_for('main.admin_import'))
 
+        # ── Step 2: Import ──────────────────────────────────────────────
         elif action == 'import':
             tmp_name = request.form.get('session_file', '')
             tmp_path = os.path.join(IMPORT_TMP_DIR, tmp_name)
@@ -2527,10 +2609,13 @@ def admin_import():
                 if key.startswith('map_') and request.form[key]:
                     field_map[key[4:]] = request.form[key]
 
-            required = ['email', 'dob']
+            # Validate required fields
+            required = ['dob']
             missing  = [r for r in required if r not in field_map]
-            if 'full_name' not in field_map and 'first_name' not in field_map:
-                missing.append('full_name or first_name')
+            if 'email' not in field_map:
+                missing.append('email')
+            if 'full_name' not in field_map:
+                missing.append('full_name (or Name of the Candidate)')
 
             if missing:
                 flash(f'Required fields not mapped: {", ".join(missing)}', 'danger')
@@ -2565,6 +2650,7 @@ def admin_import():
             for idx, row in df.iterrows():
                 row_num = idx + 2
 
+                # ── Extract email ──────────────────────────────────────
                 email_col = field_map.get('email', '')
                 email_raw = _str(row[email_col]) if email_col and email_col in df.columns else ''
                 if not email_raw:
@@ -2572,27 +2658,19 @@ def admin_import():
                     continue
                 email = email_raw.lower()
 
+                # Skip if user already exists
                 if User.query.filter_by(email=email).first():
                     skipped += 1
                     continue
 
-                if 'full_name' in field_map:
-                    fn_col     = field_map['full_name']
-                    full_name  = _str(row[fn_col]) if fn_col in df.columns else ''
-                    parts      = full_name.split(' ', 1)
-                    first_name = parts[0]
-                    last_name  = parts[1] if len(parts) > 1 else ''
-                else:
-                    fn_col     = field_map.get('first_name', '')
-                    ln_col     = field_map.get('last_name', '')
-                    first_name = _str(row[fn_col]) if fn_col and fn_col in df.columns else ''
-                    last_name  = _str(row[ln_col]) if ln_col and ln_col in df.columns else ''
-                    full_name  = f'{first_name} {last_name}'.strip()
-
+                # ── Extract full name ──────────────────────────────────
+                fn_col    = field_map.get('full_name', '')
+                full_name = _str(row[fn_col]) if fn_col and fn_col in df.columns else ''
                 if not full_name:
-                    errors.append({'row': row_num, 'msg': 'Name is empty'})
+                    errors.append({'row': row_num, 'msg': f'Name is empty for {email}'})
                     continue
 
+                # ── Extract & validate DOB → password ──────────────────
                 dob_col        = field_map.get('dob', '')
                 dob_raw        = row[dob_col] if dob_col and dob_col in df.columns else None
                 password_plain = _dob_to_password(dob_raw)
@@ -2609,6 +2687,7 @@ def admin_import():
                     return None
 
                 try:
+                    # ── Create User account ────────────────────────────
                     user = User(
                         full_name      = full_name,
                         email          = email,
@@ -2618,54 +2697,61 @@ def admin_import():
                         otp_expires_at = None,
                     )
                     db.session.add(user)
-                    db.session.flush()
+                    db.session.flush()  # get user.id
 
+                    # ── Resolve category ───────────────────────────────
                     cat_id = None
                     if 'category' in field_map:
                         cat_col = field_map['category']
                         if cat_col in df.columns:
-                            cat_raw = _str(row[cat_col]).lower()
+                            cat_raw = _str(row[cat_col]).lower().strip()
                             cat_id  = cat_name_map.get(cat_raw)
 
-                    total_10    = _flt(_get_col('total_10'))
-                    obtained_10 = _flt(_get_col('obtained_10'))
-                    percent_10  = _flt(_get_col('percent_10'))
-                    if total_10 and obtained_10 and not percent_10:
-                        percent_10 = round((obtained_10 / total_10) * 100, 2)
-
+                    # ── Marks calculation ──────────────────────────────
                     total_12    = _flt(_get_col('total_12'))
                     obtained_12 = _flt(_get_col('obtained_12'))
                     percent_12  = _flt(_get_col('percent_12'))
                     if total_12 and obtained_12 and not percent_12:
                         percent_12 = round((obtained_12 / total_12) * 100, 2)
 
+                    percent_10 = _flt(_get_col('percent_10'))
+
+                    # ── Boolean fields ─────────────────────────────────
+                    hk_region         = _bool_field(_get_col('hk_region'))
+                    kannada_medium    = _bool_field(_get_col('kannada_medium'))
+                    rural_background  = _bool_field(_get_col('rural_background'))
+
+                    # ── Create StudentApplication ──────────────────────
                     appl = StudentApplication(
-                        user_id        = user.id,
-                        first_name     = first_name,
-                        last_name      = last_name,
-                        dob            = dob_str,
-                        email          = email,
-                        phone          = _str(_get_col('phone')),
-                        gender         = _str(_get_col('gender')),
-                        address        = _str(_get_col('address')),
-                        nationality    = _str(_get_col('nationality')) or 'Indian',
-                        category_id    = cat_id,
-                        school_10      = _str(_get_col('school_10')),
-                        board_10       = _str(_get_col('board_10')),
-                        year_10        = _str(_get_col('year_10')),
-                        total_10       = total_10,
-                        obtained_10    = obtained_10,
-                        percent_10     = percent_10,
-                        school_12      = _str(_get_col('school_12')),
-                        board_12       = _str(_get_col('board_12')),
-                        stream_12      = _str(_get_col('stream_12')),
-                        year_12        = _str(_get_col('year_12')),
-                        total_12       = total_12,
-                        obtained_12    = obtained_12,
-                        percent_12     = percent_12,
-                        specialization = _str(_get_col('specialization')),
-                        marksheet_10   = None,
-                        marksheet_12   = None,
+                        user_id              = user.id,
+                        candidate_name       = full_name,
+                        mother_name          = _str(_get_col('mother_name')),
+                        father_name          = _str(_get_col('father_name')),
+                        dob                  = dob_str,
+                        gender               = _str(_get_col('gender')),
+                        parent_mobile        = _str(_get_col('parent_mobile')),
+                        phone                = _str(_get_col('phone')),
+                        email                = email,
+                        address              = _str(_get_col('address')),
+                        nationality          = _str(_get_col('nationality')) or 'Indian',
+                        religion             = _str(_get_col('religion')),
+                        hk_region            = hk_region,
+                        kannada_medium       = kannada_medium,
+                        rural_background     = rural_background,
+                        caste_certificate_no = _str(_get_col('caste_certificate_no')),
+                        parent_annual_income = _str(_get_col('parent_annual_income')),
+                        income_certificate_no= _str(_get_col('income_certificate_no')),
+                        category_id          = cat_id,
+                        board_10             = _str(_get_col('board_10')),
+                        percent_10           = percent_10,
+                        board_12             = _str(_get_col('board_12')),
+                        stream_12            = _str(_get_col('stream_12')),
+                        combination_12       = _str(_get_col('combination_12')),
+                        total_12             = total_12,
+                        obtained_12          = obtained_12,
+                        percent_12           = percent_12,
+                        declaration          = _bool_field(_get_col('declaration')),
+                        is_verified          = False,   # admin verifies separately
                     )
                     db.session.add(appl)
                     db.session.commit()
@@ -2673,7 +2759,7 @@ def admin_import():
 
                 except Exception as e:
                     db.session.rollback()
-                    errors.append({'row': row_num, 'msg': str(e)[:80]})
+                    errors.append({'row': row_num, 'msg': str(e)[:120]})
 
             try:
                 os.remove(tmp_path)
@@ -2818,7 +2904,7 @@ def faculty_set_fees(app_id):
     fees = StudentFees.query.filter_by(application_id=appl.id).first()
     if fees:
         fees.total_fees = total_fees
-        fees.updated_at = datetime.utcnow()
+        fees.updated_at = ist_now_naive()
     else:
         fees = StudentFees(application_id=appl.id, total_fees=total_fees)
         db.session.add(fees)
@@ -2890,7 +2976,7 @@ def faculty_edit_receipt(receipt_id):
 
     receipt.receipt_number = receipt_number
     receipt.amount_paid    = amount_paid
-    receipt.updated_at     = datetime.utcnow()
+    receipt.updated_at     = ist_now_naive()
     db.session.commit()
     flash(f'Receipt #{receipt_number} updated.', 'success')
     return redirect(url_for('main.faculty_payments'))
