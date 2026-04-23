@@ -348,7 +348,8 @@
       <tr>
         <th>ID</th>
         <th>Category Name</th>
-        <th>Seat Allocation</th>
+        <th>Government Seats</th>
+        <th>Management Seats</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
@@ -356,44 +357,42 @@
     <tbody>
       {% for cat in categories %}
       {% set seat_info = cat_seats[cat.id] if cat_seats and cat.id in cat_seats else None %}
-      {# Main row #}
       <tr id="row-{{ cat.id }}">
         <td>{{ cat.id }}</td>
+        <td><strong>{{ cat.name }}</strong></td>
+        
+        <!-- Government Seats Column -->
         <td>
-          <strong>{{ cat.name }}</strong>
+          <form action="{{ url_for('main.admin_category_set_seats', cat_id=cat.id) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+            <input type="number" name="govt_seats" value="{{ seat_info.govt_total if seat_info else 0 }}" 
+                   style="width: 80px; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center;">
+            <button type="submit" class="btn-icon btn-seat" style="padding: 0.3rem 0.8rem;">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <div style="font-size: 0.7rem; color: #5a6e82;">
+              Filled: {{ seat_info.govt_filled if seat_info else 0 }} | 
+              Left: {{ seat_info.govt_remaining if seat_info else 0 }}
+            </div>
+          </form>
         </td>
+        
+        <!-- Management Seats Column -->
         <td>
-          <div class="seat-info">
-            <div class="seat-row">
-              <span class="seat-label">🎓 Government:</span>
-              <strong>{{ seat_info.govt_filled if seat_info else 0 }}</strong> / 
-              <strong class="govt-total-{{ cat.id }}">{{ seat_info.govt_total if seat_info else 0 }}</strong>
-              {% set govt_remaining = (seat_info.govt_total - seat_info.govt_filled) if seat_info else 0 %}
-              {% if govt_remaining > 0 %}
-                <span class="seat-status seat-available">({{ govt_remaining }} available)</span>
-              {% else %}
-                <span class="seat-status seat-full">(Full)</span>
-              {% endif %}
-              <button class="btn-icon btn-seat" onclick="openSeatModal({{ cat.id }}, '{{ cat.name }}', 'government', {{ seat_info.govt_total if seat_info else 0 }})" style="margin-left:0.5rem; padding:0.2rem 0.6rem;">
-                <i class="fas fa-edit"></i> Set
-              </button>
+          <form action="{{ url_for('main.admin_category_set_seats', cat_id=cat.id) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+            <input type="number" name="mgmt_seats" value="{{ seat_info.mgmt_total if seat_info else 0 }}" 
+                   style="width: 80px; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center;">
+            <button type="submit" class="btn-icon btn-seat" style="padding: 0.3rem 0.8rem;">
+              <i class="fas fa-save"></i> Save
+            </button>
+            <div style="font-size: 0.7rem; color: #5a6e82;">
+              Filled: {{ seat_info.mgmt_filled if seat_info else 0 }} | 
+              Left: {{ seat_info.mgmt_remaining if seat_info else 0 }}
             </div>
-            <div class="seat-row">
-              <span class="seat-label">🏛️ Management:</span>
-              <strong>{{ seat_info.mgmt_filled if seat_info else 0 }}</strong> / 
-              <strong class="mgmt-total-{{ cat.id }}">{{ seat_info.mgmt_total if seat_info else 0 }}</strong>
-              {% set mgmt_remaining = (seat_info.mgmt_total - seat_info.mgmt_filled) if seat_info else 0 %}
-              {% if mgmt_remaining > 0 %}
-                <span class="seat-status seat-available">({{ mgmt_remaining }} available)</span>
-              {% else %}
-                <span class="seat-status seat-full">(Full)</span>
-              {% endif %}
-              <button class="btn-icon btn-seat" onclick="openSeatModal({{ cat.id }}, '{{ cat.name }}', 'management', {{ seat_info.mgmt_total if seat_info else 0 }})" style="margin-left:0.5rem; padding:0.2rem 0.6rem;">
-                <i class="fas fa-edit"></i> Set
-              </button>
-            </div>
-          </div>
+          </form>
         </td>
+        
         <td>
           {% if cat.is_active %}
             <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
@@ -401,27 +400,25 @@
             <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
           {% endif %}
         </td>
+        
         <td>
           <div class="action-buttons">
-            {# Edit button — toggles inline edit row #}
             <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit Name">
-              <i class="fas fa-edit"></i> Edit Name
+              <i class="fas fa-edit"></i> Edit
             </button>
 
-            {# Toggle active/inactive #}
             <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display:inline;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-              <button type="submit" class="btn-icon btn-toggle" title="Toggle Active/Inactive">
+              <button type="submit" class="btn-icon btn-toggle">
                 <i class="fas fa-power-off"></i>
                 {% if cat.is_active %}Deactivate{% else %}Activate{% endif %}
               </button>
             </form>
 
-            {# Delete button #}
             <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display:inline;"
                   onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;? This cannot be undone.');">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-              <button type="submit" class="btn-icon btn-delete" title="Delete">
+              <button type="submit" class="btn-icon btn-delete">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
             </form>
@@ -429,9 +426,9 @@
         </td>
       </tr>
 
-      {# Inline edit row for category name — hidden by default #}
+      <!-- Inline edit row for category name -->
       <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
-        <td colspan="5">
+        <td colspan="6">
           <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
             <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
@@ -447,7 +444,7 @@
       </tr>
       {% else %}
       <tr>
-        <td colspan="5" class="empty-state">
+        <td colspan="6" class="empty-state">
           <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
           No categories found. Click "Add New Category" to create one.
         </td>
@@ -463,7 +460,7 @@
     <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
     <form action="{{ url_for('main.admin_category_add') }}" method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <input type="text" name="category_name" placeholder="e.g. General, OBC, SC, ST, EWS, PWD" required>
+      <input type="text" name="category_name" placeholder="e.g. General, OBC, SC, ST" required>
       <div class="modal-actions">
         <button type="button" class="btn-modal-cancel" onclick="closeModal('addModal')">Cancel</button>
         <button type="submit" class="btn-modal-save">Add Category</button>
@@ -472,41 +469,19 @@
   </div>
 </div>
 
-<!-- Seat Allocation Modal -->
-<div id="seatModal" class="modal">
-  <div class="modal-content">
-    <h3 id="seatModalTitle"><i class="fas fa-chair"></i> Set Seats</h3>
-    <form id="seatForm" method="POST">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <input type="hidden" name="cat_id" id="seatCatId">
-      <input type="hidden" name="quota_type" id="seatQuotaType">
-      <p id="seatCategoryName" style="color:#5a6e82; margin-bottom: 1rem;"></p>
-      <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Total Seats</label>
-      <input type="number" name="total_seats" id="seatTotalSeats" min="0" step="1" required>
-      <div class="modal-actions">
-        <button type="button" class="btn-modal-cancel" onclick="closeModal('seatModal')">Cancel</button>
-        <button type="submit" class="btn-modal-save">Save Seats</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <script>
-  // Inline edit toggle
   function toggleInlineEdit(catId, catName) {
     const editRow = document.getElementById('edit-row-' + catId);
     const input   = document.getElementById('inline-input-' + catId);
     const isOpen  = editRow.classList.contains('active');
 
-    // Close all other open inline rows first
     document.querySelectorAll('.inline-edit-row.active').forEach(row => {
       row.classList.remove('active');
     });
 
     if (!isOpen) {
       editRow.classList.add('active');
-      input.focus();
-      input.select();
+      setTimeout(() => { input.focus(); input.select(); }, 100);
     }
   }
 
@@ -514,44 +489,12 @@
     document.getElementById('edit-row-' + catId).classList.remove('active');
   }
 
-  // Seat Modal functions
-  function openSeatModal(catId, catName, quotaType, currentTotal) {
-    const modal = document.getElementById('seatModal');
-    const form = document.getElementById('seatForm');
-    const title = document.getElementById('seatModalTitle');
-    const categoryNameSpan = document.getElementById('seatCategoryName');
-    
-    // Set form action based on quota type
-    if (quotaType === 'government') {
-      form.action = "{{ url_for('main.admin_category_set_seats', cat_id=0) }}".replace('0', catId);
-      title.innerHTML = '<i class="fas fa-chair"></i> Set Government Quota Seats - ' + catName;
-      categoryNameSpan.innerHTML = '<strong>' + catName + '</strong> - Government Quota';
-    } else {
-      form.action = "{{ url_for('main.admin_category_set_seats', cat_id=0) }}".replace('0', catId);
-      title.innerHTML = '<i class="fas fa-chair"></i> Set Management Quota Seats - ' + catName;
-      categoryNameSpan.innerHTML = '<strong>' + catName + '</strong> - Management Quota';
-    }
-    
-    document.getElementById('seatCatId').value = catId;
-    document.getElementById('seatQuotaType').value = quotaType;
-    document.getElementById('seatTotalSeats').value = currentTotal;
-    
-    modal.classList.add('active');
+  function openAddModal() {
+    document.getElementById('addModal').classList.add('active');
   }
 
   function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
-  }
-
-  // Update the display after seat save (optional, page will refresh)
-  function updateSeatDisplay(catId, quotaType, newTotal) {
-    if (quotaType === 'government') {
-      const element = document.querySelector('.govt-total-' + catId);
-      if (element) element.textContent = newTotal;
-    } else {
-      const element = document.querySelector('.mgmt-total-' + catId);
-      if (element) element.textContent = newTotal;
-    }
   }
 
   window.onclick = function(event) {
