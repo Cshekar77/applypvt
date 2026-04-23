@@ -41,13 +41,14 @@
     width: 100%;
     background: white;
     border-radius: 16px;
-    overflow: hidden;
+    overflow-x: auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
 
   .categories-table table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 800px;
   }
 
   .categories-table th {
@@ -83,6 +84,59 @@
   }
 
   .status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .seat-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .seat-input:focus {
+    outline: none;
+    border-color: #c9a03d;
+  }
+
+  .seat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .seat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .seat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #5a6e82;
+    min-width: 70px;
+  }
+
+  .seat-status {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    background: #eef2f8;
+    display: inline-block;
+  }
+
+  .seat-available {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .seat-full {
     background: #f8d7da;
     color: #721c24;
   }
@@ -134,6 +188,14 @@
   .btn-delete:hover {
     background: #dc3545;
     color: white;
+  }
+
+  .btn-seat {
+    background: #0a1f44;
+    color: white;
+  }
+  .btn-seat:hover {
+    background: #1e3a60;
   }
 
   /* Inline edit row */
@@ -200,7 +262,7 @@
   }
   .btn-cancel-inline:hover { background: #dce3ed; }
 
-  /* Modal */
+  /* Seat Modal */
   .modal {
     display: none;
     position: fixed;
@@ -268,9 +330,8 @@
 
   @media (max-width: 768px) {
     .action-buttons { flex-direction: column; align-items: flex-start; }
-    .categories-table { overflow-x: auto; }
-    .inline-edit-form { flex-direction: column; align-items: flex-start; }
-    .inline-edit-form input { width: 100%; }
+    .seat-info { margin-top: 0.5rem; }
+    .seat-row { flex-wrap: wrap; }
   }
 </style>
 
@@ -287,16 +348,52 @@
       <tr>
         <th>ID</th>
         <th>Category Name</th>
+        <th>Seat Allocation</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for cat in categories %}
+      {% set seat_info = cat_seats[cat.id] if cat_seats and cat.id in cat_seats else None %}
       {# Main row #}
       <tr id="row-{{ cat.id }}">
         <td>{{ cat.id }}</td>
-        <td><strong>{{ cat.name }}</strong></td>
+        <td>
+          <strong>{{ cat.name }}</strong>
+        </td>
+        <td>
+          <div class="seat-info">
+            <div class="seat-row">
+              <span class="seat-label">🎓 Government:</span>
+              <strong>{{ seat_info.govt_filled if seat_info else 0 }}</strong> / 
+              <strong class="govt-total-{{ cat.id }}">{{ seat_info.govt_total if seat_info else 0 }}</strong>
+              {% set govt_remaining = (seat_info.govt_total - seat_info.govt_filled) if seat_info else 0 %}
+              {% if govt_remaining > 0 %}
+                <span class="seat-status seat-available">({{ govt_remaining }} available)</span>
+              {% else %}
+                <span class="seat-status seat-full">(Full)</span>
+              {% endif %}
+              <button class="btn-icon btn-seat" onclick="openSeatModal({{ cat.id }}, '{{ cat.name }}', 'government', {{ seat_info.govt_total if seat_info else 0 }})" style="margin-left:0.5rem; padding:0.2rem 0.6rem;">
+                <i class="fas fa-edit"></i> Set
+              </button>
+            </div>
+            <div class="seat-row">
+              <span class="seat-label">🏛️ Management:</span>
+              <strong>{{ seat_info.mgmt_filled if seat_info else 0 }}</strong> / 
+              <strong class="mgmt-total-{{ cat.id }}">{{ seat_info.mgmt_total if seat_info else 0 }}</strong>
+              {% set mgmt_remaining = (seat_info.mgmt_total - seat_info.mgmt_filled) if seat_info else 0 %}
+              {% if mgmt_remaining > 0 %}
+                <span class="seat-status seat-available">({{ mgmt_remaining }} available)</span>
+              {% else %}
+                <span class="seat-status seat-full">(Full)</span>
+              {% endif %}
+              <button class="btn-icon btn-seat" onclick="openSeatModal({{ cat.id }}, '{{ cat.name }}', 'management', {{ seat_info.mgmt_total if seat_info else 0 }})" style="margin-left:0.5rem; padding:0.2rem 0.6rem;">
+                <i class="fas fa-edit"></i> Set
+              </button>
+            </div>
+          </div>
+        </td>
         <td>
           {% if cat.is_active %}
             <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
@@ -307,8 +404,8 @@
         <td>
           <div class="action-buttons">
             {# Edit button — toggles inline edit row #}
-            <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit">
-              <i class="fas fa-edit"></i> Edit
+            <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit Name">
+              <i class="fas fa-edit"></i> Edit Name
             </button>
 
             {# Toggle active/inactive #}
@@ -332,15 +429,15 @@
         </td>
       </tr>
 
-      {# Inline edit row — hidden by default, shown on Edit click #}
+      {# Inline edit row for category name — hidden by default #}
       <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
-        <td colspan="4">
+        <td colspan="5">
           <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
             <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
                    value="{{ cat.name }}" placeholder="Category name" required>
             <button type="submit" class="btn-save">
-              <i class="fas fa-check"></i> Update
+              <i class="fas fa-check"></i> Update Name
             </button>
             <button type="button" class="btn-cancel-inline" onclick="cancelInlineEdit({{ cat.id }})">
               <i class="fas fa-times"></i> Cancel
@@ -350,7 +447,7 @@
       </tr>
       {% else %}
       <tr>
-        <td colspan="4" class="empty-state">
+        <td colspan="5" class="empty-state">
           <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
           No categories found. Click "Add New Category" to create one.
         </td>
@@ -375,16 +472,20 @@
   </div>
 </div>
 
-<!-- Edit Category Modal (kept for compatibility) -->
-<div id="editModal" class="modal">
+<!-- Seat Allocation Modal -->
+<div id="seatModal" class="modal">
   <div class="modal-content">
-    <h3><i class="fas fa-edit"></i> Edit Category</h3>
-    <form id="editForm" method="POST">
+    <h3 id="seatModalTitle"><i class="fas fa-chair"></i> Set Seats</h3>
+    <form id="seatForm" method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <input type="text" name="category_name" id="editCategoryName" placeholder="Category name" required>
+      <input type="hidden" name="cat_id" id="seatCatId">
+      <input type="hidden" name="quota_type" id="seatQuotaType">
+      <p id="seatCategoryName" style="color:#5a6e82; margin-bottom: 1rem;"></p>
+      <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Total Seats</label>
+      <input type="number" name="total_seats" id="seatTotalSeats" min="0" step="1" required>
       <div class="modal-actions">
-        <button type="button" class="btn-modal-cancel" onclick="closeModal('editModal')">Cancel</button>
-        <button type="submit" class="btn-modal-save">Save Changes</button>
+        <button type="button" class="btn-modal-cancel" onclick="closeModal('seatModal')">Cancel</button>
+        <button type="submit" class="btn-modal-save">Save Seats</button>
       </div>
     </form>
   </div>
@@ -413,22 +514,44 @@
     document.getElementById('edit-row-' + catId).classList.remove('active');
   }
 
-  // Modal functions
-  function openAddModal() {
-    document.getElementById('addModal').classList.add('active');
-  }
-
-  function openEditModal(catId, catName) {
-    const modal = document.getElementById('editModal');
-    const form  = document.getElementById('editForm');
-    const input = document.getElementById('editCategoryName');
-    form.action = "{{ url_for('main.admin_category_edit', cat_id=0) }}".replace('0', catId);
-    input.value = catName;
+  // Seat Modal functions
+  function openSeatModal(catId, catName, quotaType, currentTotal) {
+    const modal = document.getElementById('seatModal');
+    const form = document.getElementById('seatForm');
+    const title = document.getElementById('seatModalTitle');
+    const categoryNameSpan = document.getElementById('seatCategoryName');
+    
+    // Set form action based on quota type
+    if (quotaType === 'government') {
+      form.action = "{{ url_for('main.admin_category_set_seats', cat_id=0) }}".replace('0', catId);
+      title.innerHTML = '<i class="fas fa-chair"></i> Set Government Quota Seats - ' + catName;
+      categoryNameSpan.innerHTML = '<strong>' + catName + '</strong> - Government Quota';
+    } else {
+      form.action = "{{ url_for('main.admin_category_set_seats', cat_id=0) }}".replace('0', catId);
+      title.innerHTML = '<i class="fas fa-chair"></i> Set Management Quota Seats - ' + catName;
+      categoryNameSpan.innerHTML = '<strong>' + catName + '</strong> - Management Quota';
+    }
+    
+    document.getElementById('seatCatId').value = catId;
+    document.getElementById('seatQuotaType').value = quotaType;
+    document.getElementById('seatTotalSeats').value = currentTotal;
+    
     modal.classList.add('active');
   }
 
   function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
+  }
+
+  // Update the display after seat save (optional, page will refresh)
+  function updateSeatDisplay(catId, quotaType, newTotal) {
+    if (quotaType === 'government') {
+      const element = document.querySelector('.govt-total-' + catId);
+      if (element) element.textContent = newTotal;
+    } else {
+      const element = document.querySelector('.mgmt-total-' + catId);
+      if (element) element.textContent = newTotal;
+    }
   }
 
   window.onclick = function(event) {
