@@ -270,13 +270,14 @@
               <span>Date of Birth</span>
               <strong>
                 {% if s.dob %}
-                  {% set parts = s.dob.split('-') %}
-                  {% if parts|length == 3 %}
+                  {% set dob_clean = s.dob.split(' ')[0] %}
+                  {% set parts = dob_clean.split('-') %}
+                  {% if parts|length == 3 and parts[0]|length == 4 %}
                     {{ parts[2] }}-{{ parts[1] }}-{{ parts[0] }}
-                  {% elif s.dob %}
-                    {{ s.dob }}
+                  {% elif parts|length == 3 %}
+                    {{ parts[0] }}-{{ parts[1] }}-{{ parts[2] }}
                   {% else %}
-                    —
+                    {{ dob_clean }}
                   {% endif %}
                 {% else %}
                   —
