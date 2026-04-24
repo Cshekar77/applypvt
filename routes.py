@@ -2750,7 +2750,7 @@ def admin_import():
                         total_12             = total_12,
                         obtained_12          = obtained_12,
                         percent_12           = percent_12,
-                        declaration          = _bool_field(_get_col('declaration')),
+                        declaration = True,
                         is_verified          = False,   # admin verifies separately
                     )
                     db.session.add(appl)
