@@ -1522,6 +1522,8 @@ def export_admitted_students():
 # ─────────────────────────────────────────
 #  Admin — Counselling Management
 # ─────────────────────────────────────────
+#  Admin — Counselling Management
+# ─────────────────────────────────────────
 @main.route('/admin/counselling', methods=['GET', 'POST'])
 @admin_required
 def admin_counselling():
@@ -1608,35 +1610,34 @@ def admin_counselling():
 
             existing_allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
 
-            if is_edit and existing_allotment:
-                old_quota = existing_allotment.quota
-                if old_quota != quota:
-                    seats = CategorySeats.get_for_category(appl.category_id)
-                    if old_quota == 'government':
-                        seats.govt_filled = max(0, seats.govt_filled - 1)
-                    else:
-                        seats.mgmt_filled = max(0, seats.mgmt_filled - 1)
-                    if quota == 'government':
-                        seats.govt_filled += 1
-                    else:
-                        seats.mgmt_filled += 1
+            # ✅ FIX: Validate admit_category_id is provided
+            if not admit_category_id:
+                flash('Please select an Admit Category.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
 
-                admit_cat   = None
-                seat_number = existing_allotment.admit_seat_number
-                if admit_category_id:
-                    try:
-                        admit_cat = AdmitCategory.query.get(int(admit_category_id))
-                    except (TypeError, ValueError):
-                        admit_cat = None
-                    if admit_cat and admit_cat.id != existing_allotment.admit_category_id:
-                        seat_number = admit_cat.seats_used + 1
-                        if seat_number > admit_cat.total_seats:
-                            flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
-                            return redirect(url_for('main.admin_counselling'))
+            try:
+                admit_category_id = int(admit_category_id)
+            except (TypeError, ValueError):
+                flash('Invalid Admit Category.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
+            admit_cat = AdmitCategory.query.get(admit_category_id)
+            if not admit_cat:
+                flash('Admit Category not found.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
+            # ✅ FIX: Check seat availability from AdmitCategory (not CategorySeats)
+            if admit_cat.seats_remaining <= 0:
+                flash(f'❌ No seats remaining in "{admit_cat.name}". Category is full.', 'danger')
+                return redirect(url_for('main.admin_counselling'))
+
+            if is_edit and existing_allotment:
+                # ── EDIT MODE ──
+                old_admit_cat_id = existing_allotment.admit_category_id
 
                 existing_allotment.quota             = quota
-                existing_allotment.admit_category_id = admit_cat.id if admit_cat else existing_allotment.admit_category_id
-                existing_allotment.admit_seat_number = seat_number
+                existing_allotment.admit_category_id = admit_cat.id
+                existing_allotment.admit_seat_number = admit_cat.seats_used + 1
 
                 try:
                     add_fee = float(additional_fee) if additional_fee else 0.0
@@ -1665,44 +1666,23 @@ def admin_counselling():
                 db.session.flush()
                 _sync_student_fees(appl.id)
                 db.session.commit()
-                flash(f'Allotment updated for {appl.full_name}.', 'success')
+                flash(f'✅ Allotment updated for {appl.full_name}.', 'success')
 
             elif not is_edit and existing_allotment:
-                flash(f'Seat already allotted to {appl.full_name}. Use the Edit button to change.', 'warning')
+                flash(f'⚠️ Seat already allotted to {appl.full_name}. Use the Edit button to change.', 'warning')
 
             else:
-                seats = CategorySeats.get_for_category(appl.category_id)
-                if quota == 'government' and seats.govt_remaining <= 0:
-                    flash(f'No Government Quota seats remaining in {appl.category_name}!', 'danger')
-                    return redirect(url_for('main.admin_counselling'))
-                elif quota == 'management' and seats.mgmt_remaining <= 0:
-                    flash(f'No Management Quota seats remaining in {appl.category_name}!', 'danger')
-                    return redirect(url_for('main.admin_counselling'))
-
-                admit_cat   = None
-                seat_number = None
-                if admit_category_id:
-                    try:
-                        admit_cat = AdmitCategory.query.get(int(admit_category_id))
-                    except (TypeError, ValueError):
-                        admit_cat = None
-                    if admit_cat:
-                        seat_number = admit_cat.seats_used + 1
-                        if seat_number > admit_cat.total_seats:
-                            flash(f'No seats remaining in admit category "{admit_cat.name}".', 'danger')
-                            return redirect(url_for('main.admin_counselling'))
+                # ── NEW ALLOTMENT ──
+                # ✅ FIX: Directly allocate from AdmitCategory
+                seat_number = admit_cat.seats_used + 1
 
                 db.session.add(SeatAllotment(
                     application_id    = appl.id,
                     category_id       = appl.category_id,
                     quota             = quota,
-                    admit_category_id = admit_cat.id if admit_cat else None,
+                    admit_category_id = admit_cat.id,
                     admit_seat_number = seat_number,
                 ))
-                if quota == 'government':
-                    seats.govt_filled += 1
-                else:
-                    seats.mgmt_filled += 1
 
                 try:
                     add_fee = float(additional_fee) if additional_fee else 0.0
@@ -1732,8 +1712,7 @@ def admin_counselling():
                 db.session.flush()
                 _sync_student_fees(appl.id)
                 db.session.commit()
-                label = f' — {admit_cat.name}({seat_number})' if admit_cat else ''
-                flash(f'Seat allotted to {appl.full_name} ({quota.title()} Quota){label}!', 'success')
+                flash(f'✅ Seat allotted to {appl.full_name} ({quota.title()} Quota) — {admit_cat.name}({seat_number})!', 'success')
 
         elif action == 'revoke_seat':
             app_id = request.form.get('app_id')
@@ -1745,14 +1724,9 @@ def admin_counselling():
 
             allotment = SeatAllotment.query.filter_by(application_id=app_id).first()
             if allotment:
-                seats = CategorySeats.get_for_category(allotment.category_id)
-                if allotment.quota == 'government':
-                    seats.govt_filled = max(0, seats.govt_filled - 1)
-                else:
-                    seats.mgmt_filled = max(0, seats.mgmt_filled - 1)
                 db.session.delete(allotment)
                 db.session.commit()
-                flash('Seat allotment revoked.', 'info')
+                flash('✅ Seat allotment revoked.', 'info')
 
         return redirect(url_for('main.admin_counselling'))
 
