@@ -3,103 +3,160 @@
 {% block content %}
 <style>
 .do-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
-.do-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+.do-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
 .do-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
-.btn-back { display: inline-flex; align-items: center; gap: .5rem; color: #5a6e82; text-decoration: none; font-size: .875rem; padding: .4rem .85rem; border-radius: 8px; background: #f5f7fa; border: 1px solid #e2e8f0; transition: all .2s; }
+.btn-back { display: inline-flex; align-items: center; gap: .5rem; color: #5a6e82; text-decoration: none; font-size: .875rem; padding: .4rem .85rem; border-radius: 8px; background: #f5f7fa; border: 1px solid #e2e8f0; transition: all .2s; white-space: nowrap; }
 .btn-back:hover { background: #eef2f8; color: #0a1f44; }
 
-/* Summary strip */
-.summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+/* ── Summary strip ── */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .85rem; margin-bottom: 2rem;
+}
 .sum-card { background: white; border-radius: 14px; padding: 1.25rem 1rem; text-align: center; border: 1px solid #e2e8f0; }
 .sum-num { font-size: 2rem; font-weight: 700; color: #0a1f44; }
 .sum-lbl { font-size: .78rem; color: #5a6e82; margin-top: .25rem; }
-.sum-green .sum-num { color: #10b981; }
+.sum-green .sum-num  { color: #10b981; }
 .sum-yellow .sum-num { color: #f59e0b; }
-.sum-gray .sum-num { color: #9ca3af; }
+.sum-gray .sum-num   { color: #9ca3af; }
 
-/* Search */
+/* ── Search ── */
 .search-bar { margin-bottom: 1.5rem; }
-.search-bar input { width: 100%; padding: .65rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: .875rem; color: #0a1f44; outline: none; box-sizing: border-box; }
+.search-bar input {
+  width: 100%; padding: .65rem 1rem; border: 1px solid #e2e8f0;
+  border-radius: 10px; font-size: .875rem; color: #0a1f44;
+  outline: none; box-sizing: border-box; font-family: inherit;
+}
 .search-bar input:focus { border-color: #0a1f44; }
 
-/* Student cards */
+/* ── Student cards ── */
 .student-list { display: flex; flex-direction: column; gap: .75rem; }
 .student-row {
   background: white; border-radius: 14px; border: 1px solid #e2e8f0;
-  padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
-  gap: 1rem; flex-wrap: wrap; cursor: pointer; transition: all .2s;
+  padding: 1rem 1.25rem; display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  cursor: pointer; transition: all .2s;
 }
 .student-row:hover { border-color: #0a1f44; box-shadow: 0 4px 12px rgba(10,31,68,.08); transform: translateY(-1px); }
-.sr-left { display: flex; align-items: center; gap: 1rem; }
-.sr-rank { width: 38px; height: 38px; border-radius: 50%; background: #eef2f8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #0a1f44; flex-shrink: 0; }
-.sr-name { font-weight: 600; color: #0a1f44; font-size: .95rem; }
-.sr-meta { font-size: .78rem; color: #5a6e82; margin-top: .15rem; }
-.sr-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.sr-left { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; }
+.sr-rank {
+  width: 38px; height: 38px; border-radius: 50%; background: #eef2f8;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem; color: #0a1f44; flex-shrink: 0;
+}
+.sr-name { font-weight: 600; color: #0a1f44; font-size: .95rem; word-break: break-word; }
+.sr-meta { font-size: .78rem; color: #5a6e82; margin-top: .15rem; word-break: break-all; }
+.sr-right {
+  display: flex; align-items: center; gap: .6rem;
+  flex-wrap: wrap; justify-content: flex-end;
+}
 
-/* Mini doc tags */
-.doc-tags { display: flex; gap: .35rem; flex-wrap: wrap; }
-.doc-tag { padding: .2rem .55rem; border-radius: 6px; font-size: .7rem; font-weight: 600; }
+/* ── Mini doc tags ── */
+.doc-tags { display: flex; gap: .3rem; flex-wrap: wrap; max-width: 260px; }
+.doc-tag { padding: .2rem .55rem; border-radius: 6px; font-size: .68rem; font-weight: 600; white-space: nowrap; }
 .tag-original  { background: #d1fae5; color: #065f46; }
 .tag-xerox     { background: #dbeafe; color: #1e40af; }
 .tag-attested  { background: #fef3c7; color: #92400e; }
 .tag-not_given { background: #f3f4f6; color: #9ca3af; }
 .tag-approved  { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
 
-.pill-approved { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #d1fae5; color: #065f46; }
-.pill-partial  { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #fef3c7; color: #92400e; }
-.pill-none     { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #f3f4f6; color: #6b7280; }
-.btn-view { background: #eef2f8; color: #0a1f44; border: none; padding: .4rem 1rem; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; }
+.pill-approved { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #d1fae5; color: #065f46; white-space: nowrap; }
+.pill-partial  { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #fef3c7; color: #92400e; white-space: nowrap; }
+.pill-none     { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; background: #f3f4f6; color: #6b7280; white-space: nowrap; }
+.btn-view { background: #eef2f8; color: #0a1f44; border: none; padding: .4rem 1rem; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; flex-shrink: 0; }
 .btn-view:hover { background: #dbe4f0; }
 
-/* Modal */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(10,31,68,.5); z-index: 999; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
+/* ── Modal ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(10,31,68,.5); z-index: 999;
+  align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 1.5rem 1rem;
+  box-sizing: border-box;
+}
 .modal-bg.open { display: flex; }
-.modal-box { background: white; border-radius: 20px; width: 100%; max-width: 660px; box-shadow: 0 24px 60px rgba(0,0,0,.2); overflow: hidden; }
-.modal-header { padding: 1.5rem 1.75rem 1rem; border-bottom: 1px solid #eef2f8; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-.modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #0a1f44; margin: 0; }
-.modal-header .sub { font-size: .8rem; color: #5a6e82; margin-top: .25rem; }
-.btn-close { background: #f3f4f6; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; color: #5a6e82; flex-shrink: 0; }
+.modal-box {
+  background: white; border-radius: 20px; width: 100%;
+  max-width: 660px; box-shadow: 0 24px 60px rgba(0,0,0,.2);
+  overflow: hidden; margin: auto;
+}
+.modal-header {
+  padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid #eef2f8;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  position: sticky; top: 0; background: white; z-index: 2;
+}
+.modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #0a1f44; margin: 0; word-break: break-word; }
+.modal-header .sub { font-size: .78rem; color: #5a6e82; margin-top: .25rem; word-break: break-word; }
+.btn-close { background: #f3f4f6; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; color: #5a6e82; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .btn-close:hover { background: #fee2e2; color: #991b1b; }
-.modal-body { padding: 1.5rem 1.75rem; max-height: 65vh; overflow-y: auto; }
+.modal-body { padding: 1.25rem 1.5rem; max-height: 60vh; overflow-y: auto; }
 
-/* Doc detail rows in modal */
+/* Doc detail rows */
 .doc-detail-row { padding: .85rem 0; border-bottom: 1px solid #f0f4f8; }
 .doc-detail-row:last-child { border-bottom: none; }
-.ddr-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
-.ddr-name { font-weight: 600; color: #0a1f44; font-size: .875rem; }
-.ddr-status { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .65rem; border-radius: 20px; font-size: .75rem; font-weight: 600; }
-.ddr-approval { margin-top: .5rem; font-size: .78rem; color: #5a6e82; display: flex; align-items: center; gap: .4rem; }
+.ddr-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.ddr-name { font-weight: 600; color: #0a1f44; font-size: .875rem; flex: 1; min-width: 0; word-break: break-word; }
+.ddr-status { display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .65rem; border-radius: 20px; font-size: .75rem; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.ddr-approval { margin-top: .5rem; font-size: .78rem; color: #5a6e82; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
 .ddr-approval .who { font-weight: 600; color: #0a1f44; }
 .ddr-approval .when { color: #9ca3af; }
 .not-approved-note { font-size: .75rem; color: #9ca3af; margin-top: .35rem; font-style: italic; }
 .approve-link { display: inline-flex; align-items: center; gap: .35rem; font-size: .78rem; color: #0a1f44; font-weight: 600; text-decoration: none; background: #eef2f8; padding: .25rem .65rem; border-radius: 7px; }
 .approve-link:hover { background: #dbe4f0; }
 
-.modal-footer { padding: 1rem 1.75rem; border-top: 1px solid #eef2f8; display: flex; justify-content: flex-end; gap: .75rem; }
-.btn-cancel { background: #f3f4f6; color: #374151; padding: .5rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; }
+.modal-footer {
+  padding: 1rem 1.5rem; border-top: 1px solid #eef2f8;
+  display: flex; justify-content: flex-end; gap: .75rem; flex-wrap: wrap;
+}
+.btn-cancel { background: #f3f4f6; color: #374151; padding: .5rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; white-space: nowrap; }
 .btn-cancel:hover { background: #e5e7eb; }
-.btn-go-verify { background: #0a1f44; color: white; padding: .5rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .4rem; }
+.btn-go-verify { background: #0a1f44; color: white; padding: .5rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; }
 .btn-go-verify:hover { background: #0d2857; }
 
-/* Dark */
-body.dark .do-header h2 { color: #eef2ff; }
-body.dark .btn-back { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .do-page { padding: 1rem .75rem 4rem; }
+  .do-header h2 { font-size: 1.35rem; }
+  .do-header { flex-direction: column; align-items: flex-start; }
+  .do-header > a { align-self: flex-start; }
+
+  .student-row { flex-direction: column; align-items: flex-start; }
+  .sr-left { width: 100%; }
+  .sr-right { width: 100%; justify-content: flex-start; }
+  .doc-tags { max-width: 100%; }
+
+  .modal-bg { padding: .75rem .5rem; align-items: flex-start; }
+  .modal-box { border-radius: 16px; }
+  .modal-header { padding: 1rem; position: static; }
+  .modal-body { padding: 1rem; max-height: 55vh; }
+  .modal-footer { padding: .85rem 1rem; }
+  .modal-footer { flex-direction: column-reverse; }
+  .btn-cancel, .btn-go-verify { width: 100%; justify-content: center; text-align: center; }
+
+  .sum-card { padding: .85rem .65rem; }
+  .sum-num { font-size: 1.5rem; }
+}
+
+/* ── Dark mode ── */
+body.dark .do-header h2     { color: #eef2ff; }
+body.dark .btn-back         { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
 body.dark .search-bar input { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
-body.dark .sum-card { background: #1a2538; border-color: #2d3e54; }
-body.dark .sum-num { color: #eef2ff; }
-body.dark .sum-lbl { color: #b9c8e8; }
-body.dark .student-row { background: #1a2538; border-color: #2d3e54; }
-body.dark .sr-rank { background: #0f1829; color: #eef2ff; }
-body.dark .sr-name { color: #eef2ff; }
-body.dark .modal-box { background: #1a2538; }
-body.dark .modal-header { border-color: #2d3e54; }
-body.dark .modal-header h3 { color: #eef2ff; }
-body.dark .modal-footer { border-color: #2d3e54; }
-body.dark .doc-detail-row { border-color: #1e2e42; }
-body.dark .ddr-name { color: #eef2ff; }
+body.dark .sum-card         { background: #1a2538; border-color: #2d3e54; }
+body.dark .sum-num          { color: #eef2ff; }
+body.dark .sum-lbl          { color: #b9c8e8; }
+body.dark .student-row      { background: #1a2538; border-color: #2d3e54; }
+body.dark .sr-rank          { background: #0f1829; color: #eef2ff; }
+body.dark .sr-name          { color: #eef2ff; }
+body.dark .modal-box        { background: #1a2538; }
+body.dark .modal-header     { border-color: #2d3e54; background: #1a2538; }
+body.dark .modal-header h3  { color: #eef2ff; }
+body.dark .modal-footer     { border-color: #2d3e54; }
+body.dark .doc-detail-row   { border-color: #1e2e42; }
+body.dark .ddr-name         { color: #eef2ff; }
 body.dark .ddr-approval .who { color: #eef2ff; }
-body.dark .btn-close { background: #2d3e54; color: #b9c8e8; }
-body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
+body.dark .btn-close        { background: #2d3e54; color: #b9c8e8; }
+body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
 
 .empty-state { text-align: center; padding: 4rem; color: #5a6e82; }
 .empty-state i { font-size: 3rem; opacity: .25; margin-bottom: 1rem; display: block; }
@@ -112,19 +169,20 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
     <div>
       <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
       <h2 style="margin-top:.75rem">Document Overview</h2>
-      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">Full document submission & approval summary for all admitted students</p>
+      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">Full document submission &amp; approval summary for all admitted students</p>
     </div>
-    <a href="{{ url_for('main.admin_document_verification') }}" style="display:inline-flex;align-items:center;gap:.5rem;background:#0a1f44;color:white;padding:.55rem 1.2rem;border-radius:10px;font-size:.875rem;font-weight:600;text-decoration:none">
+    <a href="{{ url_for('main.admin_document_verification') }}"
+       style="display:inline-flex;align-items:center;gap:.5rem;background:#0a1f44;color:white;padding:.55rem 1.2rem;border-radius:10px;font-size:.875rem;font-weight:600;text-decoration:none;white-space:nowrap">
       <i class="fas fa-folder-open"></i> Go to Verification
     </a>
   </div>
 
   <!-- Summary -->
-  {% set total_students = allotments|length %}
-  {% set fully_approved = allotments|selectattr('application_id', 'in', summaries.keys())|list|length %}
-  {% set total_docs_cat = doc_categories|length %}
   <div class="summary-strip">
-    <div class="sum-card"><div class="sum-num">{{ total_students }}</div><div class="sum-lbl">Allotted Students</div></div>
+    <div class="sum-card">
+      <div class="sum-num">{{ allotments|length }}</div>
+      <div class="sum-lbl">Allotted Students</div>
+    </div>
     <div class="sum-card sum-green">
       <div class="sum-num">
         {% set fully_approved_count = namespace(val=0) %}
@@ -139,7 +197,7 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
       <div class="sum-lbl">Fully Approved</div>
     </div>
     <div class="sum-card sum-yellow">
-      <div class="sum-num">{{ total_docs_cat }}</div>
+      <div class="sum-num">{{ doc_categories|length }}</div>
       <div class="sum-lbl">Document Types</div>
     </div>
   </div>
@@ -154,16 +212,18 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
     {% set appl = a.application %}
     {% set s = summaries[a.application_id] %}
     {% set appl_docs = doc_map.get(a.application_id, {}) %}
-    <div class="student-row" data-name="{{ appl.full_name|lower }}" data-rank="{{ appl.rank }}" onclick="openOverview({{ appl.id }})">
+    <div class="student-row"
+         data-name="{{ appl.full_name|lower }}"
+         data-rank="{{ appl.rank }}"
+         onclick="openOverview({{ appl.id }})">
       <div class="sr-left">
         <div class="sr-rank">{{ appl.rank or '—' }}</div>
-        <div>
+        <div style="min-width:0">
           <div class="sr-name">{{ appl.full_name }}</div>
           <div class="sr-meta">{{ appl.email }} &bull; {{ appl.category_name or '—' }} &bull; {{ a.quota|title }}</div>
         </div>
       </div>
       <div class="sr-right">
-        <!-- Mini status tags for each doc -->
         <div class="doc-tags">
           {% for dc in doc_categories %}
           {% set rec = appl_docs.get(dc.id) %}
@@ -200,7 +260,7 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
 <div class="modal-bg" id="overviewModal">
   <div class="modal-box">
     <div class="modal-header">
-      <div>
+      <div style="min-width:0">
         <h3 id="ovStudentName">Student Name</h3>
         <div class="sub" id="ovStudentMeta"></div>
       </div>
@@ -215,8 +275,27 @@ body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
+/* ── IST formatter (UTC+5:30) ── */
+function toIST(utcDateStr) {
+  if (!utcDateStr) return '';
+  const d = new Date(utcDateStr);
+  if (isNaN(d)) return utcDateStr;
+  // Offset by +5:30
+  const ist = new Date(d.getTime() + (5 * 60 + 30) * 60 * 1000);
+  const day  = String(ist.getUTCDate()).padStart(2, '0');
+  const mon  = ist.toLocaleString('en-IN', { month: 'short', timeZone: 'UTC' });
+  const yr   = ist.getUTCFullYear();
+  let   hr   = ist.getUTCHours();
+  const min  = String(ist.getUTCMinutes()).padStart(2, '0');
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12 || 12;
+  return `${day} ${mon} ${yr}, ${hr}:${min} ${ampm} IST`;
+}
+
 const overviewData = {
   {% for a in allotments %}
   {% set appl = a.application %}
@@ -233,7 +312,7 @@ const overviewData = {
         status: "{{ rec.status if rec else 'not_given' }}",
         statusLabel: "{{ rec.status_label if rec else 'Not Given' }}",
         isApproved: {{ 'true' if rec and rec.is_approved else 'false' }},
-        approvedAt: "{{ rec.approved_at.strftime('%d %b %Y, %I:%M %p') if rec and rec.approved_at else '' }}",
+        approvedAt: "{{ rec.approved_at.strftime('%Y-%m-%dT%H:%M:%S') if rec and rec.approved_at else '' }}",
         approvedByRole: "{{ rec.approved_by_role if rec and rec.approved_by_role else '' }}",
         approvedByName: "{{ rec.approved_by_name if rec and rec.approved_by_name else '' }}",
       },
@@ -257,14 +336,14 @@ function openOverview(appId) {
   document.getElementById('ovStudentMeta').textContent = d.meta;
 
   let html = '';
-  d.docs.forEach(doc => {
+  d.docs.forEach(function(doc) {
     const sc = STATUS_COLORS[doc.status] || STATUS_COLORS.not_given;
     const approvalHtml = doc.isApproved
       ? `<div class="ddr-approval">
            <i class="fas fa-check-circle" style="color:#10b981"></i>
            Approved by <span class="who">${doc.approvedByName}
            (${doc.approvedByRole === 'admin' ? 'Admin' : 'Faculty'})</span>
-           <span class="when">· ${doc.approvedAt}</span>
+           <span class="when">· ${toIST(doc.approvedAt)}</span>
          </div>`
       : `<div class="not-approved-note"><i class="fas fa-clock" style="margin-right:.3rem"></i>Not yet approved</div>`;
 
@@ -292,7 +371,7 @@ function closeOverview() {
 
 function filterStudents() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  document.querySelectorAll('.student-row').forEach(row => {
+  document.querySelectorAll('.student-row').forEach(function(row) {
     const name = row.dataset.name || '';
     const rank = row.dataset.rank || '';
     row.style.display = (name.includes(q) || rank.includes(q)) ? '' : 'none';
@@ -301,6 +380,10 @@ function filterStudents() {
 
 document.getElementById('overviewModal').addEventListener('click', function(e) {
   if (e.target === this) closeOverview();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeOverview();
 });
 </script>
 {% endblock %}

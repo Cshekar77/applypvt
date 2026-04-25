@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Faculty Credentials — BCA Admissions{% endblock %}
+{% block navbar_auth %}{% endblock %}
 {% block content %}
 <style>
   .page-header-inner {
@@ -7,36 +8,40 @@
     flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
   }
   .page-header-inner h2 {
-    font-family: 'Playfair Display', serif; font-size: 2rem; color: #0a1f44; margin: 0;
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0;
   }
   .back-link {
-    color: #c9a03d; text-decoration: none; font-size: .9rem;
+    color: #c9a03d; text-decoration: none; font-size: .9rem; white-space: nowrap;
   }
   .back-link:hover { text-decoration: underline; }
 
   /* ── Layout ── */
   .faculty-layout {
     display: grid;
-    grid-template-columns: 340px 1fr;
+    grid-template-columns: 320px 1fr;
     gap: 2rem;
     align-items: start;
+  }
+  @media (max-width: 900px) {
+    .faculty-layout { grid-template-columns: 1fr; }
+    .add-card { position: static; }
   }
 
   /* ── Add faculty card ── */
   .add-card {
-    background: white; border-radius: 20px; padding: 1.75rem;
+    background: white; border-radius: 20px; padding: 1.5rem;
     border: 1px solid #eef2f8;
     position: sticky; top: 1rem;
   }
   .add-card h3 {
-    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
+    font-size: 1.05rem; color: #0a1f44; margin: 0 0 1.25rem;
     display: flex; align-items: center; gap: .5rem;
   }
   .add-card h3 i { color: #7c3aed; }
 
   .form-group { margin-bottom: 1rem; }
   .form-group label {
-    display: block; font-size: .8rem; font-weight: 600;
+    display: block; font-size: .78rem; font-weight: 600;
     color: #5a6e82; margin-bottom: .35rem; text-transform: uppercase; letter-spacing: .04em;
   }
   .form-group input {
@@ -46,94 +51,158 @@
   }
   .form-group input:focus { outline: none; border-color: #7c3aed; }
 
-  .btn { display: inline-flex; align-items: center; gap: .4rem;
+  .btn {
+    display: inline-flex; align-items: center; gap: .4rem;
     padding: .6rem 1.2rem; border-radius: 10px; font-size: .875rem;
-    font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+    white-space: nowrap;
+  }
   .btn-primary { background: #0a1f44; color: white; width: 100%; justify-content: center; }
   .btn-primary:hover { background: #142d5c; }
   .btn-danger  { background: #fee2e2; color: #991b1b; }
   .btn-danger:hover  { background: #fecaca; }
   .btn-warning { background: #fef3c7; color: #92400e; }
   .btn-warning:hover { background: #fde68a; }
-  .btn-sm { padding: .4rem .8rem; font-size: .8rem; border-radius: 8px; }
+  .btn-sm { padding: .4rem .8rem; font-size: .78rem; border-radius: 8px; }
 
-  /* ── Faculty table ── */
+  /* ── Faculty table card ── */
   .table-card {
-    background: white; border-radius: 20px; padding: 1.75rem;
+    background: white; border-radius: 20px; padding: 1.5rem;
     border: 1px solid #eef2f8;
   }
   .table-card h3 {
-    font-size: 1.1rem; color: #0a1f44; margin: 0 0 1.25rem;
-    display: flex; align-items: center; gap: .5rem;
+    font-size: 1.05rem; color: #0a1f44; margin: 0 0 1.25rem;
+    display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
   }
   .table-card h3 i { color: #7c3aed; }
 
-  .fac-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  /* Table scroll wrapper */
+  .fac-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .fac-table {
+    width: 100%; border-collapse: collapse; font-size: .875rem;
+    min-width: 580px;
+  }
   .fac-table th {
-    text-align: left; font-size: .75rem; font-weight: 600;
+    text-align: left; font-size: .72rem; font-weight: 600;
     color: #5a6e82; text-transform: uppercase; letter-spacing: .05em;
     padding: .6rem 1rem; border-bottom: 2px solid #eef2f8;
+    white-space: nowrap;
   }
-  .fac-table td { padding: .85rem 1rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .fac-table td {
+    padding: .85rem 1rem; border-bottom: 1px solid #f5f7fa;
+    vertical-align: top;
+  }
   .fac-table tr:last-child td { border-bottom: none; }
   .fac-table tr:hover td { background: #fafbff; }
 
   .fac-name { font-weight: 600; color: #0a1f44; }
-  .fac-username { color: #5a6e82; font-size: .82rem; font-family: monospace; }
-  .fac-date { color: #aab4c8; font-size: .8rem; }
+  .fac-username { color: #5a6e82; font-size: .82rem; font-family: monospace; word-break: break-all; }
+  .fac-date { color: #aab4c8; font-size: .8rem; white-space: nowrap; }
 
   .badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 3px 10px; border-radius: 20px;
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .7rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; white-space: nowrap;
   }
   .badge-active   { background: #d1fae5; color: #065f46; }
   .badge-inactive { background: #f3f4f6; color: #6b7280; }
 
-  .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .actions { display: flex; gap: .4rem; flex-wrap: wrap; align-items: flex-start; }
 
   /* ── Reset password inline form ── */
   .reset-form {
-    display: none; margin-top: .5rem;
+    display: none; margin-top: .6rem;
     background: #faf5ff; border: 1px solid #ddd6fe;
     border-radius: 10px; padding: .75rem;
   }
   .reset-form.open { display: block; }
-  .reset-form .reset-row { display: flex; gap: .5rem; align-items: center; }
-  .reset-form input {
-    flex: 1; padding: .45rem .7rem; border: 1px solid #ddd6fe;
-    border-radius: 8px; font-size: .85rem; color: #0a1f44;
+  .reset-row {
+    display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;
   }
-  .reset-form input:focus { outline: none; border-color: #7c3aed; }
+  .reset-row input {
+    flex: 1 1 160px; min-width: 0;
+    padding: .45rem .7rem; border: 1px solid #ddd6fe;
+    border-radius: 8px; font-size: .85rem; color: #0a1f44;
+    box-sizing: border-box;
+  }
+  .reset-row input:focus { outline: none; border-color: #7c3aed; }
+  .reset-row-btns { display: flex; gap: .4rem; }
 
   .empty-state {
     text-align: center; padding: 3rem 1rem; color: #aab4c8;
   }
   .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #dde3ef; }
 
-  /* Dark mode */
+  /* ── Mobile card layout (≤ 580px) ── */
+  @media (max-width: 580px) {
+    .page-header-inner h2 { font-size: 1.3rem; }
+    .add-card, .table-card { padding: 1rem; border-radius: 16px; }
+
+    /* Convert table to cards */
+    .fac-table-wrap { overflow-x: unset; }
+    .fac-table, .fac-table thead, .fac-table tbody,
+    .fac-table th, .fac-table td, .fac-table tr { display: block; }
+    .fac-table { min-width: unset; }
+    .fac-table thead { display: none; }
+
+    .fac-table tbody tr {
+      background: white; border: 1px solid #eef2f8;
+      border-radius: 12px; margin-bottom: .85rem;
+      padding: .75rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .fac-table tbody tr:hover { background: #fafbff; }
+
+    .fac-table td {
+      padding: .3rem .1rem; border: none;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: .5rem;
+      font-size: .85rem;
+    }
+    .fac-table td::before {
+      content: attr(data-label);
+      font-size: .67rem; font-weight: 700; text-transform: uppercase;
+      color: #8a9ab0; letter-spacing: .06em;
+      flex-shrink: 0; min-width: 72px; padding-top: 2px;
+    }
+    /* Hide serial on mobile */
+    .fac-table td.serial-cell { display: none; }
+
+    /* Actions cell full width */
+    .fac-table td.actions-cell {
+      flex-direction: column; align-items: flex-start;
+    }
+    .fac-table td.actions-cell::before { display: none; }
+
+    .reset-row { flex-direction: column; align-items: stretch; }
+    .reset-row input { flex: unset; width: 100%; }
+    .reset-row-btns { width: 100%; }
+    .reset-row-btns .btn { flex: 1; justify-content: center; }
+  }
+
+  /* ── Dark mode ── */
   body.dark .add-card,
-  body.dark .table-card       { background: #1a2538; border-color: #2d3e54; }
+  body.dark .table-card        { background: #1a2538; border-color: #2d3e54; }
   body.dark .add-card h3,
   body.dark .table-card h3,
-  body.dark .fac-name         { color: #eef2ff; }
-  body.dark .form-group label { color: #b9c8e8; }
-  body.dark .form-group input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .fac-table th     { color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .fac-table td     { border-color: #1e2e42; }
+  body.dark .fac-name          { color: #eef2ff; }
+  body.dark .form-group label  { color: #b9c8e8; }
+  body.dark .form-group input  { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .fac-table th      { color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .fac-table td      { border-color: #1e2e42; }
   body.dark .fac-table tr:hover td { background: #1e2e42; }
-  body.dark .fac-username     { color: #8899b8; }
-  body.dark .btn-primary      { background: #c9a03d; color: #0a1f44; }
+  body.dark .fac-username      { color: #8899b8; }
+  body.dark .btn-primary       { background: #c9a03d; color: #0a1f44; }
   body.dark .btn-primary:hover { background: #b8902e; }
-  body.dark .reset-form       { background: #1e1530; border-color: #6d28d9; }
-  body.dark .reset-form input { background: #130e20; border-color: #6d28d9; color: #eef2ff; }
+  body.dark .reset-form        { background: #1e1530; border-color: #6d28d9; }
+  body.dark .reset-row input   { background: #130e20; border-color: #6d28d9; color: #eef2ff; }
 
-  @media (max-width: 900px) {
-    .faculty-layout { grid-template-columns: 1fr; }
-    .add-card { position: static; }
+  @media (max-width: 580px) {
+    body.dark .fac-table tbody tr {
+      background: #1a2538; border-color: #2d3e54;
+    }
+    body.dark .fac-table tbody tr:hover { background: #1e2e42; }
   }
 </style>
-
-{% block navbar_auth %}{% endblock %}
 
 <div class="page-wrap">
   <div class="page-header-inner">
@@ -170,7 +239,8 @@
 
     {# ── Faculty List ── #}
     <div class="table-card">
-      <h3><i class="fas fa-users"></i>
+      <h3>
+        <i class="fas fa-users"></i>
         Faculty Accounts
         <span style="font-size:.8rem; font-weight:400; color:#aab4c8; margin-left:auto">
           {{ faculties|length }} total
@@ -178,87 +248,95 @@
       </h3>
 
       {% if faculties %}
-      <table class="fac-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name / Username</th>
-            <th>Status</th>
-            <th>Added</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for fac in faculties %}
-          <tr>
-            <td style="color:#aab4c8; font-size:.8rem">{{ loop.index }}</td>
-            <td>
-              <div class="fac-name">{{ fac.full_name }}</div>
-              <div class="fac-username">@{{ fac.username }}</div>
-            </td>
-            <td>
-              {% if fac.is_active %}
-                <span class="badge badge-active"><i class="fas fa-circle" style="font-size:.5rem"></i> Active</span>
-              {% else %}
-                <span class="badge badge-inactive"><i class="fas fa-circle" style="font-size:.5rem"></i> Inactive</span>
-              {% endif %}
-            </td>
-            <td class="fac-date">
-              {{ fac.created_at.strftime('%d %b %Y') if fac.created_at else '—' }}
-            </td>
-            <td>
-              <div class="actions">
-                {# Toggle active/inactive #}
-                <form method="POST" style="display:inline">
-                  <input type="hidden" name="action" value="toggle">
-                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
-                  <button type="submit" class="btn btn-sm btn-warning" title="{{ 'Deactivate' if fac.is_active else 'Activate' }}">
-                    <i class="fas fa-{{ 'ban' if fac.is_active else 'check' }}"></i>
-                    {{ 'Deactivate' if fac.is_active else 'Activate' }}
-                  </button>
-                </form>
-
-                {# Reset password toggle #}
-                <button type="button" class="btn btn-sm btn-warning"
-                  onclick="toggleReset('reset-{{ fac.id }}')">
-                  <i class="fas fa-key"></i> Reset PW
-                </button>
-
-                {# Delete #}
-                <form method="POST" style="display:inline"
-                  onsubmit="return confirm('Delete {{ fac.full_name }}? This cannot be undone.')">
-                  <input type="hidden" name="action" value="delete">
-                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
-                  <button type="submit" class="btn btn-sm btn-danger">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </form>
-              </div>
-
-              {# Inline reset password form #}
-              <div class="reset-form" id="reset-{{ fac.id }}">
-                <form method="POST">
-                  <input type="hidden" name="action" value="reset_password">
-                  <input type="hidden" name="fac_id" value="{{ fac.id }}">
-                  <div class="reset-row">
-                    <input type="password" name="new_password"
-                      placeholder="New password (min 6 chars)" autocomplete="new-password" required>
-                    <button type="submit" class="btn btn-sm btn-primary">
-                      <i class="fas fa-save"></i> Save
+      <div class="fac-table-wrap">
+        <table class="fac-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name / Username</th>
+              <th>Status</th>
+              <th>Added</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fac in faculties %}
+            <tr>
+              <td class="serial-cell" data-label="#">{{ loop.index }}</td>
+              <td data-label="Name">
+                <div>
+                  <div class="fac-name">{{ fac.full_name }}</div>
+                  <div class="fac-username">@{{ fac.username }}</div>
+                </div>
+              </td>
+              <td data-label="Status">
+                {% if fac.is_active %}
+                  <span class="badge badge-active"><i class="fas fa-circle" style="font-size:.5rem"></i> Active</span>
+                {% else %}
+                  <span class="badge badge-inactive"><i class="fas fa-circle" style="font-size:.5rem"></i> Inactive</span>
+                {% endif %}
+              </td>
+              <td data-label="Added" class="fac-date">
+                {{ fac.created_at.strftime('%d/%m/%Y') if fac.created_at else '—' }}
+              </td>
+              <td class="actions-cell">
+                <div class="actions">
+                  {# Toggle active/inactive #}
+                  <form method="POST" style="display:inline">
+                    <input type="hidden" name="action" value="toggle">
+                    <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                    <button type="submit" class="btn btn-sm btn-warning"
+                      title="{{ 'Deactivate' if fac.is_active else 'Activate' }}">
+                      <i class="fas fa-{{ 'ban' if fac.is_active else 'check' }}"></i>
+                      {{ 'Deactivate' if fac.is_active else 'Activate' }}
                     </button>
-                    <button type="button" class="btn btn-sm btn-warning"
-                      onclick="toggleReset('reset-{{ fac.id }}')">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  </form>
 
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                  {# Reset password toggle #}
+                  <button type="button" class="btn btn-sm btn-warning"
+                    onclick="toggleReset('reset-{{ fac.id }}')">
+                    <i class="fas fa-key"></i> Reset PW
+                  </button>
+
+                  {# Delete #}
+                  <form method="POST" style="display:inline"
+                    onsubmit="return confirm('Delete {{ fac.full_name }}? This cannot be undone.')">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+
+                {# Inline reset password form #}
+                <div class="reset-form" id="reset-{{ fac.id }}">
+                  <form method="POST">
+                    <input type="hidden" name="action" value="reset_password">
+                    <input type="hidden" name="fac_id" value="{{ fac.id }}">
+                    <div class="reset-row">
+                      <input type="password" name="new_password"
+                        placeholder="New password (min 6 chars)"
+                        autocomplete="new-password" required>
+                      <div class="reset-row-btns">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                          <i class="fas fa-save"></i> Save
+                        </button>
+                        <button type="button" class="btn btn-sm btn-warning"
+                          onclick="toggleReset('reset-{{ fac.id }}')">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
       {% else %}
       <div class="empty-state">
@@ -270,6 +348,7 @@
 
   </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -281,5 +360,4 @@ function toggleReset(id) {
   }
 }
 </script>
-{% endblock %}
 {% endblock %}

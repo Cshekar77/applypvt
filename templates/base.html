@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>{% block title %}BCA Admissions 2026–2027{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <!-- Font Awesome -->
@@ -23,6 +23,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden; /* prevent horizontal scroll from rogue children */
   }
 
   /* ══════════════════════════════
@@ -47,7 +48,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: .75rem;
   }
 
   /* Brand */
@@ -55,8 +56,9 @@
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: .45rem;
     flex-shrink: 0;
+    min-width: 0;
   }
   .nav-brand-icon {
     width: 34px; height: 34px;
@@ -65,19 +67,30 @@
     display: flex; align-items: center; justify-content: center;
     color: #c9a03d; font-size: .8rem;
     box-shadow: 0 2px 8px rgba(10,31,68,.2);
+    flex-shrink: 0;
   }
   .brand-serif {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.25rem; font-weight: 700; color: #0a1f44;
     letter-spacing: .01em;
+    white-space: nowrap;
   }
   .brand-divider {
     width: 1px; height: 16px;
     background: #d1d9e8;
+    flex-shrink: 0;
   }
   .brand-sub {
     font-size: .75rem; font-weight: 400; color: #7a90b0;
     letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Hide brand-sub on very small screens */
+  @media (max-width: 360px) {
+    .brand-divider, .brand-sub { display: none; }
   }
 
   /* Desktop nav links */
@@ -85,6 +98,7 @@
     display: flex;
     align-items: center;
     gap: .25rem;
+    flex-shrink: 0;
   }
 
   .nav-link {
@@ -139,6 +153,8 @@
     padding: .75rem 1.25rem 1.25rem;
     gap: .2rem;
     box-shadow: 0 8px 24px rgba(10,31,68,.08);
+    max-height: calc(100vh - 60px); /* never taller than viewport */
+    overflow-y: auto;
   }
   .nav-mobile-drawer.open { display: flex; }
   .nav-mobile-drawer .nav-link {
@@ -161,8 +177,6 @@
 
   /* ══════════════════════════════
      MAIN CONTENT
-     - Desktop: full width up to 1280px
-     - Pages that need centering use .page-wrap inside
   ══════════════════════════════ */
   .site-main {
     flex: 1;
@@ -170,16 +184,23 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 1.5rem 2rem 3rem;
+    overflow-x: hidden; /* contain any overflowing child */
+    box-sizing: border-box;
   }
 
   @media (max-width: 768px) {
     .site-main { padding: 1rem 1rem 3rem; }
   }
 
+  @media (max-width: 400px) {
+    .site-main { padding: .75rem .75rem 3rem; }
+  }
+
   /* Student-facing pages: centered narrow layout */
   .page-wrap {
     max-width: 720px;
     margin: 0 auto;
+    width: 100%; /* ensure it never overflows on small screens */
   }
 
   /* ══════════════════════════════
@@ -192,10 +213,13 @@
     font-size: .85rem;
     margin-bottom: .5rem;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* align top for multiline messages */
     gap: .6rem;
     border: 1px solid transparent;
+    word-break: break-word; /* prevent long messages from overflowing */
+    overflow-wrap: break-word;
   }
+  .flash i { flex-shrink: 0; margin-top: 2px; } /* icon doesn't shrink on multiline */
   .flash-success { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
   .flash-danger  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
   .flash-warning { background: #fffbeb; color: #854d0e; border-color: #fde68a; }
@@ -225,18 +249,18 @@
     border-color: #1e2e42;
     box-shadow: 0 1px 12px rgba(0,0,0,.3);
   }
-  body.dark .brand-serif   { color: #eef2ff; }
-  body.dark .brand-sub     { color: #7a90b0; }
-  body.dark .brand-divider { background: #2d3e54; }
-  body.dark .nav-link      { color: #b9c8e8; }
+  body.dark .brand-serif    { color: #eef2ff; }
+  body.dark .brand-sub      { color: #7a90b0; }
+  body.dark .brand-divider  { background: #2d3e54; }
+  body.dark .nav-link       { color: #b9c8e8; }
   body.dark .nav-link:hover { background: #1a2538; color: #eef2ff; }
   body.dark .nav-btn-outline { border-color: #2d3e54; color: #7a90b0; }
-  body.dark .nav-hamburger { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .nav-hamburger  { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
   body.dark .nav-mobile-drawer { background: #0d1a2e; border-color: #1e2e42; }
-  body.dark .site-footer   { background: #0d1a2e; border-color: #1e2e42; color: #4a5568; }
+  body.dark .site-footer    { background: #0d1a2e; border-color: #1e2e42; color: #4a5568; }
 
   /* ══════════════════════════════
-     COMMON UTILITIES (shared across templates)
+     COMMON UTILITIES
   ══════════════════════════════ */
   .text-muted { color: #7a90b0; font-size: .85rem; }
 
@@ -244,6 +268,7 @@
     display: inline-flex; align-items: center; gap: .25rem;
     font-size: .7rem; font-weight: 600;
     padding: 3px 9px; border-radius: 20px;
+    white-space: nowrap;
   }
   .badge-success { background: #dcfce7; color: #166534; }
   .badge-warning { background: #fef9c3; color: #854d0e; }
@@ -257,12 +282,17 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.85rem; color: #0a1f44; margin: 0; font-weight: 700;
   }
+  @media (max-width: 480px) {
+    .page-header-inner h2 { font-size: 1.4rem; }
+  }
   body.dark .page-header-inner h2 { color: #eef2ff; }
 
+  /* Status card — fixed flex-wrap */
   .status-card {
     border-radius: 16px; padding: 1.1rem 1.25rem;
-    display: flex; align-items: center; gap: 1rem;
+    display: flex; align-items: flex-start; gap: 1rem;
     margin-bottom: 1rem; border: 1px solid transparent;
+    flex-wrap: wrap; /* prevent overflow on small screens */
   }
   .status-submitted { background: #f0fdf4; border-color: #bbf7d0; }
   .status-pending   { background: #fffbeb; border-color: #fde68a; }
@@ -279,7 +309,7 @@
     padding: .55rem 1.1rem; border-radius: 10px;
     font-size: .85rem; font-weight: 600;
     cursor: pointer; border: none; text-decoration: none;
-    transition: all .2s;
+    transition: all .2s; white-space: nowrap;
   }
   .btn-primary {
     background: linear-gradient(135deg, #0a1f44, #1e3a60);
@@ -295,6 +325,7 @@
 </head>
 <body>
 
+{% block navbar_auth %}
 <nav class="navbar">
   <div class="nav-inner">
 
@@ -377,6 +408,7 @@
     {% endif %}
   </div>
 </nav>
+{% endblock %}
 
 <main class="site-main">
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -412,7 +444,8 @@
         !drawer.contains(e.target) &&
         !hamburger.contains(e.target)) {
       drawer.classList.remove('open');
-      document.getElementById('hamburgerIcon').className = 'fas fa-bars';
+      const icon = document.getElementById('hamburgerIcon');
+      if (icon) icon.className = 'fas fa-bars';
     }
   });
 </script>
