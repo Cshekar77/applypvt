@@ -8,18 +8,12 @@
 .btn-back { display: inline-flex; align-items: center; gap: .5rem; color: #5a6e82; text-decoration: none; font-size: .875rem; padding: .4rem .85rem; border-radius: 8px; background: #f5f7fa; border: 1px solid #e2e8f0; transition: all .2s; }
 .btn-back:hover { background: #eef2f8; color: #0a1f44; }
 
-/* Search */
 .search-bar { margin-bottom: 1.5rem; }
 .search-bar input { width: 100%; padding: .65rem 1rem; border: 1px solid #e2e8f0; border-radius: 10px; font-size: .875rem; color: #0a1f44; outline: none; box-sizing: border-box; }
 .search-bar input:focus { border-color: #0a1f44; }
 
-/* Student list */
 .student-list { display: flex; flex-direction: column; gap: .75rem; }
-.student-row {
-  background: white; border-radius: 14px; border: 1px solid #e2e8f0;
-  padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
-  gap: 1rem; flex-wrap: wrap; cursor: pointer; transition: all .2s;
-}
+.student-row { background: white; border-radius: 14px; border: 1px solid #e2e8f0; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; cursor: pointer; transition: all .2s; }
 .student-row:hover { border-color: #0a1f44; box-shadow: 0 4px 12px rgba(10,31,68,.08); transform: translateY(-1px); }
 .sr-left { display: flex; align-items: center; gap: 1rem; }
 .sr-rank { width: 38px; height: 38px; border-radius: 50%; background: #eef2f8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #0a1f44; flex-shrink: 0; }
@@ -33,7 +27,6 @@
 .btn-verify { background: #0a1f44; color: white; border: none; padding: .4rem 1rem; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; }
 .btn-verify:hover { background: #0d2857; }
 
-/* Modal */
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(10,31,68,.5); z-index: 999; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
 .modal-bg.open { display: flex; }
 .modal-box { background: white; border-radius: 20px; width: 100%; max-width: 680px; box-shadow: 0 24px 60px rgba(0,0,0,.2); overflow: hidden; }
@@ -44,18 +37,13 @@
 .btn-close:hover { background: #fee2e2; color: #991b1b; }
 .modal-body { padding: 1.5rem 1.75rem; max-height: 60vh; overflow-y: auto; }
 
-/* Doc rows in modal */
 .doc-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-bottom: 1px solid #f0f4f8; flex-wrap: wrap; }
 .doc-row:last-child { border-bottom: none; }
 .doc-name { font-weight: 600; color: #0a1f44; font-size: .875rem; flex: 1; min-width: 140px; }
 .doc-name .req-star { color: #ef4444; margin-left: .2rem; }
 .doc-desc { font-size: .75rem; color: #5a6e82; margin-top: .15rem; }
 .status-options { display: flex; gap: .4rem; flex-wrap: wrap; }
-.status-btn {
-  padding: .3rem .7rem; border-radius: 20px; font-size: .75rem; font-weight: 600;
-  border: 2px solid transparent; cursor: pointer; transition: all .15s;
-  background: #f3f4f6; color: #374151;
-}
+.status-btn { padding: .3rem .7rem; border-radius: 20px; font-size: .75rem; font-weight: 600; border: 2px solid transparent; cursor: pointer; transition: all .15s; background: #f3f4f6; color: #374151; }
 .status-btn:hover { border-color: #0a1f44; }
 .status-btn.active-original  { background: #d1fae5; color: #065f46; border-color: #10b981; }
 .status-btn.active-xerox     { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
@@ -68,36 +56,17 @@ input.status-radio { display: none; }
 .btn-cancel:hover { background: #e5e7eb; }
 .btn-save-only { background: #eef2f8; color: #0a1f44; padding: .55rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; }
 .btn-save-only:hover { background: #dbe4f0; }
-/* Approve button — enabled state */
-.btn-approve {
-  background: #10b981; color: white; padding: .55rem 1.4rem;
-  border-radius: 10px; border: none; font-weight: 700; font-size: .875rem; cursor: pointer;
-  transition: background .2s;
-}
-.btn-approve:hover:not(:disabled) { background: #059669; }
-/* Approve button — disabled state */
-.btn-approve:disabled {
-  background: #d1d5db; color: #9ca3af; cursor: not-allowed;
-  box-shadow: none;
-}
-/* Approve lock notice */
-.approve-notice {
-  font-size: .75rem; color: #92400e; background: #fef3c7;
-  border-radius: 8px; padding: .4rem .75rem;
-  display: none; /* shown by JS when not all original */
-}
+.btn-approve { background: #10b981; color: white; padding: .55rem 1.4rem; border-radius: 10px; border: none; font-weight: 700; font-size: .875rem; cursor: pointer; transition: background .2s; }
+.btn-approve:hover { background: #059669; }
 
-/* Flash */
 .flash-msg { padding: .75rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: .875rem; }
 .flash-success { background: #d1fae5; color: #065f46; }
 .flash-warning { background: #fef3c7; color: #92400e; }
 .flash-danger  { background: #fee2e2; color: #991b1b; }
 
-/* Empty */
 .empty-state { text-align: center; padding: 4rem; color: #5a6e82; }
 .empty-state i { font-size: 3rem; opacity: .25; margin-bottom: 1rem; display: block; }
 
-/* Dark */
 body.dark .dv-header h2 { color: #eef2ff; }
 body.dark .btn-back { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
 body.dark .search-bar input { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
@@ -115,7 +84,6 @@ body.dark .btn-close { background: #2d3e54; color: #b9c8e8; }
 body.dark .status-btn { background: #2d3e54; color: #b9c8e8; }
 body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
 body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
-body.dark .approve-notice { background: #3b2a0a; color: #fbbf24; }
 </style>
 
 {% block navbar_auth %}{% endblock %}
@@ -208,13 +176,8 @@ body.dark .approve-notice { background: #3b2a0a; color: #fbbf24; }
           </div>
           <div class="status-options">
             {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('not_given','Not Given')] %}
-            <button type="button"
-              class="status-btn"
-              data-doc="{{ dc.id }}"
-              data-val="{{ val }}"
-              onclick="setStatus({{ dc.id }}, '{{ val }}', this)">
-              {{ label }}
-            </button>
+            <button type="button" class="status-btn" data-doc="{{ dc.id }}" data-val="{{ val }}"
+              onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
             {% endfor %}
             <input type="hidden" name="status_{{ dc.id }}" id="status_input_{{ dc.id }}" value="not_given">
           </div>
@@ -224,25 +187,16 @@ body.dark .approve-notice { background: #3b2a0a; color: #fbbf24; }
         <p style="color:#5a6e82;text-align:center;padding:2rem">No document categories defined.</p>
         {% endif %}
       </div>
+      <!-- CHANGED: approve button always enabled, no gate, no notice -->
       <div class="modal-footer">
         <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
-          <!-- Notice shown when not all docs are original -->
-          <div class="approve-notice" id="approveNotice">
-            <i class="fas fa-lock"></i>
-            All documents must be marked <strong>Original</strong> to approve.
-          </div>
-          <div style="display:flex;gap:.75rem">
-            <button type="submit" class="btn-save-only" onclick="document.getElementById('approveAllFlag').value='0'">
-              <i class="fas fa-save"></i> Save Only
-            </button>
-            <button type="submit" class="btn-approve" id="approveBtn"
-              onclick="document.getElementById('approveAllFlag').value='1'"
-              disabled
-              title="All documents must be marked as Original to approve">
-              <i class="fas fa-check-double"></i> Save & Approve All
-            </button>
-          </div>
+        <div style="display:flex;gap:.75rem">
+          <button type="submit" class="btn-save-only" onclick="document.getElementById('approveAllFlag').value='0'">
+            <i class="fas fa-save"></i> Save Only
+          </button>
+          <button type="submit" class="btn-approve" onclick="document.getElementById('approveAllFlag').value='1'">
+            <i class="fas fa-check-double"></i> Save &amp; Approve All
+          </button>
         </div>
       </div>
     </form>
@@ -250,10 +204,6 @@ body.dark .approve-notice { background: #3b2a0a; color: #fbbf24; }
 </div>
 
 <script>
-// Total number of doc categories
-const TOTAL_DOCS = {{ doc_categories|length }};
-
-// Student data map from Jinja — includes per-student all_original flag from server
 const studentData = {
   {% for a in allotments %}
   {% set appl = a.application %}
@@ -270,29 +220,6 @@ const studentData = {
   {% endfor %}
 };
 
-// Track current statuses in the open modal
-const currentStatuses = {};
-
-function _allOriginal() {
-  if (TOTAL_DOCS === 0) return false;
-  return Object.values(currentStatuses).length === TOTAL_DOCS &&
-         Object.values(currentStatuses).every(v => v === 'original');
-}
-
-function _refreshApproveBtn() {
-  const btn    = document.getElementById('approveBtn');
-  const notice = document.getElementById('approveNotice');
-  if (_allOriginal()) {
-    btn.disabled       = false;
-    btn.title          = 'Save and approve all documents';
-    notice.style.display = 'none';
-  } else {
-    btn.disabled       = true;
-    btn.title          = 'All documents must be marked as Original to approve';
-    notice.style.display = 'block';
-  }
-}
-
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
@@ -300,24 +227,15 @@ function openModal(appId) {
   document.getElementById('modalStudentMeta').textContent = d.meta;
   document.getElementById('modalAppId').value = appId;
 
-  // Reset tracking object
-  for (const k in currentStatuses) delete currentStatuses[k];
+  document.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
 
-  // Reset all buttons first
-  document.querySelectorAll('.status-btn').forEach(b => {
-    b.className = 'status-btn';
-  });
-
-  // Set current statuses from saved data
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
-    currentStatuses[docId] = status;
     const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${status}"]`);
     if (btn) btn.classList.add('active-' + status);
   }
 
-  _refreshApproveBtn();
   document.getElementById('verifyModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -328,16 +246,9 @@ function closeModal() {
 }
 
 function setStatus(docId, val, btn) {
-  // Deactivate all for this doc
-  document.querySelectorAll(`.status-btn[data-doc="${docId}"]`).forEach(b => {
-    b.className = 'status-btn';
-  });
+  document.querySelectorAll(`.status-btn[data-doc="${docId}"]`).forEach(b => { b.className = 'status-btn'; });
   btn.classList.add('active-' + val);
   document.getElementById('status_input_' + docId).value = val;
-
-  // Update live tracking and re-check approve eligibility
-  currentStatuses[String(docId)] = val;
-  _refreshApproveBtn();
 }
 
 function filterStudents() {

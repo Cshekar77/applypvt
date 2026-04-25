@@ -4,178 +4,93 @@
 <style>
   .sc-page { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 
-  .btn-back {
-    display: inline-flex; align-items: center; gap: .4rem;
-    color: #5a6e82; text-decoration: none; font-size: .88rem; margin-bottom: 1.5rem;
-    transition: color .2s;
-  }
+  .btn-back { display: inline-flex; align-items: center; gap: .4rem; color: #5a6e82; text-decoration: none; font-size: .88rem; margin-bottom: 1.5rem; transition: color .2s; }
   .btn-back:hover { color: #0a1f44; }
 
   .sc-header { margin-bottom: 1.75rem; }
-  .sc-header h2 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.85rem; color: #0a1f44; margin: 0 0 .3rem 0;
-  }
+  .sc-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; color: #0a1f44; margin: 0 0 .3rem 0; }
   .sc-header p { color: #5a6e82; font-size: .88rem; margin: 0; }
 
-  .live-chip {
-    display: inline-flex; align-items: center; gap: .45rem;
-    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
-    text-transform: uppercase; color: #25c26e;
-    background: #edf9f2; border: 1px solid #a8dfc0;
-    padding: .28rem .85rem; border-radius: 20px;
-    margin-bottom: 1.25rem;
-  }
-  .live-dot {
-    width: 7px; height: 7px; background: #25c26e;
-    border-radius: 50%; animation: live-pulse 1.4s infinite;
-  }
+  .live-chip { display: inline-flex; align-items: center; gap: .45rem; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #25c26e; background: #edf9f2; border: 1px solid #a8dfc0; padding: .28rem .85rem; border-radius: 20px; margin-bottom: 1.25rem; }
+  .live-dot { width: 7px; height: 7px; background: #25c26e; border-radius: 50%; animation: live-pulse 1.4s infinite; }
   @keyframes live-pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
   .live-chip.paused  { color: #856404; background: #fffbea; border-color: #f0d97a; }
   .live-chip.paused .live-dot { background: #f0c040; animation: none; }
   .live-chip.stopped { color: #5a6e82; background: #f5f7fa; border-color: #dde3ed; }
   .live-chip.stopped .live-dot { background: #b0bac8; animation: none; }
 
-  .sc-card {
-    background: white; border-radius: 18px;
-    border: 1px solid #eef2f8;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    padding: 1.5rem; margin-bottom: 1.25rem;
-    transition: box-shadow .2s;
-  }
+  .sc-card { background: white; border-radius: 18px; border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05); padding: 1.5rem; margin-bottom: 1.25rem; transition: box-shadow .2s; }
   .sc-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.08); }
 
   .rank-display-wrap { text-align: center; padding: .5rem 0 1rem; }
-  .rank-label { font-size: .72rem; font-weight: 600; letter-spacing: .1em;
-                text-transform: uppercase; color: #8a9ab0; margin-bottom: .5rem; }
-  .rank-number {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 5rem; font-weight: 700; color: #0a1f44; line-height: 1;
-    transition: all .4s;
-  }
+  .rank-label { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #8a9ab0; margin-bottom: .5rem; }
+  .rank-number { font-family: 'Cormorant Garamond', serif; font-size: 5rem; font-weight: 700; color: #0a1f44; line-height: 1; transition: all .4s; }
   .rank-number.highlight { color: #25c26e; transform: scale(1.06); }
   .rank-subtext { font-size: .85rem; color: #5a6e82; margin-top: .5rem; }
 
   .rank-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; }
   .rank-box { background: #f5f7fa; border-radius: 12px; padding: 1rem; text-align: center; }
   .rank-box .rb-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: #8a9ab0; }
-  .rank-box .rb-val {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.2rem; font-weight: 700; color: #0a1f44; line-height: 1.1;
-  }
+  .rank-box .rb-val { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: #0a1f44; line-height: 1.1; }
   .rank-box.my-rank { background: #eef3ff; }
   .rank-box.called   { background: #edf9f2; }
   .rank-box.called .rb-val { color: #25c26e; }
 
-  .your-turn-alert {
-    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
-    border: 1.5px solid #25c26e; border-radius: 14px; padding: 1.25rem 1.5rem;
-    display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
-    animation: pop-in .4s cubic-bezier(.22,.68,0,1.2) both;
-  }
+  .your-turn-alert { background: linear-gradient(135deg, #edf9f2, #d4f0e2); border: 1.5px solid #25c26e; border-radius: 14px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; animation: pop-in .4s cubic-bezier(.22,.68,0,1.2) both; }
   @keyframes pop-in { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
   .your-turn-icon { font-size: 2rem; flex-shrink: 0; }
   .your-turn-text h4 { font-size: 1rem; font-weight: 700; color: #1a5c3a; margin: 0 0 .2rem; }
   .your-turn-text p  { font-size: .83rem; color: #2e7d52; margin: 0; }
 
-  .allotted-card {
-    background: linear-gradient(135deg, #edf9f2, #d4f0e2);
-    border: 1.5px solid #25c26e; border-radius: 16px; padding: 1.5rem;
-    display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
-  }
+  .allotted-card { background: linear-gradient(135deg, #edf9f2, #d4f0e2); border: 1.5px solid #25c26e; border-radius: 16px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
   .allotted-card .ac-icon { font-size: 2.2rem; flex-shrink: 0; }
   .allotted-card h4 { font-size: 1rem; font-weight: 700; color: #1a5c3a; margin: 0 0 .2rem; }
   .allotted-card p  { font-size: .82rem; color: #2e7d52; margin: 0; }
 
-  .admin-msg {
-    background: #fffbea; border: 1px solid #f0d97a;
-    border-radius: 12px; padding: 1rem 1.25rem;
-    font-size: .85rem; color: #7a5c00; margin-bottom: 1.25rem;
-  }
+  .admin-msg { background: #fffbea; border: 1px solid #f0d97a; border-radius: 12px; padding: 1rem 1.25rem; font-size: .85rem; color: #7a5c00; margin-bottom: 1.25rem; }
 
-  .stopped-card {
-    text-align: center; padding: 2.5rem; color: #8a9ab0;
-    background: white; border-radius: 18px; border: 1.5px dashed #dde3ed;
-  }
+  .stopped-card { text-align: center; padding: 2.5rem; color: #8a9ab0; background: white; border-radius: 18px; border: 1.5px dashed #dde3ed; }
   .stopped-card i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
 
   .refresh-note { text-align: center; font-size: .75rem; color: #b0bac8; margin-top: 1.5rem; }
   .refresh-note span { color: #0a1f44; font-weight: 600; }
 
   /* ── Track Live Seats Button ── */
-  .track-seats-btn {
-    display: inline-flex; align-items: center; gap: .5rem;
-    background: #0a1f44; color: white;
-    border: none; border-radius: 10px;
-    padding: .6rem 1.2rem; font-size: .85rem; font-weight: 600;
-    cursor: pointer; margin-bottom: 1.1rem;
-    transition: background .2s, transform .15s;
-  }
+  .track-seats-btn { display: inline-flex; align-items: center; gap: .5rem; background: #0a1f44; color: white; border: none; border-radius: 10px; padding: .6rem 1.2rem; font-size: .85rem; font-weight: 600; cursor: pointer; margin-bottom: 1.1rem; transition: background .2s, transform .15s; }
   .track-seats-btn:hover { background: #162d5e; transform: translateY(-1px); }
   .track-seats-btn.open  { background: #5a6e82; }
 
   /* ── Slide Panel ── */
-  .seats-panel {
-    background: white; border: 1.5px solid #eef2f8;
-    border-radius: 18px; box-shadow: 0 4px 24px rgba(0,0,0,.10);
-    overflow: hidden; max-height: 0; opacity: 0; margin-bottom: 0;
-    transition: max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s ease, margin .35s ease;
-  }
-  .seats-panel.open { max-height: 1600px; opacity: 1; margin-bottom: 1.25rem; }
+  .seats-panel { background: white; border: 1.5px solid #eef2f8; border-radius: 18px; box-shadow: 0 4px 24px rgba(0,0,0,.10); overflow: hidden; max-height: 0; opacity: 0; margin-bottom: 0; transition: max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s ease, margin .35s ease; }
+  .seats-panel.open { max-height: 2000px; opacity: 1; margin-bottom: 1.25rem; }
   .seats-panel-inner { padding: 1.4rem 1.5rem 1.6rem; }
-  .seats-panel-header {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem;
-  }
-  .seats-panel-header h3 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem; color: #0a1f44; margin: 0;
-    display: flex; align-items: center; gap: .5rem;
-  }
-  .seats-close-btn {
-    background: #f5f7fa; border: none; border-radius: 50%;
-    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: #5a6e82; font-size: 1.1rem; line-height: 1;
-    transition: background .2s, color .2s; flex-shrink: 0;
-  }
+  .seats-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+  .seats-panel-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #0a1f44; margin: 0; display: flex; align-items: center; gap: .5rem; }
+  .seats-close-btn { background: #f5f7fa; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #5a6e82; font-size: 1.1rem; line-height: 1; transition: background .2s, color .2s; flex-shrink: 0; }
   .seats-close-btn:hover { background: #e2e8f0; color: #0a1f44; }
 
+  /* Quota section labels */
   .quota-section { margin-bottom: 1.5rem; }
   .quota-section:last-child { margin-bottom: 0; }
-  .quota-title {
-    font-size: .68rem; font-weight: 700; letter-spacing: .09em;
-    text-transform: uppercase; padding: .28rem .8rem;
-    border-radius: 20px; display: inline-flex; align-items: center; gap: .4rem;
-    margin-bottom: .85rem;
-  }
+  .quota-title { font-size: .68rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; padding: .28rem .8rem; border-radius: 20px; display: inline-flex; align-items: center; gap: .4rem; margin-bottom: .85rem; }
   .quota-title.govt { color: #0c447c; background: #e6f1fb; border: 1px solid #b5d4f4; }
   .quota-title.mgmt { color: #854f0b; background: #faeeda; border: 1px solid #fac775; }
 
   .panel-seat-table { width: 100%; border-collapse: collapse; }
-  .panel-seat-table th {
-    font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
-    color: #8a9ab0; text-align: left; padding: .3rem .5rem .55rem;
-    border-bottom: 1px solid #eef2f8;
-  }
+  .panel-seat-table th { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #8a9ab0; text-align: left; padding: .3rem .5rem .55rem; border-bottom: 1px solid #eef2f8; }
   .panel-seat-table th:not(:first-child) { text-align: center; }
-  .panel-seat-table td {
-    padding: .55rem .5rem; font-size: .87rem; color: #0a1f44;
-    border-bottom: 1px solid #f5f7fa; vertical-align: middle;
-  }
+  .panel-seat-table td { padding: .55rem .5rem; font-size: .87rem; color: #0a1f44; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
   .panel-seat-table td:not(:first-child) { text-align: center; }
   .panel-seat-table tr:last-child td { border-bottom: none; }
   .cat-name { font-weight: 600; }
 
-  .left-badge {
-    display: inline-block; font-weight: 700; font-size: .8rem;
-    padding: .15rem .55rem; border-radius: 8px;
-  }
+  .left-badge { display: inline-block; font-weight: 700; font-size: .8rem; padding: .15rem .55rem; border-radius: 8px; }
   .left-badge.ok   { color: #1a5c3a; background: #edf9f2; }
   .left-badge.low  { color: #854f0b; background: #faeeda; }
   .left-badge.zero { color: #721c24; background: #f8d7da; }
 
   .panel-loading { text-align: center; padding: 2rem; color: #8a9ab0; font-size: .88rem; }
-  .panel-error   { text-align: center; padding: 1.5rem; color: #dc3545; font-size: .85rem;
-                   background: #fff5f5; border-radius: 10px; }
+  .panel-error   { text-align: center; padding: 1.5rem; color: #dc3545; font-size: .85rem; background: #fff5f5; border-radius: 10px; }
   .panel-updated { font-size: .72rem; color: #b0bac8; text-align: right; margin-top: .8rem; }
 </style>
 
@@ -189,9 +104,7 @@
     <p>BCA Admissions 2026–2027 — updates automatically every 10 seconds</p>
   </div>
 
-  {# Live status chip #}
-  <div class="live-chip {% if counselling.status == 'paused' %}paused{% elif counselling.status == 'stopped' %}stopped{% endif %}"
-       id="live-chip">
+  <div class="live-chip {% if counselling.status == 'paused' %}paused{% elif counselling.status == 'stopped' %}stopped{% endif %}" id="live-chip">
     <div class="live-dot"></div>
     <span id="chip-text">
       {% if counselling.is_running %}Live — Counselling In Progress
@@ -200,7 +113,6 @@
     </span>
   </div>
 
-  {# ── Track Live Seats Button ── #}
   <div>
     <button class="track-seats-btn" onclick="toggleSeatsPanel()" id="track-btn">
       <i class="fas fa-chair"></i>
@@ -208,59 +120,44 @@
     </button>
   </div>
 
-  {# ── Slide Panel ── #}
   <div class="seats-panel" id="seats-panel">
     <div class="seats-panel-inner">
       <div class="seats-panel-header">
-        <h3>
-          <i class="fas fa-chair" style="font-size:.9rem;color:#c9a03d;"></i>
-          Live Seat Availability — All Categories
-        </h3>
+        <h3><i class="fas fa-chair" style="font-size:.9rem;color:#c9a03d;"></i> Live Seat Availability</h3>
         <button class="seats-close-btn" onclick="toggleSeatsPanel()" title="Close">&times;</button>
       </div>
       <div id="seats-panel-body">
-        <div class="panel-loading">
-          <i class="fas fa-spinner fa-spin"></i>&nbsp; Loading seat data…
-        </div>
+        <div class="panel-loading"><i class="fas fa-spinner fa-spin"></i>&nbsp; Loading seat data…</div>
       </div>
     </div>
   </div>
 
-  {# ── Allotted confirmation (IST) ── #}
   {% if allotment %}
   <div class="allotted-card" id="allotted-card">
     <div class="ac-icon">🎉</div>
     <div>
       <h4>Your Seat Has Been Allotted!</h4>
-      <p>
-        Quota: <strong>{{ allotment.quota|title }}</strong> &nbsp;·&nbsp;
-        Allotted on {{ allotment.allotted_at | ist }} IST
-      </p>
+      <p>Quota: <strong>{{ allotment.quota|title }}</strong> &nbsp;·&nbsp; Allotted on {{ allotment.allotted_at | ist }} IST</p>
     </div>
   </div>
   {% endif %}
 
-  {# ── Admin message ── #}
   {% if counselling.message %}
   <div class="admin-msg" id="admin-msg">
     <i class="fas fa-bullhorn"></i> <strong>Notice:</strong> {{ counselling.message }}
   </div>
   {% endif %}
 
-  {# ── Main content ── #}
   {% if counselling.is_stopped and not allotment %}
   <div class="stopped-card" id="main-content">
     <i class="fas fa-hourglass-start"></i>
     <strong>Counselling has not started yet</strong>
-    <p style="margin:.5rem 0 0;font-size:.85rem;">
-      Check back here when counselling begins. This page refreshes automatically.
-    </p>
+    <p style="margin:.5rem 0 0;font-size:.85rem;">Check back here when counselling begins. This page refreshes automatically.</p>
   </div>
 
   {% else %}
   <div id="main-content">
 
-    {# Your turn alert #}
     {% if appl and appl.rank and counselling.current_rank and appl.rank == counselling.current_rank %}
     <div class="your-turn-alert" id="your-turn-alert">
       <div class="your-turn-icon">🔔</div>
@@ -271,12 +168,10 @@
     </div>
     {% endif %}
 
-    {# Current rank display #}
     <div class="sc-card">
       <div class="rank-display-wrap">
         <div class="rank-label">Currently Calling Rank</div>
-        <div class="rank-number {% if appl and appl.rank and counselling.current_rank and appl.rank == counselling.current_rank %}highlight{% endif %}"
-             id="current-rank-display">
+        <div class="rank-number {% if appl and appl.rank and counselling.current_rank and appl.rank == counselling.current_rank %}highlight{% endif %}" id="current-rank-display">
           {% if counselling.current_rank %}#{{ counselling.current_rank }}{% else %}—{% endif %}
         </div>
         <div class="rank-subtext" id="rank-subtext">
@@ -314,21 +209,15 @@
 <script>
   const MY_RANK = {{ appl.rank if appl and appl.rank else 'null' }};
 
-  /* ── IST formatter ── */
   function toIST(utcString) {
     if (!utcString) return '';
     try {
       const d = new Date(utcString);
       if (isNaN(d.getTime())) return utcString;
-      return d.toLocaleString('en-IN', {
-        timeZone: 'Asia/Kolkata',
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', hour12: true
-      }) + ' IST';
+      return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) + ' IST';
     } catch(e) { return utcString; }
   }
 
-  /* ── Time since ── */
   function timeSince(date) {
     const s = Math.floor((new Date() - date) / 1000);
     if (s < 10)  return 'just now';
@@ -343,7 +232,6 @@
   }
   setInterval(updateLastUpdated, 5000);
 
-  /* ── Seats panel toggle ── */
   let panelOpen = false;
   let seatsFetched = false;
 
@@ -358,72 +246,58 @@
     if (panelOpen && !seatsFetched) fetchAllSeats();
   }
 
-  /* ── Badge helper ── */
   function leftBadge(left) {
     const n   = (left !== null && left !== undefined && !isNaN(left)) ? parseInt(left) : 0;
     const cls = n === 0 ? 'zero' : n <= 3 ? 'low' : 'ok';
     return `<span class="left-badge ${cls}">${n} left</span>`;
   }
 
-  /* ── Render seats panel from API data ── */
+  /* ── CHANGED: renderSeatsPanel now uses govt_seats / mgmt_seats with total/filled/remaining ── */
   function renderSeatsPanel(data) {
     const body = document.getElementById('seats-panel-body');
-    const cats = data.all_seats;
-    if (!cats || !cats.length) {
+    const govtSeats = data.govt_seats || [];
+    const mgmtSeats = data.mgmt_seats || [];
+
+    if (!govtSeats.length && !mgmtSeats.length) {
       body.innerHTML = '<div class="panel-error"><i class="fas fa-info-circle"></i> No seat data available yet.</div>';
       return;
     }
 
-    function safeNum(v) {
-      return (v !== null && v !== undefined && !isNaN(v)) ? parseInt(v) : 0;
-    }
-
-    function makeTable(quota) {
-      const totalKey  = quota === 'govt' ? 'govt_total'  : 'mgmt_total';
-      const filledKey = quota === 'govt' ? 'govt_filled' : 'mgmt_filled';
-      const leftKey   = quota === 'govt' ? 'govt_left'   : 'mgmt_left';
+    function makeTable(seats) {
+      if (!seats.length) return '<p style="color:#8a9ab0;font-size:.85rem;padding:.5rem 0">No categories in this quota.</p>';
       let html = `<table class="panel-seat-table">
-        <thead><tr>
-          <th>Category</th><th>Total</th><th>Filled</th><th>Left</th>
-        </tr></thead><tbody>`;
-      cats.forEach(r => {
-        const total  = safeNum(r[totalKey]);
-        const filled = safeNum(r[filledKey]);
-        const left   = (r[leftKey] !== undefined && r[leftKey] !== null) ? safeNum(r[leftKey]) : (total - filled);
+        <thead><tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr></thead><tbody>`;
+      seats.forEach(r => {
+        const total     = parseInt(r.total)     || 0;
+        const filled    = parseInt(r.filled)    || 0;
+        const remaining = parseInt(r.remaining) || 0;
         html += `<tr>
           <td class="cat-name">${r.category || '—'}</td>
           <td>${total}</td>
           <td>${filled}</td>
-          <td>${leftBadge(left)}</td>
+          <td>${leftBadge(remaining)}</td>
         </tr>`;
       });
       html += '</tbody></table>';
       return html;
     }
 
-    const nowIST = new Date().toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true
-    });
+    const nowIST = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
 
     body.innerHTML = `
       <div class="quota-section">
-        <div class="quota-title govt">
-          <i class="fas fa-university" style="font-size:.65rem;"></i> Government Quota
-        </div>
-        ${makeTable('govt')}
+        <div class="quota-title govt"><i class="fas fa-university" style="font-size:.65rem;"></i> Government Quota</div>
+        ${makeTable(govtSeats)}
       </div>
       <div class="quota-section">
-        <div class="quota-title mgmt">
-          <i class="fas fa-building" style="font-size:.65rem;"></i> Management Quota
-        </div>
-        ${makeTable('mgmt')}
+        <div class="quota-title mgmt"><i class="fas fa-building" style="font-size:.65rem;"></i> Management Quota</div>
+        ${makeTable(mgmtSeats)}
       </div>
       <div class="panel-updated">Updated at ${nowIST} IST</div>
     `;
     seatsFetched = true;
   }
 
-  /* ── Fetch all seats (first open) ── */
   async function fetchAllSeats() {
     try {
       const res  = await fetch('/counselling/status');
@@ -431,38 +305,30 @@
       renderSeatsPanel(data);
     } catch(e) {
       const body = document.getElementById('seats-panel-body');
-      if (body) body.innerHTML =
-        '<div class="panel-error"><i class="fas fa-exclamation-triangle"></i> Could not load seat data. Will retry on next refresh.</div>';
+      if (body) body.innerHTML = '<div class="panel-error"><i class="fas fa-exclamation-triangle"></i> Could not load seat data. Will retry on next refresh.</div>';
     }
   }
 
-  /* ── Main 10-second status poll ── */
   async function fetchStatus() {
     try {
       const res  = await fetch('/counselling/status');
       const data = await res.json();
-
       lastUpdated = new Date();
 
-      /* --- Status chip --- */
       const chip     = document.getElementById('live-chip');
       const chipText = document.getElementById('chip-text');
       chip.className = 'live-chip';
       if (data.status === 'paused') {
-        chip.classList.add('paused');
-        chipText.textContent = 'Paused';
+        chip.classList.add('paused'); chipText.textContent = 'Paused';
       } else if (data.status === 'stopped') {
-        chip.classList.add('stopped');
-        chipText.textContent = 'Not Started';
+        chip.classList.add('stopped'); chipText.textContent = 'Not Started';
       } else {
         chipText.textContent = 'Live — Counselling In Progress';
       }
 
-      /* --- Rank displays --- */
       const rankDisplay = document.getElementById('current-rank-display');
       const rankBox     = document.getElementById('current-rank-box');
       const rankSubtext = document.getElementById('rank-subtext');
-
       const newRankText = (data.current_rank != null) ? '#' + data.current_rank : '—';
 
       if (rankDisplay) {
@@ -479,7 +345,6 @@
         else                                rankSubtext.textContent = 'Rank is being called at the counselling desk';
       }
 
-      /* --- Admin message --- */
       const msgEl = document.getElementById('admin-msg');
       if (data.message) {
         if (msgEl) {
@@ -492,48 +357,31 @@
         }
       } else if (msgEl) { msgEl.remove(); }
 
-      /* --- Allotment card (IST) --- */
       if (data.allotment && !document.getElementById('allotted-card')) {
-        const a     = data.allotment;
-        const card  = document.createElement('div');
+        const a    = data.allotment;
+        const card = document.createElement('div');
         card.id = 'allotted-card'; card.className = 'allotted-card';
-        const quota = (a.quota && a.quota.length)
-          ? a.quota.charAt(0).toUpperCase() + a.quota.slice(1) : '—';
+        const quota = (a.quota && a.quota.length) ? a.quota.charAt(0).toUpperCase() + a.quota.slice(1) : '—';
         const when  = a.allotted_at ? toIST(a.allotted_at) : '';
-        card.innerHTML = `<div class="ac-icon">🎉</div>
-          <div>
-            <h4>Your Seat Has Been Allotted!</h4>
-            <p>Quota: <strong>${quota}</strong> &nbsp;·&nbsp; Allotted on ${when}</p>
-          </div>`;
+        card.innerHTML = `<div class="ac-icon">🎉</div><div><h4>Your Seat Has Been Allotted!</h4><p>Quota: <strong>${quota}</strong> &nbsp;·&nbsp; Allotted on ${when}</p></div>`;
         document.querySelector('.sc-header').insertAdjacentElement('afterend', card);
       }
 
-      /* --- Your-turn alert --- */
       const turnAlert = document.getElementById('your-turn-alert');
       if (MY_RANK && data.current_rank != null && MY_RANK === data.current_rank) {
         if (!turnAlert) {
           const alert = document.createElement('div');
           alert.id = 'your-turn-alert'; alert.className = 'your-turn-alert';
-          alert.innerHTML = `<div class="your-turn-icon">🔔</div>
-            <div class="your-turn-text">
-              <h4>It's Your Turn! Please Report Now.</h4>
-              <p>Rank #${MY_RANK} is currently being called.</p>
-            </div>`;
+          alert.innerHTML = `<div class="your-turn-icon">🔔</div><div class="your-turn-text"><h4>It's Your Turn! Please Report Now.</h4><p>Rank #${MY_RANK} is currently being called.</p></div>`;
           document.getElementById('main-content').prepend(alert);
         }
       } else if (turnAlert) { turnAlert.remove(); }
 
-      /* --- Refresh seats panel if open --- */
-      if (panelOpen && data.all_seats) {
-        renderSeatsPanel(data);
-      }
+      if (panelOpen) renderSeatsPanel(data);
 
-    } catch(e) {
-      console.error('Status fetch failed:', e);
-    }
+    } catch(e) { console.error('Status fetch failed:', e); }
   }
 
-  // Initial fetch
   fetchStatus();
   setInterval(fetchStatus, 10000);
 </script>

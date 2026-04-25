@@ -23,7 +23,6 @@
   }
 
   body { background: var(--ink) !important; color: #fff !important; }
-
   .navbar, .site-main { padding: 0 !important; max-width: 100% !important; }
   .navbar { display: none !important; }
 
@@ -35,30 +34,12 @@
     padding-bottom: 6rem;
   }
 
-  /* ── CANVAS BACKGROUND ── */
-  #aurora-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-  }
+  #aurora-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
 
-  /* ── PARALLAX LAYER ── */
-  #parallax-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    will-change: transform;
-  }
+  #parallax-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; will-change: transform; }
 
   .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0;
+    position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0;
     animation: orb-breathe 8s ease-in-out infinite;
   }
   @keyframes orb-breathe {
@@ -66,624 +47,258 @@
     50%      { opacity: .32; transform: scale(1.12); }
   }
 
-  /* ── CONTENT ── */
   .content { position: relative; z-index: 10; }
+
+  /* ── UNIVERSITY BANNER ── */
+  .uni-banner {
+    text-align: center;
+    padding: 1.4rem 1.5rem 0.6rem;
+    animation: fade-up .6s ease both;
+  }
+  .uni-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  .uni-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-top: 0.3rem;
+  }
+  .uni-divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0.6rem auto 0;
+    border-radius: 99px;
+  }
 
   /* ── HERO ── */
   .hero {
-    min-height: 340px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 4rem 1.5rem 3rem;
-    position: relative;
+    min-height: 280px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 2rem 1.5rem 2.5rem; position: relative;
   }
-
   .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 1rem;
-    animation: fade-up .8s ease both;
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.35);
+    margin-bottom: 1rem; animation: fade-up .8s ease both;
   }
   .hero-eyebrow span { color: var(--gold); }
-
   .hero-title {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(2.6rem, 8vw, 5rem);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.03em;
-    color: #fff;
-    margin-bottom: 0.6rem;
+    font-size: clamp(2.6rem, 8vw, 5rem); font-weight: 800; line-height: 1;
+    letter-spacing: -0.03em; color: #fff; margin-bottom: 0.6rem;
     animation: fade-up .8s .1s ease both;
   }
   .hero-title .accent {
     background: linear-gradient(120deg, var(--gold), var(--gold2), var(--rose), var(--gold));
     background-size: 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     animation: fade-up .8s .1s ease both, grad-shift 5s linear infinite;
   }
   @keyframes grad-shift { 0%{background-position:0%} 100%{background-position:300%} }
-
   .hero-sub {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    color: rgba(255,255,255,0.3);
-    animation: fade-up .8s .2s ease both;
+    font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.3); animation: fade-up .8s .2s ease both;
   }
-
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 
   /* ── STATUS CHIP ── */
-  .status-row {
-    display: flex;
-    justify-content: center;
-    margin: 0 0 2.5rem;
-    animation: fade-up .8s .3s ease both;
-    position: relative; z-index: 10;
-  }
+  .status-row { display: flex; justify-content: center; margin: 0 0 2.5rem; animation: fade-up .8s .3s ease both; position: relative; z-index: 10; }
   .status-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 1.2rem;
-    border-radius: 99px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    backdrop-filter: blur(12px);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.45rem 1.2rem; border-radius: 99px;
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; backdrop-filter: blur(12px);
   }
-  .status-chip.running {
-    background: rgba(0,229,195,0.12);
-    border: 1px solid rgba(0,229,195,0.35);
-    color: var(--teal);
-    box-shadow: 0 0 24px rgba(0,229,195,0.15);
-  }
-  .status-chip.paused {
-    background: rgba(245,200,66,0.12);
-    border: 1px solid rgba(245,200,66,0.35);
-    color: var(--gold);
-  }
-  .status-chip.stopped {
-    background: rgba(255,107,138,0.12);
-    border: 1px solid rgba(255,107,138,0.35);
-    color: var(--rose);
-  }
-  .pulse-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .pulse-dot.running {
-    background: var(--teal);
-    animation: dot-pulse 1.4s ease-in-out infinite;
-  }
+  .status-chip.running  { background: rgba(0,229,195,0.12); border: 1px solid rgba(0,229,195,0.35); color: var(--teal); box-shadow: 0 0 24px rgba(0,229,195,0.15); }
+  .status-chip.paused   { background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.35); color: var(--gold); }
+  .status-chip.stopped  { background: rgba(255,107,138,0.12); border: 1px solid rgba(255,107,138,0.35); color: var(--rose); }
+  .pulse-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .pulse-dot.running { background: var(--teal); animation: dot-pulse 1.4s ease-in-out infinite; }
   .pulse-dot.paused  { background: var(--gold); }
   .pulse-dot.stopped { background: var(--rose); }
-  @keyframes dot-pulse {
-    0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(0,229,195,0.5); }
-    50%      { opacity:.7; box-shadow: 0 0 0 6px rgba(0,229,195,0); }
-  }
+  @keyframes dot-pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,195,0.5)} 50%{opacity:.7;box-shadow:0 0 0 6px rgba(0,229,195,0)} }
 
-  /* ── WRAP ── */
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 1.25rem; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 1.25rem; }
 
-  /* ── GLASS CARD BASE ── */
   .glass-card {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    overflow: hidden;
-    transition: border-color .3s, box-shadow .3s;
+    background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border);
+    border-radius: 24px; overflow: hidden; transition: border-color .3s, box-shadow .3s;
   }
-  .glass-card:hover {
-    border-color: var(--border2);
-    box-shadow: 0 0 40px rgba(245,200,66,0.08);
-  }
+  .glass-card:hover { border-color: var(--border2); box-shadow: 0 0 40px rgba(245,200,66,0.08); }
 
-  /* ── STATE CARDS ── */
-  .state-card {
-    padding: 4rem 2rem;
-    text-align: center;
-    animation: fade-up .6s ease both;
-  }
-  .state-icon {
-    font-size: 3rem;
-    margin-bottom: 1.2rem;
-    display: block;
-    animation: float-icon 3s ease-in-out infinite;
-  }
-  @keyframes float-icon {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
-  }
-  .state-card h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 0.6rem;
-  }
-  .state-card p { font-size: 0.9rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
+  .state-card { padding: 4rem 2rem; text-align: center; animation: fade-up .6s ease both; }
+  .state-icon { font-size: 3rem; margin-bottom: 1.2rem; display: block; animation: float-icon 3s ease-in-out infinite; }
+  @keyframes float-icon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .state-card h2 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 0.6rem; }
+  .state-card p  { font-size: 0.9rem; color: rgba(255,255,255,0.45); line-height: 1.7; }
 
-  /* ── RANK CARD ── */
-  .rank-card {
-    animation: fade-up .6s .1s ease both;
-  }
-
+  .rank-card { animation: fade-up .6s .1s ease both; }
   .rank-top {
-    padding: 2.5rem 2rem 2rem;
-    position: relative;
-    overflow: hidden;
+    padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden;
     background: linear-gradient(135deg, rgba(245,200,66,0.08) 0%, rgba(79,142,255,0.06) 100%);
     border-bottom: 1px solid var(--border);
   }
-
-  .rank-top-bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .rank-ring {
-    position: absolute;
-    border-radius: 50%;
-    border: 1px solid rgba(245,200,66,0.12);
-    animation: ring-expand 4s ease-in-out infinite;
-  }
-  @keyframes ring-expand {
-    0%,100% { transform: scale(1); opacity: .6; }
-    50%      { transform: scale(1.08); opacity: .2; }
-  }
-
+  .rank-top-bg { position: absolute; inset: 0; pointer-events: none; }
+  .rank-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(245,200,66,0.12); animation: ring-expand 4s ease-in-out infinite; }
+  @keyframes ring-expand { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.08);opacity:.2} }
   .rank-inner { position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; }
-
-  .rank-calling-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 0.3rem;
-  }
-
+  .rank-calling-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.3rem; }
   .rank-big {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(5rem, 16vw, 8rem);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.04em;
-    color: #fff;
-    text-shadow: 0 0 60px rgba(245,200,66,0.4);
-    animation: num-glow 2s ease-in-out infinite alternate;
+    font-family: 'Syne', sans-serif; font-size: clamp(5rem, 16vw, 8rem); font-weight: 800;
+    line-height: 1; letter-spacing: -0.04em; color: #fff;
+    text-shadow: 0 0 60px rgba(245,200,66,0.4); animation: num-glow 2s ease-in-out infinite alternate;
   }
-  .rank-big sup {
-    font-size: 0.28em;
-    color: rgba(255,255,255,0.3);
-    font-weight: 400;
-    vertical-align: super;
-    letter-spacing: 0;
-  }
-  @keyframes num-glow {
-    from { text-shadow: 0 0 40px rgba(245,200,66,0.3); }
-    to   { text-shadow: 0 0 80px rgba(245,200,66,0.6), 0 0 120px rgba(245,200,66,0.2); }
-  }
-
+  .rank-big sup { font-size: 0.28em; color: rgba(255,255,255,0.3); font-weight: 400; vertical-align: super; letter-spacing: 0; }
+  @keyframes num-glow { from{text-shadow:0 0 40px rgba(245,200,66,0.3)} to{text-shadow:0 0 80px rgba(245,200,66,0.6),0 0 120px rgba(245,200,66,0.2)} }
   .rank-live-badge {
-    align-self: flex-start;
-    margin-top: 0.5rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: rgba(255,107,138,0.15);
-    border: 1px solid rgba(255,107,138,0.4);
-    color: var(--rose);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.35rem 0.85rem;
-    border-radius: 99px;
-    animation: badge-pulse 2s ease-in-out infinite;
+    align-self: flex-start; margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem;
+    background: rgba(255,107,138,0.15); border: 1px solid rgba(255,107,138,0.4); color: var(--rose);
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.35rem 0.85rem; border-radius: 99px; animation: badge-pulse 2s ease-in-out infinite;
   }
-  @keyframes badge-pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(255,107,138,0.3); }
-    50%      { box-shadow: 0 0 16px 4px rgba(255,107,138,0.1); }
-  }
-  .badge-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--rose);
-    animation: dot-pulse 1.2s ease-in-out infinite;
-  }
+  @keyframes badge-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,107,138,0.3)} 50%{box-shadow:0 0 16px 4px rgba(255,107,138,0.1)} }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); animation: dot-pulse 1.2s ease-in-out infinite; }
 
-  /* ── DETAILS ── */
   .rank-details { padding: 2rem; }
-
-  .detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2rem;
-    margin-bottom: 1.5rem;
-  }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem; margin-bottom: 1.5rem; }
   @media (max-width: 480px) { .detail-grid { grid-template-columns: 1fr; gap: 1rem; } }
+  .detail-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 0.35rem; }
+  .detail-val { font-size: 1rem; font-weight: 600; color: #fff; }
+  .detail-val.marks { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--gold); letter-spacing: -0.02em; text-shadow: 0 0 20px rgba(245,200,66,0.4); }
 
-  .detail-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 0.35rem;
-  }
-  .detail-val {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-  }
-  .detail-val.marks {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: -0.02em;
-    text-shadow: 0 0 20px rgba(245,200,66,0.4);
-  }
-
-  /* ── ALLOTMENT RESULT ── */
-  .allot-result {
-    border-radius: 14px;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  .allot-result.success {
-    background: rgba(0,229,195,0.08);
-    border: 1px solid rgba(0,229,195,0.25);
-  }
-  .allot-result.pending {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-  }
-  .allot-icon {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin-top: 1px;
-  }
+  .allot-result { border-radius: 14px; padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem; }
+  .allot-result.success { background: rgba(0,229,195,0.08); border: 1px solid rgba(0,229,195,0.25); }
+  .allot-result.pending { background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .allot-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.85rem; font-weight: 700; margin-top: 1px; }
   .allot-result.success .allot-icon { background: var(--teal); color: #000; }
   .allot-result.pending  .allot-icon { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
-
-  .allot-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 0.25rem;
-  }
+  .allot-tag { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.25rem; }
   .allot-result.success .allot-tag { color: var(--teal); }
   .allot-result.pending  .allot-tag { color: rgba(255,255,255,0.3); }
   .allot-main { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 0.1rem; }
   .allot-time { font-size: 0.73rem; color: rgba(255,255,255,0.35); }
 
   .admin-msg {
-    margin-top: 1rem;
-    background: rgba(245,200,66,0.08);
-    border: 1px solid rgba(245,200,66,0.25);
-    border-radius: 14px;
-    padding: 0.9rem 1.1rem;
-    font-size: 0.86rem;
-    color: var(--gold);
-    display: flex;
-    gap: 0.6rem;
-    align-items: flex-start;
-    line-height: 1.6;
+    margin-top: 1rem; background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 14px; padding: 0.9rem 1.1rem; font-size: 0.86rem; color: var(--gold);
+    display: flex; gap: 0.6rem; align-items: flex-start; line-height: 1.6;
   }
 
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 0.75rem;
-    margin-top: 1rem;
-  }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; margin-top: 1rem; }
   .stat-box {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.1rem 0.75rem;
-    text-align: center;
+    background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.1rem 0.75rem; text-align: center;
     transition: transform .25s, border-color .25s, box-shadow .25s;
-    animation: fade-up .6s ease both;
-    cursor: default;
+    animation: fade-up .6s ease both; cursor: default;
   }
-  .stat-box:hover {
-    transform: translateY(-5px);
-    border-color: var(--border2);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-  }
-  .stat-box:nth-child(1){animation-delay:.1s}
-  .stat-box:nth-child(2){animation-delay:.18s}
-  .stat-box:nth-child(3){animation-delay:.26s}
-
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.9rem;
-    font-weight: 800;
-    line-height: 1;
-    margin-bottom: 0.3rem;
-    letter-spacing: -0.03em;
-  }
-  .stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.56rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-  }
+  .stat-box:hover { transform: translateY(-5px); border-color: var(--border2); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .stat-box:nth-child(1){animation-delay:.1s} .stat-box:nth-child(2){animation-delay:.18s} .stat-box:nth-child(3){animation-delay:.26s}
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1; margin-bottom: 0.3rem; letter-spacing: -0.03em; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
 
   /* ── SECTION HEADING ── */
-  .sec-head {
-    display: flex; align-items: center; gap: 1rem;
-    margin: 3rem 0 1.2rem;
-    animation: fade-up .6s ease both;
-  }
-  .sec-head-label {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
-    white-space: nowrap;
-  }
+  .sec-head { display: flex; align-items: center; gap: 1rem; margin: 3rem 0 1.2rem; animation: fade-up .6s ease both; }
+  .sec-head-label { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); white-space: nowrap; }
   .sec-head-line { flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
 
+  /* ── QUOTA SECTION HEADING ── */
+  .quota-section-head {
+    display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 0 0.75rem;
+  }
+  .quota-section-badge {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.25rem 0.85rem; border-radius: 99px; white-space: nowrap;
+  }
+  .quota-section-badge.govt { background: rgba(79,142,255,0.15); color: var(--blue); border: 1px solid rgba(79,142,255,0.3); }
+  .quota-section-badge.mgmt { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .quota-section-line { flex:1; height:1px; background: rgba(255,255,255,0.07); }
+
   /* ── SEATS GRID ── */
-  .seats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
-    gap: 0.75rem;
-  }
+  .seats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 0.75rem; }
   .seat-card {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.25rem;
-    transition: transform .25s, border-color .3s, box-shadow .3s;
-    animation: fade-up .5s ease both;
+    background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--border);
+    border-radius: 18px; padding: 1.25rem;
+    transition: transform .25s, border-color .3s, box-shadow .3s; animation: fade-up .5s ease both;
   }
-  .seat-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border2);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
-  }
-  .seat-card-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: #fff;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .quota-row {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.3rem;
-  }
-  .q-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-  }
+  .seat-card:hover { transform: translateY(-4px); border-color: var(--border2); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+  .seat-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; color: #fff; margin-bottom: 0.85rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border); }
+  .quota-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem; }
+  .q-name { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
   .q-right { display:flex; align-items:center; gap:.5rem; }
   .q-fraction { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
-  .q-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.56rem;
-    font-weight: 500;
-    padding: 0.12rem 0.5rem;
-    border-radius: 6px;
-    white-space: nowrap;
-  }
+  .q-tag { font-family: 'DM Mono', monospace; font-size: 0.56rem; font-weight: 500; padding: 0.12rem 0.5rem; border-radius: 6px; white-space: nowrap; }
   .q-tag.avail { background: rgba(79,142,255,0.15); color: var(--blue); border: 1px solid rgba(79,142,255,0.3); }
   .q-tag.full  { background: rgba(255,107,138,0.12); color: var(--rose); border: 1px solid rgba(255,107,138,0.3); }
-
-  .q-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow:hidden; margin: 0.35rem 0 0.9rem; }
+  .q-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow:hidden; margin: 0.35rem 0 0; }
   .q-bar-fill { height:100%; border-radius:99px; background: linear-gradient(90deg, var(--blue), var(--teal)); transition: width 1.2s cubic-bezier(.4,0,.2,1); }
   .q-bar-fill.full { background: linear-gradient(90deg, var(--rose), #ff4060); }
 
-  /* ── FLOATING SEAT MAP ── */
+  /* ── SEAT MAP ── */
   .seat-map-section {
-    margin-top: 0.75rem;
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.4rem;
-    animation: fade-up .6s ease both;
+    margin-top: 0.75rem; background: var(--glass); backdrop-filter: blur(16px);
+    border: 1px solid var(--border); border-radius: 20px; padding: 1.4rem; animation: fade-up .6s ease both;
   }
-  .smap-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-  .smap-title {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-  }
+  .smap-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .smap-title { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
   .smap-legend { display:flex; gap: 12px; }
   .sleg { display:flex; align-items:center; gap:5px; font-size:9px; color:rgba(255,255,255,0.35); font-family:'DM Mono',monospace; }
   .sleg-dot { width:9px; height:9px; border-radius:3px; }
-
   .seat-grid { display:flex; flex-wrap:wrap; gap:5px; }
   .sseat {
-    width: 19px; height: 19px;
-    border-radius: 5px;
-    cursor: default;
-    transition: transform .2s, box-shadow .2s;
-    animation: seat-pop .4s ease both;
-    will-change: transform;
+    width: 19px; height: 19px; border-radius: 5px; cursor: default;
+    transition: transform .2s, box-shadow .2s; animation: seat-pop .4s ease both; will-change: transform;
   }
   @keyframes seat-pop { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
   .sseat:hover { transform: scale(1.5) translateY(-3px); z-index: 20; }
-  .sseat.govt  { background: #00e5c3; box-shadow: 0 0 7px rgba(0,229,195,0.5); }
-  .sseat.mgmt  { background: #f5c842; box-shadow: 0 0 7px rgba(245,200,66,0.5); }
-  .sseat.empty { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); }
-  .sseat.current {
-    background: #fff;
-    animation: seat-pop .4s ease both, cur-pulse 1.2s infinite;
-  }
-  @keyframes cur-pulse {
-    0%,100% { box-shadow: 0 0 8px rgba(255,255,255,.7); }
-    50%      { box-shadow: 0 0 22px rgba(255,255,255,1), 0 0 36px rgba(245,200,66,.6); }
-  }
+  .sseat.filled { background: #00e5c3; box-shadow: 0 0 7px rgba(0,229,195,0.5); }
+  .sseat.empty  { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.13); }
 
   /* ── HISTORY ── */
   .hist-toggle {
-    width:100%;
-    margin-top: 1rem;
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1rem 1.25rem;
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer;
-    transition: background .2s, border-color .2s;
-    font-family: 'Outfit', sans-serif;
-    animation: fade-up .6s ease both;
+    width:100%; margin-top: 1rem; background: var(--glass); backdrop-filter: blur(16px);
+    border: 1px solid var(--border); border-radius: 18px; padding: 1rem 1.25rem;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    transition: background .2s, border-color .2s; font-family: 'Outfit', sans-serif; animation: fade-up .6s ease both;
   }
   .hist-toggle:hover { background: var(--glass2); border-color: var(--border2); }
   .hist-left { display:flex; align-items:center; gap:.75rem; }
   .hist-title { font-weight:700; font-size:.9rem; color:#fff; font-family:'Syne',sans-serif; }
-  .hist-badge {
-    background: var(--blue);
-    color: #fff;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.58rem;
-    font-weight: 500;
-    padding: 0.15rem 0.55rem;
-    border-radius: 99px;
-  }
+  .hist-badge { background: var(--blue); color: #fff; font-family: 'DM Mono', monospace; font-size: 0.58rem; font-weight: 500; padding: 0.15rem 0.55rem; border-radius: 99px; }
   .hist-chevron { font-size:.75rem; color:rgba(255,255,255,0.35); transition:transform .2s; }
   .hist-toggle.open .hist-chevron { transform: rotate(180deg); }
-
-  .hist-panel {
-    display:none;
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 18px 18px;
-    overflow: hidden;
-    margin-top: -0.5rem;
-    padding-top: 0.5rem;
-  }
+  .hist-panel { display:none; background: var(--glass); backdrop-filter: blur(16px); border: 1px solid var(--border); border-top: none; border-radius: 0 0 18px 18px; overflow: hidden; margin-top: -0.5rem; padding-top: 0.5rem; }
   .hist-panel.open { display:block; }
-
   .hist-table-wrap { overflow-x:auto; }
   .hist-table { width:100%; border-collapse:collapse; font-size:.82rem; }
-  .hist-table thead th {
-    background: rgba(255,255,255,0.04);
-    font-family: 'DM Mono', monospace;
-    font-size: .57rem;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.3);
-    padding: .65rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .hist-table tbody td {
-    padding: .7rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: rgba(255,255,255,.7);
-    vertical-align: middle;
-  }
+  .hist-table thead th { background: rgba(255,255,255,0.04); font-family: 'DM Mono', monospace; font-size: .57rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.3); padding: .65rem 1rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .hist-table tbody td { padding: .7rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,.7); vertical-align: middle; }
   .hist-table tbody tr:last-child td { border-bottom:none; }
   .hist-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
-
-  .r-pill {
-    display:inline-block;
-    background: rgba(255,255,255,0.1);
-    color:#fff;
-    font-family:'Syne',sans-serif;
-    font-size:.74rem;
-    font-weight:700;
-    padding:.1rem .55rem;
-    border-radius:6px;
-  }
-  .q-pill {
-    display:inline-block;
-    font-family:'DM Mono',monospace;
-    font-size:.56rem;
-    font-weight:500;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    padding:.15rem .55rem;
-    border-radius:99px;
-    white-space:nowrap;
-  }
+  .r-pill { display:inline-block; background: rgba(255,255,255,0.1); color:#fff; font-family:'Syne',sans-serif; font-size:.74rem; font-weight:700; padding:.1rem .55rem; border-radius:6px; }
+  .q-pill { display:inline-block; font-family:'DM Mono',monospace; font-size:.56rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase; padding:.15rem .55rem; border-radius:99px; white-space:nowrap; }
   .q-pill.government { background:rgba(79,142,255,0.15); color:var(--blue); border:1px solid rgba(79,142,255,0.3); }
   .q-pill.management { background:rgba(245,200,66,0.12); color:var(--gold); border:1px solid rgba(245,200,66,0.3); }
   .hist-empty { text-align:center; padding:2.5rem; color:rgba(255,255,255,.3); font-size:.86rem; }
 
-  /* ── REFRESH BAR ── */
-  .refresh-wrap {
-    margin-top: 2.5rem;
-    display:flex; flex-direction:column; align-items:center; gap:.5rem;
-    animation: fade-up .6s ease both;
-  }
-  .refresh-label {
-    font-family:'DM Mono',monospace;
-    font-size:.62rem;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,.25);
-    display:flex; align-items:center; gap:.4rem;
-  }
+  .refresh-wrap { margin-top: 2.5rem; display:flex; flex-direction:column; align-items:center; gap:.5rem; animation: fade-up .6s ease both; }
+  .refresh-label { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.25); display:flex; align-items:center; gap:.4rem; }
   .refresh-count { color:var(--teal); }
   .refresh-track { width:200px; height:2px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
-  .refresh-fill {
-    height:100%;
-    background: linear-gradient(90deg,var(--blue),var(--teal));
-    border-radius:99px;
-    transform-origin:left;
-    animation: drain 30s linear forwards;
-  }
+  .refresh-fill { height:100%; background: linear-gradient(90deg,var(--blue),var(--teal)); border-radius:99px; transform-origin:left; animation: drain 30s linear forwards; }
   @keyframes drain { from{transform:scaleX(1)} to{transform:scaleX(0)} }
 </style>
 
-<!-- AURORA CANVAS -->
 <canvas id="aurora-canvas"></canvas>
-
-<!-- PARALLAX LAYER (floating orbs) -->
 <div id="parallax-layer">
   <div class="orb" style="width:500px;height:500px;left:-100px;top:0px;background:radial-gradient(circle,rgba(79,142,255,1),transparent 70%);animation-delay:0s;animation-duration:9s;"></div>
   <div class="orb" style="width:400px;height:400px;right:-80px;top:200px;background:radial-gradient(circle,rgba(0,229,195,1),transparent 70%);animation-delay:2s;animation-duration:11s;"></div>
@@ -694,9 +309,16 @@
 
 <div class="lp content">
 
+  <!-- UNIVERSITY BANNER -->
+  <div class="uni-banner">
+    <div class="uni-name">Bangalore University</div>
+    <div class="uni-sub">Department of Computer Applications</div>
+    <div class="uni-divider"></div>
+  </div>
+
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-eyebrow"><span>University</span> &nbsp;·&nbsp; BCA Admissions 2026–27</div>
+    <div class="hero-eyebrow"><span>BCA Admissions</span> &nbsp;·&nbsp; 2026–27</div>
     <h1 class="hero-title">Live <span class="accent">Counselling</span></h1>
     <p class="hero-sub">Public · No login required · Auto-refreshes every 30s</p>
   </div>
@@ -714,7 +336,6 @@
 
   <div class="wrap">
 
-    <!-- STATE CARDS -->
     {% if cs.status == 'stopped' %}
     <div class="glass-card state-card">
       <span class="state-icon">🎓</span>
@@ -728,9 +349,7 @@
       <h2>Temporarily Paused</h2>
       <p>The counselling session is on a short break.<br>It will resume shortly — please wait.</p>
       {% if cs.message %}
-      <div class="admin-msg" style="margin-top:1.5rem;text-align:left;">
-        <span style="font-size:1rem;">📢</span><span>{{ cs.message }}</span>
-      </div>
+      <div class="admin-msg" style="margin-top:1.5rem;text-align:left;"><span style="font-size:1rem;">📢</span><span>{{ cs.message }}</span></div>
       {% endif %}
     </div>
 
@@ -761,24 +380,13 @@
       <div class="rank-details">
         {% if student %}
         <div class="detail-grid">
-          <div>
-            <div class="detail-label">Student Name</div>
-            <div class="detail-val">{{ student.full_name }}</div>
-          </div>
-          <div>
-            <div class="detail-label">Rank</div>
-            <div class="detail-val">#{{ student.rank }}</div>
-          </div>
+          <div><div class="detail-label">Student Name</div><div class="detail-val">{{ student.full_name }}</div></div>
+          <div><div class="detail-label">Rank</div><div class="detail-val">#{{ student.rank }}</div></div>
           <div>
             <div class="detail-label">12th Percentage</div>
-            <div class="detail-val marks">
-              {% if student.percent_12 %}{{ "%.2f"|format(student.percent_12) }}%{% else %}—{% endif %}
-            </div>
+            <div class="detail-val marks">{% if student.percent_12 %}{{ "%.2f"|format(student.percent_12) }}%{% else %}—{% endif %}</div>
           </div>
-          <div>
-            <div class="detail-label">Category</div>
-            <div class="detail-val">{{ student.category_name or '—' }}</div>
-          </div>
+          <div><div class="detail-label">Category</div><div class="detail-val">{{ student.category_name or '—' }}</div></div>
         </div>
 
         {% if allotment %}
@@ -816,61 +424,71 @@
       </div>
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-num" style="color:#fff;">{{ total_ranked }}</div>
-        <div class="stat-label">Total Ranked</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:var(--gold);text-shadow:0 0 16px rgba(245,200,66,0.5);">{{ cs.current_rank }}</div>
-        <div class="stat-label">Current Rank</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" style="color:var(--teal);text-shadow:0 0 16px rgba(0,229,195,0.5);">{{ total_allotted }}</div>
-        <div class="stat-label">Seats Allotted</div>
-      </div>
+      <div class="stat-box"><div class="stat-num" style="color:#fff;">{{ total_ranked }}</div><div class="stat-label">Total Ranked</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--gold);text-shadow:0 0 16px rgba(245,200,66,0.5);">{{ cs.current_rank }}</div><div class="stat-label">Current Rank</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--teal);text-shadow:0 0 16px rgba(0,229,195,0.5);">{{ total_allotted }}</div><div class="stat-label">Seats Allotted</div></div>
     </div>
     {% endif %}
 
-    <!-- LIVE SEAT AVAILABILITY -->
-    {% if cat_seats_list %}
+    <!-- LIVE SEAT AVAILABILITY — GOVERNMENT QUOTA -->
+    {% if govt_seats_list %}
     <div class="sec-head">
       <span class="sec-head-label">Live Seat Availability</span>
       <span class="sec-head-line"></span>
     </div>
+
+    <div class="quota-section-head">
+      <span class="quota-section-badge govt">🏛 Government Quota</span>
+      <span class="quota-section-line"></span>
+    </div>
     <div class="seats-grid">
-      {% for item in cat_seats_list %}
+      {% for item in govt_seats_list %}
       <div class="seat-card">
         <div class="seat-card-title">{{ item.category }}</div>
         <div class="quota-row">
-          <span class="q-name">Govt Quota</span>
+          <span class="q-name">Seats</span>
           <div class="q-right">
-            <span class="q-fraction">{{ item.govt_filled }} / {{ item.govt_total }}</span>
-            <span class="q-tag {% if item.govt_remaining == 0 %}full{% else %}avail{% endif %}">
-              {% if item.govt_remaining == 0 %}Full{% else %}{{ item.govt_remaining }} left{% endif %}
+            <span class="q-fraction">{{ item.filled }} / {{ item.total }}</span>
+            <span class="q-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}">
+              {% if item.remaining == 0 %}Full{% else %}{{ item.remaining }} left{% endif %}
             </span>
           </div>
         </div>
-        {% if item.govt_total > 0 %}
+        {% if item.total > 0 %}
         <div class="q-bar">
-          <div class="q-bar-fill {% if item.govt_remaining == 0 %}full{% endif %}"
-               style="width:{{ ((item.govt_filled / item.govt_total) * 100)|int }}%"></div>
+          <div class="q-bar-fill {% if item.remaining == 0 %}full{% endif %}"
+               style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
         </div>
         {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- LIVE SEAT AVAILABILITY — MANAGEMENT QUOTA -->
+    {% if mgmt_seats_list %}
+    <div class="quota-section-head" style="margin-top:1.25rem;">
+      <span class="quota-section-badge mgmt">🏢 Management Quota</span>
+      <span class="quota-section-line"></span>
+    </div>
+    <div class="seats-grid">
+      {% for item in mgmt_seats_list %}
+      <div class="seat-card">
+        <div class="seat-card-title">{{ item.category }}</div>
         <div class="quota-row">
-          <span class="q-name">Mgmt Quota</span>
+          <span class="q-name">Seats</span>
           <div class="q-right">
-            <span class="q-fraction">{{ item.mgmt_filled }} / {{ item.mgmt_total }}</span>
-            <span class="q-tag {% if item.mgmt_remaining == 0 %}full{% else %}avail{% endif %}">
-              {% if item.mgmt_remaining == 0 %}Full{% else %}{{ item.mgmt_remaining }} left{% endif %}
+            <span class="q-fraction">{{ item.filled }} / {{ item.total }}</span>
+            <span class="q-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}">
+              {% if item.remaining == 0 %}Full{% else %}{{ item.remaining }} left{% endif %}
             </span>
           </div>
         </div>
-        {% if item.mgmt_total > 0 %}
+        {% if item.total > 0 %}
         <div class="q-bar">
-          <div class="q-bar-fill {% if item.mgmt_remaining == 0 %}full{% endif %}"
-               style="width:{{ ((item.mgmt_filled / item.mgmt_total) * 100)|int }}%"></div>
+          <div class="q-bar-fill {% if item.remaining == 0 %}full{% endif %}"
+               style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
         </div>
         {% endif %}
       </div>
@@ -879,34 +497,25 @@
     {% endif %}
 
     <!-- SEAT MAP -->
-    <div class="seat-map-section">
+    <div class="seat-map-section" style="margin-top:1.5rem;">
       <div class="smap-head">
         <div class="smap-title">Seat Map — All Seats</div>
         <div class="smap-legend">
-          <div class="sleg"><div class="sleg-dot" style="background:#00e5c3;"></div>Govt</div>
-          <div class="sleg"><div class="sleg-dot" style="background:#f5c842;"></div>Mgmt</div>
-          <div class="sleg"><div class="sleg-dot" style="background:#fff;box-shadow:0 0 6px #fff;"></div>Now</div>
+          <div class="sleg"><div class="sleg-dot" style="background:#00e5c3;"></div>Filled</div>
           <div class="sleg"><div class="sleg-dot" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);"></div>Free</div>
         </div>
       </div>
       <div class="seat-grid" id="seatGrid">
-        {% if cat_seats_list %}
+        {% set all_seats = govt_seats_list + mgmt_seats_list %}
+        {% if all_seats %}
           {% set ns = namespace(seat_idx=0) %}
-          {% for item in cat_seats_list %}
-            {% for i in range(item.govt_total) %}
+          {% for item in all_seats %}
+            {% for i in range(item.total) %}
               {% set ns.seat_idx = ns.seat_idx + 1 %}
-              {% if item.govt_total > 0 and i < item.govt_filled %}
-                <div class="sseat govt" title="Seat {{ns.seat_idx}} · {{item.category}} Govt" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
+              {% if i < item.filled %}
+                <div class="sseat filled" title="Seat {{ns.seat_idx}} · {{item.category}}" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
               {% else %}
-                <div class="sseat empty" title="Seat {{ns.seat_idx}} · {{item.category}} Govt (free)" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
-              {% endif %}
-            {% endfor %}
-            {% for i in range(item.mgmt_total) %}
-              {% set ns.seat_idx = ns.seat_idx + 1 %}
-              {% if item.mgmt_total > 0 and i < item.mgmt_filled %}
-                <div class="sseat mgmt" title="Seat {{ns.seat_idx}} · {{item.category}} Mgmt" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
-              {% else %}
-                <div class="sseat empty" title="Seat {{ns.seat_idx}} · {{item.category}} Mgmt (free)" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
+                <div class="sseat empty" title="Seat {{ns.seat_idx}} · {{item.category}} (free)" style="animation-delay:{{(ns.seat_idx * 0.012)|round(3)}}s"></div>
               {% endif %}
             {% endfor %}
           {% endfor %}
@@ -928,12 +537,7 @@
       {% if allotment_history %}
       <div class="hist-table-wrap">
         <table class="hist-table">
-          <thead>
-            <tr>
-              <th>#</th><th>Rank</th><th>Student Name</th>
-              <th>Category</th><th>Quota</th><th>Allotted At (IST)</th>
-            </tr>
-          </thead>
+          <thead><tr><th>#</th><th>Rank</th><th>Student Name</th><th>Category</th><th>Quota</th><th>Allotted At (IST)</th></tr></thead>
           <tbody>
             {% for h in allotment_history %}
             <tr>
@@ -953,7 +557,6 @@
       {% endif %}
     </div>
 
-    <!-- REFRESH -->
     <div class="refresh-wrap">
       <div class="refresh-label">Auto-refresh in <span class="refresh-count" id="cd">30</span>s</div>
       <div class="refresh-track"><div class="refresh-fill" id="rf"></div></div>
@@ -965,19 +568,13 @@
 
 {% block scripts %}
 <script>
-/* ── AURORA CANVAS ── */
 (function(){
   const cv = document.getElementById('aurora-canvas');
   if(!cv) return;
   const cx = cv.getContext('2d');
   let W, H;
-  function resize(){
-    W = cv.width = window.innerWidth;
-    H = cv.height = document.documentElement.scrollHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
+  function resize(){ W = cv.width = window.innerWidth; H = cv.height = document.documentElement.scrollHeight; }
+  resize(); window.addEventListener('resize', resize);
   const blobs = [
     {x:.12,y:.08,rx:380,ry:260,c:'rgba(79,142,255,.22)',vx:.00018,vy:.00012,t:0,ts:.0006},
     {x:.85,y:.15,rx:300,ry:320,c:'rgba(0,229,195,.18)',vx:-.00022,vy:.00016,t:1.5,ts:.0005},
@@ -985,97 +582,47 @@
     {x:.2, y:.7, rx:280,ry:240,c:'rgba(255,107,138,.12)',vx:-.00014,vy:.00022,t:2,ts:.0008},
     {x:.75,y:.72,rx:260,ry:300,c:'rgba(245,200,66,.10)',vx:.0002,vy:-.00015,t:4,ts:.0005},
   ];
-
   const stars = [];
-  for(let i=0;i<200;i++){
-    stars.push({x:Math.random(),y:Math.random(),r:.3+Math.random()*1.4,a:Math.random(),
-      da:.002+Math.random()*.005, c:Math.random()<.35?'rgba(245,200,66,':'rgba(180,210,255,'});
-  }
-
+  for(let i=0;i<200;i++) stars.push({x:Math.random(),y:Math.random(),r:.3+Math.random()*1.4,a:Math.random(),da:.002+Math.random()*.005,c:Math.random()<.35?'rgba(245,200,66,':'rgba(180,210,255,'});
   function draw(){
     cx.clearRect(0,0,W,H);
-    // deep base gradient
-    const bg = cx.createLinearGradient(0,0,W,H);
-    bg.addColorStop(0,'#06091a');
-    bg.addColorStop(.35,'#080d22');
-    bg.addColorStop(.65,'#050f18');
-    bg.addColorStop(1,'#0a0814');
-    cx.fillStyle = bg; cx.fillRect(0,0,W,H);
-
-    // animated blobs
+    const bg=cx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#06091a'); bg.addColorStop(.35,'#080d22'); bg.addColorStop(.65,'#050f18'); bg.addColorStop(1,'#0a0814');
+    cx.fillStyle=bg; cx.fillRect(0,0,W,H);
     blobs.forEach(b=>{
       b.x+=b.vx; b.y+=b.vy; b.t+=b.ts;
-      if(b.x<-.4||b.x>1.4)b.vx*=-1;
-      if(b.y<-.4||b.y>1.4)b.vy*=-1;
-      const ox=Math.sin(b.t)*40, oy=Math.cos(b.t*1.2)*28;
-      const mx=Math.max(b.rx,b.ry);
+      if(b.x<-.4||b.x>1.4)b.vx*=-1; if(b.y<-.4||b.y>1.4)b.vy*=-1;
+      const ox=Math.sin(b.t)*40,oy=Math.cos(b.t*1.2)*28,mx=Math.max(b.rx,b.ry);
       const grd=cx.createRadialGradient(b.x*W+ox,b.y*H+oy,0,b.x*W+ox,b.y*H+oy,mx);
       grd.addColorStop(0,b.c); grd.addColorStop(1,'transparent');
-      cx.save();
-      cx.translate(b.x*W+ox,b.y*H+oy);
-      cx.scale(b.rx/mx,b.ry/mx);
-      cx.beginPath(); cx.arc(0,0,mx,0,Math.PI*2);
-      cx.fillStyle=grd; cx.fill(); cx.restore();
+      cx.save(); cx.translate(b.x*W+ox,b.y*H+oy); cx.scale(b.rx/mx,b.ry/mx);
+      cx.beginPath(); cx.arc(0,0,mx,0,Math.PI*2); cx.fillStyle=grd; cx.fill(); cx.restore();
     });
-
-    // stars
-    stars.forEach(s=>{
-      s.a+=s.da; if(s.a<0||s.a>1)s.da*=-1;
-      cx.beginPath(); cx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
-      cx.fillStyle=s.c+s.a+')'; cx.fill();
-    });
-
+    stars.forEach(s=>{ s.a+=s.da; if(s.a<0||s.a>1)s.da*=-1; cx.beginPath(); cx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); cx.fillStyle=s.c+s.a+')'; cx.fill(); });
     requestAnimationFrame(draw);
   }
   draw();
 })();
 
-/* ── PARALLAX ── */
 (function(){
-  const layer = document.getElementById('parallax-layer');
-  if(!layer) return;
-  let mx=0, my=0, cx2=0, cy2=0;
-  document.addEventListener('mousemove', e=>{
-    mx = (e.clientX/window.innerWidth - .5);
-    my = (e.clientY/window.innerHeight - .5);
-  });
-  function tick(){
-    cx2 += (mx - cx2) * .05;
-    cy2 += (my - cy2) * .05;
-    layer.style.transform = `translate(${cx2*40}px,${cy2*28}px)`;
-    requestAnimationFrame(tick);
-  }
+  const layer=document.getElementById('parallax-layer'); if(!layer) return;
+  let mx=0,my=0,cx2=0,cy2=0;
+  document.addEventListener('mousemove',e=>{ mx=(e.clientX/window.innerWidth-.5); my=(e.clientY/window.innerHeight-.5); });
+  function tick(){ cx2+=(mx-cx2)*.05; cy2+=(my-cy2)*.05; layer.style.transform=`translate(${cx2*40}px,${cy2*28}px)`; requestAnimationFrame(tick); }
   tick();
 })();
 
-/* ── FLOATING SEATS ── */
 (function(){
-  const seats = document.querySelectorAll('.sseat');
-  let t = 0;
-  function floatSeats(){
-    t += 0.022;
-    seats.forEach((s, i)=>{
-      if(!s.matches(':hover')){
-        const w = Math.sin(t + i * 0.2) * 3.5 + Math.cos(t * .8 + i * .25) * 2;
-        s.style.transform = `translateY(${w}px)`;
-      }
-    });
-    requestAnimationFrame(floatSeats);
-  }
+  const seats=document.querySelectorAll('.sseat'); let t=0;
+  function floatSeats(){ t+=0.022; seats.forEach((s,i)=>{ if(!s.matches(':hover')){ const w=Math.sin(t+i*0.2)*3.5+Math.cos(t*.8+i*.25)*2; s.style.transform=`translateY(${w}px)`; } }); requestAnimationFrame(floatSeats); }
   floatSeats();
 })();
 
-/* ── COUNTDOWN + REFRESH ── */
-let s = 30;
-const cd = document.getElementById('cd');
-setInterval(()=>{ s--; if(cd) cd.textContent = s; if(s<=0) location.reload(); }, 1000);
-const rf = document.getElementById('rf');
+let s=30; const cd=document.getElementById('cd');
+setInterval(()=>{ s--; if(cd) cd.textContent=s; if(s<=0) location.reload(); },1000);
+const rf=document.getElementById('rf');
 if(rf){ rf.style.animation='none'; rf.offsetHeight; rf.style.animation='drain 30s linear forwards'; }
 
-/* ── HISTORY TOGGLE ── */
-function toggleHist(){
-  document.getElementById('histBtn').classList.toggle('open');
-  document.getElementById('histPanel').classList.toggle('open');
-}
+function toggleHist(){ document.getElementById('histBtn').classList.toggle('open'); document.getElementById('histPanel').classList.toggle('open'); }
 </script>
 {% endblock %}

@@ -153,6 +153,8 @@ def index():
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
+#  CHANGED: seat tracking now uses AdmitCategory instead of CategorySeats
+#  Categories ending with -PY = Management quota, others = Government quota
 # ─────────────────────────────────────────
 @main.route('/live')
 def counselling_live():
@@ -177,19 +179,21 @@ def counselling_live():
                     'allotted_at': utc_to_ist(a.allotted_at),
                 }
 
-    categories     = ApplicationCategory.query.filter_by(is_active=True).all()
-    cat_seats_list = []
-    for cat in categories:
-        cs_row = CategorySeats.get_for_category(cat.id)
-        cat_seats_list.append({
-            'category':       cat.name,
-            'govt_total':     cs_row.govt_total,
-            'govt_filled':    cs_row.govt_filled,
-            'govt_remaining': cs_row.govt_remaining,
-            'mgmt_total':     cs_row.mgmt_total,
-            'mgmt_filled':    cs_row.mgmt_filled,
-            'mgmt_remaining': cs_row.mgmt_remaining,
-        })
+    # CHANGED: fetch from AdmitCategory, split into govt (no -PY) and mgmt (-PY)
+    admit_categories = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    govt_seats_list  = []
+    mgmt_seats_list  = []
+    for ac in admit_categories:
+        entry = {
+            'category':  ac.name,
+            'total':     ac.total_seats,
+            'filled':    ac.seats_used,
+            'remaining': ac.seats_remaining,
+        }
+        if ac.name.upper().endswith('-PY'):
+            mgmt_seats_list.append(entry)
+        else:
+            govt_seats_list.append(entry)
 
     all_allotments    = SeatAllotment.query.order_by(SeatAllotment.allotted_at.asc()).all()
     allotment_history = []
@@ -213,12 +217,14 @@ def counselling_live():
                            allotment=allotment,
                            total_ranked=total_ranked,
                            total_allotted=total_allotted,
-                           cat_seats_list=cat_seats_list,
+                           govt_seats_list=govt_seats_list,
+                           mgmt_seats_list=mgmt_seats_list,
                            allotment_history=allotment_history)
 
 
 # ─────────────────────────────────────────
 #  POST API — Register Student
+#  CHANGED: declaration = True (consent already given via Google Forms)
 # ─────────────────────────────────────────
 @main.route('/api/d2faa6fb-745b-454d-8852-92ed0bb482d8', methods=['POST'])
 def api_register_student():
@@ -299,7 +305,7 @@ def api_register_student():
             total_12             = total_12,
             obtained_12          = obtained_12,
             percent_12           = percent_12,
-            declaration          = False,
+            declaration          = True,   # CHANGED: consent already given via Google Forms
         )
         db.session.add(appl)
         db.session.commit()
@@ -552,16 +558,14 @@ def student_whatsapp():
 
 # ─────────────────────────────────────────
 #  Student — Live Counselling Tracker
+#  CHANGED: cat_seats now uses AdmitCategory data
 # ─────────────────────────────────────────
 @main.route('/counselling')
 @login_required
 def student_counselling():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
-    cat_seats   = None
-    if appl and appl.category_id:
-        cat_seats = CategorySeats.get_for_category(appl.category_id)
-    allotment = None
+    allotment   = None
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
@@ -572,7 +576,7 @@ def student_counselling():
             }
     return render_template('student_counselling.html',
                            appl=appl, counselling=counselling,
-                           cat_seats=cat_seats, allotment=allotment)
+                           allotment=allotment)
 
 
 @main.route('/counselling/status')
@@ -581,33 +585,21 @@ def counselling_status_api():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
 
-    all_seats  = []
-    categories = ApplicationCategory.query.filter_by(is_active=True).all()
-    for cat in categories:
-        cs = CategorySeats.get_for_category(cat.id)
-        all_seats.append({
-            'category':       cat.name,
-            'govt_total':     cs.govt_total,
-            'govt_filled':    cs.govt_filled,
-            'govt_remaining': cs.govt_remaining,
-            'mgmt_total':     cs.mgmt_total,
-            'mgmt_filled':    cs.mgmt_filled,
-            'mgmt_remaining': cs.mgmt_remaining,
-        })
-
-    cat_seats = None
-    if appl and appl.category_id:
-        cs  = CategorySeats.get_for_category(appl.category_id)
-        cat = ApplicationCategory.query.get(appl.category_id)
-        cat_seats = {
-            'category':       cat.name if cat else '',
-            'govt_total':     cs.govt_total,
-            'govt_filled':    cs.govt_filled,
-            'govt_remaining': cs.govt_remaining,
-            'mgmt_total':     cs.mgmt_total,
-            'mgmt_filled':    cs.mgmt_filled,
-            'mgmt_remaining': cs.mgmt_remaining,
+    # CHANGED: fetch from AdmitCategory, split by -PY suffix
+    admit_categories = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    govt_seats = []
+    mgmt_seats = []
+    for ac in admit_categories:
+        entry = {
+            'category':  ac.name,
+            'total':     ac.total_seats,
+            'filled':    ac.seats_used,
+            'remaining': ac.seats_remaining,
         }
+        if ac.name.upper().endswith('-PY'):
+            mgmt_seats.append(entry)
+        else:
+            govt_seats.append(entry)
 
     allotment = None
     if appl:
@@ -624,8 +616,8 @@ def counselling_status_api():
         'current_rank': counselling.current_rank,
         'message':      counselling.message,
         'my_rank':      appl.rank if appl else None,
-        'all_seats':    all_seats,
-        'cat_seats':    cat_seats,
+        'govt_seats':   govt_seats,
+        'mgmt_seats':   mgmt_seats,
         'allotment':    allotment,
     })
 
@@ -1579,7 +1571,6 @@ def admin_counselling():
             flash(f'Now calling Rank #{cs.current_rank}', 'success')
 
         elif action == 'set_seats':
-            # ── Updated: set BOTH govt and mgmt seats in one action ──
             cat_id   = request.form.get('cat_id')
             if cat_id:
                 seats        = CategorySeats.get_for_category(int(cat_id))
@@ -1858,7 +1849,6 @@ def admin_admit_categories():
 
 # ─────────────────────────────────────────
 #  Admin — Application Categories + Seats
-#  (set both govt & mgmt seats per category)
 # ─────────────────────────────────────────
 @main.route('/admin/categories')
 @admin_required
@@ -1881,7 +1871,6 @@ def admin_category_add():
     new_cat = ApplicationCategory(name=name, is_active=True)
     db.session.add(new_cat)
     db.session.flush()
-    # Initialize seats row
     db.session.add(CategorySeats(category_id=new_cat.id,
                                  govt_total=0, govt_filled=0,
                                  mgmt_total=0, mgmt_filled=0))
@@ -1911,7 +1900,6 @@ def admin_category_edit(cat_id):
 @main.route('/admin/categories/set-seats/<int:cat_id>', methods=['POST'])
 @admin_required
 def admin_category_set_seats(cat_id):
-    """Set government and management quota seats for a category."""
     ApplicationCategory.query.get_or_404(cat_id)
     seats    = CategorySeats.get_for_category(cat_id)
     govt_str = request.form.get('govt_seats', '').strip()
@@ -2048,6 +2036,7 @@ def admin_document_categories():
 
 # ─────────────────────────────────────────
 #  Admin — Document Verification
+#  CHANGED: removed all_original from summaries (approve gate removed)
 # ─────────────────────────────────────────
 @main.route('/admin/document-verification')
 @admin_required
@@ -2072,16 +2061,9 @@ def admin_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        all_original = (
-            total > 0 and
-            all(
-                appl_docs.get(dc.id) and appl_docs[dc.id].status == 'original'
-                for dc in doc_categories
-            )
-        )
+        # CHANGED: all_original removed — approve button no longer gated
         summaries[a.application_id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
-            'all_original': all_original,
         }
 
     return render_template('admin_document_verification.html',
@@ -2157,6 +2139,7 @@ def admin_document_overview():
 
 # ─────────────────────────────────────────
 #  Faculty — Document Verification
+#  CHANGED: removed all_original from summaries (approve gate removed)
 # ─────────────────────────────────────────
 @main.route('/faculty/document-verification')
 @faculty_required
@@ -2181,16 +2164,9 @@ def faculty_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        all_original = (
-            total > 0 and
-            all(
-                appl_docs.get(dc.id) and appl_docs[dc.id].status == 'original'
-                for dc in doc_categories
-            )
-        )
+        # CHANGED: all_original removed — approve button no longer gated
         summaries[a.application_id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
-            'all_original': all_original,
         }
 
     return render_template('faculty_document_verification.html',
@@ -2432,21 +2408,6 @@ def export_verified():
 
 # ─────────────────────────────────────────
 #  Admin — Import Students from Excel/Google Form Export
-#
-#  Supported Google Form columns (exact names):
-#  Timestamp, Email Address, Application Number,
-#  Name of the Candidate:, Mother's Name:, Father's Name:,
-#  Date of Birth:, Gender:, Mobile Number of Parent,
-#  Mobile Number of Candidate, E-mail Id:, Address :,
-#  Nationality :, Religion :, Category:,
-#  Candidate Belongs to HK Region, Kannada Medium,
-#  Rural Background, Caste Certificate No. :,
-#  Parent's Annual Income :, Income Certificate No. :,
-#  10th Standard Board, 10th Standard Percentage,
-#  12th Standard Board, 12th Standard Stream,
-#  12th Standard Combination, 12th Standard Max. Marks,
-#  12th Standard Marks Scored, 12th Standard Percentage,
-#  Declaration
 # ─────────────────────────────────────────
 IMPORT_TMP_DIR = '/tmp/bca_imports'
 
@@ -2455,13 +2416,8 @@ def _ensure_tmp():
 
 
 def _auto_map(columns):
-    """
-    Auto-map Excel columns to StudentApplication fields.
-    Handles both exact Google Form column names and common variants.
-    """
     mapping = {}
 
-    # ── Exact Google Form column → field name ──────────────────────────────
     EXACT = {
         'email address':                  'email',
         'e-mail id:':                     'email',
@@ -2493,7 +2449,6 @@ def _auto_map(columns):
         'declaration':                    'declaration',
     }
 
-    # ── Fuzzy / variant hints ──────────────────────────────────────────────
     HINTS = {
         'email':               ['email', 'mail', 'e-mail', 'emailid', 'email id'],
         'full_name':           ['full name', 'fullname', 'name', 'student name',
@@ -2535,14 +2490,12 @@ def _auto_map(columns):
 
     col_lower = {c.lower().strip(): c for c in columns}
 
-    # First pass: exact match
     for col_l, original_col in col_lower.items():
         if col_l in EXACT:
             field = EXACT[col_l]
             if field not in mapping:
                 mapping[field] = original_col
 
-    # Second pass: fuzzy hint match (only for unmapped fields)
     for field, hints in HINTS.items():
         if field in mapping:
             continue
@@ -2562,7 +2515,6 @@ def admin_import():
     if request.method == 'POST':
         action = request.form.get('action')
 
-        # ── Step 1: Upload ──────────────────────────────────────────────
         if action == 'upload':
             f = request.files.get('excel_file')
             if not f or not f.filename:
@@ -2596,7 +2548,6 @@ def admin_import():
                 flash(f'Could not read Excel file: {e}', 'danger')
                 return redirect(url_for('main.admin_import'))
 
-        # ── Step 2: Import ──────────────────────────────────────────────
         elif action == 'import':
             tmp_name = request.form.get('session_file', '')
             tmp_path = os.path.join(IMPORT_TMP_DIR, tmp_name)
@@ -2609,7 +2560,6 @@ def admin_import():
                 if key.startswith('map_') and request.form[key]:
                     field_map[key[4:]] = request.form[key]
 
-            # Validate required fields
             required = ['dob']
             missing  = [r for r in required if r not in field_map]
             if 'email' not in field_map:
@@ -2650,7 +2600,6 @@ def admin_import():
             for idx, row in df.iterrows():
                 row_num = idx + 2
 
-                # ── Extract email ──────────────────────────────────────
                 email_col = field_map.get('email', '')
                 email_raw = _str(row[email_col]) if email_col and email_col in df.columns else ''
                 if not email_raw:
@@ -2658,19 +2607,16 @@ def admin_import():
                     continue
                 email = email_raw.lower()
 
-                # Skip if user already exists
                 if User.query.filter_by(email=email).first():
                     skipped += 1
                     continue
 
-                # ── Extract full name ──────────────────────────────────
                 fn_col    = field_map.get('full_name', '')
                 full_name = _str(row[fn_col]) if fn_col and fn_col in df.columns else ''
                 if not full_name:
                     errors.append({'row': row_num, 'msg': f'Name is empty for {email}'})
                     continue
 
-                # ── Extract & validate DOB → password ──────────────────
                 dob_col        = field_map.get('dob', '')
                 dob_raw        = row[dob_col] if dob_col and dob_col in df.columns else None
                 password_plain = _dob_to_password(dob_raw)
@@ -2687,7 +2633,6 @@ def admin_import():
                     return None
 
                 try:
-                    # ── Create User account ────────────────────────────
                     user = User(
                         full_name      = full_name,
                         email          = email,
@@ -2697,9 +2642,8 @@ def admin_import():
                         otp_expires_at = None,
                     )
                     db.session.add(user)
-                    db.session.flush()  # get user.id
+                    db.session.flush()
 
-                    # ── Resolve category ───────────────────────────────
                     cat_id = None
                     if 'category' in field_map:
                         cat_col = field_map['category']
@@ -2707,7 +2651,6 @@ def admin_import():
                             cat_raw = _str(row[cat_col]).lower().strip()
                             cat_id  = cat_name_map.get(cat_raw)
 
-                    # ── Marks calculation ──────────────────────────────
                     total_12    = _flt(_get_col('total_12'))
                     obtained_12 = _flt(_get_col('obtained_12'))
                     percent_12  = _flt(_get_col('percent_12'))
@@ -2716,12 +2659,10 @@ def admin_import():
 
                     percent_10 = _flt(_get_col('percent_10'))
 
-                    # ── Boolean fields ─────────────────────────────────
                     hk_region         = _bool_field(_get_col('hk_region'))
                     kannada_medium    = _bool_field(_get_col('kannada_medium'))
                     rural_background  = _bool_field(_get_col('rural_background'))
 
-                    # ── Create StudentApplication ──────────────────────
                     appl = StudentApplication(
                         user_id              = user.id,
                         candidate_name       = full_name,
@@ -2750,8 +2691,8 @@ def admin_import():
                         total_12             = total_12,
                         obtained_12          = obtained_12,
                         percent_12           = percent_12,
-                        declaration = True,
-                        is_verified          = False,   # admin verifies separately
+                        declaration          = True,
+                        is_verified          = False,
                     )
                     db.session.add(appl)
                     db.session.commit()
