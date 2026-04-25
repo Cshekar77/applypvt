@@ -4,6 +4,99 @@
 <style>
   .site-main { max-width: 100% !important; padding: 1.5rem 2rem !important; }
   .page-wrap  { max-width: 1280px; margin: 0 auto; }
+
+  /* ── THREE-DOT QUICK ACCESS ── */
+  .quick-access-wrap {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 999;
+  }
+  .qa-trigger {
+    width: 42px; height: 42px;
+    background: #0a1f44;
+    border: none; border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(10,31,68,.35);
+    transition: all .2s;
+    color: white;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+  }
+  .qa-trigger:hover { background: #c9a03d; transform: scale(1.07); }
+  .qa-trigger .dot { width: 4px; height: 4px; background: white; border-radius: 50%; }
+
+  .qa-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + .5rem);
+    left: 0;
+    width: 260px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 12px 40px rgba(10,31,68,.18);
+    overflow: hidden;
+    animation: qa-in .15s ease;
+  }
+  .qa-panel.open { display: block; }
+  @keyframes qa-in { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+
+  .qa-header {
+    padding: .75rem 1rem;
+    background: #0a1f44;
+    color: white;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .qa-search-wrap {
+    padding: .6rem .75rem;
+    border-bottom: 1px solid #f5f7fa;
+  }
+  .qa-search {
+    width: 100%; box-sizing: border-box;
+    padding: .4rem .7rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: .82rem;
+    font-family: inherit;
+    outline: none;
+    color: #0a1f44;
+    transition: border-color .2s;
+  }
+  .qa-search:focus { border-color: #c9a03d; }
+  .qa-list {
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .qa-list::-webkit-scrollbar { width: 4px; }
+  .qa-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+  .qa-item {
+    display: flex; align-items: center; gap: .7rem;
+    padding: .6rem 1rem;
+    text-decoration: none;
+    border-bottom: 1px solid #f5f7fa;
+    transition: background .12s;
+  }
+  .qa-item:last-child { border-bottom: none; }
+  .qa-item:hover { background: #fffdf5; }
+  .qa-item.hidden { display: none; }
+  .qa-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .82rem; flex-shrink: 0;
+  }
+  .qa-item-label { font-size: .82rem; font-weight: 600; color: #0a1f44; }
+  .qa-item-sub   { font-size: .68rem; color: #8a9ab0; margin-top: 1px; }
+  .qa-no-results { padding: 1rem; text-align: center; font-size: .8rem; color: #8a9ab0; display: none; }
+
+  /* ── MAIN GRID ── */
   .admin-nav-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -25,28 +118,14 @@
     position: relative; overflow: hidden;
   }
   .admin-nav-card.import-card:hover { border-color: #2e86de; box-shadow: 0 10px 25px rgba(46,134,222,0.15); }
-  .import-badge {
-    display: inline-block; font-size: .7rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; margin-top: .4rem;
-    background: #dbeafe; color: #1e40af;
-  }
+  .import-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #dbeafe; color: #1e40af; }
   .admin-nav-card.whatsapp-card { border-color: #25D366; position: relative; overflow: hidden; }
   .admin-nav-card.whatsapp-card:hover { border-color: #128C7E; box-shadow: 0 10px 25px rgba(37,211,102,0.15); }
-  .whatsapp-status-dot {
-    position: absolute; top: 1rem; right: 1rem;
-    width: 10px; height: 10px; border-radius: 50%; background: #25D366;
-  }
+  .whatsapp-status-dot { position: absolute; top: 1rem; right: 1rem; width: 10px; height: 10px; border-radius: 50%; background: #25D366; }
   .whatsapp-status-dot.inactive { background: #ccc; }
   .whatsapp-status-dot.active { animation: pulse-green 2s infinite; }
-  @keyframes pulse-green {
-    0%   { box-shadow: 0 0 0 0 rgba(37,211,102,0.5); }
-    70%  { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
-    100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
-  }
-  .admin-nav-card.counselling-card {
-    border-color: #e8d5a0; position: relative; overflow: hidden;
-    background: linear-gradient(135deg,#fffdf5,#fff8e8);
-  }
+  @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.5); } 70% { box-shadow: 0 0 0 8px rgba(37,211,102,0); } 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); } }
+  .admin-nav-card.counselling-card { border-color: #e8d5a0; position: relative; overflow: hidden; background: linear-gradient(135deg,#fffdf5,#fff8e8); }
   .admin-nav-card.counselling-card:hover { border-color: #c9a03d; box-shadow: 0 10px 25px rgba(201,160,61,0.18); }
   .counselling-status-dot { position: absolute; top: 1rem; right: 1rem; width: 10px; height: 10px; border-radius: 50%; }
   .counselling-status-dot.running  { background: #25c26e; animation: pulse-green 2s infinite; }
@@ -56,58 +135,28 @@
   .counsel-badge.running  { background: #d4edda; color: #155724; }
   .counsel-badge.paused   { background: #fff3cd; color: #856404; }
   .counsel-badge.stopped  { background: #f5f7fa; color: #5a6e82; }
-  .admin-nav-card.faculty-card {
-    border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.faculty-card { border-color: #ddd6fe; background: linear-gradient(135deg,#faf5ff,#f3eeff); position: relative; overflow: hidden; }
   .admin-nav-card.faculty-card:hover { border-color: #7c3aed; box-shadow: 0 10px 25px rgba(124,58,237,0.15); }
   .faculty-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ede9fe; color: #5b21b6; }
-  .admin-nav-card.payments-card {
-    border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.payments-card { border-color: #99f6e4; background: linear-gradient(135deg,#f0fdfa,#e8faf6); position: relative; overflow: hidden; }
   .admin-nav-card.payments-card:hover { border-color: #0f766e; box-shadow: 0 10px 25px rgba(15,118,110,0.15); }
   .payments-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ccfbf1; color: #0f766e; }
-
-  .admin-nav-card.admit-cat-card {
-    border-color: #fde68a; background: linear-gradient(135deg,#fffbeb,#fef3c7);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.admit-cat-card { border-color: #fde68a; background: linear-gradient(135deg,#fffbeb,#fef3c7); position: relative; overflow: hidden; }
   .admin-nav-card.admit-cat-card:hover { border-color: #d97706; box-shadow: 0 10px 25px rgba(217,119,6,0.15); }
   .admit-cat-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #fef3c7; color: #92400e; }
-
-  .admin-nav-card.admitted-card {
-    border-color: #bbf7d0; background: linear-gradient(135deg,#f0fdf4,#dcfce7);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.admitted-card { border-color: #bbf7d0; background: linear-gradient(135deg,#f0fdf4,#dcfce7); position: relative; overflow: hidden; }
   .admin-nav-card.admitted-card:hover { border-color: #16a34a; box-shadow: 0 10px 25px rgba(22,163,74,0.15); }
   .admitted-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #dcfce7; color: #166534; }
-
-  .admin-nav-card.doc-cat-card {
-    border-color: #c7d2fe; background: linear-gradient(135deg,#eef2ff,#e0e7ff);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.doc-cat-card { border-color: #c7d2fe; background: linear-gradient(135deg,#eef2ff,#e0e7ff); position: relative; overflow: hidden; }
   .admin-nav-card.doc-cat-card:hover { border-color: #4f46e5; box-shadow: 0 10px 25px rgba(79,70,229,0.15); }
   .doc-cat-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #e0e7ff; color: #3730a3; }
-
-  .admin-nav-card.doc-verify-card {
-    border-color: #fed7aa; background: linear-gradient(135deg,#fff7ed,#ffedd5);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.doc-verify-card { border-color: #fed7aa; background: linear-gradient(135deg,#fff7ed,#ffedd5); position: relative; overflow: hidden; }
   .admin-nav-card.doc-verify-card:hover { border-color: #ea580c; box-shadow: 0 10px 25px rgba(234,88,12,0.15); }
   .doc-verify-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #ffedd5; color: #9a3412; }
-
-  .admin-nav-card.doc-overview-card {
-    border-color: #e9d5ff; background: linear-gradient(135deg,#fdf4ff,#fae8ff);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.doc-overview-card { border-color: #e9d5ff; background: linear-gradient(135deg,#fdf4ff,#fae8ff); position: relative; overflow: hidden; }
   .admin-nav-card.doc-overview-card:hover { border-color: #a21caf; box-shadow: 0 10px 25px rgba(162,28,175,0.15); }
   .doc-overview-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #fae8ff; color: #701a75; }
-
-  .admin-nav-card.fee-cat-card {
-    border-color: #fca5a5; background: linear-gradient(135deg,#fff5f5,#fee2e2);
-    position: relative; overflow: hidden;
-  }
+  .admin-nav-card.fee-cat-card { border-color: #fca5a5; background: linear-gradient(135deg,#fff5f5,#fee2e2); position: relative; overflow: hidden; }
   .admin-nav-card.fee-cat-card:hover { border-color: #dc2626; box-shadow: 0 10px 25px rgba(220,38,38,0.15); }
   .fee-cat-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #fee2e2; color: #991b1b; }
 
@@ -133,6 +182,15 @@
   .wa-badge { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: .4rem; background: #d4edda; color: #155724; }
   .wa-badge.inactive { background: #f8d7da; color: #721c24; }
 
+  /* dark mode */
+  body.dark .qa-trigger { background: #1a2538; }
+  body.dark .qa-panel { background: #1a2538; border-color: #2d3e54; }
+  body.dark .qa-header { background: #0f1c2e; }
+  body.dark .qa-item:hover { background: #1e2e42; }
+  body.dark .qa-item-label { color: #eef2ff; }
+  body.dark .qa-item-sub   { color: #8a9ab0; }
+  body.dark .qa-item { border-color: #2d3e54; }
+  body.dark .qa-search { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
   body.dark .admin-nav-card        { background: #1a2538; border-color: #2d3e54; }
   body.dark .admin-nav-card strong { color: #eef2ff; }
   body.dark .admin-nav-card p      { color: #b9c8e8; }
@@ -154,11 +212,136 @@
   @media (max-width: 768px) {
     .stats-grid     { grid-template-columns: repeat(2,1fr); }
     .admin-nav-grid { grid-template-columns: 1fr; }
+    .site-main { padding: 1rem !important; }
   }
-  @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .page-header-inner h2 { font-size: 1.5rem; }
+    .qa-panel { width: 240px; }
+  }
 </style>
 
 {% block navbar_auth %}{% endblock %}
+
+{# ── THREE-DOT QUICK ACCESS MENU ── #}
+<div class="quick-access-wrap" id="qa-wrap">
+  <button class="qa-trigger" id="qa-btn" onclick="toggleQA()" title="Quick Access">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </button>
+
+  <div class="qa-panel" id="qa-panel">
+    <div class="qa-header"><i class="fas fa-bolt"></i> Quick Access</div>
+    <div class="qa-search-wrap">
+      <input type="text" class="qa-search" id="qa-search" placeholder="Search features…" oninput="filterQA(this.value)" autocomplete="off"/>
+    </div>
+    <div class="qa-list" id="qa-list">
+
+      <a href="{{ url_for('main.admin_students') }}" class="qa-item" data-label="all students applications">
+        <div class="qa-icon" style="background:#eef2f8;color:#0a1f44"><i class="fas fa-users"></i></div>
+        <div><div class="qa-item-label">All Students</div><div class="qa-item-sub">View all applications</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_verification') }}" class="qa-item" data-label="pending verification review">
+        <div class="qa-icon" style="background:#fff8e8;color:#d97706"><i class="fas fa-clock"></i></div>
+        <div><div class="qa-item-label">Pending Verification</div><div class="qa-item-sub">Review applications</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_verified') }}" class="qa-item" data-label="verified students approved">
+        <div class="qa-icon" style="background:#d4edda;color:#155724"><i class="fas fa-check-circle"></i></div>
+        <div><div class="qa-item-label">Verified Students</div><div class="qa-item-sub">View verified applicants</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_rank') }}" class="qa-item" data-label="rank management assign">
+        <div class="qa-icon" style="background:#eef2f8;color:#0a1f44"><i class="fas fa-chart-line"></i></div>
+        <div><div class="qa-item-label">Rank Management</div><div class="qa-item-sub">Assign ranks</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_counselling') }}" class="qa-item" data-label="counselling live rank seat allot">
+        <div class="qa-icon" style="background:#fff8e8;color:#c9a03d"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div><div class="qa-item-label">Counselling</div><div class="qa-item-sub">Live rank &amp; seat allotment</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_payments') }}" class="qa-item" data-label="payments fees receipts">
+        <div class="qa-icon" style="background:#ccfbf1;color:#0f766e"><i class="fas fa-rupee-sign"></i></div>
+        <div><div class="qa-item-label">Payment Overview</div><div class="qa-item-sub">Fee &amp; receipt details</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_admitted_students') }}" class="qa-item" data-label="admitted students admitted">
+        <div class="qa-icon" style="background:#dcfce7;color:#166534"><i class="fas fa-user-graduate"></i></div>
+        <div><div class="qa-item-label">Admitted Students</div><div class="qa-item-sub">View all admitted</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_document_verification') }}" class="qa-item" data-label="document verification docs verify stamp">
+        <div class="qa-icon" style="background:#ffedd5;color:#9a3412"><i class="fas fa-file-check"></i></div>
+        <div><div class="qa-item-label">Document Verification</div><div class="qa-item-sub">Verify &amp; approve docs</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_document_overview') }}" class="qa-item" data-label="document overview audit trail history">
+        <div class="qa-icon" style="background:#fae8ff;color:#701a75"><i class="fas fa-clipboard-list"></i></div>
+        <div><div class="qa-item-label">Document Overview</div><div class="qa-item-sub">Submission audit trail</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_categories') }}" class="qa-item" data-label="category management tags">
+        <div class="qa-icon" style="background:#eef2f8;color:#0a1f44"><i class="fas fa-tags"></i></div>
+        <div><div class="qa-item-label">Category Management</div><div class="qa-item-sub">Add/Edit categories</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_admit_categories') }}" class="qa-item" data-label="admit categories seat pools gm sc obc">
+        <div class="qa-icon" style="background:#fef3c7;color:#92400e"><i class="fas fa-layer-group"></i></div>
+        <div><div class="qa-item-label">Admit Categories</div><div class="qa-item-sub">GM, SC, OBC seat pools</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_fee_categories') }}" class="qa-item" data-label="fee categories structures rupee">
+        <div class="qa-icon" style="background:#fee2e2;color:#991b1b"><i class="fas fa-rupee-sign"></i></div>
+        <div><div class="qa-item-label">Fee Categories</div><div class="qa-item-sub">Fee structures</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_document_categories') }}" class="qa-item" data-label="document categories required docs list">
+        <div class="qa-icon" style="background:#e0e7ff;color:#3730a3"><i class="fas fa-folder-plus"></i></div>
+        <div><div class="qa-item-label">Document Categories</div><div class="qa-item-sub">Required documents</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_faculty') }}" class="qa-item" data-label="faculty credentials staff access password">
+        <div class="qa-icon" style="background:#ede9fe;color:#5b21b6"><i class="fas fa-user-shield"></i></div>
+        <div><div class="qa-item-label">Faculty Credentials</div><div class="qa-item-sub">Staff access management</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_whatsapp') }}" class="qa-item" data-label="whatsapp group link">
+        <div class="qa-icon" style="background:#d4edda;color:#155724"><i class="fab fa-whatsapp"></i></div>
+        <div><div class="qa-item-label">WhatsApp Group</div><div class="qa-item-sub">Set invite link</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_form_control') }}" class="qa-item" data-label="form control open close timing">
+        <div class="qa-icon" style="background:#eef2f8;color:#0a1f44"><i class="fas fa-sliders-h"></i></div>
+        <div><div class="qa-item-label">Form Control</div><div class="qa-item-sub">Open/close form</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_import') }}" class="qa-item" data-label="import students excel upload bulk">
+        <div class="qa-icon" style="background:#dbeafe;color:#1e40af"><i class="fas fa-file-import"></i></div>
+        <div><div class="qa-item-label">Import Students</div><div class="qa-item-sub">Bulk Excel upload</div></div>
+      </a>
+
+      <a href="{{ url_for('main.export_all') }}" class="qa-item" data-label="export all excel download">
+        <div class="qa-icon" style="background:#d4edda;color:#155724"><i class="fas fa-file-excel"></i></div>
+        <div><div class="qa-item-label">Export All (Excel)</div><div class="qa-item-sub">Download all applications</div></div>
+      </a>
+
+      <a href="{{ url_for('main.export_verified') }}" class="qa-item" data-label="export verified excel rank list">
+        <div class="qa-icon" style="background:#d4edda;color:#155724"><i class="fas fa-file-excel"></i></div>
+        <div><div class="qa-item-label">Export Verified (Excel)</div><div class="qa-item-sub">Download rank list</div></div>
+      </a>
+
+      <a href="{{ url_for('main.admin_change_password') }}" class="qa-item" data-label="change password lock admin">
+        <div class="qa-icon" style="background:#eef2f8;color:#5a6e82"><i class="fas fa-lock"></i></div>
+        <div><div class="qa-item-label">Change Password</div><div class="qa-item-sub">Update admin password</div></div>
+      </a>
+
+      <div class="qa-no-results" id="qa-no-results">No features found.</div>
+    </div>
+  </div>
+</div>
 
 <div class="page-wrap">
   <div class="page-header-inner">
@@ -258,7 +441,6 @@
       <span class="payments-badge"><i class="fas fa-receipt"></i> Receipts</span>
     </a>
 
-    {# ── Fee Categories ── #}
     <a href="{{ url_for('main.admin_fee_categories') }}" class="admin-nav-card fee-cat-card">
       <div class="anc-icon" style="color:#dc2626"><i class="fas fa-rupee-sign"></i></div>
       <strong>Fee Categories</strong>
@@ -266,7 +448,6 @@
       <span class="fee-cat-badge"><i class="fas fa-tags"></i> Fee Structures</span>
     </a>
 
-    {# ── Admit Categories ── #}
     <a href="{{ url_for('main.admin_admit_categories') }}" class="admin-nav-card admit-cat-card">
       <div class="anc-icon" style="color:#d97706"><i class="fas fa-layer-group"></i></div>
       <strong>Admit Categories</strong>
@@ -274,7 +455,6 @@
       <span class="admit-cat-badge"><i class="fas fa-chair"></i> Seat Pools</span>
     </a>
 
-    {# ── Admitted Students ── #}
     <a href="{{ url_for('main.admin_admitted_students') }}" class="admin-nav-card admitted-card">
       <div class="anc-icon" style="color:#16a34a"><i class="fas fa-user-graduate"></i></div>
       <strong>Admitted Students</strong>
@@ -282,7 +462,6 @@
       <span class="admitted-badge"><i class="fas fa-list-ol"></i> GM(1), SC(2)…</span>
     </a>
 
-    {# ── Document Categories ── #}
     <a href="{{ url_for('main.admin_document_categories') }}" class="admin-nav-card doc-cat-card">
       <div class="anc-icon" style="color:#4f46e5"><i class="fas fa-folder-plus"></i></div>
       <strong>Document Categories</strong>
@@ -290,7 +469,6 @@
       <span class="doc-cat-badge"><i class="fas fa-list"></i> Required Docs</span>
     </a>
 
-    {# ── Document Verification ── #}
     <a href="{{ url_for('main.admin_document_verification') }}" class="admin-nav-card doc-verify-card">
       <div class="anc-icon" style="color:#ea580c"><i class="fas fa-file-check"></i></div>
       <strong>Document Verification</strong>
@@ -298,7 +476,6 @@
       <span class="doc-verify-badge"><i class="fas fa-stamp"></i> Verify & Approve</span>
     </a>
 
-    {# ── Document Overview ── #}
     <a href="{{ url_for('main.admin_document_overview') }}" class="admin-nav-card doc-overview-card">
       <div class="anc-icon" style="color:#a21caf"><i class="fas fa-clipboard-list"></i></div>
       <strong>Document Overview</strong>
@@ -332,4 +509,47 @@
     &mdash; <a href="{{ url_for('main.admin_form_control') }}">Change</a>
   </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleQA() {
+  var panel = document.getElementById('qa-panel');
+  var isOpen = panel.classList.toggle('open');
+  if (isOpen) {
+    setTimeout(function() { document.getElementById('qa-search').focus(); }, 80);
+  }
+}
+
+function filterQA(query) {
+  var q = query.trim().toLowerCase();
+  var items = document.querySelectorAll('.qa-item');
+  var visible = 0;
+  items.forEach(function(item) {
+    var label = (item.dataset.label || '').toLowerCase();
+    var text  = (item.querySelector('.qa-item-label') ? item.querySelector('.qa-item-label').textContent : '').toLowerCase();
+    var match = !q || label.includes(q) || text.includes(q);
+    item.classList.toggle('hidden', !match);
+    if (match) visible++;
+  });
+  var nr = document.getElementById('qa-no-results');
+  if (nr) nr.style.display = visible === 0 ? 'block' : 'none';
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('qa-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('qa-panel').classList.remove('open');
+  }
+});
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('qa-panel').classList.remove('open');
+  }
+});
+</script>
 {% endblock %}

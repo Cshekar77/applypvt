@@ -2,6 +2,46 @@
 {% block title %}Counselling — Admin{% endblock %}
 {% block content %}
 <style>
+  /* ── TOP SUMMARY BAR ── */
+  .cl-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: .85rem;
+    margin-bottom: 1.5rem;
+  }
+  .cl-summary-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+  }
+  .cl-summary-card .sc-label {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: #8a9ab0;
+  }
+  .cl-summary-card .sc-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0a1f44;
+    line-height: 1.1;
+  }
+  .cl-summary-card .sc-sub {
+    font-size: .72rem;
+    color: #5a6e82;
+  }
+  .cl-summary-card.highlight-rank { border-left: 4px solid #c9a03d; }
+  .cl-summary-card.highlight-total { border-left: 4px solid #0a1f44; }
+  .cl-summary-card.highlight-allotted { border-left: 4px solid #25c26e; }
+  .cl-summary-card.highlight-pending { border-left: 4px solid #f59e0b; }
+
   .cl-page { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
   .cl-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
   .cl-header h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: #0a1f44; margin: 0; }
@@ -12,7 +52,7 @@
   .status-banner.running { background: #edf9f2; border-color: #25c26e; }
   .status-banner.paused  { background: #fffbea; border-color: #f0c040; }
   .status-banner.stopped { background: #f5f7fa; border-color: #dde3ed; }
-  .status-left { display: flex; align-items: center; gap: .85rem; }
+  .status-left { display: flex; align-items: center; gap: .85rem; flex: 1; min-width: 0; }
   .status-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
   .running .status-dot { background: #25c26e; animation: pulse-g 1.8s infinite; }
   .paused  .status-dot { background: #f0c040; }
@@ -25,17 +65,16 @@
   .btn-stop   { background: #dc3545; color: white; }
   .btn-resume { background: #0a1f44; color: white; }
   .btn-pause  { background: #f0c040; color: #0a1f44; }
-  .btn-ctrl { padding: .5rem 1.1rem; border-radius: 9px; border: none; font-size: .82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; transition: all .2s; }
+  .btn-ctrl { padding: .5rem 1.1rem; border-radius: 9px; border: none; font-size: .82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; transition: all .2s; white-space: nowrap; }
   .btn-ctrl:hover { opacity: .88; transform: translateY(-1px); }
 
   .cl-body { display: grid; grid-template-columns: 300px 1fr; gap: 1.25rem; align-items: start; }
-  @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } }
 
   .cl-left { display: flex; flex-direction: column; gap: 1rem; }
   .cl-card { background: white; border-radius: 16px; border: 1px solid #eef2f8; box-shadow: 0 2px 8px rgba(0,0,0,.05); padding: 1.25rem; }
   .cl-card-title { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #8a9ab0; margin: 0 0 1rem; display: flex; align-items: center; gap: .4rem; }
-  .rank-display { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem; }
-  .rank-display span { font-size: .95rem; color: #8a9ab0; font-family: inherit; }
+  .rank-display { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem; }
+  .rank-display span { font-size: .9rem; color: #8a9ab0; font-family: inherit; }
   .rank-input-row { display: flex; flex-direction: column; gap: .6rem; }
   .rank-input-row input, .rank-input-row textarea { padding: .6rem .9rem; border: 2px solid #e2e8f0; border-radius: 9px; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .2s; width: 100%; box-sizing: border-box; }
   .rank-input-row input:focus, .rank-input-row textarea:focus { border-color: #0a1f44; }
@@ -61,11 +100,11 @@
   .stu-row:last-child { border-bottom: none; }
   .stu-row:hover { background: #fffdf5; }
   .stu-row.hidden { display: none; }
-  .rank-pill { background: #0a1f44; color: white; font-size: .68rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; min-width: 34px; text-align: center; flex-shrink: 0; }
+  .rank-pill { background: #0a1f44; color: white; font-size: .68rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; min-width: 34px; text-align: center; flex-shrink: 0; white-space: nowrap; }
   .stu-info { flex: 1; min-width: 0; }
   .stu-name { font-weight: 600; color: #0a1f44; font-size: .875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stu-sub  { color: #5a6e82; font-size: .73rem; margin-top: 1px; }
-  .badge { display: inline-block; font-size: .66rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+  .badge { display: inline-block; font-size: .66rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
   .badge-government { background: #cce5ff; color: #004085; }
   .badge-management { background: #fff3cd; color: #856404; }
   .badge-pending { background: #f3f4f6; color: #6b7280; }
@@ -85,12 +124,7 @@
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
   .modal-body { padding: 1.5rem; }
 
-  /* ── SEAT TRACKING MODAL — split by Govt / Mgmt ── */
-  .seat-section-header {
-    padding: .65rem 1rem; font-size: .75rem; font-weight: 700; letter-spacing: .06em;
-    text-transform: uppercase; display: flex; align-items: center; gap: .5rem;
-    border-bottom: 1px solid; border-radius: 10px 10px 0 0;
-  }
+  .seat-section-header { padding: .65rem 1rem; font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: .5rem; border-bottom: 1px solid; border-radius: 10px 10px 0 0; }
   .seat-section-header.govt { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
   .seat-section-header.mgmt { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
   .seat-section-wrap { border-radius: 10px; overflow: hidden; border: 1px solid #eef2f8; margin-bottom: 1.1rem; }
@@ -105,7 +139,7 @@
 
   .section-divider { font-size: .7rem; font-weight: 600; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; margin: 1.1rem 0 .65rem; padding-bottom: .35rem; border-bottom: 1px solid #f5f7fa; }
   .section-divider:first-child { margin-top: 0; }
-  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .65rem; }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .65rem; }
   .detail-item span { font-size: .68rem; text-transform: uppercase; color: #5a6e82; letter-spacing: .04em; display: block; margin-bottom: 2px; }
   .detail-item strong { font-size: .85rem; color: #0a1f44; }
 
@@ -131,25 +165,24 @@
   .btn-allot { padding: .6rem 1.3rem; background: #25c26e; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
   .btn-allot:hover { background: #1da85c; }
 
-  /* Quota filter in dropdown */
-  .quota-filter-tabs { display: flex; gap: .4rem; margin-bottom: .5rem; }
-  .qtab { padding: .3rem .75rem; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: .72rem; font-weight: 600; cursor: pointer; background: white; color: #5a6e82; transition: all .15s; }
+  .quota-filter-tabs { display: flex; gap: .4rem; margin-bottom: .5rem; flex-wrap: wrap; }
+  .qtab { padding: .3rem .75rem; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: .72rem; font-weight: 600; cursor: pointer; background: white; color: #5a6e82; transition: all .15s; white-space: nowrap; }
   .qtab.active-govt { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
   .qtab.active-mgmt { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
   .qtab:not(.active-govt):not(.active-mgmt):hover { background: #f3f4f6; }
 
   .already-allotted { background: #edf9f2; border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem; overflow: hidden; }
   .allotted-info { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; padding: .85rem 1.1rem; }
-  .allotted-info p { margin: 0; font-size: .83rem; color: #1a5c3a; flex: 1; }
+  .allotted-info p { margin: 0; font-size: .83rem; color: #1a5c3a; flex: 1; min-width: 150px; }
   .allotted-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
 
   .edit-allotment-form { display: none; background: #fffdf5; border-top: 1px solid #c9d9ba; padding: 1rem 1.1rem; flex-direction: column; gap: .85rem; }
   .edit-allotment-form.open { display: flex; }
   .edit-form-title { font-size: .72rem; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; gap: .4rem; margin-bottom: .25rem; }
 
-  .btn-edit-allot { padding: .45rem .9rem; background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; border-radius: 9px; font-weight: 600; font-size: .8rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem; }
+  .btn-edit-allot { padding: .45rem .9rem; background: #fef3c7; color: #92400e; border: 1.5px solid #fde68a; border-radius: 9px; font-weight: 600; font-size: .8rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; }
   .btn-edit-allot:hover { background: #fde68a; }
-  .btn-revoke { padding: .45rem .9rem; background: white; color: #dc3545; border: 1.5px solid #dc3545; border-radius: 9px; font-weight: 600; font-size: .8rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem; }
+  .btn-revoke { padding: .45rem .9rem; background: white; color: #dc3545; border: 1.5px solid #dc3545; border-radius: 9px; font-weight: 600; font-size: .8rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; }
   .btn-revoke:hover { background: #dc3545; color: white; }
   .btn-save-edit { padding: .5rem 1.1rem; background: #c9a03d; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: .82rem; cursor: pointer; display: inline-flex; align-items: center; gap: .35rem; }
   .btn-save-edit:hover { background: #b8902e; }
@@ -159,6 +192,11 @@
   .btn-close-modal:hover { background: #e5e7eb; }
   .admit-badge-display { display: inline-block; font-size: .75rem; font-weight: 800; padding: 2px 9px; border-radius: 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; margin-left: .3rem; }
 
+  /* ── DARK MODE ── */
+  body.dark .cl-summary-card { background: #1a2538; border-color: #2d3e54; }
+  body.dark .cl-summary-card .sc-label { color: #8a9ab0; }
+  body.dark .cl-summary-card .sc-value { color: #eef2ff; }
+  body.dark .cl-summary-card .sc-sub   { color: #b9c8e8; }
   body.dark .cl-card, body.dark .list-card, body.dark .modal-box, body.dark .modal-header, body.dark .seat-section-wrap { background: #1a2538; border-color: #2d3e54; }
   body.dark .modal-header { background: #1a2538; }
   body.dark .cl-card-title, body.dark .status-label, body.dark .modal-title, body.dark .stu-name, body.dark .detail-item strong, body.dark .list-card-header h4 { color: #eef2ff; }
@@ -167,7 +205,8 @@
   body.dark .stu-row { border-color: #1e2e42; }
   body.dark .stu-row:hover { background: #1e2e42; }
   body.dark .list-card-header { border-color: #2d3e54; }
-  body.dark .rank-input-row input, body.dark .rank-input-row textarea, body.dark .quota-select, body.dark .admit-cat-select, body.dark .fee-cat-select, body.dark .additional-fee-input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .rank-input-row input, body.dark .rank-input-row textarea,
+  body.dark .quota-select, body.dark .admit-cat-select, body.dark .fee-cat-select, body.dark .additional-fee-input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
   body.dark .seat-track-table th { background: #131e2e; color: #8a9ab0; border-color: #2d3e54; }
   body.dark .seat-track-table td { border-color: #1e2e42; color: #eef2ff; }
   body.dark .allot-form { background: #131e2e; border-color: #2d3e54; }
@@ -184,7 +223,42 @@
   body.dark .qtab { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
   body.dark .seat-section-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
   body.dark .seat-section-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
-  @media(max-width:600px) { .badge { display: none; } .modal-box { border-radius: 18px; } }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 900px) {
+    .cl-body { grid-template-columns: 1fr; }
+  }
+
+  @media(max-width: 600px) {
+    .cl-page { padding: 1rem .75rem 5rem; }
+    .cl-header h2 { font-size: 1.35rem; }
+    .rank-display { font-size: 2rem; }
+    .status-banner { padding: .85rem 1rem; }
+    .status-actions { width: 100%; }
+    .status-actions form, .status-actions button { flex: 1; }
+    .btn-ctrl { justify-content: center; width: 100%; }
+    .badge { display: none; }
+    .modal-box { border-radius: 18px; max-height: 95vh; }
+    .modal-body { padding: 1rem; }
+    .modal-header { padding: 1rem; }
+    .allot-form-row { flex-direction: column; }
+    .allot-form-group { min-width: 0; width: 100%; }
+    .detail-grid { grid-template-columns: 1fr 1fr; }
+    .allotted-actions { width: 100%; }
+    .allotted-actions button, .allotted-actions form, .allotted-actions .btn-revoke { flex: 1; justify-content: center; }
+    .stu-row { padding: .75rem 1rem; gap: .6rem; }
+    .edit-allotment-form { padding: .85rem .9rem; }
+    .cl-summary-bar { grid-template-columns: 1fr 1fr; gap: .65rem; }
+    .cl-summary-card .sc-value { font-size: 1.4rem; }
+    .seat-track-table { font-size: .75rem; }
+    .seat-track-table th, .seat-track-table td { padding: .4rem .6rem; }
+    .seats-bar-wrap { width: 50px; }
+  }
+
+  @media(max-width: 380px) {
+    .cl-summary-bar { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
 </style>
 
 <div class="cl-page">
@@ -194,6 +268,33 @@
 
   <div class="cl-header" style="margin-top:1rem">
     <h2><i class="fas fa-chalkboard-teacher" style="color:#c9a03d"></i> Counselling Management</h2>
+  </div>
+
+  {# ── TOP SUMMARY BAR ── #}
+  {% set total_students = students | length %}
+  {% set allotted_count = allotments | length %}
+  {% set pending_count  = total_students - allotted_count %}
+  <div class="cl-summary-bar">
+    <div class="cl-summary-card highlight-rank">
+      <div class="sc-label"><i class="fas fa-broadcast-tower"></i> Current Rank</div>
+      <div class="sc-value">{% if cs.current_rank %}#{{ cs.current_rank }}{% else %}—{% endif %}</div>
+      <div class="sc-sub">{% if cs.current_rank %}Now calling{% else %}Not set{% endif %}</div>
+    </div>
+    <div class="cl-summary-card highlight-total">
+      <div class="sc-label"><i class="fas fa-users"></i> Total Ranked</div>
+      <div class="sc-value">{{ total_students }}</div>
+      <div class="sc-sub">Students in queue</div>
+    </div>
+    <div class="cl-summary-card highlight-allotted">
+      <div class="sc-label"><i class="fas fa-check-circle"></i> Allotted</div>
+      <div class="sc-value">{{ allotted_count }}</div>
+      <div class="sc-sub">Seats confirmed</div>
+    </div>
+    <div class="cl-summary-card highlight-pending">
+      <div class="sc-label"><i class="fas fa-clock"></i> Pending</div>
+      <div class="sc-value">{{ pending_count }}</div>
+      <div class="sc-sub">Awaiting allotment</div>
+    </div>
   </div>
 
   <div class="status-banner {{ cs.status }}">
@@ -260,7 +361,6 @@
         </form>
       </div>
 
-      {# Seat tracking badge — uses pre-computed dict data, no N+1 #}
       {% set total_seats_all = admit_categories | sum(attribute='total_seats') %}
       {% set filled_seats_all = admit_categories | sum(attribute='seats_used') %}
       <button class="btn-seat-track" onclick="openModal('seat-track-modal')">
@@ -295,7 +395,7 @@
           {% if allotment %}
             <span class="badge badge-{{ allotment.quota }}"><i class="fas fa-check"></i> {{ allotment.quota|title }}</span>
             {% if allotment.admit_seat_label %}
-              <span style="background:#ede9fe;color:#7c3aed;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0">{{ allotment.admit_seat_label }}</span>
+              <span style="background:#ede9fe;color:#7c3aed;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;white-space:nowrap">{{ allotment.admit_seat_label }}</span>
             {% endif %}
           {% else %}
             <span class="badge badge-pending">Not Allotted</span>
@@ -314,7 +414,7 @@
   </div>
 </div>
 
-{# ── SEAT TRACKING MODAL — split Govt / Mgmt ── #}
+{# ── SEAT TRACKING MODAL ── #}
 <div class="modal-overlay" id="seat-track-modal" onclick="closeOnOverlay(event, 'seat-track-modal')">
   <div class="modal-box">
     <div class="modal-header">
@@ -326,7 +426,6 @@
     </div>
     <div class="modal-body">
 
-      {# Government Quota #}
       {% set govt_cats = [] %}
       {% set mgmt_cats = [] %}
       {% for ac in admit_categories %}
@@ -341,31 +440,33 @@
             {{ govt_cats | sum(attribute='seats_used') }} / {{ govt_cats | sum(attribute='total_seats') }} filled
           </span>
         </div>
-        <table class="seat-track-table">
-          <thead>
-            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
-          </thead>
-          <tbody>
-            {% for ac in govt_cats %}
-            <tr>
-              <td><strong>{{ ac.name }}</strong></td>
-              <td>{{ ac.total_seats }}</td>
-              <td>{{ ac.seats_used }}</td>
-              <td>
-                <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                  {{ ac.seats_remaining }}
-                </strong>
-                <div class="seats-bar-wrap">
-                  <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
-                       style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
-                </div>
-              </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No government quota categories.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+          <table class="seat-track-table">
+            <thead>
+              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
+            </thead>
+            <tbody>
+              {% for ac in govt_cats %}
+              <tr>
+                <td><strong>{{ ac.name }}</strong></td>
+                <td>{{ ac.total_seats }}</td>
+                <td>{{ ac.seats_used }}</td>
+                <td>
+                  <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
+                    {{ ac.seats_remaining }}
+                  </strong>
+                  <div class="seats-bar-wrap">
+                    <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
+                         style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No government quota categories.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="seat-section-wrap">
@@ -375,31 +476,33 @@
             {{ mgmt_cats | sum(attribute='seats_used') }} / {{ mgmt_cats | sum(attribute='total_seats') }} filled
           </span>
         </div>
-        <table class="seat-track-table">
-          <thead>
-            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
-          </thead>
-          <tbody>
-            {% for ac in mgmt_cats %}
-            <tr>
-              <td><strong>{{ ac.name }}</strong></td>
-              <td>{{ ac.total_seats }}</td>
-              <td>{{ ac.seats_used }}</td>
-              <td>
-                <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                  {{ ac.seats_remaining }}
-                </strong>
-                <div class="seats-bar-wrap">
-                  <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
-                       style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
-                </div>
-              </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No management quota categories.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+          <table class="seat-track-table">
+            <thead>
+              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
+            </thead>
+            <tbody>
+              {% for ac in mgmt_cats %}
+              <tr>
+                <td><strong>{{ ac.name }}</strong></td>
+                <td>{{ ac.total_seats }}</td>
+                <td>{{ ac.seats_used }}</td>
+                <td>
+                  <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
+                    {{ ac.seats_remaining }}
+                  </strong>
+                  <div class="seats-bar-wrap">
+                    <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
+                         style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No management quota categories.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <p style="font-size:.72rem;color:#8a9ab0;margin-top:.5rem;text-align:right">
@@ -411,8 +514,6 @@
 
 {# ── STUDENT MODALS ── #}
 {% for appl in students %}{% set allotment = allotments.get(appl.id) %}
-
-{# Pre-fetch student fee data for this student #}
 {% set sf = appl.student_fee[0] if appl.student_fee else None %}
 
 <div class="modal-overlay" id="cs-modal-{{ appl.id }}" onclick="closeOnOverlay(event, 'cs-modal-{{ appl.id }}')">
@@ -431,7 +532,22 @@
         <div class="detail-item"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
         <div class="detail-item"><span>Email</span><strong>{{ appl.email }}</strong></div>
         <div class="detail-item"><span>Phone</span><strong>{{ appl.phone or '—' }}</strong></div>
-        <div class="detail-item"><span>Date of Birth</span><strong>{{ appl.dob or '—' }}</strong></div>
+        <div class="detail-item">
+          <span>Date of Birth</span>
+          <strong>
+            {% if appl.dob %}
+              {% set dob = appl.dob | string %}
+              {% if '-' in dob and dob | length >= 10 %}
+                {# Format from YYYY-MM-DD to DD/MM/YYYY #}
+                {{ dob[8:10] }}/{{ dob[5:7] }}/{{ dob[0:4] }}
+              {% elif '/' in dob %}
+                {{ dob }}
+              {% else %}
+                {{ dob }}
+              {% endif %}
+            {% else %}—{% endif %}
+          </strong>
+        </div>
         <div class="detail-item"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
         <div class="detail-item"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
         <div class="detail-item"><span>Category</span><strong>{{ appl.category_name or '—' }}</strong></div>
@@ -539,7 +655,6 @@
       </div>
 
       {% else %}
-      {# New allotment form — quota-filtered admit category dropdown #}
       <form method="POST" class="allot-form" id="allot-form-{{ appl.id }}">
         <input type="hidden" name="action" value="allot_seat"/>
         <input type="hidden" name="app_id" value="{{ appl.id }}"/>
@@ -616,6 +731,8 @@
 </div>
 {% endfor %}
 
+{% endblock %}
+
 {% block scripts %}
 <script>
 function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
@@ -634,27 +751,22 @@ function toggleEditAllotment(id) {
 }
 
 function updateSeatHint(select, hintId) {
-  const hint = document.getElementById(hintId);
-  const opt  = select.options[select.selectedIndex];
+  var hint = document.getElementById(hintId);
+  var opt  = select.options[select.selectedIndex];
   if (!hint || !opt || !opt.value) { if (hint) hint.textContent = ''; return; }
-  const rem   = parseInt(opt.dataset.remaining);
-  const total = parseInt(opt.dataset.total);
+  var rem   = parseInt(opt.dataset.remaining);
+  var total = parseInt(opt.dataset.total);
   if (rem === 0) { hint.textContent = '⚠ No seats remaining!'; hint.className = 'seat-hint full'; }
   else           { hint.textContent = rem + ' of ' + total + ' seats available'; hint.className = 'seat-hint'; }
 }
 
-/**
- * Filter admit category dropdown to only show options matching the selected quota.
- * Government quota = categories NOT ending in -PY
- * Management quota = categories ending in -PY
- */
 function filterAdmitCatsByQuota(quotaValue, selectId) {
-  const select = document.getElementById(selectId);
+  var select = document.getElementById(selectId);
   if (!select) return;
-  const options = select.querySelectorAll('option');
+  var options = select.querySelectorAll('option');
   options.forEach(function(opt) {
-    if (!opt.value) return; // keep placeholder
-    const optQuota = opt.dataset.quota || '';
+    if (!opt.value) return;
+    var optQuota = opt.dataset.quota || '';
     if (!quotaValue || optQuota === quotaValue) {
       opt.style.display = '';
       opt.hidden = false;
@@ -663,16 +775,14 @@ function filterAdmitCatsByQuota(quotaValue, selectId) {
       opt.hidden = true;
     }
   });
-  // Reset selection if current value no longer visible
-  const current = select.options[select.selectedIndex];
+  var current = select.options[select.selectedIndex];
   if (current && current.hidden) {
     select.value = '';
-    const hintId = selectId.replace('admit-cat-', 'hint-').replace('edit-admit-cat-', 'edit-hint-');
-    const hint = document.getElementById(hintId);
+    var hintId = selectId.replace('admit-cat-', 'hint-').replace('edit-admit-cat-', 'edit-hint-');
+    var hint = document.getElementById(hintId);
     if (hint) hint.textContent = '';
   }
-  // Update placeholder text
-  const placeholder = select.options[0];
+  var placeholder = select.options[0];
   if (placeholder && !placeholder.value) {
     if (quotaValue === 'government') placeholder.text = '— Select Govt Category —';
     else if (quotaValue === 'management') placeholder.text = '— Select Mgmt Category —';
@@ -681,47 +791,46 @@ function filterAdmitCatsByQuota(quotaValue, selectId) {
 }
 
 function updateFeePreview(appId, feeCatValue, addFeeValue) {
-  const isEdit     = appId.startsWith('edit-');
-  const rawId      = isEdit ? appId.replace('edit-', '') : appId;
-  const formSel    = isEdit ? '#edit-allot-form-' + rawId : '#allot-form-' + rawId;
-  const addInputId = isEdit ? 'add-fee-edit-' + rawId : 'add-fee-' + rawId;
-  const previewId  = 'fee-preview-' + appId;
+  var isEdit     = appId.startsWith('edit-');
+  var rawId      = isEdit ? appId.replace('edit-', '') : appId;
+  var formSel    = isEdit ? '#edit-allot-form-' + rawId : '#allot-form-' + rawId;
+  var addInputId = isEdit ? 'add-fee-edit-' + rawId : 'add-fee-' + rawId;
+  var previewId  = 'fee-preview-' + appId;
 
-  const feeSelect = document.querySelector(formSel + ' .fee-cat-select');
-  const addInput  = document.getElementById(addInputId);
-  const preview   = document.getElementById(previewId);
+  var feeSelect = document.querySelector(formSel + ' .fee-cat-select');
+  var addInput  = document.getElementById(addInputId);
+  var preview   = document.getElementById(previewId);
   if (!feeSelect || !addInput || !preview) return;
 
-  const selectedOpt = feeSelect.options[feeSelect.selectedIndex];
-  const base        = selectedOpt && selectedOpt.dataset.amount ? parseFloat(selectedOpt.dataset.amount) : 0;
-  const additional  = parseFloat(addInput.value) || 0;
-  const total       = base + additional;
+  var selectedOpt = feeSelect.options[feeSelect.selectedIndex];
+  var base        = selectedOpt && selectedOpt.dataset.amount ? parseFloat(selectedOpt.dataset.amount) : 0;
+  var additional  = parseFloat(addInput.value) || 0;
+  var total       = base + additional;
 
   if (base > 0 || additional > 0) {
     preview.style.display = 'flex';
-    document.getElementById('preview-base-'  + appId).textContent  = '₹' + base.toFixed(2);
-    document.getElementById('preview-add-'   + appId).textContent  = '₹' + additional.toFixed(2);
-    document.getElementById('preview-total-' + appId).textContent  = '₹' + total.toFixed(2);
+    document.getElementById('preview-base-'  + appId).textContent = '₹' + base.toFixed(2);
+    document.getElementById('preview-add-'   + appId).textContent = '₹' + additional.toFixed(2);
+    document.getElementById('preview-total-' + appId).textContent = '₹' + total.toFixed(2);
   } else {
     preview.style.display = 'none';
   }
 }
 
 function filterStudents(query) {
-  const q    = query.trim().toLowerCase();
-  const rows = document.querySelectorAll('.stu-row[id^="row-"]');
-  let visible = 0;
+  var q    = query.trim().toLowerCase();
+  var rows = document.querySelectorAll('.stu-row[id^="row-"]');
+  var visible = 0;
   rows.forEach(function(row) {
-    const match = !q || String(row.dataset.rank) === q || (row.dataset.name || '').includes(q);
+    var match = !q || String(row.dataset.rank) === q || (row.dataset.name || '').includes(q);
     row.classList.toggle('hidden', !match);
     if (match) visible++;
   });
   document.getElementById('visible-count').textContent = visible;
-  const nr = document.getElementById('no-results');
+  var nr = document.getElementById('no-results');
   if (nr) nr.style.display = visible === 0 ? 'block' : 'none';
-  const ce = document.getElementById('search-count');
+  var ce = document.getElementById('search-count');
   if (ce) ce.textContent = q ? 'Showing ' + visible + ' of ' + rows.length + ' student(s)' : '';
 }
 </script>
-{% endblock %}
 {% endblock %}

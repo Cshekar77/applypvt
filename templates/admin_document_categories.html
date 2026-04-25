@@ -5,9 +5,9 @@
 .dc-page { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 .dc-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
 .dc-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
-.btn-back { display: inline-flex; align-items: center; gap: .5rem; color: #5a6e82; text-decoration: none; font-size: .875rem; padding: .4rem .85rem; border-radius: 8px; background: #f5f7fa; border: 1px solid #e2e8f0; transition: all .2s; }
+.btn-back { display: inline-flex; align-items: center; gap: .5rem; color: #5a6e82; text-decoration: none; font-size: .875rem; padding: .4rem .85rem; border-radius: 8px; background: #f5f7fa; border: 1px solid #e2e8f0; transition: all .2s; white-space: nowrap; }
 .btn-back:hover { background: #eef2f8; color: #0a1f44; }
-.btn-add { display: inline-flex; align-items: center; gap: .5rem; background: #0a1f44; color: white; border: none; padding: .55rem 1.2rem; border-radius: 10px; font-size: .875rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+.btn-add { display: inline-flex; align-items: center; gap: .5rem; background: #0a1f44; color: white; border: none; padding: .55rem 1.2rem; border-radius: 10px; font-size: .875rem; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; }
 .btn-add:hover { background: #0d2857; }
 
 /* Add form card */
@@ -20,7 +20,7 @@
 .form-group input, .form-group textarea, .form-group select {
   padding: .55rem .85rem; border: 1px solid #e2e8f0; border-radius: 8px;
   font-size: .875rem; color: #0a1f44; outline: none; transition: border .2s;
-  background: white;
+  background: white; box-sizing: border-box; width: 100%;
 }
 .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #0a1f44; }
 .form-group textarea { resize: vertical; min-height: 60px; }
@@ -28,19 +28,20 @@
 
 /* Table */
 .doc-table-wrap { background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; }
-.doc-table-head { padding: 1rem 1.5rem; border-bottom: 1px solid #eef2f8; display: flex; justify-content: space-between; align-items: center; }
-.doc-table-head span { font-size: .875rem; color: #5a6e82; }
-table.doc-table { width: 100%; border-collapse: collapse; }
-table.doc-table th { padding: .75rem 1.25rem; text-align: left; font-size: .75rem; font-weight: 700; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; background: #f8fafc; border-bottom: 1px solid #eef2f8; }
+.doc-table-head { padding: 1rem 1.5rem; border-bottom: 1px solid #eef2f8; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.doc-table-head span { font-size: .8rem; color: #5a6e82; }
+.doc-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table.doc-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+table.doc-table th { padding: .75rem 1.25rem; text-align: left; font-size: .75rem; font-weight: 700; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; background: #f8fafc; border-bottom: 1px solid #eef2f8; white-space: nowrap; }
 table.doc-table td { padding: .9rem 1.25rem; border-bottom: 1px solid #f0f4f8; font-size: .875rem; color: #0a1f44; vertical-align: middle; }
 table.doc-table tr:last-child td { border-bottom: none; }
 table.doc-table tr:hover td { background: #fafbfc; }
-.badge-req { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #fee2e2; color: #991b1b; }
-.badge-opt { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #dbeafe; color: #1e40af; }
-.badge-active { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #d1fae5; color: #065f46; }
-.badge-inactive { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #f3f4f6; color: #6b7280; }
-.action-btns { display: flex; gap: .5rem; }
-.btn-sm { padding: .3rem .7rem; border-radius: 7px; font-size: .78rem; font-weight: 600; border: none; cursor: pointer; transition: all .15s; }
+.badge-req  { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #fee2e2; color: #991b1b; white-space: nowrap; }
+.badge-opt  { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #dbeafe; color: #1e40af; white-space: nowrap; }
+.badge-active   { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #d1fae5; color: #065f46; white-space: nowrap; }
+.badge-inactive { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 600; background: #f3f4f6; color: #6b7280; white-space: nowrap; }
+.action-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+.btn-sm { padding: .3rem .7rem; border-radius: 7px; font-size: .78rem; font-weight: 600; border: none; cursor: pointer; transition: all .15s; white-space: nowrap; }
 .btn-edit   { background: #ede9fe; color: #5b21b6; }
 .btn-edit:hover   { background: #ddd6fe; }
 .btn-toggle { background: #f3f4f6; color: #374151; }
@@ -51,15 +52,26 @@ table.doc-table tr:hover td { background: #fafbfc; }
 .empty-state i { font-size: 2.5rem; opacity: .3; margin-bottom: 1rem; display: block; }
 
 /* Edit modal */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(10,31,68,.45); z-index: 999; align-items: center; justify-content: center; }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(10,31,68,.45); z-index: 999; align-items: center; justify-content: center; padding: 1rem; }
 .modal-bg.open { display: flex; }
-.modal-box { background: white; border-radius: 20px; padding: 2rem; width: 100%; max-width: 520px; margin: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.modal-box { background: white; border-radius: 20px; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
 .modal-box h3 { font-size: 1.1rem; font-weight: 700; color: #0a1f44; margin: 0 0 1.25rem; }
-.modal-footer { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.25rem; }
+.modal-footer { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
 .btn-cancel { background: #f3f4f6; color: #374151; padding: .5rem 1.1rem; border-radius: 9px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; }
 .btn-cancel:hover { background: #e5e7eb; }
 .btn-save { background: #0a1f44; color: white; padding: .5rem 1.1rem; border-radius: 9px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; }
 .btn-save:hover { background: #0d2857; }
+
+/* Mobile card layout */
+.doc-card-list { display: none; }
+.doc-card { background: #f8fafc; border-radius: 12px; border: 1px solid #eef2f8; padding: 1rem; margin: .75rem 1rem; }
+.doc-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; margin-bottom: .6rem; }
+.doc-card-name { font-weight: 700; color: #0a1f44; font-size: .9rem; }
+.doc-card-order { font-size: .72rem; color: #8a9ab0; margin-top: 2px; }
+.doc-card-desc { font-size: .78rem; color: #5a6e82; margin-bottom: .65rem; }
+.doc-card-badges { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.doc-card-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.doc-card-actions .btn-sm { flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: .3rem; }
 
 /* Dark mode */
 body.dark .dc-header h2 { color: #eef2ff; }
@@ -72,10 +84,26 @@ body.dark table.doc-table th { background: #0f1829; color: #b9c8e8; border-color
 body.dark table.doc-table td { color: #eef2ff; border-color: #1e2e42; }
 body.dark table.doc-table tr:hover td { background: #1e2e42; }
 body.dark .doc-table-head { border-color: #2d3e54; }
+body.dark .doc-card { background: #131e2e; border-color: #2d3e54; }
+body.dark .doc-card-name { color: #eef2ff; }
+body.dark .doc-card-desc { color: #b9c8e8; }
+body.dark .doc-card-order { color: #5a6e82; }
+body.dark .btn-cancel { background: #2d3e54; color: #b9c8e8; }
 
+/* ── RESPONSIVE ── */
 @media (max-width: 600px) {
+  .dc-page { padding: 1rem .75rem 5rem; }
+  .dc-header h2 { font-size: 1.4rem; }
   .form-row { grid-template-columns: 1fr; }
-  table.doc-table th:nth-child(3), table.doc-table td:nth-child(3) { display: none; }
+  .form-group.full { grid-column: 1; }
+  .add-card { padding: 1.1rem; }
+  .modal-box { padding: 1.25rem; border-radius: 16px; }
+  .modal-footer { justify-content: stretch; }
+  .modal-footer .btn-cancel, .modal-footer .btn-save { flex: 1; text-align: center; justify-content: center; }
+
+  /* Hide desktop table, show mobile cards */
+  .doc-table-scroll { display: none; }
+  .doc-card-list { display: block; padding-bottom: .5rem; }
 }
 </style>
 
@@ -136,63 +164,103 @@ body.dark .doc-table-head { border-color: #2d3e54; }
   <div class="doc-table-wrap">
     <div class="doc-table-head">
       <strong style="color:#0a1f44;font-size:.95rem">{{ docs|length }} Document{{ 's' if docs|length != 1 }}</strong>
-      <span>Drag to reorder via sort order field</span>
+      <span>Set sort order to reorder documents</span>
     </div>
+
     {% if docs %}
-    <table class="doc-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Document Name</th>
-          <th>Description</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in docs %}
-        <tr>
-          <td style="color:#5a6e82;font-size:.8rem">{{ doc.sort_order }}</td>
-          <td><strong>{{ doc.name }}</strong></td>
-          <td style="color:#5a6e82;font-size:.82rem;max-width:200px">{{ doc.description or '—' }}</td>
-          <td>
-            {% if doc.is_required %}
-              <span class="badge-req">Required</span>
-            {% else %}
-              <span class="badge-opt">Optional</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if doc.is_active %}
-              <span class="badge-active">Active</span>
-            {% else %}
-              <span class="badge-inactive">Inactive</span>
-            {% endif %}
-          </td>
-          <td>
-            <div class="action-btns">
-              <button class="btn-sm btn-edit" onclick="openEdit({{ doc.id }}, '{{ doc.name|e }}', '{{ (doc.description or '')|e }}', {{ '1' if doc.is_required else '0' }}, {{ doc.sort_order }})">
-                <i class="fas fa-pen"></i> Edit
-              </button>
-              <form method="POST" style="display:inline">
-                <input type="hidden" name="action" value="toggle">
-                <input type="hidden" name="doc_id" value="{{ doc.id }}">
-                <button type="submit" class="btn-sm btn-toggle">
-                  {% if doc.is_active %}<i class="fas fa-eye-slash"></i> Hide{% else %}<i class="fas fa-eye"></i> Show{% endif %}
+
+    {# ── DESKTOP TABLE ── #}
+    <div class="doc-table-scroll">
+      <table class="doc-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Document Name</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in docs %}
+          <tr>
+            <td style="color:#5a6e82;font-size:.8rem">{{ doc.sort_order }}</td>
+            <td><strong>{{ doc.name }}</strong></td>
+            <td style="color:#5a6e82;font-size:.82rem;max-width:200px">{{ doc.description or '—' }}</td>
+            <td>
+              {% if doc.is_required %}<span class="badge-req">Required</span>
+              {% else %}<span class="badge-opt">Optional</span>{% endif %}
+            </td>
+            <td>
+              {% if doc.is_active %}<span class="badge-active">Active</span>
+              {% else %}<span class="badge-inactive">Inactive</span>{% endif %}
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm btn-edit" onclick="openEdit({{ doc.id }}, '{{ doc.name|e }}', '{{ (doc.description or '')|e }}', {{ '1' if doc.is_required else '0' }}, {{ doc.sort_order }})">
+                  <i class="fas fa-pen"></i> Edit
                 </button>
-              </form>
-              <form method="POST" style="display:inline" onsubmit="return confirm('Delete \'{{ doc.name }}\'? All student records for this doc will also be removed.')">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="doc_id" value="{{ doc.id }}">
-                <button type="submit" class="btn-sm btn-delete"><i class="fas fa-trash"></i></button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+                <form method="POST" style="display:inline">
+                  <input type="hidden" name="action" value="toggle">
+                  <input type="hidden" name="doc_id" value="{{ doc.id }}">
+                  <button type="submit" class="btn-sm btn-toggle">
+                    {% if doc.is_active %}<i class="fas fa-eye-slash"></i> Hide{% else %}<i class="fas fa-eye"></i> Show{% endif %}
+                  </button>
+                </form>
+                <form method="POST" style="display:inline" onsubmit="return confirm('Delete \'{{ doc.name }}\'? All student records for this doc will also be removed.')">
+                  <input type="hidden" name="action" value="delete">
+                  <input type="hidden" name="doc_id" value="{{ doc.id }}">
+                  <button type="submit" class="btn-sm btn-delete"><i class="fas fa-trash"></i></button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# ── MOBILE CARDS ── #}
+    <div class="doc-card-list">
+      {% for doc in docs %}
+      <div class="doc-card">
+        <div class="doc-card-top">
+          <div>
+            <div class="doc-card-name">{{ doc.name }}</div>
+            <div class="doc-card-order">Sort order: {{ doc.sort_order }}</div>
+          </div>
+          <div style="display:flex;gap:.35rem;flex-shrink:0">
+            {% if doc.is_required %}<span class="badge-req">Required</span>
+            {% else %}<span class="badge-opt">Optional</span>{% endif %}
+            {% if doc.is_active %}<span class="badge-active">Active</span>
+            {% else %}<span class="badge-inactive">Inactive</span>{% endif %}
+          </div>
+        </div>
+        {% if doc.description %}
+        <div class="doc-card-desc">{{ doc.description }}</div>
+        {% endif %}
+        <div class="doc-card-actions">
+          <button class="btn-sm btn-edit" onclick="openEdit({{ doc.id }}, '{{ doc.name|e }}', '{{ (doc.description or '')|e }}', {{ '1' if doc.is_required else '0' }}, {{ doc.sort_order }})">
+            <i class="fas fa-pen"></i> Edit
+          </button>
+          <form method="POST" style="flex:1">
+            <input type="hidden" name="action" value="toggle">
+            <input type="hidden" name="doc_id" value="{{ doc.id }}">
+            <button type="submit" class="btn-sm btn-toggle" style="width:100%">
+              {% if doc.is_active %}<i class="fas fa-eye-slash"></i> Hide{% else %}<i class="fas fa-eye"></i> Show{% endif %}
+            </button>
+          </form>
+          <form method="POST" onsubmit="return confirm('Delete \'{{ doc.name }}\'? All student records for this doc will also be removed.')">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="doc_id" value="{{ doc.id }}">
+            <button type="submit" class="btn-sm btn-delete"><i class="fas fa-trash"></i> Delete</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
     {% else %}
     <div class="empty-state">
       <i class="fas fa-folder-open"></i>
@@ -238,20 +306,28 @@ body.dark .doc-table-head { border-color: #2d3e54; }
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
 function openEdit(id, name, desc, isReq, sort) {
-  document.getElementById('editId').value      = id;
-  document.getElementById('editName').value    = name;
-  document.getElementById('editDesc').value    = desc;
-  document.getElementById('editSort').value    = sort;
+  document.getElementById('editId').value       = id;
+  document.getElementById('editName').value     = name;
+  document.getElementById('editDesc').value     = desc;
+  document.getElementById('editSort').value     = sort;
   document.getElementById('editRequired').value = String(isReq);
   document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 function closeEdit() {
   document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 document.getElementById('editModal').addEventListener('click', function(e) {
   if (e.target === this) closeEdit();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeEdit();
 });
 </script>
 {% endblock %}
