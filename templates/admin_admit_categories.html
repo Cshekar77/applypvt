@@ -2,7 +2,7 @@
 {% block title %}Admit Categories — Admin{% endblock %}
 {% block content %}
 <style>
-  .ac-page { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  .ac-page { max-width: 1060px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 
   .ac-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -20,9 +20,9 @@
 
   /* ── Layout ── */
   .ac-layout {
-    display: grid; grid-template-columns: 320px 1fr; gap: 1.75rem;
+    display: grid; grid-template-columns: 340px 1fr; gap: 1.75rem;
   }
-  @media(max-width: 820px) { .ac-layout { grid-template-columns: 1fr; } }
+  @media(max-width: 860px) { .ac-layout { grid-template-columns: 1fr; } }
 
   /* ── Card ── */
   .ac-card {
@@ -41,12 +41,17 @@
     display: block; font-size: .8rem; font-weight: 600; color: #0a1f44;
     margin-bottom: .4rem;
   }
-  .form-group input {
+  .form-group input,
+  .form-group select {
     width: 100%; padding: .65rem 1rem; border: 2px solid #e2e8f0;
     border-radius: 10px; font-size: .9rem; font-family: inherit;
     outline: none; transition: border-color .2s; box-sizing: border-box;
   }
-  .form-group input:focus { border-color: #7c3aed; }
+  .form-group input:focus,
+  .form-group select:focus { border-color: #7c3aed; }
+  .form-group .hint {
+    font-size: .72rem; color: #8a9ab0; margin-top: .3rem;
+  }
 
   .btn-add {
     width: 100%; padding: .75rem; background: #7c3aed; color: white;
@@ -55,6 +60,20 @@
     justify-content: center; gap: .5rem;
   }
   .btn-add:hover { background: #6d28d9; transform: translateY(-1px); }
+
+  /* ── Quota filters ── */
+  .quota-filter-bar {
+    display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .quota-filter-btn {
+    padding: .4rem .9rem; border-radius: 20px; border: 1.5px solid #e2e8f0;
+    font-size: .78rem; font-weight: 600; cursor: pointer; background: white;
+    color: #5a6e82; transition: all .15s; display: inline-flex; align-items: center; gap: .35rem;
+  }
+  .quota-filter-btn.active-all   { background: #0a1f44; color: white; border-color: #0a1f44; }
+  .quota-filter-btn.active-govt  { background: #1e3a60; color: white; border-color: #1e3a60; }
+  .quota-filter-btn.active-mgmt  { background: #7c3aed; color: white; border-color: #7c3aed; }
+  .quota-filter-btn:hover { transform: translateY(-1px); }
 
   /* ── Table ── */
   .ac-table-wrap { overflow-x: auto; }
@@ -75,16 +94,27 @@
   .ac-table tr:last-child td { border-bottom: none; }
   .ac-table tr:hover td { background: #fafbff; }
 
+  /* ── Quota badges ── */
+  .quota-govt {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+    background: #dbeafe; color: #1d4ed8;
+  }
+  .quota-mgmt {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 20px;
+    background: #ede9fe; color: #7c3aed;
+  }
   .cat-badge {
     display: inline-block; font-size: .75rem; font-weight: 700;
     padding: 3px 10px; border-radius: 20px;
     background: #ede9fe; color: #7c3aed; letter-spacing: .03em;
   }
+  .cat-badge.govt { background: #dbeafe; color: #1d4ed8; }
 
   .status-pill {
     display: inline-flex; align-items: center; gap: .3rem;
-    font-size: .72rem; font-weight: 600; padding: 3px 9px;
-    border-radius: 20px;
+    font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px;
   }
   .status-pill.active   { background: #dcfce7; color: #15803d; }
   .status-pill.inactive { background: #f3f4f6; color: #6b7280; }
@@ -97,6 +127,7 @@
   .seats-bar-inner {
     background: #7c3aed; height: 100%; border-radius: 20px; transition: width .4s;
   }
+  .seats-bar-inner.govt { background: #1d4ed8; }
   .seats-bar-inner.full { background: #dc3545; }
 
   /* Action buttons */
@@ -118,13 +149,16 @@
   .edit-row { display: none; }
   .edit-row td { background: #f8f4ff; padding: .75rem 1rem; }
   .edit-inline { display: flex; gap: .65rem; align-items: center; flex-wrap: wrap; }
-  .edit-inline input {
+  .edit-inline input,
+  .edit-inline select {
     padding: .4rem .8rem; border: 2px solid #e2e8f0; border-radius: 8px;
     font-size: .85rem; font-family: inherit; outline: none; transition: border-color .2s;
   }
-  .edit-inline input:focus { border-color: #7c3aed; }
-  .edit-inline input[name="name"] { width: 100px; text-transform: uppercase; }
+  .edit-inline input:focus,
+  .edit-inline select:focus { border-color: #7c3aed; }
+  .edit-inline input[name="name"] { width: 110px; text-transform: uppercase; }
   .edit-inline input[name="total_seats"] { width: 80px; }
+  .edit-inline select[name="quota_type"] { width: 160px; }
   .btn-save-edit {
     padding: .4rem .9rem; background: #7c3aed; color: white;
     border: none; border-radius: 8px; font-size: .8rem; font-weight: 600;
@@ -142,12 +176,25 @@
     border: 1.5px dashed #e2e8f0; border-radius: 14px;
   }
 
+  /* Summary row */
+  .summary-bar {
+    display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  .summary-chip {
+    padding: .35rem .85rem; border-radius: 20px; font-size: .78rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: .35rem;
+  }
+  .summary-chip.total { background: #f3f4f6; color: #374151; }
+  .summary-chip.govt  { background: #dbeafe; color: #1d4ed8; }
+  .summary-chip.mgmt  { background: #ede9fe; color: #7c3aed; }
+
   /* Dark mode */
   body.dark .ac-card          { background: #1a2538; border-color: #2d3e54; }
   body.dark .ac-card h3       { color: #8a9ab0; }
   body.dark .ac-header h2     { color: #eef2ff; }
   body.dark .form-group label { color: #eef2ff; }
-  body.dark .form-group input {
+  body.dark .form-group input,
+  body.dark .form-group select {
     background: #0f1c2e; border-color: #2d3e54; color: #eef2ff;
   }
   body.dark .ac-table thead tr { background: #131e2e; border-color: #2d3e54; }
@@ -155,9 +202,11 @@
   body.dark .ac-table td       { border-color: #1e2e42; color: #eef2ff; }
   body.dark .ac-table tr:hover td { background: #1e2e42; }
   body.dark .edit-row td       { background: #0f1c2e; }
-  body.dark .edit-inline input {
+  body.dark .edit-inline input,
+  body.dark .edit-inline select {
     background: #0f1c2e; border-color: #2d3e54; color: #eef2ff;
   }
+  body.dark .quota-filter-btn { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
 </style>
 
 <div class="ac-page">
@@ -169,6 +218,9 @@
     <h2><i class="fas fa-tags" style="color:#7c3aed"></i> Admit Categories</h2>
   </div>
 
+  {# Compute quota type for each category based on -PY suffix #}
+  {% set govt_cats = categories | selectattr('name') | list | selectattr('name', 'defined') | list %}
+
   <div class="ac-layout">
 
     {# ── Add Form ── #}
@@ -177,12 +229,19 @@
       <form method="POST">
         <input type="hidden" name="action" value="add"/>
         <div class="form-group">
-          <label>Category Name (e.g. GM, SC, OBC)</label>
-          <input type="text" name="name" placeholder="GM" required maxlength="50"
-            style="text-transform:uppercase">
+          <label>Category Name <span style="color:#dc3545">*</span></label>
+          <input type="text" name="name" placeholder="e.g. GM, SC-PY, OBC" required maxlength="50"
+            style="text-transform:uppercase" id="add-name-input" oninput="previewQuota(this.value)">
+          <div class="hint">Categories ending with <strong>-PY</strong> = Management Quota. Others = Government Quota.</div>
         </div>
         <div class="form-group">
-          <label>Total Seats</label>
+          <label>Quota Type</label>
+          <div id="quota-preview" style="padding:.5rem .85rem;border-radius:10px;font-size:.82rem;font-weight:600;background:#f3f4f6;color:#6b7280;display:flex;align-items:center;gap:.4rem;">
+            <i class="fas fa-info-circle"></i> Auto-detected from name
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Total Seats <span style="color:#dc3545">*</span></label>
           <input type="number" name="total_seats" placeholder="30" min="0" required>
         </div>
         <button type="submit" class="btn-add">
@@ -196,12 +255,43 @@
       <h3><i class="fas fa-list"></i> All Admit Categories ({{ categories|length }})</h3>
 
       {% if categories %}
+      {# Summary counts #}
+      {% set govt_count = categories | selectattr('name') | list | selectattr('name', 'defined') | list | length %}
+      {% set total_seats_all = categories | sum(attribute='total_seats') %}
+      {% set used_seats_all = categories | map(attribute='seats_used') | sum %}
+      <div class="summary-bar">
+        <span class="summary-chip total"><i class="fas fa-layer-group"></i> {{ categories|length }} categories</span>
+        <span class="summary-chip govt"><i class="fas fa-university"></i>
+          {% set gc = [] %}{% for c in categories %}{% if not c.name.upper().endswith('-PY') %}{% set _ = gc.append(c) %}{% endif %}{% endfor %}
+          {{ gc|length }} Govt
+        </span>
+        <span class="summary-chip mgmt"><i class="fas fa-building"></i>
+          {% set mc = [] %}{% for c in categories %}{% if c.name.upper().endswith('-PY') %}{% set _ = mc.append(c) %}{% endif %}{% endfor %}
+          {{ mc|length }} Mgmt
+        </span>
+        <span class="summary-chip total"><i class="fas fa-chair"></i> {{ total_seats_all }} total seats</span>
+      </div>
+
+      {# Quota filter buttons #}
+      <div class="quota-filter-bar">
+        <button class="quota-filter-btn active-all" id="filter-all" onclick="filterQuota('all')">
+          <i class="fas fa-th"></i> All
+        </button>
+        <button class="quota-filter-btn" id="filter-govt" onclick="filterQuota('govt')">
+          <i class="fas fa-university"></i> Government Quota
+        </button>
+        <button class="quota-filter-btn" id="filter-mgmt" onclick="filterQuota('mgmt')">
+          <i class="fas fa-building"></i> Management Quota
+        </button>
+      </div>
+
       <div class="ac-table-wrap">
         <table class="ac-table">
           <thead>
             <tr>
               <th>#</th>
               <th>Category</th>
+              <th>Quota</th>
               <th>Total Seats</th>
               <th>Used</th>
               <th>Remaining</th>
@@ -209,19 +299,29 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="ac-tbody">
             {% for cat in categories %}
-            <tr id="row-{{ cat.id }}">
+            {% set is_mgmt = cat.name.upper().endswith('-PY') %}
+            <tr id="row-{{ cat.id }}" data-quota="{{ 'mgmt' if is_mgmt else 'govt' }}">
               <td style="color:#8a9ab0;font-size:.8rem">{{ loop.index }}</td>
-              <td><span class="cat-badge">{{ cat.name }}</span></td>
+              <td>
+                <span class="cat-badge {{ '' if is_mgmt else 'govt' }}">{{ cat.name }}</span>
+              </td>
+              <td>
+                {% if is_mgmt %}
+                  <span class="quota-mgmt"><i class="fas fa-building"></i> Management</span>
+                {% else %}
+                  <span class="quota-govt"><i class="fas fa-university"></i> Government</span>
+                {% endif %}
+              </td>
               <td><strong>{{ cat.total_seats }}</strong></td>
               <td>{{ cat.seats_used }}</td>
               <td>
-                <strong style="color:{% if cat.seats_remaining == 0 %}#dc3545{% else %}#25c26e{% endif %}">
+                <strong style="color:{% if cat.seats_remaining == 0 %}#dc3545{% elif cat.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
                   {{ cat.seats_remaining }}
                 </strong>
                 <div class="seats-bar-outer">
-                  <div class="seats-bar-inner {% if cat.seats_remaining == 0 %}full{% endif %}"
+                  <div class="seats-bar-inner {{ 'full' if cat.seats_remaining == 0 else ('' if is_mgmt else 'govt') }}"
                     style="width:{% if cat.total_seats > 0 %}{{ ((cat.seats_used / cat.total_seats)*100)|int }}{% else %}0{% endif %}%">
                   </div>
                 </div>
@@ -234,8 +334,7 @@
               </td>
               <td>
                 <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-                  <button class="act-btn act-edit"
-                    onclick="toggleEdit({{ cat.id }})">
+                  <button class="act-btn act-edit" onclick="toggleEdit({{ cat.id }})">
                     <i class="fas fa-pencil-alt"></i> Edit
                   </button>
                   <form method="POST" style="display:inline">
@@ -259,20 +358,33 @@
               </td>
             </tr>
             {# Inline edit row #}
-            <tr class="edit-row" id="edit-{{ cat.id }}">
-              <td colspan="7">
+            <tr class="edit-row" id="edit-{{ cat.id }}" data-quota="{{ 'mgmt' if is_mgmt else 'govt' }}">
+              <td colspan="8">
                 <form method="POST" class="edit-inline">
                   <input type="hidden" name="action" value="edit"/>
                   <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                  <input type="text" name="name" value="{{ cat.name }}"
-                    placeholder="Name" required maxlength="50">
-                  <input type="number" name="total_seats" value="{{ cat.total_seats }}"
-                    placeholder="Seats" min="0" required>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <label style="font-size:.68rem;color:#8a9ab0;font-weight:600;text-transform:uppercase">Name</label>
+                    <input type="text" name="name" value="{{ cat.name }}"
+                      placeholder="Name" required maxlength="50" style="text-transform:uppercase">
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <label style="font-size:.68rem;color:#8a9ab0;font-weight:600;text-transform:uppercase">Total Seats</label>
+                    <input type="number" name="total_seats" value="{{ cat.total_seats }}"
+                      placeholder="Seats" min="0" required>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:140px">
+                    <label style="font-size:.68rem;color:#8a9ab0;font-weight:600;text-transform:uppercase">Quota (read-only, from name)</label>
+                    <div style="padding:.4rem .8rem;border-radius:8px;font-size:.82rem;font-weight:600;{% if is_mgmt %}background:#ede9fe;color:#7c3aed{% else %}background:#dbeafe;color:#1d4ed8{% endif %}">
+                      <i class="fas fa-{{ 'building' if is_mgmt else 'university' }}"></i>
+                      {{ 'Management' if is_mgmt else 'Government' }} Quota
+                      <small style="opacity:.7;font-weight:400">— add/remove -PY to change</small>
+                    </div>
+                  </div>
                   <button type="submit" class="btn-save-edit">
                     <i class="fas fa-save"></i> Save
                   </button>
-                  <button type="button" class="btn-cancel-edit"
-                    onclick="toggleEdit({{ cat.id }})">
+                  <button type="button" class="btn-cancel-edit" onclick="toggleEdit({{ cat.id }})">
                     <i class="fas fa-times"></i> Cancel
                   </button>
                 </form>
@@ -285,7 +397,7 @@
       {% else %}
       <div class="empty-state">
         <i class="fas fa-tags" style="font-size:2rem;margin-bottom:.85rem;display:block;color:#c4b5fd"></i>
-        No admit categories yet.<br>Add your first one using the form.
+        No admit categories yet.<br>Add your first one using the form on the left.
       </div>
       {% endif %}
     </div>
@@ -298,6 +410,42 @@
 function toggleEdit(id) {
   const editRow = document.getElementById('edit-' + id);
   editRow.style.display = (editRow.style.display === 'table-row') ? 'none' : 'table-row';
+}
+
+function previewQuota(name) {
+  const preview = document.getElementById('quota-preview');
+  if (!name) {
+    preview.style.background = '#f3f4f6';
+    preview.style.color = '#6b7280';
+    preview.innerHTML = '<i class="fas fa-info-circle"></i> Auto-detected from name';
+    return;
+  }
+  const isMgmt = name.trim().toUpperCase().endsWith('-PY');
+  if (isMgmt) {
+    preview.style.background = '#ede9fe';
+    preview.style.color = '#7c3aed';
+    preview.innerHTML = '<i class="fas fa-building"></i> Management Quota (ends with -PY)';
+  } else {
+    preview.style.background = '#dbeafe';
+    preview.style.color = '#1d4ed8';
+    preview.innerHTML = '<i class="fas fa-university"></i> Government Quota';
+  }
+}
+
+function filterQuota(type) {
+  // Update button states
+  document.getElementById('filter-all').className  = 'quota-filter-btn' + (type === 'all'  ? ' active-all'  : '');
+  document.getElementById('filter-govt').className = 'quota-filter-btn' + (type === 'govt' ? ' active-govt' : '');
+  document.getElementById('filter-mgmt').className = 'quota-filter-btn' + (type === 'mgmt' ? ' active-mgmt' : '');
+
+  // Show/hide rows
+  document.querySelectorAll('#ac-tbody tr[data-quota]').forEach(function(row) {
+    if (type === 'all' || row.dataset.quota === type) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
 }
 </script>
 {% endblock %}

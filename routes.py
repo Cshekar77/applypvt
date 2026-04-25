@@ -1522,8 +1522,6 @@ def export_admitted_students():
 # ─────────────────────────────────────────
 #  Admin — Counselling Management
 # ─────────────────────────────────────────
-#  Admin — Counselling Management
-# ─────────────────────────────────────────
 @main.route('/admin/counselling', methods=['GET', 'POST'])
 @admin_required
 def admin_counselling():
@@ -1610,7 +1608,6 @@ def admin_counselling():
 
             existing_allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
 
-            # ✅ FIX: Validate admit_category_id is provided
             if not admit_category_id:
                 flash('Please select an Admit Category.', 'danger')
                 return redirect(url_for('main.admin_counselling'))
@@ -1626,7 +1623,6 @@ def admin_counselling():
                 flash('Admit Category not found.', 'danger')
                 return redirect(url_for('main.admin_counselling'))
 
-            # ✅ FIX: Check seat availability from AdmitCategory (not CategorySeats)
             if admit_cat.seats_remaining <= 0:
                 flash(f'❌ No seats remaining in "{admit_cat.name}". Category is full.', 'danger')
                 return redirect(url_for('main.admin_counselling'))
@@ -1673,7 +1669,6 @@ def admin_counselling():
 
             else:
                 # ── NEW ALLOTMENT ──
-                # ✅ FIX: Directly allocate from AdmitCategory
                 seat_number = admit_cat.seats_used + 1
 
                 db.session.add(SeatAllotment(
@@ -1731,6 +1726,10 @@ def admin_counselling():
         return redirect(url_for('main.admin_counselling'))
 
     # ── GET ──
+    # ✅ N+1 FIX: pre-compute seat counts in ONE GROUP BY query instead of
+    # calling ac.seats_used (a @property doing COUNT per instance) in the template.
+    from sqlalchemy import func as sqlfunc
+
     cs             = CounsellingSettings.get()
     categories     = ApplicationCategory.query.filter_by(is_active=True).all()
     cat_seats      = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
@@ -1751,8 +1750,29 @@ def admin_counselling():
 
     students = query.order_by(StudentApplication.rank.asc()).all()
 
-    allotments       = {a.application_id: a for a in SeatAllotment.query.all()}
-    admit_categories = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    allotments = {a.application_id: a for a in SeatAllotment.query.all()}
+
+    # Single GROUP BY query — replaces N per-instance COUNT calls in the template
+    seat_counts = dict(
+        db.session.query(
+            SeatAllotment.admit_category_id,
+            sqlfunc.count(SeatAllotment.id)
+        ).group_by(SeatAllotment.admit_category_id).all()
+    )
+
+    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    admit_categories = []
+    for ac in admit_categories_raw:
+        used      = seat_counts.get(ac.id, 0)
+        remaining = max(0, ac.total_seats - used)
+        admit_categories.append({
+            'id':              ac.id,
+            'name':            ac.name,
+            'total_seats':     ac.total_seats,
+            'seats_used':      used,
+            'seats_remaining': remaining,
+            'is_active':       ac.is_active,
+        })
 
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,

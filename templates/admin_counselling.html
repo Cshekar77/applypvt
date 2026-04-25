@@ -37,7 +37,7 @@
   .rank-display { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem; }
   .rank-display span { font-size: .95rem; color: #8a9ab0; font-family: inherit; }
   .rank-input-row { display: flex; flex-direction: column; gap: .6rem; }
-  .rank-input-row input, .rank-input-row textarea { padding: .6rem .9rem; border: 2px solid #e2e8f0; border-radius: 9px; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .2s; width: 100%; }
+  .rank-input-row input, .rank-input-row textarea { padding: .6rem .9rem; border: 2px solid #e2e8f0; border-radius: 9px; font-size: .9rem; font-family: inherit; outline: none; transition: border-color .2s; width: 100%; box-sizing: border-box; }
   .rank-input-row input:focus, .rank-input-row textarea:focus { border-color: #0a1f44; }
   .rank-input-row textarea { resize: none; }
   .btn-next-rank { padding: .55rem 1.1rem; background: #c9a03d; color: white; border: none; border-radius: 9px; font-size: .85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; transition: all .2s; box-shadow: 0 3px 10px rgba(201,160,61,.3); width: 100%; justify-content: center; margin-bottom: .5rem; }
@@ -66,8 +66,8 @@
   .stu-name { font-weight: 600; color: #0a1f44; font-size: .875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stu-sub  { color: #5a6e82; font-size: .73rem; margin-top: 1px; }
   .badge { display: inline-block; font-size: .66rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
-  .badge-govt    { background: #cce5ff; color: #004085; }
-  .badge-mgmt    { background: #fff3cd; color: #856404; }
+  .badge-government { background: #cce5ff; color: #004085; }
+  .badge-management { background: #fff3cd; color: #856404; }
   .badge-pending { background: #f3f4f6; color: #6b7280; }
   .row-arrow { color: #c9a03d; font-size: .75rem; flex-shrink: 0; }
   .no-results { text-align: center; padding: 2rem; color: #8a9ab0; display: none; }
@@ -76,7 +76,7 @@
   .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(10,31,68,.45); align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
   .modal-box { background: white; border-radius: 22px; width: 100%; max-width: 720px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(10,31,68,.2); animation: modal-in .18s ease; }
-  .modal-box.student-modal { max-width: 660px; }
+  .modal-box.student-modal { max-width: 680px; }
   @keyframes modal-in { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; background: white; z-index: 2; border-radius: 22px 22px 0 0; }
   .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; }
@@ -85,15 +85,22 @@
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
   .modal-body { padding: 1.5rem; }
 
-  /* ── SEAT TRACKING TABLE (now single unified table using AdmitCategory) ── */
-  .seat-track-single { border-radius: 14px; overflow: hidden; border: 1px solid #eef2f8; }
-  .seat-track-single-header { padding: .7rem 1rem; font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: .5rem; background: #ede9fe; color: #5b21b6; border-bottom: 1px solid #ddd6fe; }
+  /* ── SEAT TRACKING MODAL — split by Govt / Mgmt ── */
+  .seat-section-header {
+    padding: .65rem 1rem; font-size: .75rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; display: flex; align-items: center; gap: .5rem;
+    border-bottom: 1px solid; border-radius: 10px 10px 0 0;
+  }
+  .seat-section-header.govt { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+  .seat-section-header.mgmt { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
+  .seat-section-wrap { border-radius: 10px; overflow: hidden; border: 1px solid #eef2f8; margin-bottom: 1.1rem; }
   .seat-track-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
   .seat-track-table th { padding: .45rem .85rem; text-align: left; font-size: .67rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #8a9ab0; background: #fafbfd; border-bottom: 1px solid #eef2f8; }
   .seat-track-table td { padding: .55rem .85rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
   .seat-track-table tr:last-child td { border-bottom: none; }
   .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: 3px; overflow: hidden; width: 80px; }
   .seats-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #7c3aed, #6d28d9); }
+  .seats-bar-fill.govt { background: linear-gradient(90deg, #2563eb, #1d4ed8); }
   .seats-bar-fill.full { background: #dc3545; }
 
   .section-divider { font-size: .7rem; font-weight: 600; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; margin: 1.1rem 0 .65rem; padding-bottom: .35rem; border-bottom: 1px solid #f5f7fa; }
@@ -124,6 +131,13 @@
   .btn-allot { padding: .6rem 1.3rem; background: #25c26e; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
   .btn-allot:hover { background: #1da85c; }
 
+  /* Quota filter in dropdown */
+  .quota-filter-tabs { display: flex; gap: .4rem; margin-bottom: .5rem; }
+  .qtab { padding: .3rem .75rem; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: .72rem; font-weight: 600; cursor: pointer; background: white; color: #5a6e82; transition: all .15s; }
+  .qtab.active-govt { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  .qtab.active-mgmt { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
+  .qtab:not(.active-govt):not(.active-mgmt):hover { background: #f3f4f6; }
+
   .already-allotted { background: #edf9f2; border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem; overflow: hidden; }
   .allotted-info { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; padding: .85rem 1.1rem; }
   .allotted-info p { margin: 0; font-size: .83rem; color: #1a5c3a; flex: 1; }
@@ -145,7 +159,7 @@
   .btn-close-modal:hover { background: #e5e7eb; }
   .admit-badge-display { display: inline-block; font-size: .75rem; font-weight: 800; padding: 2px 9px; border-radius: 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; margin-left: .3rem; }
 
-  body.dark .cl-card, body.dark .list-card, body.dark .modal-box, body.dark .modal-header, body.dark .seat-track-single { background: #1a2538; border-color: #2d3e54; }
+  body.dark .cl-card, body.dark .list-card, body.dark .modal-box, body.dark .modal-header, body.dark .seat-section-wrap { background: #1a2538; border-color: #2d3e54; }
   body.dark .modal-header { background: #1a2538; }
   body.dark .cl-card-title, body.dark .status-label, body.dark .modal-title, body.dark .stu-name, body.dark .detail-item strong, body.dark .list-card-header h4 { color: #eef2ff; }
   body.dark .status-sub, body.dark .modal-sub, body.dark .stu-sub, body.dark .detail-item span, body.dark .section-divider { color: #b9c8e8; }
@@ -166,8 +180,10 @@
   body.dark .modal-close { background: #2d3e54; color: #b9c8e8; }
   body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .rank-display { color: #eef2ff; }
-  body.dark .seat-track-single-header { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
   body.dark .btn-close-modal, body.dark .btn-cancel-edit { background: #2d3e54; color: #b9c8e8; }
+  body.dark .qtab { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
+  body.dark .seat-section-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
+  body.dark .seat-section-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
   @media(max-width:600px) { .badge { display: none; } .modal-box { border-radius: 18px; } }
 </style>
 
@@ -244,7 +260,7 @@
         </form>
       </div>
 
-      {# CHANGED: badge now uses admit_categories total_seats / seats_used #}
+      {# Seat tracking badge — uses pre-computed dict data, no N+1 #}
       {% set total_seats_all = admit_categories | sum(attribute='total_seats') %}
       {% set filled_seats_all = admit_categories | sum(attribute='seats_used') %}
       <button class="btn-seat-track" onclick="openModal('seat-track-modal')">
@@ -298,32 +314,73 @@
   </div>
 </div>
 
-{# SEAT TRACKING MODAL — CHANGED: now uses admit_categories #}
+{# ── SEAT TRACKING MODAL — split Govt / Mgmt ── #}
 <div class="modal-overlay" id="seat-track-modal" onclick="closeOnOverlay(event, 'seat-track-modal')">
   <div class="modal-box">
     <div class="modal-header">
       <div>
         <div class="modal-title"><i class="fas fa-chair" style="color:#7c3aed"></i> Seat Tracking</div>
-        <div class="modal-sub">Live seat availability by admit category</div>
+        <div class="modal-sub">Live seat availability — Government &amp; Management Quota</div>
       </div>
       <button class="modal-close" onclick="closeModal('seat-track-modal')">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="seat-track-single">
-        <div class="seat-track-single-header">
-          <i class="fas fa-chair"></i> Admit Categories — Seat Availability
+
+      {# Government Quota #}
+      {% set govt_cats = [] %}
+      {% set mgmt_cats = [] %}
+      {% for ac in admit_categories %}
+        {% if ac.name.upper().endswith('-PY') %}{% set _ = mgmt_cats.append(ac) %}
+        {% else %}{% set _ = govt_cats.append(ac) %}{% endif %}
+      {% endfor %}
+
+      <div class="seat-section-wrap">
+        <div class="seat-section-header govt">
+          <i class="fas fa-university"></i> Government Quota
+          <span style="margin-left:auto;font-size:.72rem;font-weight:600;opacity:.8">
+            {{ govt_cats | sum(attribute='seats_used') }} / {{ govt_cats | sum(attribute='total_seats') }} filled
+          </span>
         </div>
         <table class="seat-track-table">
           <thead>
-            <tr>
-              <th>Category</th>
-              <th>Total</th>
-              <th>Filled</th>
-              <th>Remaining</th>
-            </tr>
+            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
           </thead>
           <tbody>
-            {% for ac in admit_categories %}
+            {% for ac in govt_cats %}
+            <tr>
+              <td><strong>{{ ac.name }}</strong></td>
+              <td>{{ ac.total_seats }}</td>
+              <td>{{ ac.seats_used }}</td>
+              <td>
+                <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
+                  {{ ac.seats_remaining }}
+                </strong>
+                <div class="seats-bar-wrap">
+                  <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
+                       style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No government quota categories.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="seat-section-wrap">
+        <div class="seat-section-header mgmt">
+          <i class="fas fa-building"></i> Management Quota
+          <span style="margin-left:auto;font-size:.72rem;font-weight:600;opacity:.8">
+            {{ mgmt_cats | sum(attribute='seats_used') }} / {{ mgmt_cats | sum(attribute='total_seats') }} filled
+          </span>
+        </div>
+        <table class="seat-track-table">
+          <thead>
+            <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
+          </thead>
+          <tbody>
+            {% for ac in mgmt_cats %}
             <tr>
               <td><strong>{{ ac.name }}</strong></td>
               <td>{{ ac.total_seats }}</td>
@@ -334,32 +391,30 @@
                 </strong>
                 <div class="seats-bar-wrap">
                   <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
-                       style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%">
-                  </div>
+                       style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
                 </div>
               </td>
             </tr>
             {% else %}
-            <tr>
-              <td colspan="4" style="text-align:center;color:#8a9ab0;padding:1.5rem">
-                No admit categories defined yet.
-                <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600;">Add categories</a>
-              </td>
-            </tr>
+            <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No management quota categories.</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-      <p style="font-size:.72rem;color:#8a9ab0;margin-top:.85rem;text-align:right">
-        To update seat totals, go to
-        <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600;">Admit Categories</a>
+
+      <p style="font-size:.72rem;color:#8a9ab0;margin-top:.5rem;text-align:right">
+        To update seat totals, go to <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600;">Admit Categories</a>
       </p>
     </div>
   </div>
 </div>
 
-{# STUDENT MODALS #}
+{# ── STUDENT MODALS ── #}
 {% for appl in students %}{% set allotment = allotments.get(appl.id) %}
+
+{# Pre-fetch student fee data for this student #}
+{% set sf = appl.student_fee[0] if appl.student_fee else None %}
+
 <div class="modal-overlay" id="cs-modal-{{ appl.id }}" onclick="closeOnOverlay(event, 'cs-modal-{{ appl.id }}')">
   <div class="modal-box student-modal">
     <div class="modal-header">
@@ -380,7 +435,6 @@
         <div class="detail-item"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
         <div class="detail-item"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
         <div class="detail-item"><span>Category</span><strong>{{ appl.category_name or '—' }}</strong></div>
-        <div class="detail-item"><span>Address</span><strong>{{ appl.address or '—' }}</strong></div>
         <div class="detail-item"><span>10th %</span><strong>{{ '%.2f'|format(appl.percent_10) if appl.percent_10 else '—' }}{% if appl.percent_10 %}%{% endif %}</strong></div>
         <div class="detail-item"><span>12th %</span><strong>{{ '%.2f'|format(appl.percent_12) if appl.percent_12 else '—' }}{% if appl.percent_12 %}%{% endif %}</strong></div>
         <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
@@ -418,7 +472,8 @@
             <div class="allot-form-row">
               <div class="allot-form-group">
                 <label><i class="fas fa-landmark"></i> Quota <span class="req">*</span></label>
-                <select name="quota" class="quota-select" required>
+                <select name="quota" class="quota-select" required
+                  onchange="filterAdmitCatsByQuota(this.value, 'edit-admit-cat-{{ appl.id }}')">
                   <option value="">— Choose Quota —</option>
                   <option value="government" {% if allotment.quota == 'government' %}selected{% endif %}>Government Quota</option>
                   <option value="management" {% if allotment.quota == 'management' %}selected{% endif %}>Management Quota</option>
@@ -426,10 +481,16 @@
               </div>
               <div class="allot-form-group">
                 <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category <span class="req">*</span></label>
-                <select name="admit_category_id" class="admit-cat-select" required onchange="updateSeatHint(this, 'edit-hint-{{ appl.id }}')">
+                <select name="admit_category_id" class="admit-cat-select" required
+                  id="edit-admit-cat-{{ appl.id }}"
+                  onchange="updateSeatHint(this, 'edit-hint-{{ appl.id }}')">
                   <option value="">— Select Category —</option>
                   {% for ac in admit_categories %}
-                  <option value="{{ ac.id }}" data-remaining="{{ ac.seats_remaining }}" data-total="{{ ac.total_seats }}"
+                  {% set is_mgmt_ac = ac.name.upper().endswith('-PY') %}
+                  <option value="{{ ac.id }}"
+                    data-remaining="{{ ac.seats_remaining }}"
+                    data-total="{{ ac.total_seats }}"
+                    data-quota="{{ 'management' if is_mgmt_ac else 'government' }}"
                     {% if allotment.admit_category_id == ac.id %}selected{% endif %}>
                     {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left)
                   </option>
@@ -441,10 +502,12 @@
             <div class="allot-form-row">
               <div class="allot-form-group">
                 <label><i class="fas fa-rupee-sign" style="color:#c9a03d"></i> Fee Structure <span class="req">*</span></label>
-                <select name="fee_category_id" class="fee-cat-select" required onchange="updateFeePreview('edit-{{ appl.id }}', this.value, null)">
+                <select name="fee_category_id" class="fee-cat-select" required
+                  onchange="updateFeePreview('edit-{{ appl.id }}', this.value, null)">
                   <option value="">— Select Fee Structure —</option>
                   {% for fc in fee_categories %}
-                  <option value="{{ fc.id }}" data-amount="{{ fc.amount }}" {% if allotment.fee_category_id == fc.id %}selected{% endif %}>
+                  <option value="{{ fc.id }}" data-amount="{{ fc.amount }}"
+                    {% if sf and sf.fee_category_id == fc.id %}selected{% endif %}>
                     {{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}
                   </option>
                   {% endfor %}
@@ -455,7 +518,7 @@
                 <div class="additional-fee-wrap">
                   <span class="currency-prefix">₹</span>
                   <input type="number" name="additional_fee" min="0" step="0.01"
-                    value="{{ allotment.additional_fee or 0 }}"
+                    value="{{ sf.additional_fee if sf else 0 }}"
                     class="additional-fee-input"
                     oninput="updateFeePreview('edit-{{ appl.id }}', null, this.value)"
                     id="add-fee-edit-{{ appl.id }}"/>
@@ -476,13 +539,15 @@
       </div>
 
       {% else %}
+      {# New allotment form — quota-filtered admit category dropdown #}
       <form method="POST" class="allot-form" id="allot-form-{{ appl.id }}">
         <input type="hidden" name="action" value="allot_seat"/>
         <input type="hidden" name="app_id" value="{{ appl.id }}"/>
         <div class="allot-form-row">
           <div class="allot-form-group">
             <label><i class="fas fa-landmark"></i> Quota <span class="req">*</span></label>
-            <select name="quota" class="quota-select" required>
+            <select name="quota" class="quota-select" required
+              onchange="filterAdmitCatsByQuota(this.value, 'admit-cat-{{ appl.id }}')">
               <option value="">— Choose Quota —</option>
               <option value="government">Government Quota</option>
               <option value="management">Management Quota</option>
@@ -490,10 +555,17 @@
           </div>
           <div class="allot-form-group">
             <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category <span class="req">*</span></label>
-            <select name="admit_category_id" class="admit-cat-select" required onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
-              <option value="">— Select Category —</option>
+            <select name="admit_category_id" class="admit-cat-select" required
+              id="admit-cat-{{ appl.id }}"
+              onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
+              <option value="">— Select Quota first —</option>
               {% for ac in admit_categories %}
-              <option value="{{ ac.id }}" data-remaining="{{ ac.seats_remaining }}" data-total="{{ ac.total_seats }}" {% if ac.seats_remaining == 0 %}disabled{% endif %}>
+              {% set is_mgmt_ac = ac.name.upper().endswith('-PY') %}
+              <option value="{{ ac.id }}"
+                data-remaining="{{ ac.seats_remaining }}"
+                data-total="{{ ac.total_seats }}"
+                data-quota="{{ 'management' if is_mgmt_ac else 'government' }}"
+                {% if ac.seats_remaining == 0 %}disabled{% endif %}>
                 {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left){% if ac.seats_remaining == 0 %} — FULL{% endif %}
               </option>
               {% endfor %}
@@ -504,10 +576,13 @@
         <div class="allot-form-row">
           <div class="allot-form-group">
             <label><i class="fas fa-rupee-sign" style="color:#c9a03d"></i> Fee Structure <span class="req">*</span></label>
-            <select name="fee_category_id" class="fee-cat-select" required onchange="updateFeePreview('{{ appl.id }}', this.value, null)">
+            <select name="fee_category_id" class="fee-cat-select" required
+              onchange="updateFeePreview('{{ appl.id }}', this.value, null)">
               <option value="">— Select Fee Structure —</option>
               {% for fc in fee_categories %}
-              <option value="{{ fc.id }}" data-amount="{{ fc.amount }}">{{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}</option>
+              <option value="{{ fc.id }}" data-amount="{{ fc.amount }}">
+                {{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}
+              </option>
               {% endfor %}
             </select>
           </div>
@@ -516,7 +591,9 @@
             <div class="additional-fee-wrap">
               <span class="currency-prefix">₹</span>
               <input type="number" name="additional_fee" min="0" step="0.01" value="0" placeholder="0.00"
-                class="additional-fee-input" oninput="updateFeePreview('{{ appl.id }}', null, this.value)" id="add-fee-{{ appl.id }}"/>
+                class="additional-fee-input"
+                oninput="updateFeePreview('{{ appl.id }}', null, this.value)"
+                id="add-fee-{{ appl.id }}"/>
             </div>
           </div>
         </div>
@@ -541,7 +618,7 @@
 
 {% block scripts %}
 <script>
-function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
 function closeOnOverlay(e, id) { if (e.target === e.currentTarget) closeModal(id); }
 document.addEventListener('keydown', function(e) {
@@ -563,17 +640,54 @@ function updateSeatHint(select, hintId) {
   const rem   = parseInt(opt.dataset.remaining);
   const total = parseInt(opt.dataset.total);
   if (rem === 0) { hint.textContent = '⚠ No seats remaining!'; hint.className = 'seat-hint full'; }
-  else           { hint.textContent = `${rem} of ${total} seats available`; hint.className = 'seat-hint'; }
+  else           { hint.textContent = rem + ' of ' + total + ' seats available'; hint.className = 'seat-hint'; }
+}
+
+/**
+ * Filter admit category dropdown to only show options matching the selected quota.
+ * Government quota = categories NOT ending in -PY
+ * Management quota = categories ending in -PY
+ */
+function filterAdmitCatsByQuota(quotaValue, selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const options = select.querySelectorAll('option');
+  options.forEach(function(opt) {
+    if (!opt.value) return; // keep placeholder
+    const optQuota = opt.dataset.quota || '';
+    if (!quotaValue || optQuota === quotaValue) {
+      opt.style.display = '';
+      opt.hidden = false;
+    } else {
+      opt.style.display = 'none';
+      opt.hidden = true;
+    }
+  });
+  // Reset selection if current value no longer visible
+  const current = select.options[select.selectedIndex];
+  if (current && current.hidden) {
+    select.value = '';
+    const hintId = selectId.replace('admit-cat-', 'hint-').replace('edit-admit-cat-', 'edit-hint-');
+    const hint = document.getElementById(hintId);
+    if (hint) hint.textContent = '';
+  }
+  // Update placeholder text
+  const placeholder = select.options[0];
+  if (placeholder && !placeholder.value) {
+    if (quotaValue === 'government') placeholder.text = '— Select Govt Category —';
+    else if (quotaValue === 'management') placeholder.text = '— Select Mgmt Category —';
+    else placeholder.text = '— Select Category —';
+  }
 }
 
 function updateFeePreview(appId, feeCatValue, addFeeValue) {
   const isEdit     = appId.startsWith('edit-');
   const rawId      = isEdit ? appId.replace('edit-', '') : appId;
-  const formSel    = isEdit ? `#edit-allot-form-${rawId}` : `#allot-form-${rawId}`;
-  const addInputId = isEdit ? `add-fee-edit-${rawId}` : `add-fee-${rawId}`;
-  const previewId  = `fee-preview-${appId}`;
+  const formSel    = isEdit ? '#edit-allot-form-' + rawId : '#allot-form-' + rawId;
+  const addInputId = isEdit ? 'add-fee-edit-' + rawId : 'add-fee-' + rawId;
+  const previewId  = 'fee-preview-' + appId;
 
-  const feeSelect = document.querySelector(`${formSel} .fee-cat-select`);
+  const feeSelect = document.querySelector(formSel + ' .fee-cat-select');
   const addInput  = document.getElementById(addInputId);
   const preview   = document.getElementById(previewId);
   if (!feeSelect || !addInput || !preview) return;
@@ -585,9 +699,9 @@ function updateFeePreview(appId, feeCatValue, addFeeValue) {
 
   if (base > 0 || additional > 0) {
     preview.style.display = 'flex';
-    document.getElementById(`preview-base-${appId}`).textContent  = `₹${base.toFixed(2)}`;
-    document.getElementById(`preview-add-${appId}`).textContent   = `₹${additional.toFixed(2)}`;
-    document.getElementById(`preview-total-${appId}`).textContent = `₹${total.toFixed(2)}`;
+    document.getElementById('preview-base-'  + appId).textContent  = '₹' + base.toFixed(2);
+    document.getElementById('preview-add-'   + appId).textContent  = '₹' + additional.toFixed(2);
+    document.getElementById('preview-total-' + appId).textContent  = '₹' + total.toFixed(2);
   } else {
     preview.style.display = 'none';
   }
@@ -606,7 +720,7 @@ function filterStudents(query) {
   const nr = document.getElementById('no-results');
   if (nr) nr.style.display = visible === 0 ? 'block' : 'none';
   const ce = document.getElementById('search-count');
-  if (ce) ce.textContent = q ? `Showing ${visible} of ${rows.length} student(s)` : '';
+  if (ce) ce.textContent = q ? 'Showing ' + visible + ' of ' + rows.length + ' student(s)' : '';
 }
 </script>
 {% endblock %}

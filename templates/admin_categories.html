@@ -48,7 +48,7 @@
   .categories-table table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    min-width: 500px;
   }
 
   .categories-table th {
@@ -84,59 +84,6 @@
   }
 
   .status-inactive {
-    background: #f8d7da;
-    color: #721c24;
-  }
-
-  .seat-input {
-    width: 80px;
-    padding: 0.5rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    text-align: center;
-    font-weight: 600;
-  }
-
-  .seat-input:focus {
-    outline: none;
-    border-color: #c9a03d;
-  }
-
-  .seat-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .seat-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .seat-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #5a6e82;
-    min-width: 70px;
-  }
-
-  .seat-status {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    background: #eef2f8;
-    display: inline-block;
-  }
-
-  .seat-available {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  .seat-full {
     background: #f8d7da;
     color: #721c24;
   }
@@ -188,14 +135,6 @@
   .btn-delete:hover {
     background: #dc3545;
     color: white;
-  }
-
-  .btn-seat {
-    background: #0a1f44;
-    color: white;
-  }
-  .btn-seat:hover {
-    background: #1e3a60;
   }
 
   /* Inline edit row */
@@ -262,7 +201,7 @@
   }
   .btn-cancel-inline:hover { background: #dce3ed; }
 
-  /* Seat Modal */
+  /* Add Modal */
   .modal {
     display: none;
     position: fixed;
@@ -278,7 +217,7 @@
     background: white;
     border-radius: 24px;
     padding: 2rem;
-    max-width: 500px;
+    max-width: 480px;
     width: 90%;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   }
@@ -294,6 +233,7 @@
     border-radius: 12px;
     margin: 1rem 0;
     font-size: 1rem;
+    box-sizing: border-box;
   }
   .modal-content input:focus {
     outline: none;
@@ -311,6 +251,7 @@
     border-radius: 30px;
     border: none;
     cursor: pointer;
+    font-weight: 600;
   }
   .btn-modal-save {
     background: #c9a03d;
@@ -330,8 +271,6 @@
 
   @media (max-width: 768px) {
     .action-buttons { flex-direction: column; align-items: flex-start; }
-    .seat-info { margin-top: 0.5rem; }
-    .seat-row { flex-wrap: wrap; }
   }
 </style>
 
@@ -342,57 +281,27 @@
   </button>
 </div>
 
+{# INFO NOTE: Seats are now managed in Admit Categories, not here #}
+<div style="background:#fffbea;border:1.5px solid #f0c040;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;color:#92400e;">
+  <i class="fas fa-info-circle" style="font-size:1rem;flex-shrink:0"></i>
+  <span>Seat allocations are now managed in <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:700;text-decoration:none;">Admit Categories</a>. This page manages caste/reservation categories only.</span>
+</div>
+
 <div class="categories-table">
   <table>
     <thead>
       <tr>
         <th>ID</th>
         <th>Category Name</th>
-        <th>Government Seats</th>
-        <th>Management Seats</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for cat in categories %}
-      {% set seat_info = cat_seats[cat.id] if cat_seats and cat.id in cat_seats else None %}
       <tr id="row-{{ cat.id }}">
         <td>{{ cat.id }}</td>
         <td><strong>{{ cat.name }}</strong></td>
-        
-        <!-- Government Seats Column -->
-        <td>
-          <form action="{{ url_for('main.admin_category_set_seats', cat_id=cat.id) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-            <input type="number" name="govt_seats" value="{{ seat_info.govt_total if seat_info else 0 }}" 
-                   style="width: 80px; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center;">
-            <button type="submit" class="btn-icon btn-seat" style="padding: 0.3rem 0.8rem;">
-              <i class="fas fa-save"></i> Save
-            </button>
-            <div style="font-size: 0.7rem; color: #5a6e82;">
-              Filled: {{ seat_info.govt_filled if seat_info else 0 }} | 
-              Left: {{ seat_info.govt_remaining if seat_info else 0 }}
-            </div>
-          </form>
-        </td>
-        
-        <!-- Management Seats Column -->
-        <td>
-          <form action="{{ url_for('main.admin_category_set_seats', cat_id=cat.id) }}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-            <input type="number" name="mgmt_seats" value="{{ seat_info.mgmt_total if seat_info else 0 }}" 
-                   style="width: 80px; padding: 0.5rem; border: 2px solid #e2e8f0; border-radius: 8px; text-align: center;">
-            <button type="submit" class="btn-icon btn-seat" style="padding: 0.3rem 0.8rem;">
-              <i class="fas fa-save"></i> Save
-            </button>
-            <div style="font-size: 0.7rem; color: #5a6e82;">
-              Filled: {{ seat_info.mgmt_filled if seat_info else 0 }} | 
-              Left: {{ seat_info.mgmt_remaining if seat_info else 0 }}
-            </div>
-          </form>
-        </td>
-        
         <td>
           {% if cat.is_active %}
             <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
@@ -400,7 +309,6 @@
             <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
           {% endif %}
         </td>
-        
         <td>
           <div class="action-buttons">
             <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit Name">
@@ -428,7 +336,7 @@
 
       <!-- Inline edit row for category name -->
       <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
-        <td colspan="6">
+        <td colspan="4">
           <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
             <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
@@ -444,7 +352,7 @@
       </tr>
       {% else %}
       <tr>
-        <td colspan="6" class="empty-state">
+        <td colspan="4" class="empty-state">
           <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
           No categories found. Click "Add New Category" to create one.
         </td>
@@ -458,11 +366,12 @@
 <div id="addModal" class="modal">
   <div class="modal-content">
     <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
+    <p style="font-size:.85rem;color:#5a6e82;margin:0 0 .5rem">Enter the caste/reservation category name (e.g. General, OBC, SC, ST).</p>
     <form action="{{ url_for('main.admin_category_add') }}" method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
       <input type="text" name="category_name" placeholder="e.g. General, OBC, SC, ST" required>
       <div class="modal-actions">
-        <button type="button" class="btn-modal-cancel" onclick="closeModal('addModal')">Cancel</button>
+        <button type="button" class="btn-modal-cancel" onclick="closeAddModal()">Cancel</button>
         <button type="submit" class="btn-modal-save">Add Category</button>
       </div>
     </form>
@@ -475,13 +384,13 @@
     const input   = document.getElementById('inline-input-' + catId);
     const isOpen  = editRow.classList.contains('active');
 
-    document.querySelectorAll('.inline-edit-row.active').forEach(row => {
+    document.querySelectorAll('.inline-edit-row.active').forEach(function(row) {
       row.classList.remove('active');
     });
 
     if (!isOpen) {
       editRow.classList.add('active');
-      setTimeout(() => { input.focus(); input.select(); }, 100);
+      setTimeout(function() { input.focus(); input.select(); }, 100);
     }
   }
 
@@ -493,8 +402,8 @@
     document.getElementById('addModal').classList.add('active');
   }
 
-  function closeModal(modalId) {
-    document.getElementById(modalId).classList.remove('active');
+  function closeAddModal() {
+    document.getElementById('addModal').classList.remove('active');
   }
 
   window.onclick = function(event) {
