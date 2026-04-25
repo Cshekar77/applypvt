@@ -15,6 +15,10 @@
     font-family: 'Playfair Display', serif;
     color: #0a1f44;
     margin: 0;
+    font-size: 1.7rem;
+  }
+  @media (max-width: 480px) {
+    .admin-header h1 { font-size: 1.3rem; }
   }
 
   .btn-add {
@@ -30,25 +34,29 @@
     border: none;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
-
   .btn-add:hover {
     background: #b58c2e;
     transform: translateY(-2px);
   }
 
+  /* ── Table wrapper ── */
   .categories-table {
     width: 100%;
     background: white;
     border-radius: 16px;
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
-
+  .categories-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .categories-table table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 500px;
+    min-width: 480px;
   }
 
   .categories-table th {
@@ -57,6 +65,7 @@
     padding: 1rem;
     text-align: left;
     font-weight: 600;
+    white-space: nowrap;
   }
 
   .categories-table td {
@@ -71,22 +80,17 @@
   }
 
   .status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
+    white-space: nowrap;
   }
-
-  .status-active {
-    background: #d4edda;
-    color: #155724;
-  }
-
-  .status-inactive {
-    background: #f8d7da;
-    color: #721c24;
-  }
+  .status-active   { background: #d4edda; color: #155724; }
+  .status-inactive { background: #f8d7da; color: #721c24; }
 
   .action-buttons {
     display: flex;
@@ -109,64 +113,49 @@
     gap: 0.35rem;
     white-space: nowrap;
   }
+  .btn-edit   { background: #eef2ff; color: #0a1f44; }
+  .btn-edit:hover { background: #c9a03d; color: white; }
+  .btn-toggle { background: #fff3cd; color: #856404; }
+  .btn-toggle:hover { background: #c9a03d; color: white; }
+  .btn-delete { background: #f8d7da; color: #721c24; }
+  .btn-delete:hover { background: #dc3545; color: white; }
 
-  .btn-edit {
-    background: #eef2ff;
-    color: #0a1f44;
-  }
-  .btn-edit:hover {
-    background: #c9a03d;
-    color: white;
-  }
-
-  .btn-toggle {
-    background: #fff3cd;
-    color: #856404;
-  }
-  .btn-toggle:hover {
-    background: #c9a03d;
-    color: white;
-  }
-
-  .btn-delete {
-    background: #f8d7da;
-    color: #721c24;
-  }
-  .btn-delete:hover {
-    background: #dc3545;
-    color: white;
-  }
-
-  /* Inline edit row */
+  /* ── Inline edit row ── */
   .inline-edit-row { display: none; }
   .inline-edit-row td {
     background: #f0f4ff;
     border-bottom: 2px solid #c9a03d;
+    padding: .75rem 1rem;
   }
   .inline-edit-row.active { display: table-row; }
 
   .inline-edit-form {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    align-items: flex-end;
+    gap: 0.65rem;
     flex-wrap: wrap;
     padding: 0.25rem 0;
   }
-
+  .inline-edit-form .field-wrap {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
   .inline-edit-form input {
+    width: 100%;
     padding: 0.55rem 0.9rem;
     border: 2px solid #c9a03d;
     border-radius: 10px;
     font-size: 0.9rem;
     font-family: inherit;
-    flex: 1;
-    min-width: 180px;
     outline: none;
     color: #0a1f44;
+    box-sizing: border-box;
   }
-
   .inline-edit-form input:focus {
     box-shadow: 0 0 0 3px rgba(201,160,61,0.15);
+  }
+  .inline-edit-actions {
+    display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
   }
 
   .btn-save {
@@ -182,6 +171,7 @@
     align-items: center;
     gap: 0.35rem;
     transition: background 0.2s;
+    white-space: nowrap;
   }
   .btn-save:hover { background: #1e3a60; }
 
@@ -198,10 +188,11 @@
     align-items: center;
     gap: 0.35rem;
     transition: background 0.2s;
+    white-space: nowrap;
   }
   .btn-cancel-inline:hover { background: #dce3ed; }
 
-  /* Add Modal */
+  /* ── Modal ── */
   .modal {
     display: none;
     position: fixed;
@@ -211,20 +202,26 @@
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
   }
   .modal.active { display: flex; }
   .modal-content {
     background: white;
     border-radius: 24px;
-    padding: 2rem;
+    padding: 1.75rem;
     max-width: 480px;
-    width: 90%;
+    width: 100%;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
   .modal-content h3 {
     font-family: 'Playfair Display', serif;
     color: #0a1f44;
-    margin-bottom: 1rem;
+    margin: 0 0 .5rem;
+    font-size: 1.25rem;
   }
   .modal-content input {
     width: 100%;
@@ -234,6 +231,7 @@
     margin: 1rem 0;
     font-size: 1rem;
     box-sizing: border-box;
+    font-family: inherit;
   }
   .modal-content input:focus {
     outline: none;
@@ -243,6 +241,7 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
   .btn-modal-cancel {
     background: #eef2f8;
@@ -252,6 +251,7 @@
     border: none;
     cursor: pointer;
     font-weight: 600;
+    white-space: nowrap;
   }
   .btn-modal-save {
     background: #c9a03d;
@@ -261,7 +261,9 @@
     border: none;
     cursor: pointer;
     font-weight: 600;
+    white-space: nowrap;
   }
+  .btn-modal-save:hover { background: #b58c2e; }
 
   .empty-state {
     text-align: center;
@@ -269,8 +271,97 @@
     color: #6c757d;
   }
 
-  @media (max-width: 768px) {
-    .action-buttons { flex-direction: column; align-items: flex-start; }
+  /* ── Mobile card layout (≤ 580px) ── */
+  @media (max-width: 580px) {
+    .categories-table {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .categories-table-scroll { overflow-x: unset; }
+
+    .categories-table table,
+    .categories-table thead,
+    .categories-table tbody,
+    .categories-table th,
+    .categories-table td,
+    .categories-table tr {
+      display: block;
+    }
+    .categories-table table { min-width: unset; }
+    .categories-table thead { display: none; }
+
+    .categories-table tbody tr:not(.inline-edit-row) {
+      background: white;
+      border: 1px solid #eef2f8;
+      border-radius: 14px;
+      margin-bottom: .85rem;
+      padding: .75rem 1rem;
+      box-shadow: 0 1px 5px rgba(0,0,0,.04);
+    }
+    .categories-table tbody tr:not(.inline-edit-row):hover {
+      background: #f8f9fa;
+    }
+
+    .categories-table td {
+      padding: .3rem .1rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      font-size: .85rem;
+    }
+    .categories-table td::before {
+      content: attr(data-label);
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      color: #8a9ab0; letter-spacing: .06em;
+      flex-shrink: 0; min-width: 70px;
+    }
+    /* Hide ID on mobile */
+    .categories-table td.id-cell { display: none; }
+
+    /* Action buttons on mobile — wrap naturally */
+    .action-buttons {
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    /* Inline edit row on mobile */
+    .inline-edit-row.active { display: block; }
+    .inline-edit-row td {
+      border-radius: 14px;
+      margin-bottom: .85rem;
+      display: block;
+      padding: .85rem 1rem;
+    }
+    .inline-edit-row td::before { display: none; }
+    .inline-edit-form { flex-direction: column; align-items: stretch; }
+    .inline-edit-form .field-wrap { flex: unset; width: 100%; }
+    .inline-edit-actions { width: 100%; }
+
+    .modal-content { padding: 1.25rem; border-radius: 18px; }
+  }
+
+  /* ── Dark mode ── */
+  body.dark .categories-table        { background: #1a2538; }
+  body.dark .categories-table td     { border-color: #2d3e54; color: #eef2ff; }
+  body.dark .categories-table tr:hover { background: #1e2e42; }
+  body.dark .inline-edit-row td      { background: #0f1c2e; }
+  body.dark .inline-edit-form input  { background: #0f1c2e; border-color: #c9a03d; color: #eef2ff; }
+  body.dark .modal-content           { background: #1a2538; }
+  body.dark .modal-content h3        { color: #eef2ff; }
+  body.dark .modal-content input     { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .btn-cancel-inline       { background: #2d3e54; color: #b9c8e8; }
+  body.dark .btn-modal-cancel        { background: #2d3e54; color: #b9c8e8; }
+  body.dark .admin-header h1         { color: #eef2ff; }
+
+  @media (max-width: 580px) {
+    body.dark .categories-table tbody tr:not(.inline-edit-row) {
+      background: #1a2538;
+      border-color: #2d3e54;
+    }
+    body.dark .inline-edit-row td { border-radius: 14px; }
   }
 </style>
 
@@ -282,84 +373,90 @@
 </div>
 
 {# INFO NOTE: Seats are now managed in Admit Categories, not here #}
-<div style="background:#fffbea;border:1.5px solid #f0c040;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;color:#92400e;">
-  <i class="fas fa-info-circle" style="font-size:1rem;flex-shrink:0"></i>
+<div style="background:#fffbea;border:1.5px solid #f0c040;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:.75rem;font-size:.85rem;color:#92400e;">
+  <i class="fas fa-info-circle" style="font-size:1rem;flex-shrink:0;margin-top:2px"></i>
   <span>Seat allocations are now managed in <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:700;text-decoration:none;">Admit Categories</a>. This page manages caste/reservation categories only.</span>
 </div>
 
 <div class="categories-table">
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Category Name</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for cat in categories %}
-      <tr id="row-{{ cat.id }}">
-        <td>{{ cat.id }}</td>
-        <td><strong>{{ cat.name }}</strong></td>
-        <td>
-          {% if cat.is_active %}
-            <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
-          {% else %}
-            <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
-          {% endif %}
-        </td>
-        <td>
-          <div class="action-buttons">
-            <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit Name">
-              <i class="fas fa-edit"></i> Edit
-            </button>
-
-            <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display:inline;">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-              <button type="submit" class="btn-icon btn-toggle">
-                <i class="fas fa-power-off"></i>
-                {% if cat.is_active %}Deactivate{% else %}Activate{% endif %}
+  <div class="categories-table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Category Name</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr id="row-{{ cat.id }}">
+          <td class="id-cell" data-label="ID">{{ cat.id }}</td>
+          <td data-label="Name"><strong>{{ cat.name }}</strong></td>
+          <td data-label="Status">
+            {% if cat.is_active %}
+              <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Active</span>
+            {% else %}
+              <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
+            {% endif %}
+          </td>
+          <td data-label="Actions">
+            <div class="action-buttons">
+              <button class="btn-icon btn-edit" onclick="toggleInlineEdit({{ cat.id }}, '{{ cat.name }}')" title="Edit Name">
+                <i class="fas fa-edit"></i> Edit
               </button>
-            </form>
 
-            <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display:inline;"
-                  onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;? This cannot be undone.');">
+              <form action="{{ url_for('main.admin_category_toggle', cat_id=cat.id) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                <button type="submit" class="btn-icon btn-toggle">
+                  <i class="fas fa-power-off"></i>
+                  {% if cat.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+              </form>
+
+              <form action="{{ url_for('main.admin_category_delete', cat_id=cat.id) }}" method="POST" style="display:inline;"
+                    onsubmit="return confirm('Delete category &quot;{{ cat.name }}&quot;? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+                <button type="submit" class="btn-icon btn-delete">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Inline edit row -->
+        <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
+          <td colspan="4">
+            <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-              <button type="submit" class="btn-icon btn-delete">
-                <i class="fas fa-trash-alt"></i> Delete
-              </button>
+              <div class="field-wrap">
+                <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
+                       value="{{ cat.name }}" placeholder="Category name" required>
+              </div>
+              <div class="inline-edit-actions">
+                <button type="submit" class="btn-save">
+                  <i class="fas fa-check"></i> Update Name
+                </button>
+                <button type="button" class="btn-cancel-inline" onclick="cancelInlineEdit({{ cat.id }})">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
             </form>
-          </div>
-        </td>
-      </tr>
-
-      <!-- Inline edit row for category name -->
-      <tr class="inline-edit-row" id="edit-row-{{ cat.id }}">
-        <td colspan="4">
-          <form action="{{ url_for('main.admin_category_edit', cat_id=cat.id) }}" method="POST" class="inline-edit-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-            <input type="text" name="category_name" id="inline-input-{{ cat.id }}"
-                   value="{{ cat.name }}" placeholder="Category name" required>
-            <button type="submit" class="btn-save">
-              <i class="fas fa-check"></i> Update Name
-            </button>
-            <button type="button" class="btn-cancel-inline" onclick="cancelInlineEdit({{ cat.id }})">
-              <i class="fas fa-times"></i> Cancel
-            </button>
-          </form>
-        </td>
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="4" class="empty-state">
-          <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
-          No categories found. Click "Add New Category" to create one.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="empty-state">
+            <i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:1rem; display:block;"></i>
+            No categories found. Click "Add New Category" to create one.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Add Category Modal -->
@@ -377,7 +474,9 @@
     </form>
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
   function toggleInlineEdit(catId, catName) {
     const editRow = document.getElementById('edit-row-' + catId);

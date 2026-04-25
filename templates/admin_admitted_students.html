@@ -12,35 +12,41 @@
     font-family: 'Playfair Display', serif;
     font-size: 1.9rem; color: #0a1f44; margin: 0;
   }
+  @media (max-width: 480px) { .as-header h2 { font-size: 1.4rem; } }
+
   .btn-back {
     display: inline-flex; align-items: center; gap: .4rem;
     color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
   }
   .btn-back:hover { color: #0a1f44; }
 
+  /* ── Summary strip ── */
   .summary-strip {
-    display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: .75rem; margin-bottom: 2rem;
   }
   .sum-box {
     background: white; border-radius: 14px; border: 1px solid #eef2f8;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    padding: .9rem 1.4rem; flex: 1; min-width: 130px;
+    padding: .9rem 1.1rem;
   }
   .sum-box .sum-label {
-    font-size: .7rem; font-weight: 700; text-transform: uppercase;
+    font-size: .68rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .07em; color: #8a9ab0; margin-bottom: .25rem;
   }
   .sum-box .sum-val {
-    font-size: 1.65rem; font-weight: 800; color: #0a1f44; line-height: 1;
+    font-size: 1.5rem; font-weight: 800; color: #0a1f44; line-height: 1;
   }
 
+  /* ── Category section ── */
   .cat-section { margin-bottom: 2.5rem; }
   .cat-section-header {
     display: flex; align-items: center; gap: .75rem;
     margin-bottom: .85rem; flex-wrap: wrap;
   }
   .cat-section-header h3 {
-    font-family: 'Playfair Display', serif; font-size: 1.2rem;
+    font-family: 'Playfair Display', serif; font-size: 1.1rem;
     color: #0a1f44; margin: 0;
   }
   .cat-pill {
@@ -49,14 +55,15 @@
     color: white; font-size: .75rem; font-weight: 700;
     padding: 4px 12px; border-radius: 20px;
     box-shadow: 0 2px 8px rgba(124,58,237,.3);
+    white-space: nowrap;
   }
   .cat-stats {
     font-size: .78rem; color: #5a6e82;
     background: #f8f9fd; padding: 3px 10px; border-radius: 20px;
-    border: 1px solid #eef2f8;
+    border: 1px solid #eef2f8; white-space: nowrap;
   }
   .progress-cat-wrap {
-    flex: 1; min-width: 120px; max-width: 200px;
+    flex: 1; min-width: 80px; max-width: 180px;
     background: #eef2f8; border-radius: 20px; height: 7px; overflow: hidden;
   }
   .progress-cat-fill {
@@ -64,13 +71,17 @@
     height: 100%; border-radius: 20px; transition: width .5s;
   }
 
+  /* ── Table card ── */
   .table-card {
     background: white; border-radius: 18px;
     border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05);
     overflow: hidden;
   }
-  .as-table-wrap { overflow-x: auto; }
-  .as-table { width: 100%; border-collapse: collapse; font-size: .87rem; }
+  .as-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .as-table {
+    width: 100%; border-collapse: collapse; font-size: .87rem;
+    min-width: 780px; /* horizontal scroll on small screens */
+  }
   .as-table thead tr { background: #f8f9fd; border-bottom: 2px solid #eef2f8; }
   .as-table th {
     padding: .65rem 1rem; text-align: left; font-size: .68rem;
@@ -95,6 +106,7 @@
     background: linear-gradient(135deg,#7c3aed,#6d28d9);
     color: white; letter-spacing: .03em;
     box-shadow: 0 2px 8px rgba(124,58,237,.25);
+    white-space: nowrap;
   }
   .admit-seat-badge.vacant {
     background: #f3f4f6; color: #b0bac8;
@@ -104,11 +116,11 @@
   .rank-pill {
     background: #0a1f44; color: white; font-size: .7rem;
     font-weight: 700; padding: 3px 9px; border-radius: 20px;
-    display: inline-block;
+    display: inline-block; white-space: nowrap;
   }
   .rank-empty { font-size: .78rem; color: #c4cdd8; font-style: italic; }
 
-  .badge { display: inline-block; font-size: .68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge { display: inline-block; font-size: .68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
   .badge-govt { background: #cce5ff; color: #004085; }
   .badge-mgmt { background: #fff3cd; color: #856404; }
 
@@ -116,10 +128,10 @@
   .student-email { font-size: .75rem; color: #8a9ab0; margin-top: 1px; }
   .unassigned-label { font-size: .8rem; color: #c4cdd8; font-style: italic; }
 
-  .fees-total   { font-weight: 700; color: #0a1f44; }
-  .fees-paid    { color: #15803d; font-weight: 600; }
-  .fees-pending { color: #dc3545; font-weight: 600; }
-  .fees-clear   { color: #15803d; font-weight: 700; }
+  .fees-total   { font-weight: 700; color: #0a1f44; white-space: nowrap; }
+  .fees-paid    { color: #15803d; font-weight: 600; white-space: nowrap; }
+  .fees-pending { color: #dc3545; font-weight: 600; white-space: nowrap; }
+  .fees-clear   { color: #15803d; font-weight: 700; white-space: nowrap; }
   .fees-none    { color: #c4cdd8; font-style: italic; font-size: .8rem; }
 
   .progress-bar-wrap {
@@ -130,13 +142,16 @@
     background: #25c26e; height: 100%; border-radius: 20px; transition: width .4s;
   }
 
+  /* ── Search row ── */
   .search-row {
-    display: flex; align-items: center; gap: .65rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    display: flex; align-items: center; gap: .65rem;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
   }
   .search-input {
     padding: .6rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
     font-size: .88rem; font-family: inherit; outline: none;
-    transition: border-color .2s; width: 260px;
+    transition: border-color .2s;
+    width: 100%; max-width: 320px; box-sizing: border-box;
   }
   .search-input:focus { border-color: #7c3aed; }
 
@@ -145,6 +160,55 @@
     background: white; border-radius: 18px; border: 1.5px dashed #e2e8f0;
   }
 
+  /* ── Mobile card layout (≤ 600px) ── */
+  @media (max-width: 600px) {
+    .as-page { padding: 1rem .75rem 4rem; }
+
+    .cat-section-header h3 { font-size: .95rem; }
+    .progress-cat-wrap { display: none; } /* hide progress bar in header on tiny screens */
+
+    /* Convert table rows to cards */
+    .as-table, .as-table thead, .as-table tbody,
+    .as-table th, .as-table td, .as-table tr {
+      display: block;
+    }
+    .as-table { min-width: unset; }
+    .as-table thead { display: none; }
+
+    .as-table tbody tr.assigned,
+    .as-table tbody tr.unassigned {
+      background: #fff !important;
+      border: 1px solid #eef2f8;
+      border-radius: 12px;
+      margin-bottom: .75rem;
+      padding: .65rem .75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+
+    .as-table td {
+      padding: .28rem .1rem;
+      border: none;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: .5rem;
+      font-size: .83rem;
+    }
+    .as-table td::before {
+      content: attr(data-label);
+      font-size: .67rem; font-weight: 700; text-transform: uppercase;
+      color: #8a9ab0; letter-spacing: .06em;
+      flex-shrink: 0; min-width: 90px; padding-top: 2px;
+    }
+    /* hide serial on mobile */
+    .as-table td.sl-cell { display: none; }
+
+    .search-input { max-width: 100%; }
+
+    .sum-box .sum-val { font-size: 1.25rem; }
+  }
+
+  /* ── Dark mode ── */
   body.dark .sum-box            { background: #1a2538; border-color: #2d3e54; }
   body.dark .sum-box .sum-val   { color: #eef2ff; }
   body.dark .cat-section-header h3 { color: #eef2ff; }
@@ -163,6 +227,14 @@
   body.dark .search-input       { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
   body.dark .as-header h2       { color: #eef2ff; }
   body.dark .admit-seat-badge.vacant { background: #1e2e42; border-color: #2d3e54; color: #5a6e82; }
+
+  @media (max-width: 600px) {
+    body.dark .as-table tbody tr.assigned,
+    body.dark .as-table tbody tr.unassigned {
+      background: #1a2538 !important;
+      border-color: #2d3e54;
+    }
+  }
 </style>
 
 <div class="as-page">
@@ -200,7 +272,7 @@
   {% if admit_categories %}
 
   <div class="search-row">
-    <i class="fas fa-search" style="color:#8a9ab0"></i>
+    <i class="fas fa-search" style="color:#8a9ab0;flex-shrink:0"></i>
     <input type="text" class="search-input" id="searchInput"
       placeholder="Search by name, rank, category…" oninput="filterRows()">
   </div>
@@ -246,47 +318,51 @@
               {% set pending        = allotment._fees_pending %}
               <tr class="assigned"
                 data-search="{{ appl.full_name|lower }} rank{{ appl.rank }} {{ appl.category_name|lower if appl.category_name else '' }} {{ ac.name|lower }}">
-                <td class="sl-num">{{ seat_num }}</td>
-                <td><span class="admit-seat-badge">{{ ac.name }}({{ seat_num }})</span></td>
-                <td>
+                <td class="sl-cell" data-label="#">{{ seat_num }}</td>
+                <td data-label="Seat"><span class="admit-seat-badge">{{ ac.name }}({{ seat_num }})</span></td>
+                <td data-label="Rank">
                   {% if appl.rank %}
                     <span class="rank-pill">#{{ appl.rank }}</span>
                   {% else %}
                     <span class="rank-empty">—</span>
                   {% endif %}
                 </td>
-                <td>
-                  <div class="student-name">{{ appl.full_name }}</div>
-                  <div class="student-email">{{ appl.email }}</div>
+                <td data-label="Student">
+                  <div>
+                    <div class="student-name">{{ appl.full_name }}</div>
+                    <div class="student-email">{{ appl.email }}</div>
+                  </div>
                 </td>
-                <td>{{ appl.category_name or '—' }}</td>
-                <td>
+                <td data-label="Caste">{{ appl.category_name or '—' }}</td>
+                <td data-label="Quota">
                   <span class="badge badge-{{ allotment.quota }}">
                     {{ allotment.quota|title }}
                   </span>
                 </td>
-                <td>
+                <td data-label="Total Fees">
                   {% if allotment._has_fees %}
                     <span class="fees-total">₹{{ '{:,.0f}'.format(total_fees_val) }}</span>
                   {% else %}
                     <span class="fees-none">Not set</span>
                   {% endif %}
                 </td>
-                <td>
+                <td data-label="Paid">
                   {% if allotment._has_fees %}
-                    <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid) }}</span>
-                    {% if total_fees_val > 0 %}
-                    <div class="progress-bar-wrap">
-                      <div class="progress-bar-fill"
-                        style="width:{{ [((total_paid / total_fees_val) * 100)|int, 100]|min }}%">
+                    <div>
+                      <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid) }}</span>
+                      {% if total_fees_val > 0 %}
+                      <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill"
+                          style="width:{{ [((total_paid / total_fees_val) * 100)|int, 100]|min }}%">
+                        </div>
                       </div>
+                      {% endif %}
                     </div>
-                    {% endif %}
                   {% else %}
                     <span class="fees-none">—</span>
                   {% endif %}
                 </td>
-                <td>
+                <td data-label="Pending">
                   {% if allotment._has_fees %}
                     {% if pending <= 0 %}
                       <span class="fees-clear"><i class="fas fa-check-circle"></i> Cleared</span>
@@ -297,7 +373,7 @@
                     <span class="fees-none">—</span>
                   {% endif %}
                 </td>
-                <td style="font-size:.78rem;color:#5a6e82;white-space:nowrap">
+                <td data-label="Allotted At" style="font-size:.78rem;color:#5a6e82;white-space:nowrap">
                   {% if allotment.allotted_at %}
                     {{ allotment.allotted_at | ist }}
                   {% else %}—{% endif %}
@@ -306,16 +382,16 @@
 
             {% else %}
               <tr class="unassigned" data-search="{{ ac.name|lower }}">
-                <td class="sl-num">{{ seat_num }}</td>
-                <td><span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span></td>
-                <td><span class="rank-empty">—</span></td>
-                <td><span class="unassigned-label">Not yet assigned</span></td>
-                <td><span class="fees-none">—</span></td>
-                <td><span class="fees-none">—</span></td>
-                <td><span class="fees-none">—</span></td>
-                <td><span class="fees-none">—</span></td>
-                <td><span class="fees-none">—</span></td>
-                <td><span class="fees-none">—</span></td>
+                <td class="sl-cell" data-label="#">{{ seat_num }}</td>
+                <td data-label="Seat"><span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span></td>
+                <td data-label="Rank"><span class="rank-empty">—</span></td>
+                <td data-label="Student"><span class="unassigned-label">Not yet assigned</span></td>
+                <td data-label="Caste"><span class="fees-none">—</span></td>
+                <td data-label="Quota"><span class="fees-none">—</span></td>
+                <td data-label="Total Fees"><span class="fees-none">—</span></td>
+                <td data-label="Paid"><span class="fees-none">—</span></td>
+                <td data-label="Pending"><span class="fees-none">—</span></td>
+                <td data-label="Allotted At"><span class="fees-none">—</span></td>
               </tr>
             {% endif %}
 
@@ -342,6 +418,7 @@
   {% endif %}
 
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -354,5 +431,4 @@ function filterRows() {
   });
 }
 </script>
-{% endblock %}
 {% endblock %}
