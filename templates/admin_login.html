@@ -1,22 +1,429 @@
 {% extends 'base.html' %}
 {% block title %}Admin Login — BCA Admissions{% endblock %}
+{% block navbar_auth %}{% endblock %}
 {% block content %}
-<div class="auth-wrap">
-  <div class="auth-card">
-    <h2 class="auth-title">Admin Login</h2>
-    <p class="auth-sub">Admissions office access only.</p>
-    <form method="POST" class="auth-form">
+<style>
+  /* ── CSS VARIABLES FOR THEMES ── */
+  :root {
+    --al-bg-from: #f0f4fb;
+    --al-bg-mid:  #e8eef8;
+    --al-bg-to:   #dde6f5;
+    --al-card-bg: rgba(255,255,255,.92);
+    --al-card-border: rgba(201,160,61,.3);
+    --al-card-shadow: 0 30px 80px rgba(10,31,68,.13), 0 0 60px rgba(201,160,61,.06);
+    --al-circle1: rgba(201,160,61,.13);
+    --al-circle2: rgba(10,31,68,.07);
+    --al-h1: #0a1f44;
+    --al-sub: rgba(10,31,68,.45);
+    --al-divider-line: rgba(201,160,61,.3);
+    --al-divider-text: rgba(201,160,61,.75);
+    --al-label: rgba(10,31,68,.5);
+    --al-input-bg: rgba(10,31,68,.04);
+    --al-input-border: rgba(10,31,68,.13);
+    --al-input-focus-border: rgba(201,160,61,.75);
+    --al-input-focus-shadow: rgba(201,160,61,.12);
+    --al-input-color: #0a1f44;
+    --al-placeholder: rgba(10,31,68,.3);
+    --al-icon-color: rgba(201,160,61,.7);
+    --al-toggle-color: rgba(10,31,68,.3);
+    --al-toggle-hover: rgba(201,160,61,.8);
+    --al-footer-color: rgba(10,31,68,.35);
+    --al-footer-hover: rgba(201,160,61,.8);
+    --al-theme-btn-bg: rgba(10,31,68,.07);
+    --al-theme-btn-color: #0a1f44;
+    --al-theme-btn-border: rgba(10,31,68,.13);
+    --al-flash-error-bg: rgba(220,53,69,.1);
+    --al-flash-error-color: #b91c1c;
+    --al-flash-success-bg: rgba(37,194,110,.1);
+    --al-flash-success-color: #15803d;
+    --al-flash-warn-bg: rgba(240,192,64,.1);
+    --al-flash-warn-color: #92400e;
+  }
+
+  [data-al-theme="dark"] {
+    --al-bg-from: #060f1e;
+    --al-bg-mid:  #0a1f44;
+    --al-bg-to:   #0d2857;
+    --al-card-bg: rgba(255,255,255,.04);
+    --al-card-border: rgba(201,160,61,.25);
+    --al-card-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 60px rgba(201,160,61,.06);
+    --al-circle1: rgba(201,160,61,.12);
+    --al-circle2: rgba(201,160,61,.08);
+    --al-h1: white;
+    --al-sub: rgba(255,255,255,.45);
+    --al-divider-line: rgba(201,160,61,.3);
+    --al-divider-text: rgba(201,160,61,.6);
+    --al-label: rgba(255,255,255,.55);
+    --al-input-bg: rgba(255,255,255,.06);
+    --al-input-border: rgba(255,255,255,.1);
+    --al-input-focus-border: rgba(201,160,61,.7);
+    --al-input-focus-shadow: rgba(201,160,61,.12);
+    --al-input-color: white;
+    --al-placeholder: rgba(255,255,255,.25);
+    --al-icon-color: rgba(201,160,61,.6);
+    --al-toggle-color: rgba(255,255,255,.35);
+    --al-toggle-hover: rgba(201,160,61,.8);
+    --al-footer-color: rgba(255,255,255,.3);
+    --al-footer-hover: rgba(201,160,61,.7);
+    --al-theme-btn-bg: rgba(255,255,255,.08);
+    --al-theme-btn-color: rgba(255,255,255,.8);
+    --al-theme-btn-border: rgba(255,255,255,.12);
+    --al-flash-error-bg: rgba(220,53,69,.15);
+    --al-flash-error-color: #f87171;
+    --al-flash-success-bg: rgba(37,194,110,.15);
+    --al-flash-success-color: #4ade80;
+    --al-flash-warn-bg: rgba(240,192,64,.15);
+    --al-flash-warn-color: #fbbf24;
+  }
+
+  /* ── PAGE ── */
+  .al-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, var(--al-bg-from) 0%, var(--al-bg-mid) 50%, var(--al-bg-to) 100%);
+    position: relative;
+    overflow: hidden;
+    transition: background .4s;
+  }
+  .al-page::before, .al-page::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .al-page::before {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--al-circle1) 0%, transparent 70%);
+    top: -150px; right: -150px;
+  }
+  .al-page::after {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--al-circle2) 0%, transparent 70%);
+    bottom: -100px; left: -100px;
+  }
+
+  /* ── CARD ── */
+  .al-card {
+    background: var(--al-card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--al-card-border);
+    border-radius: 24px;
+    padding: 2.75rem 2.5rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--al-card-shadow);
+    position: relative;
+    z-index: 1;
+    transition: background .4s, border-color .4s, box-shadow .4s;
+  }
+
+  /* ── THEME TOGGLE ── */
+  .al-theme-toggle {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--al-theme-btn-bg);
+    border: 1px solid var(--al-theme-btn-border);
+    border-radius: 30px;
+    padding: .3rem .6rem .3rem .5rem;
+    cursor: pointer;
+    transition: all .2s;
+    z-index: 10;
+  }
+  .al-theme-toggle:hover { border-color: rgba(201,160,61,.5); }
+
+  .al-theme-icon {
+    font-size: .8rem;
+    color: var(--al-theme-btn-color);
+    transition: color .3s;
+    width: 14px;
+    text-align: center;
+  }
+  .al-theme-label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--al-theme-btn-color);
+    letter-spacing: .04em;
+    transition: color .3s;
+    white-space: nowrap;
+    min-width: 30px;
+  }
+  .al-track {
+    width: 32px; height: 18px;
+    background: rgba(201,160,61,.2);
+    border-radius: 20px;
+    position: relative;
+    transition: background .3s;
+    flex-shrink: 0;
+  }
+  .al-track.on { background: rgba(201,160,61,.55); }
+  .al-thumb {
+    width: 13px; height: 13px;
+    background: #c9a03d;
+    border-radius: 50%;
+    position: absolute;
+    top: 2.5px; left: 3px;
+    transition: transform .25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  }
+  .al-track.on .al-thumb { transform: translateX(14px); }
+
+  /* ── BRANDING ── */
+  .al-brand { text-align: center; margin-bottom: 2rem; }
+  .al-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #c9a03d, #a8872d);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 24px rgba(201,160,61,.4);
+    font-size: 1.6rem;
+    color: white;
+  }
+  .al-brand h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--al-h1);
+    margin: 0 0 .3rem;
+    letter-spacing: .01em;
+    transition: color .3s;
+  }
+  .al-brand p {
+    font-size: .82rem;
+    color: var(--al-sub);
+    margin: 0; letter-spacing: .02em;
+    transition: color .3s;
+  }
+
+  /* Divider */
+  .al-divider { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.75rem; }
+  .al-divider-line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--al-divider-line), transparent);
+    transition: background .3s;
+  }
+  .al-divider-text {
+    font-size: .7rem; font-weight: 600;
+    color: var(--al-divider-text);
+    letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+    transition: color .3s;
+  }
+
+  /* ── FLASH MESSAGES ── */
+  .al-flash {
+    border-radius: 10px; padding: .75rem 1rem;
+    margin-bottom: 1.25rem; font-size: .84rem; font-weight: 500;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .al-flash.error   { background: var(--al-flash-error-bg);   border: 1px solid rgba(220,53,69,.35);  color: var(--al-flash-error-color);   }
+  .al-flash.success { background: var(--al-flash-success-bg); border: 1px solid rgba(37,194,110,.35); color: var(--al-flash-success-color); }
+  .al-flash.warning { background: var(--al-flash-warn-bg);    border: 1px solid rgba(240,192,64,.35); color: var(--al-flash-warn-color);    }
+
+  /* ── FORM ── */
+  .al-form { display: flex; flex-direction: column; gap: 1.1rem; }
+  .al-field { display: flex; flex-direction: column; gap: .4rem; }
+  .al-field label {
+    font-size: .75rem; font-weight: 700;
+    color: var(--al-label);
+    text-transform: uppercase; letter-spacing: .07em;
+    transition: color .3s;
+  }
+  .al-input-wrap { position: relative; display: flex; align-items: center; }
+  .al-input-icon {
+    position: absolute; left: .95rem;
+    color: var(--al-icon-color); font-size: .9rem;
+    pointer-events: none; z-index: 1; transition: color .3s;
+  }
+  .al-input {
+    width: 100%; box-sizing: border-box;
+    padding: .75rem 1rem .75rem 2.6rem;
+    background: var(--al-input-bg);
+    border: 1.5px solid var(--al-input-border);
+    border-radius: 12px; font-size: .92rem;
+    color: var(--al-input-color); outline: none;
+    transition: border-color .2s, background .2s, box-shadow .2s, color .3s;
+    font-family: inherit;
+  }
+  .al-input::placeholder { color: var(--al-placeholder); }
+  .al-input:focus {
+    border-color: var(--al-input-focus-border);
+    box-shadow: 0 0 0 3px var(--al-input-focus-shadow);
+  }
+  .al-input.has-toggle { padding-right: 2.8rem; }
+  .al-pw-toggle {
+    position: absolute; right: .85rem;
+    background: none; border: none;
+    color: var(--al-toggle-color);
+    cursor: pointer; font-size: .9rem;
+    padding: .25rem; transition: color .2s;
+    line-height: 1; z-index: 1;
+  }
+  .al-pw-toggle:hover { color: var(--al-toggle-hover); }
+
+  /* ── SUBMIT ── */
+  .al-submit {
+    margin-top: .5rem; width: 100%;
+    padding: .85rem 1.5rem;
+    background: linear-gradient(135deg, #c9a03d, #a8872d);
+    color: white; font-size: .95rem; font-weight: 700;
+    border: none; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: .6rem;
+    transition: all .25s;
+    box-shadow: 0 6px 20px rgba(201,160,61,.35);
+    letter-spacing: .02em; font-family: inherit;
+  }
+  .al-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(201,160,61,.45);
+    background: linear-gradient(135deg, #d4aa45, #b8902e);
+    color: white;
+  }
+  .al-submit:active { transform: translateY(0); }
+
+  /* ── FOOTER ── */
+  .al-footer { text-align: center; margin-top: 1.5rem; }
+  .al-footer a {
+    font-size: .8rem; color: var(--al-footer-color);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem;
+    transition: color .2s;
+  }
+  .al-footer a:hover { color: var(--al-footer-hover); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 480px) {
+    .al-card { padding: 2rem 1.5rem 1.75rem; border-radius: 20px; }
+    .al-brand h1 { font-size: 1.4rem; }
+    .al-logo { width: 56px; height: 56px; font-size: 1.4rem; }
+  }
+  @media (max-width: 360px) {
+    .al-card { padding: 1.75rem 1.1rem 1.5rem; }
+    .al-theme-label { display: none; }
+  }
+</style>
+
+<div class="al-page" id="al-page">
+  <div class="al-card" id="al-card">
+
+    <!-- Theme Toggle -->
+    <button class="al-theme-toggle" onclick="alToggleTheme()" title="Toggle light / dark mode">
+      <span class="al-theme-icon" id="al-theme-icon"><i class="fas fa-sun"></i></span>
+      <div class="al-track" id="al-track"><div class="al-thumb"></div></div>
+      <span class="al-theme-label" id="al-theme-label">Light</span>
+    </button>
+
+    <!-- Branding -->
+    <div class="al-brand">
+      <div class="al-logo"><i class="fas fa-user-shield"></i></div>
+      <h1>Admin Portal</h1>
+      <p>BCA Admissions 2026–27 &nbsp;·&nbsp; Restricted Access</p>
+    </div>
+
+    <div class="al-divider">
+      <div class="al-divider-line"></div>
+      <span class="al-divider-text">Sign In</span>
+      <div class="al-divider-line"></div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="al-flash {{ 'error' if cat in ('danger','error') else ('success' if cat == 'success' else 'warning') }}">
+          <i class="fas fa-{{ 'exclamation-circle' if cat in ('danger','error') else ('check-circle' if cat == 'success' else 'exclamation-triangle') }}"></i>
+          {{ msg }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Form -->
+    <form method="POST" class="al-form" autocomplete="on">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-      <div class="field">
-        <label>Username <span class="req">*</span></label>
-        <input type="text" name="username" required placeholder="Admin username">
+
+      <div class="al-field">
+        <label for="al-username">Username</label>
+        <div class="al-input-wrap">
+          <span class="al-input-icon"><i class="fas fa-user"></i></span>
+          <input type="text" id="al-username" name="username" class="al-input"
+            placeholder="Enter admin username" required
+            autocomplete="username" spellcheck="false">
+        </div>
       </div>
-      <div class="field">
-        <label>Password <span class="req">*</span></label>
-        <input type="password" name="password" required placeholder="Admin password">
+
+      <div class="al-field">
+        <label for="al-password">Password</label>
+        <div class="al-input-wrap">
+          <span class="al-input-icon"><i class="fas fa-lock"></i></span>
+          <input type="password" id="al-password" name="password"
+            class="al-input has-toggle"
+            placeholder="Enter admin password" required
+            autocomplete="current-password">
+          <button type="button" class="al-pw-toggle" onclick="alTogglePw()" title="Show/hide password">
+            <i class="fas fa-eye" id="al-eye-icon"></i>
+          </button>
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary btn-full">Login as Admin</button>
+
+      <button type="submit" class="al-submit">
+        <i class="fas fa-sign-in-alt"></i> Login as Admin
+      </button>
     </form>
+
+    <div class="al-footer">
+      <a href="{{ url_for('main.index') }}">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
+    </div>
+
   </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var _alDark = localStorage.getItem('al_theme') === 'dark';
+
+  function alApplyTheme(dark) {
+    var card  = document.getElementById('al-card');
+    var icon  = document.getElementById('al-theme-icon');
+    var label = document.getElementById('al-theme-label');
+    var track = document.getElementById('al-track');
+
+    if (dark) {
+      card.setAttribute('data-al-theme', 'dark');
+      icon.innerHTML    = '<i class="fas fa-moon"></i>';
+      label.textContent = 'Dark';
+      track.classList.add('on');
+    } else {
+      card.removeAttribute('data-al-theme');
+      icon.innerHTML    = '<i class="fas fa-sun"></i>';
+      label.textContent = 'Light';
+      track.classList.remove('on');
+    }
+  }
+
+  function alToggleTheme() {
+    _alDark = !_alDark;
+    localStorage.setItem('al_theme', _alDark ? 'dark' : 'light');
+    alApplyTheme(_alDark);
+  }
+
+  function alTogglePw() {
+    var input = document.getElementById('al-password');
+    var icon  = document.getElementById('al-eye-icon');
+    var show  = input.type === 'text';
+    input.type     = show ? 'password' : 'text';
+    icon.className = show ? 'fas fa-eye' : 'fas fa-eye-slash';
+  }
+
+  // Apply saved theme immediately on load
+  alApplyTheme(_alDark);
+</script>
 {% endblock %}

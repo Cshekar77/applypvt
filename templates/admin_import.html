@@ -10,22 +10,23 @@
 }
 .imp-header h2 {
   font-family: 'Playfair Display', serif; font-size: 1.8rem;
-  color: #0a1f44; margin: 0; flex: 1;
+  color: #0a1f44; margin: 0; flex: 1; min-width: 0;
 }
 .btn-back {
   display: inline-flex; align-items: center; gap: .4rem;
   color: #5a6e82; text-decoration: none; font-size: .88rem;
   padding: .5rem .9rem; border-radius: 8px; border: 1px solid #dde3ed;
-  transition: all .2s;
+  transition: all .2s; white-space: nowrap; flex-shrink: 0;
 }
 .btn-back:hover { background: #f0f4fb; color: #0a1f44; text-decoration: none; }
 
-/* Steps indicator */
+/* Steps bar */
 .steps-bar {
   display: flex; align-items: center; gap: 0;
   margin-bottom: 2.5rem; background: white;
   border: 1px solid #eef2f8; border-radius: 14px;
-  padding: 1rem 1.5rem; overflow-x: auto;
+  padding: .85rem 1.25rem; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .step-ind {
   display: flex; align-items: center; gap: .6rem;
@@ -42,12 +43,12 @@
 }
 .step-ind.active .step-circle { background: #0a1f44; color: white; }
 .step-ind.done   .step-circle { background: #25c26e; color: white; }
-.step-arrow { color: #dde3ed; padding: 0 .75rem; font-size: .8rem; flex-shrink: 0; }
+.step-arrow { color: #dde3ed; padding: 0 .65rem; font-size: .8rem; flex-shrink: 0; }
 
 /* Cards */
 .imp-card {
   background: white; border-radius: 16px;
-  border: 1px solid #eef2f8; padding: 2rem;
+  border: 1px solid #eef2f8; padding: 1.75rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 12px rgba(0,0,0,.04);
 }
@@ -60,7 +61,7 @@
 /* Upload zone */
 .upload-zone {
   border: 2px dashed #c9a03d;
-  border-radius: 12px; padding: 3rem 2rem;
+  border-radius: 12px; padding: 2rem 1.5rem;
   text-align: center; cursor: pointer;
   transition: background .2s;
   position: relative;
@@ -77,12 +78,14 @@
 }
 
 /* Mapping table */
-.map-table { width: 100%; border-collapse: collapse; }
+.map-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.map-table { width: 100%; border-collapse: collapse; min-width: 480px; }
 .map-table th {
   background: #f0f4fb; padding: .75rem 1rem;
   font-size: .78rem; font-weight: 700; color: #5a6e82;
   text-transform: uppercase; letter-spacing: .06em;
   text-align: left; border-bottom: 1px solid #eef2f8;
+  white-space: nowrap;
 }
 .map-table td {
   padding: .75rem 1rem; border-bottom: 1px solid #f5f7fa;
@@ -95,12 +98,12 @@
 .field-req {
   display: inline-block; font-size: .65rem; font-weight: 700;
   padding: 1px 6px; border-radius: 4px; margin-left: .4rem;
-  background: #fdecea; color: #c0392b;
+  background: #fdecea; color: #c0392b; white-space: nowrap;
 }
 .field-opt {
   display: inline-block; font-size: .65rem; font-weight: 700;
   padding: 1px 6px; border-radius: 4px; margin-left: .4rem;
-  background: #eef2f8; color: #5a6e82;
+  background: #eef2f8; color: #5a6e82; white-space: nowrap;
 }
 .field-desc { font-size: .78rem; color: #5a6e82; margin-top: .15rem; }
 .map-select {
@@ -109,11 +112,12 @@
   font-size: .85rem; color: #0a1f44;
   background: white; cursor: pointer;
   transition: border-color .2s;
+  box-sizing: border-box;
 }
 .map-select:focus { outline: none; border-color: #c9a03d; }
 
 /* Preview table */
-.preview-wrap { overflow-x: auto; }
+.preview-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .preview-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
 .preview-table th {
   background: #0a1f44; color: white; padding: .6rem .9rem;
@@ -125,9 +129,7 @@
   color: #2d3e54; white-space: nowrap;
 }
 .preview-table tr:nth-child(even) td { background: #f8f9fc; }
-.preview-count {
-  font-size: .82rem; color: #5a6e82; margin-bottom: .75rem;
-}
+.preview-count { font-size: .82rem; color: #5a6e82; margin-bottom: .75rem; }
 
 /* Result */
 .import-result {
@@ -149,6 +151,7 @@
   cursor: pointer; text-decoration: none;
   transition: transform .2s, box-shadow .2s;
   box-shadow: 0 4px 14px rgba(201,160,61,.3);
+  white-space: nowrap;
 }
 .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201,160,61,.4); color: white; text-decoration: none; }
 .btn-outline {
@@ -156,7 +159,7 @@
   background: white; color: #0a1f44; font-weight: 600; font-size: .9rem;
   padding: .75rem 1.75rem; border-radius: 10px;
   border: 1px solid #dde3ed; cursor: pointer;
-  transition: all .2s; text-decoration: none;
+  transition: all .2s; text-decoration: none; white-space: nowrap;
 }
 .btn-outline:hover { background: #f0f4fb; text-decoration: none; }
 
@@ -171,30 +174,64 @@
 }
 .info-box i { color: #c9a03d; margin-top: .1rem; flex-shrink: 0; }
 
-/* Section toggle */
-.section-hidden { display: none; }
-
 /* Loading spinner */
 .spinner {
   display: none; width: 20px; height: 20px;
   border: 3px solid rgba(255,255,255,.3);
   border-top-color: white; border-radius: 50%;
-  animation: spin .7s linear infinite;
+  animation: spin .7s linear infinite; flex-shrink: 0;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-body.dark .imp-card     { background: #1a2538; border-color: #2d3e54; }
-body.dark .imp-card h3  { color: #eef2ff; }
-body.dark .imp-card .sub{ color: #b9c8e8; }
-body.dark .steps-bar    { background: #1a2538; border-color: #2d3e54; }
-body.dark .map-table th { background: #222f45; }
-body.dark .map-select   { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
-body.dark .preview-table td { color: #c8d8f0; }
+/* Dark mode */
+body.dark .imp-card      { background: #1a2538; border-color: #2d3e54; }
+body.dark .imp-card h3   { color: #eef2ff; }
+body.dark .imp-card .sub { color: #b9c8e8; }
+body.dark .steps-bar     { background: #1a2538; border-color: #2d3e54; }
+body.dark .step-ind      { color: #5a6e82; }
+body.dark .step-ind.active { color: #eef2ff; }
+body.dark .map-table th  { background: #222f45; color: #b9c8e8; border-color: #2d3e54; }
+body.dark .map-table td  { border-color: #1e2e42; }
+body.dark .map-select    { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
+body.dark .preview-table td { color: #c8d8f0; border-color: #1e2e42; }
 body.dark .preview-table tr:nth-child(even) td { background: #1f2e44; }
-body.dark .btn-outline  { background: #1a2538; color: #eef2ff; border-color: #2d3e54; }
-body.dark .info-box     { background: #1e1a0a; border-color: #5a4a1a; color: #d4b866; }
-body.dark .field-name   { color: #eef2ff; }
+body.dark .btn-outline   { background: #1a2538; color: #eef2ff; border-color: #2d3e54; }
+body.dark .info-box      { background: #1e1a0a; border-color: #5a4a1a; color: #d4b866; }
+body.dark .field-name    { color: #eef2ff; }
+body.dark .field-desc    { color: #8a9ab0; }
+body.dark .upload-zone   { border-color: #c9a03d; }
+body.dark .upload-zone h4 { color: #eef2ff; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .imp-page { padding: 1rem .75rem 5rem; }
+  .imp-header h2 { font-size: 1.4rem; }
+  .imp-card { padding: 1.1rem; }
+  .upload-zone { padding: 1.5rem 1rem; }
+  .upload-icon { font-size: 2rem; }
+
+  .action-row { flex-direction: column; align-items: stretch; }
+  .action-row .btn-gold,
+  .action-row .btn-outline { width: 100%; justify-content: center; }
+
+  .steps-bar { padding: .75rem .85rem; gap: 0; }
+  .step-ind  { font-size: .75rem; gap: .4rem; }
+  .step-circle { width: 24px; height: 24px; font-size: .68rem; }
+  .step-arrow  { padding: 0 .4rem; }
+
+  .map-table td:first-child { width: 40%; }
+  .map-table td:last-child  { width: 60%; }
+}
+
+@media (max-width: 400px) {
+  .imp-header { flex-direction: column; align-items: flex-start; }
+  .imp-header h2 { font-size: 1.25rem; }
+  /* Hide step labels on very small screens, keep circles only */
+  .step-ind .step-label { display: none; }
+}
 </style>
+
+{% block navbar_auth %}{% endblock %}
 
 <div class="imp-page">
 
@@ -208,19 +245,23 @@ body.dark .field-name   { color: #eef2ff; }
   <!-- Steps bar -->
   <div class="steps-bar">
     <div class="step-ind active" id="step-ind-1">
-      <div class="step-circle">1</div> Upload File
+      <div class="step-circle">1</div>
+      <span class="step-label">Upload File</span>
     </div>
     <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
     <div class="step-ind" id="step-ind-2">
-      <div class="step-circle">2</div> Map Columns
+      <div class="step-circle">2</div>
+      <span class="step-label">Map Columns</span>
     </div>
     <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
     <div class="step-ind" id="step-ind-3">
-      <div class="step-circle">3</div> Preview
+      <div class="step-circle">3</div>
+      <span class="step-label">Preview</span>
     </div>
     <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
     <div class="step-ind" id="step-ind-4">
-      <div class="step-circle">4</div> Import
+      <div class="step-circle">4</div>
+      <span class="step-label">Import</span>
     </div>
   </div>
 
@@ -281,68 +322,71 @@ body.dark .field-name   { color: #eef2ff; }
       <input type="hidden" name="action" value="import">
       <input type="hidden" name="session_file" value="{{ session_file }}">
 
-      <table class="map-table">
-        <thead>
-          <tr>
-            <th>Database Field</th>
-            <th>Your Excel Column</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% set fields = [
-            ('email',            'Email Address',         True,  'Used as login username'),
-            ('full_name',        'Candidate Name',        True,  'Full name of the candidate'),
-            ('dob',              'Date of Birth',         True,  'Used as password (dd-mm-yyyy or dd/mm/yyyy)'),
-            ('mother_name',      "Mother's Name",         False, 'Mother\'s full name'),
-            ('father_name',      "Father's Name",         False, 'Father\'s full name'),
-            ('gender',           'Gender',                False, 'Male / Female / Other'),
-            ('parent_mobile',    'Parent Mobile Number',  False, 'Parent/Guardian mobile number'),
-            ('phone',            'Student Mobile Number', False, 'Student\'s own mobile number'),
-            ('address',          'Address',               False, 'Residential address'),
-            ('nationality',      'Nationality',           False, 'Default: Indian'),
-            ('religion',         'Religion',              False, 'Religion/Caste category'),
-            ('category',         'Category',              False, 'General / SC / ST / OBC / EWS / PWD'),
-            ('hk_region',        'HK Region',             False, 'Hyderabad-Karnataka region (Yes/No)'),
-            ('kannada_medium',   'Kannada Medium',        False, 'Studied in Kannada medium (Yes/No)'),
-            ('rural_background', 'Rural Background',      False, 'From rural area (Yes/No)'),
-            ('caste_certificate_no', 'Caste Certificate No.', False, 'Caste certificate number'),
-            ('parent_annual_income', 'Parent Annual Income', False, 'Parent\'s annual income'),
-            ('income_certificate_no', 'Income Certificate No.', False, 'Income certificate number'),
-            ('board_10',         '10th Board',            False, 'e.g. CBSE, ICSE, State Board'),
-            ('percent_10',       '10th Percentage',       False, '10th standard percentage'),
-            ('board_12',         '12th Board',            False, 'e.g. CBSE, ICSE, State Board'),
-            ('stream_12',        '12th Stream',           False, 'Science / Commerce / Arts'),
-            ('combination_12',   '12th Combination',      False, 'PCM, PCB, Commerce with Maths, etc.'),
-            ('total_12',         '12th Total Marks',      False, 'Maximum marks in 12th'),
-            ('obtained_12',      '12th Obtained Marks',   False, 'Marks obtained in 12th'),
-            ('percent_12',       '12th Percentage',       False, '12th percentage (auto-calculated)'),
-            ('declaration',      'Declaration',           False, 'Student declaration (Yes/No)')
-          ] %}
+      <div class="map-table-wrap">
+        <table class="map-table">
+          <thead>
+            <tr>
+              <th>Database Field</th>
+              <th>Your Excel Column</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set fields = [
+              ('email',            'Email Address',         True,  'Used as login username'),
+              ('full_name',        'Candidate Name',        True,  'Full name of the candidate'),
+              ('dob',              'Date of Birth',         True,  'Used as password (dd-mm-yyyy or dd/mm/yyyy)'),
+              ('mother_name',      "Mother's Name",         False, "Mother's full name"),
+              ('father_name',      "Father's Name",         False, "Father's full name"),
+              ('gender',           'Gender',                False, 'Male / Female / Other'),
+              ('parent_mobile',    'Parent Mobile Number',  False, 'Parent/Guardian mobile number'),
+              ('phone',            'Student Mobile Number', False, "Student's own mobile number"),
+              ('address',          'Address',               False, 'Residential address'),
+              ('nationality',      'Nationality',           False, 'Default: Indian'),
+              ('religion',         'Religion',              False, 'Religion/Caste category'),
+              ('category',         'Category',              False, 'General / SC / ST / OBC / EWS / PWD'),
+              ('hk_region',        'HK Region',             False, 'Hyderabad-Karnataka region (Yes/No)'),
+              ('kannada_medium',   'Kannada Medium',        False, 'Studied in Kannada medium (Yes/No)'),
+              ('rural_background', 'Rural Background',      False, 'From rural area (Yes/No)'),
+              ('caste_certificate_no', 'Caste Certificate No.', False, 'Caste certificate number'),
+              ('parent_annual_income', 'Parent Annual Income', False, "Parent's annual income"),
+              ('income_certificate_no', 'Income Certificate No.', False, 'Income certificate number'),
+              ('board_10',         '10th Board',            False, 'e.g. CBSE, ICSE, State Board'),
+              ('percent_10',       '10th Percentage',       False, '10th standard percentage'),
+              ('board_12',         '12th Board',            False, 'e.g. CBSE, ICSE, State Board'),
+              ('stream_12',        '12th Stream',           False, 'Science / Commerce / Arts'),
+              ('combination_12',   '12th Combination',      False, 'PCM, PCB, Commerce with Maths, etc.'),
+              ('total_12',         '12th Total Marks',      False, 'Maximum marks in 12th'),
+              ('obtained_12',      '12th Obtained Marks',   False, 'Marks obtained in 12th'),
+              ('percent_12',       '12th Percentage',       False, '12th percentage (auto-calculated)'),
+              ('declaration',      'Declaration',           False, 'Student declaration (Yes/No)')
+            ] %}
 
-          {% for field_key, field_label, required, desc in fields %}
-          <tr>
-            <td style="width: 35%">
-              <div class="field-name">
-                {{ field_label }}
-                {% if required %}<span class="field-req">Required</span>{% else %}<span class="field-opt">Optional</span>{% endif %}
-              </div>
-              <div class="field-desc">{{ desc }}</div>
-            </td>
-            <td style="width: 65%">
-              <select name="map_{{ field_key }}" class="map-select">
-                <option value="">— Skip this field —</option>
-                {% for col in columns %}
-                <option value="{{ col }}"
-                  {% if auto_map and auto_map.get(field_key) == col %}selected{% endif %}>
-                  {{ col }}
-                </option>
-                {% endfor %}
-              </select>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            {% for field_key, field_label, required, desc in fields %}
+            <tr>
+              <td style="width:38%">
+                <div class="field-name">
+                  {{ field_label }}
+                  {% if required %}<span class="field-req">Required</span>
+                  {% else %}<span class="field-opt">Optional</span>{% endif %}
+                </div>
+                <div class="field-desc">{{ desc }}</div>
+              </td>
+              <td style="width:62%">
+                <select name="map_{{ field_key }}" class="map-select">
+                  <option value="">— Skip this field —</option>
+                  {% for col in columns %}
+                  <option value="{{ col }}"
+                    {% if auto_map and auto_map.get(field_key) == col %}selected{% endif %}>
+                    {{ col }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
       {% if preview_rows %}
       <div style="margin-top:2rem">
@@ -398,10 +442,10 @@ body.dark .field-name   { color: #eef2ff; }
         <strong>How it works:</strong> Upload any Excel file → We detect your column names → You map them to our fields → We import the data and auto-create student accounts.
         <br><br>
         <strong>Required columns in your Excel file:</strong>
-        <ul style="margin-top: .5rem; margin-bottom: 0;">
-          <li><strong>Email Address</strong> - Student's email (will be used as username)</li>
-          <li><strong>Candidate Name</strong> - Full name of the student</li>
-          <li><strong>Date of Birth</strong> - Will be used as password (format: DD-MM-YYYY)</li>
+        <ul style="margin-top:.5rem;margin-bottom:0">
+          <li><strong>Email Address</strong> — Student's email (used as username)</li>
+          <li><strong>Candidate Name</strong> — Full name of the student</li>
+          <li><strong>Date of Birth</strong> — Used as password (format: DD-MM-YYYY)</li>
         </ul>
         <br>
         <strong>Optional but recommended:</strong> Mother's Name, Father's Name, Category, 10th/12th details, etc.
@@ -415,9 +459,9 @@ body.dark .field-name   { color: #eef2ff; }
 
       <div class="upload-zone" id="uploadZone">
         <div class="upload-icon"><i class="fas fa-file-excel"></i></div>
-        <h4>Click to choose file or drag & drop</h4>
+        <h4>Click to choose file or drag &amp; drop</h4>
         <p>Supports .xlsx and .xls files</p>
-        <input type="file" name="excel_file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+        <input type="file" name="excel_file" id="fileInput" accept=".xlsx,.xls" style="display:none">
         <div class="file-chosen" id="fileChosen">
           <i class="fas fa-check"></i> <span id="fileName"></span>
         </div>
@@ -440,31 +484,33 @@ body.dark .field-name   { color: #eef2ff; }
       <li>Make sure the <strong>first row</strong> of your Excel file contains column headers</li>
       <li>Each student must have a unique <strong>email address</strong></li>
       <li>Date of birth should be in <strong>DD-MM-YYYY</strong> or <strong>DD/MM/YYYY</strong> format</li>
-      <li><strong>Category names</strong> should match your admin categories: General, SC, ST, OBC, Cat-I, 2A, 2B, 3A, 3B</li>
-      <li><strong>Yes/No fields</strong> (HK Region, Kannada Medium, Rural Background, Declaration) accept: Yes/No, True/False, 1/0</li>
+      <li><strong>Category names</strong> should match: General, SC, ST, OBC, Cat-I, 2A, 2B, 3A, 3B</li>
+      <li><strong>Yes/No fields</strong> accept: Yes/No, True/False, 1/0</li>
       <li>Percentage can be auto-calculated if you provide Total Marks and Obtained Marks</li>
       <li>Students already in the system (same email) will be <strong>skipped</strong>, not duplicated</li>
       <li>All imported students will be marked as <strong>email-verified</strong> automatically</li>
-      <li>After import, you'll need to <strong>verify</strong> students and assign ranks manually in admin panel</li>
+      <li>After import, you'll need to <strong>verify</strong> students and assign ranks manually</li>
     </ul>
   </div>
   {% endif %}
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
 // File input handling
 var uploadZone = document.getElementById('uploadZone');
-var fileInput = document.getElementById('fileInput');
+var fileInput  = document.getElementById('fileInput');
 var fileChosen = document.getElementById('fileChosen');
-var fileName = document.getElementById('fileName');
+var fileName   = document.getElementById('fileName');
 
 if (uploadZone && fileInput) {
   uploadZone.addEventListener('click', function(e) {
     if (e.target.closest('.file-chosen')) return;
     fileInput.click();
   });
-  
   fileInput.addEventListener('change', function() {
     if (fileInput.files.length > 0) {
       fileName.textContent = fileInput.files[0].name;
@@ -477,11 +523,13 @@ if (uploadZone && fileInput) {
 
 // Drag & drop
 if (uploadZone) {
-  uploadZone.addEventListener('dragover', function(e) { 
-    e.preventDefault(); 
-    uploadZone.classList.add('dragover'); 
+  uploadZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
   });
-  uploadZone.addEventListener('dragleave', function() { uploadZone.classList.remove('dragover'); });
+  uploadZone.addEventListener('dragleave', function() {
+    uploadZone.classList.remove('dragover');
+  });
   uploadZone.addEventListener('drop', function(e) {
     e.preventDefault();
     uploadZone.classList.remove('dragover');
@@ -493,24 +541,25 @@ if (uploadZone) {
   });
 }
 
-// Show spinner on submit
-var uploadForm = document.getElementById('uploadForm');
-var uploadBtn  = document.getElementById('uploadBtn');
+// Spinner on upload submit
+var uploadForm    = document.getElementById('uploadForm');
+var uploadBtn     = document.getElementById('uploadBtn');
 var uploadSpinner = document.getElementById('uploadSpinner');
 if (uploadForm) {
   uploadForm.addEventListener('submit', function() {
     if (uploadSpinner) uploadSpinner.style.display = 'block';
-    if (uploadBtn) uploadBtn.disabled = true;
+    if (uploadBtn)     uploadBtn.disabled = true;
   });
 }
 
-var importForm = document.getElementById('mapForm');
-var importBtn  = document.getElementById('importBtn');
+// Spinner on import submit
+var importForm    = document.getElementById('mapForm');
+var importBtn     = document.getElementById('importBtn');
 var importSpinner = document.getElementById('importSpinner');
 if (importForm) {
   importForm.addEventListener('submit', function() {
     if (importSpinner) importSpinner.style.display = 'block';
-    if (importBtn) importBtn.disabled = true;
+    if (importBtn)     importBtn.disabled = true;
   });
 }
 
@@ -519,7 +568,8 @@ var currentStep = {{ 3 if columns else (4 if result else 1) }};
 for (var i = 1; i <= 4; i++) {
   var el = document.getElementById('step-ind-' + i);
   if (!el) continue;
-  if (i < currentStep) el.classList.add('done');
+  el.classList.remove('active', 'done');
+  if (i < currentStep)      el.classList.add('done');
   else if (i === currentStep) el.classList.add('active');
 }
 </script>

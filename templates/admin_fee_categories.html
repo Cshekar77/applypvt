@@ -14,9 +14,11 @@
   .btn-back {
     display: inline-flex; align-items: center; gap: .4rem;
     color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
+    white-space: nowrap;
   }
   .btn-back:hover { color: #0a1f44; }
 
+  /* ── Add card ── */
   .add-card {
     background: linear-gradient(135deg, #fffdf5, #fff8e8);
     border: 1.5px solid #e8d5a0; border-radius: 20px;
@@ -29,7 +31,10 @@
   .add-form-row {
     display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap;
   }
-  .add-form-group { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 180px; }
+  .add-form-group {
+    display: flex; flex-direction: column; gap: .3rem;
+    flex: 1 1 180px; min-width: 0;
+  }
   .add-form-group label {
     font-size: .75rem; font-weight: 600; color: #0a1f44;
     text-transform: uppercase; letter-spacing: .04em;
@@ -37,24 +42,28 @@
   .add-form-group input {
     padding: .65rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
     font-size: .92rem; font-family: inherit; outline: none; transition: border-color .2s;
-    background: white;
+    background: white; box-sizing: border-box; width: 100%;
   }
   .add-form-group input:focus { border-color: #c9a03d; }
+
+  /* BUG FIX: wider left padding so ₹ never overlaps number */
   .amount-wrap { position: relative; }
   .amount-wrap .currency-prefix {
-    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+    position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
     color: #5a6e82; font-size: .9rem; font-weight: 600; pointer-events: none;
+    z-index: 1;
   }
-  .amount-wrap input { padding-left: 1.75rem; }
+  .amount-wrap input { padding-left: 2rem; }
 
   .btn-add {
     padding: .65rem 1.4rem; background: #c9a03d; color: white;
     border: none; border-radius: 10px; font-size: .88rem; font-weight: 700;
     cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem;
-    white-space: nowrap; align-self: flex-end;
+    white-space: nowrap; flex-shrink: 0;
   }
   .btn-add:hover { background: #b8902e; transform: translateY(-1px); }
 
+  /* ── Table card ── */
   .table-card {
     background: white; border-radius: 20px;
     border: 1px solid #eef2f8; overflow: hidden;
@@ -62,53 +71,64 @@
   }
   .table-card-header {
     padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
   }
   .table-card-header h4 { font-size: 1rem; color: #0a1f44; margin: 0; font-weight: 700; }
   .count-pill {
     background: #eef2f8; color: #5a6e82; font-size: .72rem;
-    font-weight: 700; padding: 2px 10px; border-radius: 20px;
+    font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap;
   }
 
-  .fee-table { width: 100%; border-collapse: collapse; }
+  /* BUG FIX: proper overflow wrapper for table */
+  .fee-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .fee-table { width: 100%; border-collapse: collapse; min-width: 420px; }
   .fee-table th {
     text-align: left; padding: .65rem 1.25rem; font-size: .7rem; font-weight: 700;
     letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
-    background: #fafbfd; border-bottom: 1px solid #eef2f8;
+    background: #fafbfd; border-bottom: 1px solid #eef2f8; white-space: nowrap;
   }
-  .fee-table td { padding: .75rem 1.25rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle; }
+  .fee-table td {
+    padding: .75rem 1.25rem; border-bottom: 1px solid #f5f7fa; vertical-align: middle;
+  }
   .fee-table tr:last-child td { border-bottom: none; }
   .fee-table tr:hover td { background: #fffdf5; }
 
-  .fee-name { font-weight: 600; color: #0a1f44; font-size: .9rem; }
+  .fee-name { font-weight: 600; color: #0a1f44; font-size: .9rem; word-break: break-word; }
   .fee-amount {
     font-weight: 700; color: #1a5c3a; font-size: .95rem;
-    font-family: 'Courier New', monospace;
+    font-family: 'Courier New', monospace; white-space: nowrap;
   }
   .status-pill {
-    display: inline-block; font-size: .68rem; font-weight: 700;
-    padding: 2px 9px; border-radius: 20px;
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .68rem; font-weight: 700;
+    padding: 2px 9px; border-radius: 20px; white-space: nowrap;
   }
   .status-pill.active   { background: #d4edda; color: #155724; }
   .status-pill.inactive { background: #f8d7da; color: #721c24; }
 
-  .action-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .action-btns { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
   .btn-edit {
-    padding: .35rem .8rem; background: #eef2f8; color: #0a1f44;
+    padding: .38rem .85rem; background: #eef2f8; color: #0a1f44;
     border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
-    cursor: pointer; transition: all .2s;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: .3rem;
+    min-height: 32px;
   }
   .btn-edit:hover { background: #dde3ed; }
   .btn-toggle {
-    padding: .35rem .8rem; background: #fff3cd; color: #856404;
+    padding: .38rem .85rem; background: #fff3cd; color: #856404;
     border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
-    cursor: pointer; transition: all .2s;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: .3rem;
+    min-height: 32px;
   }
   .btn-toggle:hover { background: #fde8a0; }
   .btn-del {
-    padding: .35rem .8rem; background: #fee2e2; color: #991b1b;
+    padding: .38rem .85rem; background: #fee2e2; color: #991b1b;
     border: none; border-radius: 7px; font-size: .78rem; font-weight: 600;
-    cursor: pointer; transition: all .2s;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: .3rem;
+    min-height: 32px;
   }
   .btn-del:hover { background: #fca5a5; }
 
@@ -117,10 +137,12 @@
   }
   .empty-state i { font-size: 2rem; margin-bottom: .75rem; display: block; }
 
+  /* ── Modal ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
     background: rgba(10,31,68,.45);
-    align-items: center; justify-content: center; padding: 1rem;
+    align-items: center; justify-content: center;
+    padding: 1rem; box-sizing: border-box;
   }
   .modal-overlay.open { display: flex; }
   .modal-box {
@@ -129,6 +151,9 @@
     box-shadow: 0 20px 60px rgba(10,31,68,.2);
     animation: modal-in .18s ease;
     overflow: hidden;
+    /* BUG FIX: max-height + flex column so it scrolls on short screens */
+    max-height: calc(100vh - 2rem);
+    display: flex; flex-direction: column;
   }
   @keyframes modal-in {
     from { transform: translateY(20px); opacity: 0; }
@@ -137,16 +162,20 @@
   .modal-header {
     padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
     display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
   }
   .modal-header h4 { font-size: 1rem; font-weight: 700; color: #0a1f44; margin: 0; }
   .modal-close {
     background: #f3f4f6; border: none; border-radius: 50%;
     width: 32px; height: 32px; cursor: pointer; font-size: 1.1rem;
     color: #5a6e82; display: flex; align-items: center; justify-content: center;
-    transition: background .15s;
+    transition: background .15s; flex-shrink: 0;
   }
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
-  .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+  .modal-body {
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+    overflow-y: auto; flex: 1;
+  }
   .modal-body label {
     font-size: .75rem; font-weight: 600; color: #0a1f44;
     text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: .3rem;
@@ -157,47 +186,106 @@
     box-sizing: border-box;
   }
   .modal-body input:focus { border-color: #c9a03d; }
+  .modal-body .amount-wrap input { padding-left: 2rem; }
   .modal-footer {
     padding: 1rem 1.5rem; border-top: 1px solid #eef2f8;
     display: flex; justify-content: flex-end; gap: .65rem;
+    flex-shrink: 0; flex-wrap: wrap;
   }
   .btn-cancel {
     padding: .6rem 1.2rem; background: #f3f4f6; color: #5a6e82;
     border: none; border-radius: 9px; font-weight: 600; font-size: .85rem;
-    cursor: pointer; transition: background .2s;
+    cursor: pointer; transition: background .2s; white-space: nowrap;
   }
   .btn-cancel:hover { background: #e5e7eb; }
   .btn-save {
     padding: .6rem 1.4rem; background: #c9a03d; color: white;
     border: none; border-radius: 9px; font-weight: 700; font-size: .85rem;
-    cursor: pointer; transition: all .2s;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: .4rem;
   }
   .btn-save:hover { background: #b8902e; }
 
-  body.dark .add-card      { background: #1a1408; border-color: #c9a03d44; }
-  body.dark .add-card h3   { color: #b9c8e8; }
-  body.dark .add-form-group input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .table-card    { background: #1a2538; border-color: #2d3e54; }
-  body.dark .fee-table th  { background: #131e2e; color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .fee-table td  { border-color: #1e2e42; }
-  body.dark .fee-table tr:hover td { background: #1e2438; }
-  body.dark .fee-name      { color: #eef2ff; }
-  body.dark .modal-box     { background: #1a2538; }
-  body.dark .modal-header  { border-color: #2d3e54; }
-  body.dark .modal-header h4 { color: #eef2ff; }
-  body.dark .modal-body input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .modal-footer  { border-color: #2d3e54; }
-  body.dark .modal-close   { background: #2d3e54; color: #b9c8e8; }
-  body.dark .btn-edit      { background: #2d3e54; color: #eef2ff; }
-  body.dark .btn-cancel    { background: #2d3e54; color: #b9c8e8; }
-  body.dark .fc-header h2  { color: #eef2ff; }
-  body.dark .table-card-header h4 { color: #eef2ff; }
+  /* ── Mobile card layout (≤ 580px) ── */
+  @media (max-width: 580px) {
+    .fc-page { padding: 1rem .75rem 4rem; }
+    .fc-header h2 { font-size: 1.4rem; }
 
-  @media (max-width: 600px) {
-    .add-form-row  { flex-direction: column; }
-    .add-form-group { min-width: unset; }
-    .fee-table th:nth-child(3),
-    .fee-table td:nth-child(3) { display: none; }
+    /* Add form stacks fully */
+    .add-form-row { flex-direction: column; align-items: stretch; }
+    .add-form-group { flex: unset; width: 100%; }
+    .btn-add { width: 100%; justify-content: center; }
+
+    /* BUG FIX: replace display:none column trick with mobile cards */
+    .fee-table-wrap { overflow-x: unset; }
+    .fee-table, .fee-table thead, .fee-table tbody,
+    .fee-table th, .fee-table td, .fee-table tr { display: block; }
+    .fee-table { min-width: unset; }
+    .fee-table thead { display: none; }
+
+    .fee-table tbody tr {
+      background: white; border: 1px solid #eef2f8;
+      border-radius: 14px; margin-bottom: .85rem;
+      padding: .75rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .fee-table tbody tr:hover { background: #fffdf5; }
+
+    .fee-table td {
+      padding: .3rem .1rem; border: none;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: .5rem; font-size: .85rem;
+    }
+    .fee-table td::before {
+      content: attr(data-label);
+      font-size: .67rem; font-weight: 700; text-transform: uppercase;
+      color: #8a9ab0; letter-spacing: .06em;
+      flex-shrink: 0; min-width: 70px;
+    }
+    .fee-table td.actions-cell {
+      flex-direction: column; align-items: flex-start;
+    }
+    .fee-table td.actions-cell::before { display: none; }
+    .action-btns { width: 100%; }
+
+    /* Modal full width on mobile */
+    .modal-box { border-radius: 16px; max-height: calc(100vh - 1rem); }
+    .modal-header { padding: 1rem; }
+    .modal-body { padding: 1rem; }
+    .modal-footer {
+      padding: .85rem 1rem; flex-direction: column-reverse;
+    }
+    .btn-cancel, .btn-save { width: 100%; justify-content: center; text-align: center; }
+  }
+
+  /* ── Dark mode ── */
+  body.dark .add-card        { background: #1a1408; border-color: #c9a03d44; }
+  body.dark .add-card h3     { color: #b9c8e8; }
+  body.dark .add-form-group label { color: #eef2ff; }
+  body.dark .add-form-group input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .table-card      { background: #1a2538; border-color: #2d3e54; }
+  body.dark .table-card-header { border-color: #2d3e54; }
+  body.dark .table-card-header h4 { color: #eef2ff; }
+  body.dark .fee-table th    { background: #131e2e; color: #b9c8e8; border-color: #2d3e54; }
+  body.dark .fee-table td    { border-color: #1e2e42; }
+  body.dark .fee-table tr:hover td { background: #1e2438; }
+  body.dark .fee-name        { color: #eef2ff; }
+  body.dark .modal-box       { background: #1a2538; }
+  body.dark .modal-header    { border-color: #2d3e54; }
+  body.dark .modal-header h4 { color: #eef2ff; }
+  body.dark .modal-body label { color: #eef2ff; }
+  body.dark .modal-body input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .modal-footer    { border-color: #2d3e54; }
+  body.dark .modal-close     { background: #2d3e54; color: #b9c8e8; }
+  body.dark .btn-edit        { background: #2d3e54; color: #eef2ff; }
+  body.dark .btn-cancel      { background: #2d3e54; color: #b9c8e8; }
+  body.dark .fc-header h2    { color: #eef2ff; }
+  body.dark .count-pill      { background: #2d3e54; color: #b9c8e8; }
+
+  @media (max-width: 580px) {
+    body.dark .fee-table tbody tr {
+      background: #1a2538; border-color: #2d3e54;
+    }
+    body.dark .fee-table tbody tr:hover { background: #1e2e42; }
   }
 </style>
 
@@ -240,52 +328,62 @@
     </div>
 
     {% if categories %}
-    <table class="fee-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Amount</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for cat in categories %}
-        <tr>
-          <td><span class="fee-name">{{ cat.name }}</span></td>
-          <td><span class="fee-amount">₹{{ '%.2f'|format(cat.amount) }}</span></td>
-          <td>
-            <span class="status-pill {% if cat.is_active %}active{% else %}inactive{% endif %}">
-              {% if cat.is_active %}● Active{% else %}● Inactive{% endif %}
-            </span>
-          </td>
-          <td>
-            <div class="action-btns">
-              <button class="btn-edit" onclick="openEdit({{ cat.id }}, '{{ cat.name|e }}', {{ cat.amount }})">
-                <i class="fas fa-pen"></i> Edit
-              </button>
-              <form method="POST" style="display:inline">
-                <input type="hidden" name="action" value="toggle"/>
-                <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                <button type="submit" class="btn-toggle">
-                  {% if cat.is_active %}<i class="fas fa-eye-slash"></i> Disable
-                  {% else %}<i class="fas fa-eye"></i> Enable{% endif %}
+    <div class="fee-table-wrap">
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in categories %}
+          <tr>
+            <td data-label="Name">
+              <span class="fee-name">{{ cat.name }}</span>
+            </td>
+            <td data-label="Amount">
+              <span class="fee-amount">₹{{ '%.2f'|format(cat.amount) }}</span>
+            </td>
+            <td data-label="Status">
+              <span class="status-pill {% if cat.is_active %}active{% else %}inactive{% endif %}">
+                {% if cat.is_active %}● Active{% else %}● Inactive{% endif %}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <div class="action-btns">
+                <button class="btn-edit"
+                  onclick="openEdit({{ cat.id }}, '{{ cat.name|e }}', {{ cat.amount }})">
+                  <i class="fas fa-pen"></i> Edit
                 </button>
-              </form>
-              <form method="POST" style="display:inline"
-                onsubmit="return confirm('Delete fee category &quot;{{ cat.name|e }}&quot;?')">
-                <input type="hidden" name="action" value="delete"/>
-                <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
-                <button type="submit" class="btn-del">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+                <form method="POST" style="display:inline">
+                  <input type="hidden" name="action" value="toggle"/>
+                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                  <button type="submit" class="btn-toggle">
+                    {% if cat.is_active %}
+                      <i class="fas fa-eye-slash"></i> Disable
+                    {% else %}
+                      <i class="fas fa-eye"></i> Enable
+                    {% endif %}
+                  </button>
+                </form>
+                <form method="POST" style="display:inline"
+                  onsubmit="return confirm('Delete fee category &quot;{{ cat.name|e }}&quot;?')">
+                  <input type="hidden" name="action" value="delete"/>
+                  <input type="hidden" name="cat_id" value="{{ cat.id }}"/>
+                  <button type="submit" class="btn-del">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     {% else %}
     <div class="empty-state">
       <i class="fas fa-folder-open"></i>
@@ -314,17 +412,21 @@
           <label>Amount (₹)</label>
           <div class="amount-wrap">
             <span class="currency-prefix">₹</span>
-            <input type="number" name="amount" id="edit-amount" min="0" step="0.01" required/>
+            <input type="number" name="amount" id="edit-amount"
+              min="0" step="0.01" required/>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-cancel" onclick="closeEdit()">Cancel</button>
-        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+        <button type="submit" class="btn-save">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
       </div>
     </form>
   </div>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -334,6 +436,9 @@ function openEdit(id, name, amount) {
   document.getElementById('edit-amount').value = amount;
   document.getElementById('edit-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  setTimeout(function() {
+    document.getElementById('edit-name').focus();
+  }, 200);
 }
 function closeEdit() {
   document.getElementById('edit-modal').classList.remove('open');
@@ -346,5 +451,4 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeEdit();
 });
 </script>
-{% endblock %}
 {% endblock %}
