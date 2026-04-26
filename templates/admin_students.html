@@ -1,123 +1,170 @@
 {% extends 'base.html' %}
 {% block title %}All Students — Admin{% endblock %}
+{% block navbar_auth %}{% endblock %}
 {% block content %}
 <style>
-  /* ── List View ── */
   .page-header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
   .page-header-inner h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0; }
-  .search-bar { display: flex; gap: 0.5rem; margin: 1rem 0 1.2rem; flex-wrap: wrap; }
-  .search-bar input { flex: 1; padding: 0.6rem 1rem; border: 2px solid #e2e8f0; border-radius: 40px; font-size: 0.9rem; }
+
+  .search-bar { display: flex; gap: .5rem; margin: 1rem 0 1.2rem; flex-wrap: wrap; }
+  .search-bar input { flex: 1; min-width: 0; padding: .6rem 1rem; border: 2px solid #e2e8f0; border-radius: 40px; font-size: .9rem; box-sizing: border-box; transition: border-color .2s; }
   .search-bar input:focus { outline: none; border-color: #c9a03d; }
-  .btn-outline { background: transparent; border: 1px solid #c9a03d; color: #c9a03d; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; text-decoration: none; display: inline-block; }
+
+  .btn-outline { background: transparent; border: 1px solid #c9a03d; color: #c9a03d; padding: .4rem .8rem; border-radius: 20px; font-size: .8rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; transition: background .2s, color .2s; }
   .btn-outline:hover { background: #c9a03d; color: white; }
-  .btn-primary { background: #c9a03d; color: #0a1f44; border: none; padding: 0.4rem 1rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+  .btn-primary { background: #c9a03d; color: #0a1f44; border: none; padding: .4rem 1rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: .85rem; display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
   .btn-primary:hover { background: #b58c2e; }
-  .btn-sm { font-size: 0.8rem; padding: 0.3rem 0.8rem; }
+  .btn-sm { font-size: .8rem; padding: .3rem .8rem; }
 
   /* ── Student List ── */
-  .student-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
+  .student-list { display: flex; flex-direction: column; gap: .5rem; margin: .5rem 0; }
   .student-row {
     display: flex; align-items: center; gap: 1rem;
     background: white; border-radius: 12px;
-    padding: 0.75rem 1.1rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    cursor: pointer; transition: box-shadow 0.18s, transform 0.15s;
+    padding: .75rem 1.1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    cursor: pointer; transition: box-shadow .18s, transform .15s;
     border: 1.5px solid transparent;
   }
-  .student-row:hover { box-shadow: 0 4px 16px rgba(10,31,68,0.10); border-color: #c9a03d33; transform: translateY(-1px); }
-  .student-row .sno { font-size: 0.78rem; color: #aab; min-width: 28px; font-weight: 600; }
-  .student-row .appno { font-size: 0.75rem; color: #888; min-width: 90px; font-family: monospace; }
-  .student-row .sname { font-weight: 700; color: #0a1f44; font-size: 0.95rem; flex: 1; min-width: 140px; }
-  .student-row .semail { font-size: 0.82rem; color: #555; flex: 1; min-width: 160px; }
-  .student-row .scat { min-width: 90px; }
-  .student-row .stime { font-size: 0.75rem; color: #888; white-space: nowrap; min-width: 130px; }
-  .student-row .sstatus { min-width: 85px; text-align: right; }
+  .student-row:hover { box-shadow: 0 4px 16px rgba(10,31,68,.10); border-color: #c9a03d33; transform: translateY(-1px); }
+  .student-row .sno   { font-size: .78rem; color: #aab; min-width: 28px; font-weight: 600; flex-shrink: 0; }
+  .student-row .appno { font-size: .75rem; color: #888; min-width: 90px; font-family: monospace; flex-shrink: 0; }
+  .student-row .sname { font-weight: 700; color: #0a1f44; font-size: .92rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .student-row .semail { font-size: .82rem; color: #555; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .student-row .scat  { min-width: 90px; flex-shrink: 0; }
+  .student-row .stime { font-size: .75rem; color: #888; white-space: nowrap; min-width: 130px; flex-shrink: 0; }
+  .student-row .sstatus { flex-shrink: 0; text-align: right; }
 
-  .badge-success { background: #d4edda; color: #155724; padding: 0.22rem 0.6rem; border-radius: 20px; font-size: 0.73rem; font-weight: 600; display: inline-block; }
-  .badge-warning { background: #fff3cd; color: #856404; padding: 0.22rem 0.6rem; border-radius: 20px; font-size: 0.73rem; font-weight: 600; display: inline-block; }
-  .category-badge { background: #e8f5e9; color: #2e7d32; padding: 0.18rem 0.5rem; border-radius: 12px; font-size: 0.7rem; display: inline-block; white-space: nowrap; }
-  .bool-yes { background: #d4edda; color: #155724; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
-  .bool-no  { background: #f1f3f5; color: #aaa; padding: 0.12rem 0.45rem; border-radius: 10px; font-size: 0.7rem; display: inline-block; }
+  .badge-success { background: #d4edda; color: #155724; padding: .22rem .6rem; border-radius: 20px; font-size: .73rem; font-weight: 600; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; }
+  .badge-warning { background: #fff3cd; color: #856404; padding: .22rem .6rem; border-radius: 20px; font-size: .73rem; font-weight: 600; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; }
+  .category-badge { background: #e8f5e9; color: #2e7d32; padding: .18rem .5rem; border-radius: 12px; font-size: .7rem; display: inline-block; white-space: nowrap; }
+  .bool-yes { background: #d4edda; color: #155724; padding: .12rem .45rem; border-radius: 10px; font-size: .7rem; font-weight: 600; display: inline-block; }
+  .bool-no  { background: #f1f3f5; color: #aaa; padding: .12rem .45rem; border-radius: 10px; font-size: .7rem; display: inline-block; }
 
   .list-header {
     display: flex; align-items: center; gap: 1rem;
-    padding: 0.4rem 1.1rem; font-size: 0.72rem; font-weight: 700;
-    color: #0a1f44; text-transform: uppercase; letter-spacing: 0.04em;
-    opacity: 0.6;
+    padding: .4rem 1.1rem; font-size: .72rem; font-weight: 700;
+    color: #0a1f44; text-transform: uppercase; letter-spacing: .04em; opacity: .6;
   }
-  .list-header .sno  { min-width: 28px; }
-  .list-header .appno { min-width: 90px; }
-  .list-header .sname { flex: 1; min-width: 140px; }
-  .list-header .semail { flex: 1; min-width: 160px; }
-  .list-header .scat { min-width: 90px; }
-  .list-header .stime { min-width: 130px; }
-  .list-header .sstatus { min-width: 85px; text-align: right; }
+  .list-header .sno   { min-width: 28px; flex-shrink: 0; }
+  .list-header .appno { min-width: 90px; flex-shrink: 0; }
+  .list-header .sname { flex: 1; min-width: 0; }
+  .list-header .semail { flex: 1; min-width: 0; }
+  .list-header .scat  { min-width: 90px; flex-shrink: 0; }
+  .list-header .stime { min-width: 130px; flex-shrink: 0; }
+  .list-header .sstatus { flex-shrink: 0; }
 
   .empty-state { text-align: center; padding: 3rem; color: #888; background: white; border-radius: 12px; }
 
   /* ── Modal ── */
   .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);
-    z-index: 9999; align-items: center; justify-content: center;
-    padding: 1rem;
+    background: rgba(10,20,40,.45); backdrop-filter: blur(3px);
+    z-index: 9999; align-items: center; justify-content: center; padding: 1rem;
   }
   .modal-overlay.active { display: flex; }
   .modal-box {
     background: white; border-radius: 18px;
-    width: 100%; max-width: 720px; max-height: 90vh;
-    overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    animation: modalIn 0.22s ease;
-    position: relative;
+    width: 100%; max-width: 720px;
+    max-height: 90vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    animation: modalIn .22s ease;
   }
-  @keyframes modalIn { from { transform: translateY(24px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes modalIn { from { transform: translateY(24px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+
   .modal-header {
-    position: sticky; top: 0; background: #0a1f44;
-    padding: 1.1rem 1.4rem; border-radius: 18px 18px 0 0;
-    display: flex; align-items: center; justify-content: space-between; z-index: 1;
+    background: #0a1f44; padding: 1.1rem 1.4rem;
+    border-radius: 18px 18px 0 0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
   }
-  .modal-header h3 { color: white; font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 0; }
+  .modal-header h3 { color: white; font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .modal-close {
-    background: rgba(255,255,255,0.15); border: none; color: white;
-    width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem;
+    background: rgba(255,255,255,.15); border: none; color: white;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 1rem;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
+    flex-shrink: 0; transition: background .15s;
   }
-  .modal-close:hover { background: rgba(255,255,255,0.28); }
-  .modal-body { padding: 1.4rem; }
+  .modal-close:hover { background: rgba(255,255,255,.28); }
+  .modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; }
 
   .detail-section { margin-bottom: 1.4rem; }
   .detail-section-title {
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; color: #c9a03d; margin-bottom: 0.6rem;
-    padding-bottom: 0.3rem; border-bottom: 1px solid #f0e8d5;
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #c9a03d; margin-bottom: .6rem;
+    padding-bottom: .3rem; border-bottom: 1px solid #f0e8d5;
+    display: flex; align-items: center; gap: .4rem;
   }
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.2rem; }
-  .detail-item { display: flex; flex-direction: column; gap: 0.1rem; }
-  .detail-label { font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
-  .detail-value { font-size: 0.9rem; color: #1a2c3e; font-weight: 500; word-break: break-word; }
-  .detail-value.—  { color: #ccc; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem 1.2rem; }
+  .detail-item { display: flex; flex-direction: column; gap: .1rem; }
+  .detail-label { font-size: .7rem; color: #999; text-transform: uppercase; letter-spacing: .05em; }
+  .detail-value { font-size: .88rem; color: #1a2c3e; font-weight: 500; word-break: break-word; }
 
-  /* Dark mode */
-  body.dark .student-row { background: #1a2538; }
-  body.dark .student-row .sname { color: #eef2ff; }
-  body.dark .student-row .semail, body.dark .student-row .stime { color: #aab; }
-  body.dark .modal-box { background: #1a2538; }
-  body.dark .detail-value { color: #eef2ff; }
-  body.dark .search-bar input { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .empty-state { background: #1a2538; }
+  /* ── DARK MODE ── */
+  body.dark .page-header-inner h2 { color: #eef2ff; }
+  body.dark .list-header { color: #b9c8e8; }
+  body.dark .student-row { background: #1a2538; border-color: transparent; }
+  body.dark .student-row:hover { border-color: rgba(201,160,61,.2); background: #1e2e42; }
+  body.dark .student-row .sname  { color: #eef2ff; }
+  body.dark .student-row .semail,
+  body.dark .student-row .stime,
+  body.dark .student-row .sno,
+  body.dark .student-row .appno  { color: #8a9ab0; }
+  body.dark .search-bar input    { background: #1a2538; border-color: #2d3e54; color: #eef2ff; }
+  body.dark .empty-state         { background: #1a2538; color: #b9c8e8; }
+  body.dark .modal-box           { background: #1a2538; }
+  body.dark .modal-body          { background: #1a2538; }
+  body.dark .detail-section-title { color: #c9a03d; border-color: #3a2e1a; }
+  body.dark .detail-label        { color: #5a6e82; }
+  body.dark .detail-value        { color: #eef2ff; }
+  body.dark .badge-success       { background: #0a2318; color: #4ade80; }
+  body.dark .badge-warning       { background: #1a1408; color: #fbbf24; }
+  body.dark .category-badge      { background: #1e3a2f; color: #81c784; }
+  body.dark .bool-yes            { background: #0a2318; color: #4ade80; }
+  body.dark .bool-no             { background: #2d3e54; color: #8a9ab0; }
 
-  @media (max-width: 600px) {
-    .student-row .semail, .student-row .stime, .student-row .appno { display: none; }
-    .list-header .semail, .list-header .stime, .list-header .appno { display: none; }
-    .detail-grid { grid-template-columns: 1fr; }
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .student-row .appno,
+    .list-header .appno { display: none; }
+    .student-row .stime,
+    .list-header .stime { display: none; }
+  }
+
+  @media (max-width: 560px) {
+    .page-header-inner h2 { font-size: 1.4rem; }
+    .student-row .semail,
+    .list-header .semail { display: none; }
+    .student-row { padding: .65rem .85rem; gap: .65rem; }
+
+    /* Mobile card-style status row */
+    .student-row .sname { font-size: .875rem; }
+    .student-row .scat  { min-width: 0; }
+  }
+
+  @media (max-width: 400px) {
+    .student-row .scat,
+    .list-header .scat { display: none; }
+    .bottom-actions { flex-direction: column; align-items: stretch; }
+    .bottom-actions .btn-outline { width: 100%; justify-content: center; }
+    .search-bar { flex-direction: column; }
+    .search-bar input { border-radius: 10px; }
+    .search-bar .btn-primary { border-radius: 10px; width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .modal-box { border-radius: 16px; max-height: 95vh; }
+    .modal-header { padding: .9rem 1rem; border-radius: 16px 16px 0 0; }
+    .modal-body   { padding: 1rem; }
+    .detail-grid  { grid-template-columns: 1fr; }
   }
 </style>
 
 <div class="page-wrap">
   <div class="page-header-inner">
     <h2><i class="fas fa-users"></i> All Applications
-      <span style="font-size:0.9rem; font-weight:400; color:#888; font-family:sans-serif; margin-left:0.5rem;">({{ students|length }})</span>
+      <span style="font-size:.9rem;font-weight:400;color:#888;font-family:sans-serif;margin-left:.5rem">({{ students|length }})</span>
     </h2>
     <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm">
       <i class="fas fa-arrow-left"></i> Dashboard
@@ -125,7 +172,7 @@
   </div>
 
   <form method="GET" class="search-bar">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email...">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name or email…">
     <button type="submit" class="btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
     {% if q %}<a href="{{ url_for('main.admin_students') }}" class="btn-outline btn-sm"><i class="fas fa-times"></i> Clear</a>{% endif %}
   </form>
@@ -146,11 +193,10 @@
     <div class="student-row" onclick="openModal({{ loop.index0 }})">
       <span class="sno">{{ loop.index }}</span>
       <span class="appno">{{ s.application_number or '—' }}</span>
-      <span class="sname"><i class="fas fa-user-circle" style="color:#c9a03d; margin-right:0.3rem;"></i>{{ s.candidate_name or '—' }}</span>
+      <span class="sname"><i class="fas fa-user-circle" style="color:#c9a03d;margin-right:.3rem"></i>{{ s.candidate_name or '—' }}</span>
       <span class="semail">{{ s.email or '—' }}</span>
       <span class="scat">
-        {% if s.category %}
-          <span class="category-badge">{{ s.category.name }}</span>
+        {% if s.category %}<span class="category-badge">{{ s.category.name }}</span>
         {% else %}—{% endif %}
       </span>
       <span class="stime">{{ s.submitted_at | ist if s.submitted_at else '—' }}</span>
@@ -167,19 +213,19 @@
 
   {% else %}
   <div class="empty-state">
-    <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:0.5rem; display:block; color:#ccc;"></i>
+    <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:.5rem;display:block;color:#ccc"></i>
     No applications found.
   </div>
   {% endif %}
 
-  <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
-    <a href="{{ url_for('main.export_all') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export All (Excel)</a>
-    <a href="{{ url_for('main.export_verified') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export Verified (Excel)</a>
+  <div class="bottom-actions" style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap">
+    <a href="{{ url_for('main.export_all') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export All</a>
+    <a href="{{ url_for('main.export_verified') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export Verified</a>
     <a href="{{ url_for('main.admin_verification') }}" class="btn-outline btn-sm"><i class="fas fa-clock"></i> Pending Verification</a>
   </div>
 </div>
 
-<!-- ── Modal ── -->
+<!-- Modal -->
 <div class="modal-overlay" id="studentModal" onclick="closeModalOutside(event)">
   <div class="modal-box" id="modalBox">
     <div class="modal-header">
@@ -190,65 +236,65 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
 <script>
-  // Helper function to format DOB
+  /* ── DOB formatter: any input → DD/MM/YYYY ── */
   function formatDOB(dob) {
     if (!dob || dob === '—') return '—';
-    var dobClean = dob.split(' ')[0];
-    var parts = dobClean.split('-');
-    if (parts.length === 3 && parts[0].length === 4) {
-      // YYYY-MM-DD to DD-MM-YYYY
-      return parts[2] + '-' + parts[1] + '-' + parts[0];
-    } else if (parts.length === 3) {
-      return parts[0] + '-' + parts[1] + '-' + parts[2];
+    var d = String(dob).split(' ')[0];          // strip time if present
+    var parts = d.includes('-') ? d.split('-') : d.split('/');
+    if (parts.length !== 3) return d;
+    if (parts[0].length === 4) {
+      // YYYY-MM-DD → DD/MM/YYYY
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
     }
-    return dobClean;
+    // Already DD-MM-YYYY or DD/MM/YYYY
+    return parts[0] + '/' + parts[1] + '/' + parts[2];
   }
 
   var students = [
     {% for s in students %}
     {
-      name:               {{ (s.candidate_name or '—') | tojson }},
-      app_number:         {{ (s.application_number or '—') | tojson }},
-      submitted_at:       {{ (s.submitted_at | ist if s.submitted_at else '—') | tojson }},
-      email:              {{ (s.email or '—') | tojson }},
-      phone:              {{ (s.phone or '—') | tojson }},
-      parent_mobile:      {{ (s.parent_mobile or '—') | tojson }},
-      dob:                {{ (s.dob or '—') | tojson }},
-      gender:             {{ (s.gender or '—') | tojson }},
-      mother_name:        {{ (s.mother_name or '—') | tojson }},
-      father_name:        {{ (s.father_name or '—') | tojson }},
-      address:            {{ (s.address or '—') | tojson }},
-      nationality:        {{ (s.nationality or '—') | tojson }},
-      religion:           {{ (s.religion or '—') | tojson }},
-      category:           {{ (s.category.name if s.category else '—') | tojson }},
-      hk_region:          {{ s.hk_region | tojson }},
-      kannada_medium:     {{ s.kannada_medium | tojson }},
-      rural_background:   {{ s.rural_background | tojson }},
-      caste_cert:         {{ (s.caste_certificate_no or '—') | tojson }},
-      annual_income:      {{ (s.parent_annual_income or '—') | tojson }},
-      income_cert:        {{ (s.income_certificate_no or '—') | tojson }},
-      board_10:           {{ (s.board_10 or '—') | tojson }},
-      percent_10:         {{ ('%.2f'|format(s.percent_10) ~ '%' if s.percent_10 else '—') | tojson }},
-      board_12:           {{ (s.board_12 or '—') | tojson }},
-      stream_12:          {{ (s.stream_12 or '—') | tojson }},
-      combination_12:     {{ (s.combination_12 or '—') | tojson }},
-      total_12:           {{ (s.total_12|int|string if s.total_12 else '—') | tojson }},
-      obtained_12:        {{ (s.obtained_12|int|string if s.obtained_12 else '—') | tojson }},
-      percent_12:         {{ ('%.2f'|format(s.percent_12) ~ '%' if s.percent_12 else '—') | tojson }},
-      is_verified:        {{ s.is_verified | tojson }},
+      name:           {{ (s.candidate_name or '—') | tojson }},
+      app_number:     {{ (s.application_number or '—') | tojson }},
+      submitted_at:   {{ (s.submitted_at | ist if s.submitted_at else '—') | tojson }},
+      email:          {{ (s.email or '—') | tojson }},
+      phone:          {{ (s.phone or '—') | tojson }},
+      parent_mobile:  {{ (s.parent_mobile or '—') | tojson }},
+      dob:            {{ (s.dob | string if s.dob else '—') | tojson }},
+      gender:         {{ (s.gender or '—') | tojson }},
+      mother_name:    {{ (s.mother_name or '—') | tojson }},
+      father_name:    {{ (s.father_name or '—') | tojson }},
+      address:        {{ (s.address or '—') | tojson }},
+      nationality:    {{ (s.nationality or '—') | tojson }},
+      religion:       {{ (s.religion or '—') | tojson }},
+      category:       {{ (s.category.name if s.category else '—') | tojson }},
+      hk_region:      {{ s.hk_region | tojson }},
+      kannada_medium: {{ s.kannada_medium | tojson }},
+      rural_background: {{ s.rural_background | tojson }},
+      caste_cert:     {{ (s.caste_certificate_no or '—') | tojson }},
+      annual_income:  {{ (s.parent_annual_income or '—') | tojson }},
+      income_cert:    {{ (s.income_certificate_no or '—') | tojson }},
+      board_10:       {{ (s.board_10 or '—') | tojson }},
+      percent_10:     {{ ('%.2f'|format(s.percent_10) ~ '%' if s.percent_10 else '—') | tojson }},
+      board_12:       {{ (s.board_12 or '—') | tojson }},
+      stream_12:      {{ (s.stream_12 or '—') | tojson }},
+      combination_12: {{ (s.combination_12 or '—') | tojson }},
+      total_12:       {{ (s.total_12|int|string if s.total_12 else '—') | tojson }},
+      obtained_12:    {{ (s.obtained_12|int|string if s.obtained_12 else '—') | tojson }},
+      percent_12:     {{ ('%.2f'|format(s.percent_12) ~ '%' if s.percent_12 else '—') | tojson }},
+      is_verified:    {{ s.is_verified | tojson }}
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ];
 
   function bool(v) {
-    return v
-      ? '<span class="bool-yes">Yes</span>'
-      : '<span class="bool-no">No</span>';
+    return v ? '<span class="bool-yes">Yes</span>' : '<span class="bool-no">No</span>';
   }
-
   function row(label, value) {
-    return `<div class="detail-item"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`;
+    return '<div class="detail-item"><span class="detail-label">' + label + '</span><span class="detail-value">' + value + '</span></div>';
   }
 
   function openModal(idx) {
@@ -257,23 +303,21 @@
 
     var html = '';
 
-    // Personal
     html += '<div class="detail-section">';
     html += '<div class="detail-section-title"><i class="fas fa-id-card"></i> Personal Information</div>';
     html += '<div class="detail-grid">';
     html += row('Application No.', s.app_number);
-    html += row('Submitted At', s.submitted_at);
+    html += row('Submitted At (IST)', s.submitted_at);
     html += row('Full Name', s.name);
     html += row('Date of Birth', formatDOB(s.dob));
     html += row('Gender', s.gender);
-    html += row('Mother\'s Name', s.mother_name);
-    html += row('Father\'s Name', s.father_name);
+    html += row("Mother's Name", s.mother_name);
+    html += row("Father's Name", s.father_name);
     html += row('Religion', s.religion);
     html += row('Nationality', s.nationality);
     html += row('Address', s.address);
     html += '</div></div>';
 
-    // Contact
     html += '<div class="detail-section">';
     html += '<div class="detail-section-title"><i class="fas fa-phone"></i> Contact Details</div>';
     html += '<div class="detail-grid">';
@@ -282,7 +326,6 @@
     html += row('Parent Mobile', s.parent_mobile);
     html += '</div></div>';
 
-    // Category & Reservation
     html += '<div class="detail-section">';
     html += '<div class="detail-section-title"><i class="fas fa-tag"></i> Category & Reservation</div>';
     html += '<div class="detail-grid">';
@@ -291,11 +334,10 @@
     html += row('Kannada Medium', bool(s.kannada_medium));
     html += row('Rural Background', bool(s.rural_background));
     html += row('Caste Certificate No.', s.caste_cert);
-    html += row('Parent\'s Annual Income', s.annual_income);
+    html += row("Parent's Annual Income", s.annual_income);
     html += row('Income Certificate No.', s.income_cert);
     html += '</div></div>';
 
-    // Academics
     html += '<div class="detail-section">';
     html += '<div class="detail-section-title"><i class="fas fa-graduation-cap"></i> Academic Details</div>';
     html += '<div class="detail-grid">';
@@ -306,16 +348,15 @@
     html += row('12th Combination', s.combination_12);
     html += row('12th Max. Marks', s.total_12);
     html += row('12th Marks Scored', s.obtained_12);
-    html += row('12th Percentage', `<strong>${s.percent_12}</strong>`);
+    html += row('12th Percentage', '<strong>' + s.percent_12 + '</strong>');
     html += '</div></div>';
 
-    // Status
     var statusBadge = s.is_verified
       ? '<span class="badge-success"><i class="fas fa-check-circle"></i> Verified</span>'
       : '<span class="badge-warning"><i class="fas fa-clock"></i> Pending Verification</span>';
     html += '<div class="detail-section">';
     html += '<div class="detail-section-title"><i class="fas fa-info-circle"></i> Application Status</div>';
-    html += `<div style="padding:0.3rem 0;">${statusBadge}</div>`;
+    html += '<div style="padding:.3rem 0">' + statusBadge + '</div>';
     html += '</div>';
 
     document.getElementById('modalBody').innerHTML = html;
@@ -327,11 +368,9 @@
     document.getElementById('studentModal').classList.remove('active');
     document.body.style.overflow = '';
   }
-
   function closeModalOutside(e) {
     if (e.target === document.getElementById('studentModal')) closeModal();
   }
-
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeModal();
   });

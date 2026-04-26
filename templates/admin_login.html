@@ -3,8 +3,8 @@
 {% block navbar_auth %}{% endblock %}
 {% block content %}
 <style>
-  /* ── CSS VARIABLES FOR THEMES ── */
-  :root {
+  /* ── CSS VARIABLES — scoped to #al-page so dark mode affects everything ── */
+  #al-page {
     --al-bg-from: #f0f4fb;
     --al-bg-mid:  #e8eef8;
     --al-bg-to:   #dde6f5;
@@ -40,44 +40,45 @@
     --al-flash-warn-color: #92400e;
   }
 
-  [data-al-theme="dark"] {
+  /* ── DARK MODE — also on #al-page so bg + circles + card ALL change ── */
+  #al-page[data-al-theme="dark"] {
     --al-bg-from: #060f1e;
     --al-bg-mid:  #0a1f44;
     --al-bg-to:   #0d2857;
-    --al-card-bg: rgba(255,255,255,.04);
-    --al-card-border: rgba(201,160,61,.25);
-    --al-card-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 60px rgba(201,160,61,.06);
-    --al-circle1: rgba(201,160,61,.12);
+    --al-card-bg: rgba(255,255,255,.05);
+    --al-card-border: rgba(201,160,61,.28);
+    --al-card-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 60px rgba(201,160,61,.07);
+    --al-circle1: rgba(201,160,61,.13);
     --al-circle2: rgba(201,160,61,.08);
-    --al-h1: white;
+    --al-h1: #ffffff;
     --al-sub: rgba(255,255,255,.45);
     --al-divider-line: rgba(201,160,61,.3);
-    --al-divider-text: rgba(201,160,61,.6);
+    --al-divider-text: rgba(201,160,61,.65);
     --al-label: rgba(255,255,255,.55);
-    --al-input-bg: rgba(255,255,255,.06);
-    --al-input-border: rgba(255,255,255,.1);
-    --al-input-focus-border: rgba(201,160,61,.7);
-    --al-input-focus-shadow: rgba(201,160,61,.12);
-    --al-input-color: white;
-    --al-placeholder: rgba(255,255,255,.25);
-    --al-icon-color: rgba(201,160,61,.6);
-    --al-toggle-color: rgba(255,255,255,.35);
-    --al-toggle-hover: rgba(201,160,61,.8);
-    --al-footer-color: rgba(255,255,255,.3);
-    --al-footer-hover: rgba(201,160,61,.7);
-    --al-theme-btn-bg: rgba(255,255,255,.08);
-    --al-theme-btn-color: rgba(255,255,255,.8);
-    --al-theme-btn-border: rgba(255,255,255,.12);
-    --al-flash-error-bg: rgba(220,53,69,.15);
+    --al-input-bg: rgba(255,255,255,.07);
+    --al-input-border: rgba(255,255,255,.12);
+    --al-input-focus-border: rgba(201,160,61,.75);
+    --al-input-focus-shadow: rgba(201,160,61,.13);
+    --al-input-color: #ffffff;
+    --al-placeholder: rgba(255,255,255,.28);
+    --al-icon-color: rgba(201,160,61,.65);
+    --al-toggle-color: rgba(255,255,255,.38);
+    --al-toggle-hover: rgba(201,160,61,.85);
+    --al-footer-color: rgba(255,255,255,.32);
+    --al-footer-hover: rgba(201,160,61,.75);
+    --al-theme-btn-bg: rgba(255,255,255,.09);
+    --al-theme-btn-color: rgba(255,255,255,.85);
+    --al-theme-btn-border: rgba(255,255,255,.14);
+    --al-flash-error-bg: rgba(220,53,69,.18);
     --al-flash-error-color: #f87171;
-    --al-flash-success-bg: rgba(37,194,110,.15);
+    --al-flash-success-bg: rgba(37,194,110,.18);
     --al-flash-success-color: #4ade80;
-    --al-flash-warn-bg: rgba(240,192,64,.15);
+    --al-flash-warn-bg: rgba(240,192,64,.18);
     --al-flash-warn-color: #fbbf24;
   }
 
-  /* ── PAGE ── */
-  .al-page {
+  /* ── PAGE — uses #al-page vars so switching on the element works ── */
+  #al-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -86,30 +87,32 @@
     background: linear-gradient(135deg, var(--al-bg-from) 0%, var(--al-bg-mid) 50%, var(--al-bg-to) 100%);
     position: relative;
     overflow: hidden;
-    transition: background .4s;
+    transition: background 0s; /* gradients can't interpolate — instant swap looks cleaner */
   }
-  .al-page::before, .al-page::after {
+
+  /* Decorative circles — inherit vars from #al-page */
+  #al-page::before, #al-page::after {
     content: '';
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
   }
-  .al-page::before {
-    width: 500px; height: 500px;
+  #al-page::before {
+    width: 520px; height: 520px;
     background: radial-gradient(circle, var(--al-circle1) 0%, transparent 70%);
-    top: -150px; right: -150px;
+    top: -160px; right: -160px;
   }
-  .al-page::after {
-    width: 400px; height: 400px;
+  #al-page::after {
+    width: 420px; height: 420px;
     background: radial-gradient(circle, var(--al-circle2) 0%, transparent 70%);
-    bottom: -100px; left: -100px;
+    bottom: -110px; left: -110px;
   }
 
   /* ── CARD ── */
   .al-card {
     background: var(--al-card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--al-card-border);
     border-radius: 24px;
     padding: 2.75rem 2.5rem 2.5rem;
@@ -118,52 +121,46 @@
     box-shadow: var(--al-card-shadow);
     position: relative;
     z-index: 1;
-    transition: background .4s, border-color .4s, box-shadow .4s;
+    transition: background .25s, border-color .25s, box-shadow .25s;
   }
 
-  /* ── THEME TOGGLE ── */
+  /* ── THEME TOGGLE PILL ── */
   .al-theme-toggle {
     position: absolute;
-    top: 1.1rem;
-    right: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: .4rem;
+    top: 1.1rem; right: 1.1rem;
+    display: flex; align-items: center; gap: .4rem;
     background: var(--al-theme-btn-bg);
     border: 1px solid var(--al-theme-btn-border);
     border-radius: 30px;
     padding: .3rem .6rem .3rem .5rem;
     cursor: pointer;
-    transition: all .2s;
+    transition: border-color .2s, background .2s;
     z-index: 10;
   }
-  .al-theme-toggle:hover { border-color: rgba(201,160,61,.5); }
+  .al-theme-toggle:hover { border-color: rgba(201,160,61,.55); }
 
   .al-theme-icon {
-    font-size: .8rem;
+    font-size: .82rem;
     color: var(--al-theme-btn-color);
-    transition: color .3s;
-    width: 14px;
-    text-align: center;
+    width: 15px; text-align: center;
+    transition: color .25s;
   }
   .al-theme-label {
-    font-size: .72rem;
-    font-weight: 600;
+    font-size: .72rem; font-weight: 600;
     color: var(--al-theme-btn-color);
     letter-spacing: .04em;
-    transition: color .3s;
-    white-space: nowrap;
-    min-width: 30px;
+    white-space: nowrap; min-width: 28px;
+    transition: color .25s;
   }
   .al-track {
     width: 32px; height: 18px;
-    background: rgba(201,160,61,.2);
+    background: rgba(201,160,61,.22);
     border-radius: 20px;
     position: relative;
-    transition: background .3s;
+    transition: background .25s;
     flex-shrink: 0;
   }
-  .al-track.on { background: rgba(201,160,61,.55); }
+  .al-track.on { background: rgba(201,160,61,.6); }
   .al-thumb {
     width: 13px; height: 13px;
     background: #c9a03d;
@@ -171,7 +168,7 @@
     position: absolute;
     top: 2.5px; left: 3px;
     transition: transform .25s;
-    box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    box-shadow: 0 1px 4px rgba(0,0,0,.28);
   }
   .al-track.on .al-thumb { transform: translateX(14px); }
 
@@ -183,23 +180,20 @@
     border-radius: 18px;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 1rem;
-    box-shadow: 0 8px 24px rgba(201,160,61,.4);
-    font-size: 1.6rem;
-    color: white;
+    box-shadow: 0 8px 24px rgba(201,160,61,.42);
+    font-size: 1.6rem; color: white;
   }
   .al-brand h1 {
     font-family: 'Playfair Display', serif;
     font-size: 1.6rem; font-weight: 700;
     color: var(--al-h1);
-    margin: 0 0 .3rem;
-    letter-spacing: .01em;
-    transition: color .3s;
+    margin: 0 0 .3rem; letter-spacing: .01em;
+    transition: color .25s;
   }
   .al-brand p {
-    font-size: .82rem;
-    color: var(--al-sub);
+    font-size: .82rem; color: var(--al-sub);
     margin: 0; letter-spacing: .02em;
-    transition: color .3s;
+    transition: color .25s;
   }
 
   /* Divider */
@@ -207,13 +201,13 @@
   .al-divider-line {
     flex: 1; height: 1px;
     background: linear-gradient(90deg, transparent, var(--al-divider-line), transparent);
-    transition: background .3s;
+    transition: background .25s;
   }
   .al-divider-text {
     font-size: .7rem; font-weight: 600;
     color: var(--al-divider-text);
     letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
-    transition: color .3s;
+    transition: color .25s;
   }
 
   /* ── FLASH MESSAGES ── */
@@ -222,9 +216,9 @@
     margin-bottom: 1.25rem; font-size: .84rem; font-weight: 500;
     display: flex; align-items: center; gap: .6rem;
   }
-  .al-flash.error   { background: var(--al-flash-error-bg);   border: 1px solid rgba(220,53,69,.35);  color: var(--al-flash-error-color);   }
+  .al-flash.error   { background: var(--al-flash-error-bg);   border: 1px solid rgba(220,53,69,.35);  color: var(--al-flash-error-color); }
   .al-flash.success { background: var(--al-flash-success-bg); border: 1px solid rgba(37,194,110,.35); color: var(--al-flash-success-color); }
-  .al-flash.warning { background: var(--al-flash-warn-bg);    border: 1px solid rgba(240,192,64,.35); color: var(--al-flash-warn-color);    }
+  .al-flash.warning { background: var(--al-flash-warn-bg);    border: 1px solid rgba(240,192,64,.35); color: var(--al-flash-warn-color); }
 
   /* ── FORM ── */
   .al-form { display: flex; flex-direction: column; gap: 1.1rem; }
@@ -233,13 +227,13 @@
     font-size: .75rem; font-weight: 700;
     color: var(--al-label);
     text-transform: uppercase; letter-spacing: .07em;
-    transition: color .3s;
+    transition: color .25s;
   }
   .al-input-wrap { position: relative; display: flex; align-items: center; }
   .al-input-icon {
     position: absolute; left: .95rem;
     color: var(--al-icon-color); font-size: .9rem;
-    pointer-events: none; z-index: 1; transition: color .3s;
+    pointer-events: none; z-index: 1; transition: color .25s;
   }
   .al-input {
     width: 100%; box-sizing: border-box;
@@ -248,7 +242,7 @@
     border: 1.5px solid var(--al-input-border);
     border-radius: 12px; font-size: .92rem;
     color: var(--al-input-color); outline: none;
-    transition: border-color .2s, background .2s, box-shadow .2s, color .3s;
+    transition: border-color .2s, background .25s, box-shadow .2s, color .25s;
     font-family: inherit;
   }
   .al-input::placeholder { color: var(--al-placeholder); }
@@ -257,6 +251,7 @@
     box-shadow: 0 0 0 3px var(--al-input-focus-shadow);
   }
   .al-input.has-toggle { padding-right: 2.8rem; }
+
   .al-pw-toggle {
     position: absolute; right: .85rem;
     background: none; border: none;
@@ -281,7 +276,7 @@
   }
   .al-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(201,160,61,.45);
+    box-shadow: 0 10px 28px rgba(201,160,61,.48);
     background: linear-gradient(135deg, #d4aa45, #b8902e);
     color: white;
   }
@@ -309,8 +304,8 @@
   }
 </style>
 
-<div class="al-page" id="al-page">
-  <div class="al-card" id="al-card">
+<div id="al-page">
+  <div class="al-card">
 
     <!-- Theme Toggle -->
     <button class="al-theme-toggle" onclick="alToggleTheme()" title="Toggle light / dark mode">
@@ -391,18 +386,18 @@
   var _alDark = localStorage.getItem('al_theme') === 'dark';
 
   function alApplyTheme(dark) {
-    var card  = document.getElementById('al-card');
+    var page  = document.getElementById('al-page');
     var icon  = document.getElementById('al-theme-icon');
     var label = document.getElementById('al-theme-label');
     var track = document.getElementById('al-track');
 
     if (dark) {
-      card.setAttribute('data-al-theme', 'dark');
+      page.setAttribute('data-al-theme', 'dark');
       icon.innerHTML    = '<i class="fas fa-moon"></i>';
       label.textContent = 'Dark';
       track.classList.add('on');
     } else {
-      card.removeAttribute('data-al-theme');
+      page.removeAttribute('data-al-theme');
       icon.innerHTML    = '<i class="fas fa-sun"></i>';
       label.textContent = 'Light';
       track.classList.remove('on');
@@ -423,7 +418,7 @@
     icon.className = show ? 'fas fa-eye' : 'fas fa-eye-slash';
   }
 
-  // Apply saved theme immediately on load
+  // Apply saved preference immediately on page load
   alApplyTheme(_alDark);
 </script>
 {% endblock %}
