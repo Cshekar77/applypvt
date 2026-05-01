@@ -8,17 +8,14 @@
     flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
   }
   .page-header-inner h2 {
-    font-family: 'Playfair Display', serif; font-size: 1.8rem;
-    color: #0a1f44; margin: 0;
+    font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #0a1f44; margin: 0;
   }
-  .header-actions {
-    display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;
-  }
+  .header-actions { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
 
-  /* ── Buttons ── */
+  /* Buttons */
   .btn-outline {
-    background: transparent; border: 1.5px solid #c9a03d; color: #c9a03d;
-    padding: .4rem .9rem; border-radius: 20px; font-size: .8rem; font-weight: 600;
+    background: transparent; border: 1px solid #c9a03d; color: #c9a03d;
+    padding: .4rem .9rem; border-radius: 20px; font-size: .8rem;
     cursor: pointer; text-decoration: none; display: inline-flex;
     align-items: center; gap: .35rem; transition: all .2s; white-space: nowrap;
   }
@@ -41,23 +38,23 @@
   .btn-primary:hover { background: #b58c2e; }
   .btn-sm { font-size: .8rem; padding: .35rem .8rem; }
 
-  /* ── List card ── */
+  /* List card */
   .list-card {
     background: white; border-radius: 20px;
     border: 1px solid #eef2f8; overflow: hidden; margin-bottom: 1.5rem;
   }
   .list-card-header {
     padding: 1rem 1.5rem; border-bottom: 1px solid #f5f7fa;
-    display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+    display: flex; align-items: center; gap: .5rem;
   }
   .list-card-header h3 { font-size: 1rem; color: #0a1f44; margin: 0; }
   .list-card-header i  { color: #c9a03d; }
 
-  /* ── Student rows ── */
+  /* Student rows */
   .stu-row {
-    display: flex; align-items: center; gap: .85rem;
+    display: flex; align-items: center; gap: .75rem;
     padding: .9rem 1.5rem; border-bottom: 1px solid #f5f7fa;
-    cursor: pointer; transition: background .15s; flex-wrap: wrap;
+    cursor: pointer; transition: background .15s; flex-wrap: nowrap;
   }
   .stu-row:last-child { border-bottom: none; }
   .stu-row:hover { background: #fffdf5; }
@@ -72,58 +69,46 @@
     font-weight: 600; color: #0a1f44; font-size: .925rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .stu-sub  {
-    color: #5a6e82; font-size: .78rem; margin-top: 1px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
+  .stu-sub  { color: #5a6e82; font-size: .78rem; margin-top: 1px; }
 
   .badge {
     display: inline-flex; align-items: center; gap: .3rem;
     font-size: .68rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
-    white-space: nowrap;
+    padding: 2px 8px; border-radius: 20px; flex-shrink: 0; white-space: nowrap;
   }
-  .badge-warning   { background: #fff3cd; color: #856404; }
+  .badge-warning  { background: #fff3cd; color: #856404; }
   .badge-submitted { background: #e0f2fe; color: #0369a1; }
+
   .row-arrow { color: #c9a03d; font-size: .8rem; flex-shrink: 0; }
 
-  /* ── Modal ── */
+  /* Modal */
   .modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
     background: rgba(10,31,68,.45);
-    align-items: flex-start; justify-content: center;
-    padding: 1.5rem 1rem; box-sizing: border-box;
-    overflow-y: auto;
+    align-items: center; justify-content: center; padding: 1rem;
   }
   .modal-overlay.open { display: flex; }
 
-  /* BUG FIX: remove overflow-y from modal-box so sticky header works */
   .modal-box {
     background: white; border-radius: 24px;
     width: 100%; max-width: 760px;
+    max-height: 90vh;
+    display: flex; flex-direction: column;
     box-shadow: 0 20px 60px rgba(10,31,68,.2);
     animation: modal-in .18s ease;
-    margin: auto;
-    /* sticky header needs overflow visible on the scroll container (overlay) */
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    max-height: calc(100vh - 3rem);
   }
   @keyframes modal-in {
     from { transform: translateY(20px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
 
-  /* BUG FIX: sticky header — works because overlay is the scroll container */
   .modal-header {
     padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
     display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
-    flex-shrink: 0; /* header never shrinks */
-    background: white;
-    border-radius: 24px 24px 0 0;
+    border-radius: 24px 24px 0 0; flex-shrink: 0;
   }
-  .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; word-break: break-word; }
-  .modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 3px; word-break: break-word; }
+  .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; }
+  .modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 3px; }
 
   .modal-close {
     background: #f3f4f6; border: none; border-radius: 50%;
@@ -133,22 +118,18 @@
   }
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
 
-  /* modal-body scrolls */
   .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; }
 
-  /* ── Detail grid ── */
+  /* Detail grid */
   .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: .75rem; margin-bottom: 1.25rem;
   }
   .detail-item span {
     font-size: .7rem; text-transform: uppercase; color: #5a6e82;
     letter-spacing: .04em; display: block; margin-bottom: 2px;
   }
-  .detail-item strong {
-    font-size: .88rem; color: #0a1f44; word-break: break-word;
-  }
+  .detail-item strong { font-size: .88rem; color: #0a1f44; }
 
   .section-divider {
     font-size: .72rem; font-weight: 600; color: #5a6e82;
@@ -162,58 +143,64 @@
     display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; margin-top: 1rem;
   }
 
-  /* ── Empty state ── */
   .empty-state {
     text-align: center; padding: 3rem 1rem; color: #aab4c8;
     background: white; border-radius: 20px; border: 1px solid #eef2f8;
   }
-  .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; color: #d4edda; }
+  .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  .empty-state .empty-title { font-size: 1.1rem; font-weight: 600; color: #0a1f44; margin-bottom: .5rem; }
 
-  /* ── Mobile ── */
-  @media (max-width: 600px) {
-    .page-header-inner h2 { font-size: 1.35rem; }
-    .badge-submitted { display: none; }
-
-    .modal-overlay { padding: .5rem; }
-    .modal-box { border-radius: 16px; max-height: calc(100vh - 1rem); }
-    .modal-header { padding: 1rem; border-radius: 16px 16px 0 0; }
-    .modal-body { padding: 1rem; }
-
-    .detail-grid { grid-template-columns: 1fr 1fr; }
-
-    .modal-actions { flex-direction: column; align-items: stretch; }
-    .modal-actions .btn-primary,
-    .modal-actions .btn-outline { width: 100%; justify-content: center; }
-
-    .header-actions { width: 100%; justify-content: flex-start; }
-
-    .stu-row { padding: .75rem 1rem; }
-  }
-
-  @media (max-width: 380px) {
-    .detail-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── Dark mode ── */
-  body.dark .list-card      { background: #1a2538; border-color: #2d3e54; }
-  body.dark .modal-box      { background: #1a2538; }
-  body.dark .modal-header   { background: #1a2538; border-color: #2d3e54; }
-  body.dark .list-card-header { border-color: #2d3e54; }
+  /* Dark mode */
+  body.dark .page-header-inner h2 { color: #eef2ff; }
+  body.dark .list-card,
+  body.dark .modal-box            { background: #1a2538; border-color: #2d3e54; }
+  body.dark .modal-header         { background: #1a2538; border-color: #2d3e54; }
+  body.dark .list-card-header     { border-color: #2d3e54; }
   body.dark .list-card-header h3,
   body.dark .modal-title,
   body.dark .stu-name,
-  body.dark .detail-item strong { color: #eef2ff; }
+  body.dark .detail-item strong   { color: #eef2ff; }
   body.dark .stu-sub,
   body.dark .modal-sub,
-  body.dark .detail-item span   { color: #b9c8e8; }
-  body.dark .stu-row       { border-color: #1e2e42; }
-  body.dark .stu-row:hover { background: #1e2e42; }
-  body.dark .serial-num    { background: #2d3e54; color: #b9c8e8; }
-  body.dark .modal-close   { background: #2d3e54; color: #b9c8e8; }
-  body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
-  body.dark .section-divider { color: #b9c8e8; border-color: #2d3e54; }
-  body.dark .empty-state   { background: #1a2538; border-color: #2d3e54; }
-  body.dark .modal-body    { background: #1a2538; }
+  body.dark .detail-item span,
+  body.dark .section-divider      { color: #b9c8e8; }
+  body.dark .section-divider      { border-color: #2d3e54; }
+  body.dark .stu-row              { border-color: #1e2e42; }
+  body.dark .stu-row:hover        { background: #1e2e42; }
+  body.dark .serial-num           { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close          { background: #2d3e54; color: #b9c8e8; }
+  body.dark .modal-close:hover    { background: #4a1515; color: #f87171; }
+  body.dark .empty-state          { background: #1a2538; border-color: #2d3e54; }
+  body.dark .empty-state .empty-title { color: #eef2ff; }
+  body.dark .modal-body           { background: #1a2538; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .page-header-inner h2 { font-size: 1.4rem; }
+    .header-actions { width: 100%; }
+    .header-actions form,
+    .header-actions .btn-success,
+    .header-actions .btn-outline { flex: 1; justify-content: center; }
+  }
+
+  @media (max-width: 560px) {
+    .badge-submitted { display: none; }
+    .stu-row { padding: .75rem 1rem; gap: .55rem; }
+  }
+
+  @media (max-width: 480px) {
+    .modal-box { border-radius: 18px; max-height: 95vh; }
+    .modal-header { padding: 1rem; border-radius: 18px 18px 0 0; }
+    .modal-body   { padding: 1rem; }
+    .detail-grid  { grid-template-columns: 1fr 1fr; }
+    .modal-actions { flex-direction: column; align-items: stretch; }
+    .modal-actions .btn-primary,
+    .modal-actions .btn-outline { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 360px) {
+    .detail-grid { grid-template-columns: 1fr; }
+  }
 </style>
 
 <div class="page-wrap">
@@ -223,7 +210,7 @@
       {% if students %}
       <form method="POST" action="{{ url_for('main.verify_all_students') }}"
         onsubmit="return confirm('Mark ALL pending applications as verified? This cannot be undone.');"
-        style="display:inline;">
+        style="display:inline-flex">
         <button type="submit" class="btn-success btn-sm">
           <i class="fas fa-check-double"></i> Verify All ({{ students|length }})
         </button>
@@ -238,14 +225,10 @@
   {% if not students %}
   <div class="empty-state">
     <i class="fas fa-check-circle" style="color:#28a745"></i>
-    <p style="font-size:1.1rem; font-weight:600; color:#0a1f44; margin-bottom:.5rem">
-      All caught up!
-    </p>
+    <p class="empty-title">All caught up!</p>
     <p>No pending applications to verify.</p>
     <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm"
-      style="display:inline-flex; margin-top:1rem">
-      <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
+      style="display:inline-flex;margin-top:1rem">Back to Dashboard</a>
   </div>
 
   {% else %}
@@ -256,7 +239,6 @@
     </div>
 
     {% for s in students %}
-    {# ── List row ── #}
     <div class="stu-row" onclick="openModal('ver-modal-{{ s.id }}')">
       <span class="serial-num">{{ loop.index }}</span>
       <div class="stu-info">
@@ -281,21 +263,17 @@
           <div style="min-width:0">
             <div class="modal-title">{{ s.candidate_name or s.full_name }}</div>
             <div class="modal-sub">
-              {{ s.email }}
-              &bull; {{ s.phone or s.parent_mobile or '—' }}
-              {% if s.submitted_at %}
-                &bull; Submitted {{ s.submitted_at | ist }}
-              {% endif %}
+              {{ s.email }} &bull; {{ s.phone or s.parent_mobile or '—' }}
+              {% if s.submitted_at %}&bull; Submitted {{ s.submitted_at | ist }}{% endif %}
             </div>
           </div>
           <button class="modal-close"
-            onclick="closeModal('ver-modal-{{ s.id }}')"
-            title="Close">&times;</button>
+            onclick="closeModal('ver-modal-{{ s.id }}')">&times;</button>
         </div>
 
         <div class="modal-body">
 
-          {# Personal details #}
+          {# Personal #}
           <div class="section-divider"><i class="fas fa-user"></i> Personal Details</div>
           <div class="detail-grid">
             <div class="detail-item">
@@ -312,43 +290,23 @@
             </div>
             <div class="detail-item">
               <span>Date of Birth</span>
-              {# BUG FIX: output dd/mm/yyyy with slashes #}
               <strong>
                 {% if s.dob %}
-                  {% set dob_str = s.dob if s.dob is string else s.dob.strftime('%Y-%m-%d') %}
+                  {% set dob_str = s.dob | string %}
                   {% set dob_clean = dob_str.split(' ')[0] %}
                   {% if '-' in dob_clean %}
                     {% set parts = dob_clean.split('-') %}
-                    {% if parts|length == 3 %}
-                      {% if parts[0]|length == 4 %}
-                        {# YYYY-MM-DD → DD/MM/YYYY #}
-                        {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
-                      {% else %}
-                        {# DD-MM-YYYY → DD/MM/YYYY #}
-                        {{ parts[0] }}/{{ parts[1] }}/{{ parts[2] }}
-                      {% endif %}
+                    {% if parts[0] | length == 4 %}
+                      {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
                     {% else %}
-                      {{ dob_clean }}
+                      {{ parts[0] }}/{{ parts[1] }}/{{ parts[2] }}
                     {% endif %}
                   {% elif '/' in dob_clean %}
-                    {% set parts = dob_clean.split('/') %}
-                    {% if parts|length == 3 %}
-                      {% if parts[0]|length == 4 %}
-                        {# YYYY/MM/DD → DD/MM/YYYY #}
-                        {{ parts[2] }}/{{ parts[1] }}/{{ parts[0] }}
-                      {% else %}
-                        {# already DD/MM/YYYY #}
-                        {{ dob_clean }}
-                      {% endif %}
-                    {% else %}
-                      {{ dob_clean }}
-                    {% endif %}
+                    {{ dob_clean }}
                   {% else %}
                     {{ dob_clean }}
                   {% endif %}
-                {% else %}
-                  —
-                {% endif %}
+                {% else %}—{% endif %}
               </strong>
             </div>
             <div class="detail-item">
@@ -365,7 +323,7 @@
             </div>
             <div class="detail-item">
               <span>Email</span>
-              <strong style="word-break:break-all">{{ s.email or '—' }}</strong>
+              <strong>{{ s.email or '—' }}</strong>
             </div>
             <div class="detail-item">
               <span>Nationality</span>
@@ -381,7 +339,7 @@
             </div>
           </div>
 
-          {# Category & Background #}
+          {# Category #}
           <div class="section-divider"><i class="fas fa-tags"></i> Category &amp; Background</div>
           <div class="detail-grid">
             <div class="detail-item">
@@ -406,7 +364,7 @@
             </div>
             <div class="detail-item">
               <span>Parent Annual Income</span>
-              <strong>{{ s.parent_annual_income or '—' }}</strong>
+              <strong>{% if s.parent_annual_income %}₹{{ s.parent_annual_income }}{% else %}—{% endif %}</strong>
             </div>
             <div class="detail-item">
               <span>Income Certificate No.</span>
@@ -423,7 +381,7 @@
             </div>
             <div class="detail-item">
               <span>Percentage</span>
-              <strong>{% if s.percent_10 %}{{ '%.2f'|format(s.percent_10|float) }}%{% else %}—{% endif %}</strong>
+              <strong>{% if s.percent_10 %}{{ '%.2f'|format(s.percent_10) }}%{% else %}—{% endif %}</strong>
             </div>
           </div>
 
@@ -452,7 +410,7 @@
             </div>
             <div class="detail-item">
               <span>Percentage</span>
-              <strong>{% if s.percent_12 %}{{ '%.2f'|format(s.percent_12|float) }}%{% else %}—{% endif %}</strong>
+              <strong>{% if s.percent_12 %}{{ '%.2f'|format(s.percent_12) }}%{% else %}—{% endif %}</strong>
             </div>
           </div>
 
@@ -465,7 +423,7 @@
             </div>
           </div>
 
-          {# Verify action #}
+          {# Action #}
           <div class="section-divider"><i class="fas fa-check-circle"></i> Verification Action</div>
           <form method="POST" action="{{ url_for('main.verify_student', app_id=s.id) }}">
             <div class="modal-actions">
@@ -479,12 +437,11 @@
             </div>
           </form>
 
-        </div>{# /modal-body #}
-      </div>{# /modal-box #}
-    </div>{# /modal-overlay #}
-
+        </div>
+      </div>
+    </div>
     {% endfor %}
-  </div>{# /list-card #}
+  </div>
   {% endif %}
 
 </div>
@@ -507,8 +464,8 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
       m.classList.remove('open');
+      document.body.style.overflow = '';
     });
-    document.body.style.overflow = '';
   }
 });
 </script>

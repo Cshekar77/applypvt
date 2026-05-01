@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Admitted Students — Admin{% endblock %}
+{% block navbar_auth %}{% endblock %}
 {% block content %}
 <style>
-  .as-page { max-width: 1150px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  .as-page { max-width: 1280px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 
   .as-header {
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
   }
   .as-header h2 {
     font-family: 'Playfair Display', serif;
     font-size: 1.9rem; color: #0a1f44; margin: 0;
   }
-  @media (max-width: 480px) { .as-header h2 { font-size: 1.4rem; } }
-
   .btn-back {
     display: inline-flex; align-items: center; gap: .4rem;
-    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
+    color: #5a6e82; text-decoration: none; font-size: .88rem;
+    transition: color .2s; white-space: nowrap;
   }
   .btn-back:hover { color: #0a1f44; }
 
@@ -24,12 +24,11 @@
   .summary-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: .75rem; margin-bottom: 2rem;
+    gap: .75rem; margin-bottom: 1.75rem;
   }
   .sum-box {
     background: white; border-radius: 14px; border: 1px solid #eef2f8;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    padding: .9rem 1.1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04); padding: .9rem 1.1rem;
   }
   .sum-box .sum-label {
     font-size: .68rem; font-weight: 700; text-transform: uppercase;
@@ -39,201 +38,268 @@
     font-size: 1.5rem; font-weight: 800; color: #0a1f44; line-height: 1;
   }
 
-  /* ── Category section ── */
-  .cat-section { margin-bottom: 2.5rem; }
-  .cat-section-header {
-    display: flex; align-items: center; gap: .75rem;
-    margin-bottom: .85rem; flex-wrap: wrap;
+  /* ── Top bar: search + export ── */
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: .75rem; margin-bottom: 1.5rem;
   }
-  .cat-section-header h3 {
-    font-family: 'Playfair Display', serif; font-size: 1.1rem;
-    color: #0a1f44; margin: 0;
+  .search-wrap {
+    display: flex; align-items: center; gap: .5rem;
+    background: white; border: 2px solid #e2e8f0; border-radius: 12px;
+    padding: .5rem 1rem; transition: border-color .2s; flex: 1; max-width: 340px;
   }
-  .cat-pill {
-    display: inline-flex; align-items: center; gap: .4rem;
-    background: linear-gradient(135deg,#7c3aed,#6d28d9);
-    color: white; font-size: .75rem; font-weight: 700;
-    padding: 4px 12px; border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(124,58,237,.3);
-    white-space: nowrap;
+  .search-wrap:focus-within { border-color: #7c3aed; }
+  .search-wrap i { color: #8a9ab0; flex-shrink: 0; }
+  .search-input {
+    border: none; outline: none; font-size: .88rem;
+    font-family: inherit; width: 100%; background: transparent; color: #0a1f44;
   }
-  .cat-stats {
-    font-size: .78rem; color: #5a6e82;
-    background: #f8f9fd; padding: 3px 10px; border-radius: 20px;
-    border: 1px solid #eef2f8; white-space: nowrap;
+  .search-input::placeholder { color: #b0bac8; }
+
+  /* ── Two-column quota layout ── */
+  .quota-layout {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
   }
-  .progress-cat-wrap {
-    flex: 1; min-width: 80px; max-width: 180px;
-    background: #eef2f8; border-radius: 20px; height: 7px; overflow: hidden;
+  .quota-col { display: flex; flex-direction: column; gap: .85rem; }
+  .quota-col-header {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .85rem 1.1rem; border-radius: 14px;
+    font-size: .85rem; font-weight: 700; letter-spacing: .02em;
   }
-  .progress-cat-fill {
-    background: linear-gradient(90deg,#7c3aed,#6d28d9);
-    height: 100%; border-radius: 20px; transition: width .5s;
+  .quota-col-header.govt {
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    color: #1d4ed8; border: 1px solid #bfdbfe;
+  }
+  .quota-col-header.mgmt {
+    background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+    color: #7c3aed; border: 1px solid #ddd6fe;
+  }
+  .quota-col-header i { font-size: 1rem; }
+  .quota-col-header .quota-count {
+    margin-left: auto; font-size: .75rem; font-weight: 600;
+    opacity: .75; white-space: nowrap;
   }
 
-  /* ── Table card ── */
-  .table-card {
-    background: white; border-radius: 18px;
-    border: 1px solid #eef2f8; box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    overflow: hidden;
+  /* ── Category button cards ── */
+  .cat-btn {
+    background: white; border: 1px solid #eef2f8;
+    border-radius: 14px; padding: .9rem 1.1rem;
+    cursor: pointer; transition: all .2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    text-align: left; width: 100%;
+    display: flex; flex-direction: column; gap: .5rem;
   }
-  .as-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .cat-btn:hover {
+    border-color: #7c3aed; box-shadow: 0 4px 16px rgba(124,58,237,.12);
+    transform: translateY(-2px);
+  }
+  .cat-btn.govt-btn:hover { border-color: #2563eb; box-shadow: 0 4px 16px rgba(37,99,235,.12); }
+
+  .cat-btn-top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+  .cat-btn-name { font-weight: 700; color: #0a1f44; font-size: .92rem; }
+  .cat-btn-seats {
+    font-size: .72rem; font-weight: 600; padding: 2px 9px;
+    border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+  }
+  .cat-btn-seats.full  { background: #fee2e2; color: #991b1b; }
+  .cat-btn-seats.partial { background: #fef3c7; color: #92400e; }
+  .cat-btn-seats.empty { background: #f3f4f6; color: #6b7280; }
+
+  .cat-btn-bar-wrap {
+    background: #eef2f8; border-radius: 20px; height: 5px; overflow: hidden;
+  }
+  .cat-btn-bar-fill {
+    height: 100%; border-radius: 20px; transition: width .5s;
+  }
+  .govt-btn .cat-btn-bar-fill { background: linear-gradient(90deg, #2563eb, #1d4ed8); }
+  .cat-btn .cat-btn-bar-fill  { background: linear-gradient(90deg, #7c3aed, #6d28d9); }
+
+  .cat-btn-meta { font-size: .73rem; color: #8a9ab0; display: flex; align-items: center; gap: .4rem; }
+
+  /* View details button inside card */
+  .cat-btn-view {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .75rem; font-weight: 600; color: #7c3aed;
+    margin-top: .15rem;
+  }
+  .govt-btn .cat-btn-view { color: #2563eb; }
+
+  /* ── Modal ── */
+  .as-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,31,68,.5); align-items: center;
+    justify-content: center; padding: 1rem;
+  }
+  .as-modal-overlay.open { display: flex; }
+
+  .as-modal-box {
+    background: white; border-radius: 22px;
+    width: 100%; max-width: 1000px;
+    max-height: 92vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 70px rgba(10,31,68,.22);
+    animation: as-modal-in .18s ease;
+  }
+  @keyframes as-modal-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .as-modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    flex-shrink: 0; border-radius: 22px 22px 0 0;
+  }
+  .as-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #0a1f44; margin: 0; }
+  .as-modal-sub   { font-size: .8rem; color: #5a6e82; margin-top: 3px; }
+
+  .as-modal-close {
+    background: #f3f4f6; border: none; border-radius: 50%;
+    width: 34px; height: 34px; cursor: pointer; font-size: 1.1rem;
+    color: #5a6e82; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background .15s;
+  }
+  .as-modal-close:hover { background: #fee2e2; color: #991b1b; }
+
+  .as-modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1; }
+
+  /* Modal search */
+  .modal-search-wrap {
+    display: flex; align-items: center; gap: .5rem;
+    background: #f8fafc; border: 1.5px solid #e2e8f0;
+    border-radius: 10px; padding: .45rem .9rem;
+    margin-bottom: 1rem; transition: border-color .2s;
+  }
+  .modal-search-wrap:focus-within { border-color: #7c3aed; }
+  .modal-search-wrap i { color: #8a9ab0; font-size: .85rem; flex-shrink: 0; }
+  .modal-search-input {
+    border: none; outline: none; font-size: .85rem;
+    font-family: inherit; background: transparent; width: 100%; color: #0a1f44;
+  }
+  .modal-search-input::placeholder { color: #b0bac8; }
+
+  /* Table inside modal */
+  .as-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid #eef2f8; }
   .as-table {
-    width: 100%; border-collapse: collapse; font-size: .87rem;
-    min-width: 780px; /* horizontal scroll on small screens */
+    width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 700px;
   }
   .as-table thead tr { background: #f8f9fd; border-bottom: 2px solid #eef2f8; }
   .as-table th {
-    padding: .65rem 1rem; text-align: left; font-size: .68rem;
-    font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #8a9ab0;
-    white-space: nowrap;
+    padding: .6rem 1rem; text-align: left; font-size: .67rem;
+    font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: #8a9ab0; white-space: nowrap;
   }
   .as-table td {
-    padding: .7rem 1rem; border-bottom: 1px solid #f5f7fa;
+    padding: .65rem 1rem; border-bottom: 1px solid #f5f7fa;
     color: #1a2c3e; vertical-align: middle;
   }
   .as-table tr:last-child td { border-bottom: none; }
-  .as-table tr.assigned td         { background: #fafffe; }
-  .as-table tr.assigned:hover td   { background: #f0fdf8; }
+  .as-table tr.assigned td       { background: #fafffe; }
+  .as-table tr.assigned:hover td { background: #f0fdf8; }
   .as-table tr.unassigned td       { background: #fafbfd; }
   .as-table tr.unassigned:hover td { background: #f5f7ff; }
 
   .sl-num { font-size: .78rem; color: #8a9ab0; font-weight: 600; }
-
   .admit-seat-badge {
-    display: inline-block; font-size: .8rem; font-weight: 800;
-    padding: 4px 12px; border-radius: 20px;
+    display: inline-block; font-size: .78rem; font-weight: 800;
+    padding: 3px 11px; border-radius: 20px;
     background: linear-gradient(135deg,#7c3aed,#6d28d9);
-    color: white; letter-spacing: .03em;
-    box-shadow: 0 2px 8px rgba(124,58,237,.25);
-    white-space: nowrap;
+    color: white; white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(124,58,237,.22);
   }
+  .admit-seat-badge.govt-seat { background: linear-gradient(135deg,#2563eb,#1d4ed8); box-shadow: 0 2px 6px rgba(37,99,235,.22); }
   .admit-seat-badge.vacant {
     background: #f3f4f6; color: #b0bac8;
     box-shadow: none; border: 1.5px dashed #dde3ed;
   }
-
   .rank-pill {
     background: #0a1f44; color: white; font-size: .7rem;
     font-weight: 700; padding: 3px 9px; border-radius: 20px;
     display: inline-block; white-space: nowrap;
   }
   .rank-empty { font-size: .78rem; color: #c4cdd8; font-style: italic; }
-
   .badge { display: inline-block; font-size: .68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
-  .badge-govt { background: #cce5ff; color: #004085; }
-  .badge-mgmt { background: #fff3cd; color: #856404; }
-
+  .badge-government, .badge-govt { background: #cce5ff; color: #004085; }
+  .badge-management, .badge-mgmt { background: #fff3cd; color: #856404; }
   .student-name  { font-weight: 600; color: #0a1f44; }
-  .student-email { font-size: .75rem; color: #8a9ab0; margin-top: 1px; }
+  .student-email { font-size: .73rem; color: #8a9ab0; margin-top: 1px; }
   .unassigned-label { font-size: .8rem; color: #c4cdd8; font-style: italic; }
-
   .fees-total   { font-weight: 700; color: #0a1f44; white-space: nowrap; }
   .fees-paid    { color: #15803d; font-weight: 600; white-space: nowrap; }
   .fees-pending { color: #dc3545; font-weight: 600; white-space: nowrap; }
   .fees-clear   { color: #15803d; font-weight: 700; white-space: nowrap; }
   .fees-none    { color: #c4cdd8; font-style: italic; font-size: .8rem; }
-
   .progress-bar-wrap {
     background: #eef2f8; border-radius: 20px; height: 5px;
     overflow: hidden; width: 70px; margin-top: 4px;
   }
-  .progress-bar-fill {
-    background: #25c26e; height: 100%; border-radius: 20px; transition: width .4s;
-  }
+  .progress-bar-fill { background: #25c26e; height: 100%; border-radius: 20px; }
 
-  /* ── Search row ── */
-  .search-row {
-    display: flex; align-items: center; gap: .65rem;
-    margin-bottom: 1.5rem; flex-wrap: wrap;
-  }
-  .search-input {
-    padding: .6rem 1rem; border: 2px solid #e2e8f0; border-radius: 10px;
-    font-size: .88rem; font-family: inherit; outline: none;
-    transition: border-color .2s;
-    width: 100%; max-width: 320px; box-sizing: border-box;
-  }
-  .search-input:focus { border-color: #7c3aed; }
+  .no-results-row td { text-align: center; padding: 2rem; color: #8a9ab0; font-style: italic; }
 
+  /* Empty state */
   .empty-state {
     text-align: center; padding: 4rem; color: #8a9ab0;
     background: white; border-radius: 18px; border: 1.5px dashed #e2e8f0;
   }
 
-  /* ── Mobile card layout (≤ 600px) ── */
-  @media (max-width: 600px) {
-    .as-page { padding: 1rem .75rem 4rem; }
-
-    .cat-section-header h3 { font-size: .95rem; }
-    .progress-cat-wrap { display: none; } /* hide progress bar in header on tiny screens */
-
-    /* Convert table rows to cards */
-    .as-table, .as-table thead, .as-table tbody,
-    .as-table th, .as-table td, .as-table tr {
-      display: block;
-    }
-    .as-table { min-width: unset; }
-    .as-table thead { display: none; }
-
-    .as-table tbody tr.assigned,
-    .as-table tbody tr.unassigned {
-      background: #fff !important;
-      border: 1px solid #eef2f8;
-      border-radius: 12px;
-      margin-bottom: .75rem;
-      padding: .65rem .75rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,.04);
-    }
-
-    .as-table td {
-      padding: .28rem .1rem;
-      border: none;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: .5rem;
-      font-size: .83rem;
-    }
-    .as-table td::before {
-      content: attr(data-label);
-      font-size: .67rem; font-weight: 700; text-transform: uppercase;
-      color: #8a9ab0; letter-spacing: .06em;
-      flex-shrink: 0; min-width: 90px; padding-top: 2px;
-    }
-    /* hide serial on mobile */
-    .as-table td.sl-cell { display: none; }
-
-    .search-input { max-width: 100%; }
-
-    .sum-box .sum-val { font-size: 1.25rem; }
-  }
-
-  /* ── Dark mode ── */
-  body.dark .sum-box            { background: #1a2538; border-color: #2d3e54; }
-  body.dark .sum-box .sum-val   { color: #eef2ff; }
-  body.dark .cat-section-header h3 { color: #eef2ff; }
-  body.dark .cat-stats          { background: #131e2e; border-color: #2d3e54; color: #b9c8e8; }
-  body.dark .progress-cat-wrap  { background: #2d3e54; }
-  body.dark .table-card         { background: #1a2538; border-color: #2d3e54; }
-  body.dark .as-table thead tr  { background: #131e2e; border-color: #2d3e54; }
-  body.dark .as-table th        { color: #8a9ab0; }
-  body.dark .as-table td        { border-color: #1e2e42; color: #eef2ff; }
-  body.dark .as-table tr.assigned td         { background: #0d1f18; }
-  body.dark .as-table tr.assigned:hover td   { background: #0a1f15; }
+  /* ── DARK MODE ── */
+  body.dark .as-header h2    { color: #eef2ff; }
+  body.dark .btn-back        { color: #b9c8e8; }
+  body.dark .btn-back:hover  { color: #eef2ff; }
+  body.dark .sum-box         { background: #1a2538; border-color: #2d3e54; }
+  body.dark .sum-box .sum-val { color: #eef2ff; }
+  body.dark .sum-box .sum-label { color: #5a6e82; }
+  body.dark .search-wrap     { background: #1a2538; border-color: #2d3e54; }
+  body.dark .search-input    { color: #eef2ff; }
+  body.dark .quota-col-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
+  body.dark .quota-col-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
+  body.dark .cat-btn         { background: #1a2538; border-color: #2d3e54; }
+  body.dark .cat-btn:hover   { border-color: #7c3aed; box-shadow: 0 4px 16px rgba(124,58,237,.2); }
+  body.dark .cat-btn.govt-btn:hover { border-color: #2563eb; }
+  body.dark .cat-btn-name    { color: #eef2ff; }
+  body.dark .cat-btn-meta    { color: #5a6e82; }
+  body.dark .cat-btn-bar-wrap { background: #2d3e54; }
+  body.dark .as-modal-box    { background: #1a2538; }
+  body.dark .as-modal-header { background: #1a2538; border-color: #2d3e54; }
+  body.dark .as-modal-title  { color: #eef2ff; }
+  body.dark .as-modal-close  { background: #2d3e54; color: #b9c8e8; }
+  body.dark .as-modal-close:hover { background: #4a1515; color: #f87171; }
+  body.dark .as-modal-body   { background: #1a2538; }
+  body.dark .modal-search-wrap { background: #131e2e; border-color: #2d3e54; }
+  body.dark .modal-search-input { color: #eef2ff; }
+  body.dark .as-table-wrap   { border-color: #2d3e54; }
+  body.dark .as-table thead tr { background: #131e2e; border-color: #2d3e54; }
+  body.dark .as-table th     { color: #5a6e82; }
+  body.dark .as-table td     { border-color: #1e2e42; color: #eef2ff; }
+  body.dark .as-table tr.assigned td       { background: #0d1f18; }
+  body.dark .as-table tr.assigned:hover td { background: #0a1f15; }
   body.dark .as-table tr.unassigned td       { background: #131e2e; }
   body.dark .as-table tr.unassigned:hover td { background: #1a2538; }
-  body.dark .student-name       { color: #eef2ff; }
-  body.dark .fees-total         { color: #eef2ff; }
-  body.dark .search-input       { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .as-header h2       { color: #eef2ff; }
+  body.dark .student-name  { color: #eef2ff; }
+  body.dark .fees-total    { color: #eef2ff; }
   body.dark .admit-seat-badge.vacant { background: #1e2e42; border-color: #2d3e54; color: #5a6e82; }
+  body.dark .empty-state   { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .quota-layout { grid-template-columns: 1fr; gap: 1rem; }
+  }
 
   @media (max-width: 600px) {
-    body.dark .as-table tbody tr.assigned,
-    body.dark .as-table tbody tr.unassigned {
-      background: #1a2538 !important;
-      border-color: #2d3e54;
-    }
+    .as-page { padding: 1rem .75rem 4rem; }
+    .as-header h2 { font-size: 1.4rem; }
+    .summary-strip { grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+    .sum-box .sum-val { font-size: 1.2rem; }
+    .top-bar { flex-direction: column; align-items: stretch; }
+    .search-wrap { max-width: 100%; }
+    .as-modal-box { border-radius: 18px; max-height: 95vh; }
+    .as-modal-header { padding: 1rem; border-radius: 18px 18px 0 0; }
+    .as-modal-body   { padding: 1rem; }
+    .as-modal-title  { font-size: 1rem; }
+  }
+
+  @media (max-width: 400px) {
+    .summary-strip { grid-template-columns: 1fr 1fr; }
   }
 </style>
 
@@ -246,6 +312,7 @@
     <h2><i class="fas fa-user-check" style="color:#0f766e"></i> Admitted Students</h2>
   </div>
 
+  <!-- Summary -->
   <div class="summary-strip">
     <div class="sum-box">
       <div class="sum-label"><i class="fas fa-chair"></i> Total Seats</div>
@@ -260,54 +327,171 @@
       <div class="sum-val" style="color:#f0c040">{{ total_seats - total_assigned }}</div>
     </div>
     <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-landmark"></i> Govt Quota</div>
+      <div class="sum-label"><i class="fas fa-landmark"></i> Govt</div>
       <div class="sum-val" style="color:#004085">{{ govt_count }}</div>
     </div>
     <div class="sum-box">
-      <div class="sum-label"><i class="fas fa-building"></i> Mgmt Quota</div>
+      <div class="sum-label"><i class="fas fa-building"></i> Mgmt</div>
       <div class="sum-val" style="color:#856404">{{ mgmt_count }}</div>
     </div>
   </div>
 
   {% if admit_categories %}
 
-  <div class="search-row">
-    <i class="fas fa-search" style="color:#8a9ab0;flex-shrink:0"></i>
-    <input type="text" class="search-input" id="searchInput"
-      placeholder="Search by name, rank, category…" oninput="filterRows()">
+  <!-- Top search bar -->
+  <div class="top-bar">
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" class="search-input" id="globalSearch"
+        placeholder="Search student, rank, category…" oninput="globalSearchFn()">
+    </div>
+    <div id="globalSearchMsg" style="font-size:.8rem;color:#5a6e82;display:none"></div>
   </div>
 
-  {% for ac in admit_categories %}
-  {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
+  <!-- Two-column quota layout -->
+  {# Split categories into govt and mgmt, sorted by sort_order #}
+  {% set govt_cats = [] %}
+  {% set mgmt_cats = [] %}
+  {% for ac in admit_categories | sort(attribute='sort_order') %}
+    {% if ac.name.upper().endswith('-PY') %}
+      {% set _ = mgmt_cats.append(ac) %}
+    {% else %}
+      {% set _ = govt_cats.append(ac) %}
+    {% endif %}
+  {% endfor %}
 
-  <div class="cat-section" id="cat-section-{{ ac.id }}">
-    <div class="cat-section-header">
-      <span class="cat-pill"><i class="fas fa-tag"></i> {{ ac.name }}</span>
-      <h3>{{ ac.name }} — {{ ac.seats_used }}/{{ ac.total_seats }} Seats Filled</h3>
-      <span class="cat-stats">{{ ac.total_seats - ac.seats_used }} vacant</span>
-      <div class="progress-cat-wrap">
-        <div class="progress-cat-fill" style="width:{{ filled_pct }}%"></div>
+  <div class="quota-layout">
+
+    <!-- Government Quota -->
+    <div class="quota-col">
+      <div class="quota-col-header govt">
+        <i class="fas fa-university"></i>
+        <span>Government Quota</span>
+        <span class="quota-count">{{ govt_cats|length }} categories &bull; {{ govt_cats|sum(attribute='total_seats') }} seats</span>
       </div>
+      {% for ac in govt_cats %}
+      {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
+      {% set vacant = ac.total_seats - ac.seats_used %}
+      <button class="cat-btn govt-btn" onclick="openCatModal('cat-modal-{{ ac.id }}')">
+        <div class="cat-btn-top">
+          <span class="cat-btn-name">{{ ac.name }}</span>
+          <span class="cat-btn-seats {% if vacant == 0 %}full{% elif ac.seats_used > 0 %}partial{% else %}empty{% endif %}">
+            {{ ac.seats_used }}/{{ ac.total_seats }}
+          </span>
+        </div>
+        <div class="cat-btn-bar-wrap">
+          <div class="cat-btn-bar-fill" style="width:{{ filled_pct }}%"></div>
+        </div>
+        <div class="cat-btn-meta">
+          <i class="fas fa-chair"></i> {{ vacant }} seat{{ 's' if vacant != 1 }} vacant
+          &nbsp;·&nbsp;
+          <i class="fas fa-sort-numeric-up"></i> Order {{ ac.sort_order }}
+          <span class="cat-btn-view" style="margin-left:auto"><i class="fas fa-eye"></i> View Details</span>
+        </div>
+      </button>
+      {% else %}
+      <div style="text-align:center;padding:2rem;color:#8a9ab0;font-size:.85rem">No government quota categories.</div>
+      {% endfor %}
     </div>
 
-    <div class="table-card">
+    <!-- Management Quota -->
+    <div class="quota-col">
+      <div class="quota-col-header mgmt">
+        <i class="fas fa-building"></i>
+        <span>Management Quota</span>
+        <span class="quota-count">{{ mgmt_cats|length }} categories &bull; {{ mgmt_cats|sum(attribute='total_seats') }} seats</span>
+      </div>
+      {% for ac in mgmt_cats %}
+      {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
+      {% set vacant = ac.total_seats - ac.seats_used %}
+      <button class="cat-btn" onclick="openCatModal('cat-modal-{{ ac.id }}')">
+        <div class="cat-btn-top">
+          <span class="cat-btn-name">{{ ac.name }}</span>
+          <span class="cat-btn-seats {% if vacant == 0 %}full{% elif ac.seats_used > 0 %}partial{% else %}empty{% endif %}">
+            {{ ac.seats_used }}/{{ ac.total_seats }}
+          </span>
+        </div>
+        <div class="cat-btn-bar-wrap">
+          <div class="cat-btn-bar-fill" style="width:{{ filled_pct }}%"></div>
+        </div>
+        <div class="cat-btn-meta">
+          <i class="fas fa-chair"></i> {{ vacant }} seat{{ 's' if vacant != 1 }} vacant
+          &nbsp;·&nbsp;
+          <i class="fas fa-sort-numeric-up"></i> Order {{ ac.sort_order }}
+          <span class="cat-btn-view" style="margin-left:auto"><i class="fas fa-eye"></i> View Details</span>
+        </div>
+      </button>
+      {% else %}
+      <div style="text-align:center;padding:2rem;color:#8a9ab0;font-size:.85rem">No management quota categories.</div>
+      {% endfor %}
+    </div>
+
+  </div>{# /quota-layout #}
+
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-tags" style="font-size:2.5rem;margin-bottom:1rem;display:block;color:#c4b5fd"></i>
+    No admit categories created yet.<br>
+    <span style="font-size:.85rem;margin-top:.5rem;display:block">
+      Go to <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600">Admit Categories</a> to add categories first.
+    </span>
+  </div>
+  {% endif %}
+
+</div>
+
+{# ── Category Modals — one per admit category ── #}
+{% for ac in admit_categories | sort(attribute='sort_order') %}
+{% set is_mgmt = ac.name.upper().endswith('-PY') %}
+{% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
+
+<div class="as-modal-overlay" id="cat-modal-{{ ac.id }}"
+     onclick="closeOnOverlay(event, 'cat-modal-{{ ac.id }}')">
+  <div class="as-modal-box">
+    <div class="as-modal-header">
+      <div>
+        <div class="as-modal-title">
+          <i class="fas fa-{% if is_mgmt %}building{% else %}university{% endif %}"
+             style="color:{% if is_mgmt %}#7c3aed{% else %}#2563eb{% endif %};margin-right:.4rem"></i>
+          {{ ac.name }}
+        </div>
+        <div class="as-modal-sub">
+          {{ ac.seats_used }}/{{ ac.total_seats }} seats filled &bull;
+          {{ ac.total_seats - ac.seats_used }} vacant &bull;
+          {% if is_mgmt %}Management{% else %}Government{% endif %} Quota &bull;
+          Sort order: {{ ac.sort_order }}
+        </div>
+      </div>
+      <button class="as-modal-close" onclick="closeCatModal('cat-modal-{{ ac.id }}')">&times;</button>
+    </div>
+
+    <div class="as-modal-body">
+      <!-- Modal search -->
+      <div class="modal-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="modal-search-input"
+          placeholder="Search in {{ ac.name }}…"
+          oninput="filterModalRows('modal-tbody-{{ ac.id }}', this.value)">
+      </div>
+
+      <!-- Seat table -->
       <div class="as-table-wrap">
         <table class="as-table">
           <thead>
             <tr>
-              <th>Sl No</th>
-              <th>Admit Seat</th>
+              <th>Sl</th>
+              <th>Seat</th>
               <th>Rank</th>
-              <th>Student Name</th>
-              <th>Caste Category</th>
+              <th>Student</th>
+              <th>Caste</th>
               <th>Quota</th>
               <th>Total Fees</th>
-              <th>Paid So Far</th>
+              <th>Paid</th>
               <th>Pending</th>
-              <th>Allotted At</th>
+              <th>Allotted At (IST)</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="modal-tbody-{{ ac.id }}">
             {% for seat_num in range(1, ac.total_seats + 1) %}
             {% set allotment = seat_map.get((ac.id, seat_num)) %}
 
@@ -318,117 +502,168 @@
               {% set pending        = allotment._fees_pending %}
               <tr class="assigned"
                 data-search="{{ appl.full_name|lower }} rank{{ appl.rank }} {{ appl.category_name|lower if appl.category_name else '' }} {{ ac.name|lower }}">
-                <td class="sl-cell" data-label="#">{{ seat_num }}</td>
-                <td data-label="Seat"><span class="admit-seat-badge">{{ ac.name }}({{ seat_num }})</span></td>
-                <td data-label="Rank">
-                  {% if appl.rank %}
-                    <span class="rank-pill">#{{ appl.rank }}</span>
-                  {% else %}
-                    <span class="rank-empty">—</span>
-                  {% endif %}
+                <td><span class="sl-num">{{ seat_num }}</span></td>
+                <td>
+                  <span class="admit-seat-badge {% if not is_mgmt %}govt-seat{% endif %}">
+                    {{ ac.name }}({{ seat_num }})
+                  </span>
                 </td>
-                <td data-label="Student">
+                <td>
+                  {% if appl.rank %}<span class="rank-pill">#{{ appl.rank }}</span>
+                  {% else %}<span class="rank-empty">—</span>{% endif %}
+                </td>
+                <td>
                   <div>
                     <div class="student-name">{{ appl.full_name }}</div>
                     <div class="student-email">{{ appl.email }}</div>
                   </div>
                 </td>
-                <td data-label="Caste">{{ appl.category_name or '—' }}</td>
-                <td data-label="Quota">
-                  <span class="badge badge-{{ allotment.quota }}">
-                    {{ allotment.quota|title }}
-                  </span>
+                <td>{{ appl.category_name or '—' }}</td>
+                <td>
+                  <span class="badge badge-{{ allotment.quota }}">{{ allotment.quota|title }}</span>
                 </td>
-                <td data-label="Total Fees">
+                <td>
                   {% if allotment._has_fees %}
-                    <span class="fees-total">₹{{ '{:,.0f}'.format(total_fees_val) }}</span>
-                  {% else %}
-                    <span class="fees-none">Not set</span>
-                  {% endif %}
+                    <span class="fees-total">₹{{ '{:,.2f}'.format(total_fees_val) }}</span>
+                  {% else %}<span class="fees-none">Not set</span>{% endif %}
                 </td>
-                <td data-label="Paid">
+                <td>
                   {% if allotment._has_fees %}
                     <div>
-                      <span class="fees-paid">₹{{ '{:,.0f}'.format(total_paid) }}</span>
+                      <span class="fees-paid">₹{{ '{:,.2f}'.format(total_paid) }}</span>
                       {% if total_fees_val > 0 %}
                       <div class="progress-bar-wrap">
                         <div class="progress-bar-fill"
-                          style="width:{{ [((total_paid / total_fees_val) * 100)|int, 100]|min }}%">
-                        </div>
+                          style="width:{{ [((total_paid / total_fees_val)*100)|int, 100]|min }}%"></div>
                       </div>
                       {% endif %}
                     </div>
-                  {% else %}
-                    <span class="fees-none">—</span>
-                  {% endif %}
+                  {% else %}<span class="fees-none">—</span>{% endif %}
                 </td>
-                <td data-label="Pending">
+                <td>
                   {% if allotment._has_fees %}
                     {% if pending <= 0 %}
                       <span class="fees-clear"><i class="fas fa-check-circle"></i> Cleared</span>
                     {% else %}
-                      <span class="fees-pending">₹{{ '{:,.0f}'.format(pending) }}</span>
+                      <span class="fees-pending">₹{{ '{:,.2f}'.format(pending) }}</span>
                     {% endif %}
-                  {% else %}
-                    <span class="fees-none">—</span>
-                  {% endif %}
+                  {% else %}<span class="fees-none">—</span>{% endif %}
                 </td>
-                <td data-label="Allotted At" style="font-size:.78rem;color:#5a6e82;white-space:nowrap">
-                  {% if allotment.allotted_at %}
-                    {{ allotment.allotted_at | ist }}
-                  {% else %}—{% endif %}
+                <td style="font-size:.75rem;color:#5a6e82;white-space:nowrap">
+                  {% if allotment.allotted_at %}{{ allotment.allotted_at | ist }}{% else %}—{% endif %}
                 </td>
               </tr>
 
             {% else %}
               <tr class="unassigned" data-search="{{ ac.name|lower }}">
-                <td class="sl-cell" data-label="#">{{ seat_num }}</td>
-                <td data-label="Seat"><span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span></td>
-                <td data-label="Rank"><span class="rank-empty">—</span></td>
-                <td data-label="Student"><span class="unassigned-label">Not yet assigned</span></td>
-                <td data-label="Caste"><span class="fees-none">—</span></td>
-                <td data-label="Quota"><span class="fees-none">—</span></td>
-                <td data-label="Total Fees"><span class="fees-none">—</span></td>
-                <td data-label="Paid"><span class="fees-none">—</span></td>
-                <td data-label="Pending"><span class="fees-none">—</span></td>
-                <td data-label="Allotted At"><span class="fees-none">—</span></td>
+                <td><span class="sl-num">{{ seat_num }}</span></td>
+                <td><span class="admit-seat-badge vacant">{{ ac.name }}({{ seat_num }})</span></td>
+                <td><span class="rank-empty">—</span></td>
+                <td><span class="unassigned-label">Not yet assigned</span></td>
+                <td><span class="fees-none">—</span></td>
+                <td><span class="fees-none">—</span></td>
+                <td><span class="fees-none">—</span></td>
+                <td><span class="fees-none">—</span></td>
+                <td><span class="fees-none">—</span></td>
+                <td><span class="fees-none">—</span></td>
               </tr>
             {% endif %}
 
             {% endfor %}
+            <tr class="no-results-row" id="no-results-{{ ac.id }}" style="display:none">
+              <td colspan="10">No matching students found.</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-  {% endfor %}
-
-  {% else %}
-  <div class="empty-state">
-    <i class="fas fa-tags" style="font-size:2.5rem;margin-bottom:1rem;display:block;color:#c4b5fd"></i>
-    No admit categories created yet.<br>
-    <span style="font-size:.85rem;margin-top:.5rem;display:block">
-      Go to
-      <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600">
-        Admit Categories
-      </a>
-      to add categories and seat pools first.
-    </span>
-  </div>
-  {% endif %}
-
 </div>
+{% endfor %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-function filterRows() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  document.querySelectorAll('.as-table tbody tr').forEach(row => {
-    if (!q) { row.style.display = ''; return; }
-    const text = (row.dataset.search || '') + row.textContent.toLowerCase();
-    row.style.display = text.includes(q) ? '' : 'none';
+/* ── Modal open/close ── */
+function openCatModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCatModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOnOverlay(e, id) {
+  if (e.target === e.currentTarget) closeCatModal(id);
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.as-modal-overlay.open').forEach(function(m) {
+      m.classList.remove('open');
+    });
+    document.body.style.overflow = '';
+  }
+});
+
+/* ── Filter rows inside a modal tbody ── */
+function filterModalRows(tbodyId, query) {
+  var q      = query.trim().toLowerCase();
+  var tbody  = document.getElementById(tbodyId);
+  if (!tbody) return;
+  var rows   = tbody.querySelectorAll('tr.assigned, tr.unassigned');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text = (row.dataset.search || '') + row.textContent.toLowerCase();
+    var show = !q || text.includes(q);
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
   });
+  /* show/hide no-results row */
+  var noRes = tbody.querySelector('.no-results-row');
+  if (noRes) noRes.style.display = (visible === 0 && q) ? '' : 'none';
+}
+
+/* ── Global search: open matching modal or highlight ── */
+function globalSearchFn() {
+  var q   = document.getElementById('globalSearch').value.trim().toLowerCase();
+  var msg = document.getElementById('globalSearchMsg');
+  if (!q) { msg.style.display = 'none'; return; }
+
+  /* Search across all modals */
+  var found = [];
+  document.querySelectorAll('.as-modal-overlay').forEach(function(modal) {
+    var tbody = modal.querySelector('tbody');
+    if (!tbody) return;
+    var rows = tbody.querySelectorAll('tr.assigned');
+    rows.forEach(function(row) {
+      var text = (row.dataset.search || '') + row.textContent.toLowerCase();
+      if (text.includes(q)) {
+        var title = modal.querySelector('.as-modal-title');
+        var catName = title ? title.textContent.trim() : modal.id;
+        if (!found.find(function(f) { return f.id === modal.id; })) {
+          found.push({ id: modal.id, name: catName });
+        }
+      }
+    });
+  });
+
+  if (found.length === 0) {
+    msg.textContent = 'No matching student found across all categories.';
+    msg.style.display = 'block';
+  } else if (found.length === 1) {
+    msg.style.display = 'none';
+    openCatModal(found[0].id);
+    /* pre-fill modal search */
+    var modal = document.getElementById(found[0].id);
+    if (modal) {
+      var inp = modal.querySelector('.modal-search-input');
+      if (inp) { inp.value = q; filterModalRows(modal.querySelector('tbody').id, q); }
+    }
+  } else {
+    msg.textContent = 'Found in ' + found.length + ' categories: ' + found.map(function(f){ return f.name; }).join(', ');
+    msg.style.display = 'block';
+  }
 }
 </script>
 {% endblock %}

@@ -154,6 +154,7 @@ class AdmitCategory(db.Model):
     name        = db.Column(db.String(100), unique=True, nullable=False)
     total_seats = db.Column(db.Integer, default=0)
     is_active   = db.Column(db.Boolean, default=True)
+    sort_order  = db.Column(db.Integer, default=0)   # ← ADDED: controls display order across all pages
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
