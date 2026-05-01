@@ -153,8 +153,7 @@ def index():
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
-#  CHANGED: seat tracking now uses AdmitCategory instead of CategorySeats
-#  Categories ending with -PY = Management quota, others = Government quota
+#  FIXED: sorted by sort_order then name
 # ─────────────────────────────────────────
 @main.route('/live')
 def counselling_live():
@@ -179,8 +178,9 @@ def counselling_live():
                     'allotted_at': utc_to_ist(a.allotted_at),
                 }
 
-    # CHANGED: fetch from AdmitCategory, split into govt (no -PY) and mgmt (-PY)
-    admit_categories = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    # FIXED: sorted by sort_order asc, then name asc
+    admit_categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     govt_seats_list  = []
     mgmt_seats_list  = []
     for ac in admit_categories:
@@ -224,7 +224,6 @@ def counselling_live():
 
 # ─────────────────────────────────────────
 #  POST API — Register Student
-#  CHANGED: declaration = True (consent already given via Google Forms)
 # ─────────────────────────────────────────
 @main.route('/api/d2faa6fb-745b-454d-8852-92ed0bb482d8', methods=['POST'])
 def api_register_student():
@@ -305,7 +304,7 @@ def api_register_student():
             total_12             = total_12,
             obtained_12          = obtained_12,
             percent_12           = percent_12,
-            declaration          = True,   # CHANGED: consent already given via Google Forms
+            declaration          = True,
         )
         db.session.add(appl)
         db.session.commit()
@@ -558,7 +557,7 @@ def student_whatsapp():
 
 # ─────────────────────────────────────────
 #  Student — Live Counselling Tracker
-#  CHANGED: cat_seats now uses AdmitCategory data
+#  FIXED: sorted by sort_order
 # ─────────────────────────────────────────
 @main.route('/counselling')
 @login_required
@@ -585,8 +584,9 @@ def counselling_status_api():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
 
-    # CHANGED: fetch from AdmitCategory, split by -PY suffix
-    admit_categories = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    # FIXED: sorted by sort_order asc, name asc
+    admit_categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     govt_seats = []
     mgmt_seats = []
     for ac in admit_categories:
@@ -1389,10 +1389,15 @@ def export_admitted_students():
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
-    allotments = SeatAllotment.query.filter(
-        SeatAllotment.admit_category_id.isnot(None),
-        SeatAllotment.admit_seat_number.isnot(None)
-    ).order_by(SeatAllotment.admit_category_id, SeatAllotment.admit_seat_number).all()
+    # FIXED: sorted by admit_category sort_order, then seat number
+    allotments = (SeatAllotment.query
+                  .join(AdmitCategory, SeatAllotment.admit_category_id == AdmitCategory.id)
+                  .filter(
+                      SeatAllotment.admit_category_id.isnot(None),
+                      SeatAllotment.admit_seat_number.isnot(None)
+                  )
+                  .order_by(AdmitCategory.sort_order.asc(), SeatAllotment.admit_seat_number.asc())
+                  .all())
 
     rows = []
     for a in allotments:
@@ -1726,8 +1731,6 @@ def admin_counselling():
         return redirect(url_for('main.admin_counselling'))
 
     # ── GET ──
-    # ✅ N+1 FIX: pre-compute seat counts in ONE GROUP BY query instead of
-    # calling ac.seats_used (a @property doing COUNT per instance) in the template.
     from sqlalchemy import func as sqlfunc
 
     cs             = CounsellingSettings.get()
@@ -1760,7 +1763,9 @@ def admin_counselling():
         ).group_by(SeatAllotment.admit_category_id).all()
     )
 
-    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True).order_by(AdmitCategory.name).all()
+    # FIXED: sorted by sort_order asc, name asc
+    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     admit_categories = []
     for ac in admit_categories_raw:
         used      = seat_counts.get(ac.id, 0)
@@ -1785,6 +1790,7 @@ def admin_counselling():
 
 # ─────────────────────────────────────────
 #  Admin — Admit Categories Management
+#  FIXED: add/edit now save sort_order and quota_type
 # ─────────────────────────────────────────
 @main.route('/admin/admit-categories', methods=['GET', 'POST'])
 @admin_required
@@ -1794,29 +1800,68 @@ def admin_admit_categories():
 
         if action == 'add':
             name        = request.form.get('name', '').strip().upper()
-            total_seats = int(request.form.get('total_seats', 0))
+            total_seats = request.form.get('total_seats', '0').strip()
+            sort_order  = request.form.get('sort_order', '0').strip()
+            quota_type  = request.form.get('quota_type', 'government').strip()
+
             if not name:
                 flash('Category name is required.', 'danger')
             elif AdmitCategory.query.filter_by(name=name).first():
                 flash(f'Admit category "{name}" already exists.', 'danger')
             else:
-                db.session.add(AdmitCategory(name=name, total_seats=total_seats))
+                try:
+                    total_seats_int = int(total_seats) if total_seats.isdigit() else 0
+                    sort_order_int  = int(sort_order)  if sort_order.lstrip('-').isdigit() else 0
+                except (ValueError, TypeError):
+                    total_seats_int = 0
+                    sort_order_int  = 0
+
+                new_cat = AdmitCategory(
+                    name        = name,
+                    total_seats = total_seats_int,
+                    sort_order  = sort_order_int,
+                )
+                # Store quota type in name suffix if management (backward compatible)
+                # If quota_type == 'management' and name doesn't end in -PY, append -PY
+                if quota_type == 'management' and not name.endswith('-PY'):
+                    new_cat.name = name + '-PY'
+                db.session.add(new_cat)
                 db.session.commit()
-                flash(f'Admit category "{name}" added.', 'success')
+                flash(f'Admit category "{new_cat.name}" added.', 'success')
 
         elif action == 'edit':
-            cat_id      = int(request.form.get('cat_id'))
+            cat_id      = request.form.get('cat_id')
+            cat         = AdmitCategory.query.get_or_404(int(cat_id))
             name        = request.form.get('name', '').strip().upper()
-            total_seats = int(request.form.get('total_seats', 0))
-            cat         = AdmitCategory.query.get_or_404(cat_id)
-            existing    = AdmitCategory.query.filter_by(name=name).first()
-            if existing and existing.id != cat_id:
-                flash(f'Name "{name}" already in use.', 'danger')
+            total_seats = request.form.get('total_seats', '0').strip()
+            sort_order  = request.form.get('sort_order', '0').strip()
+            quota_type  = request.form.get('quota_type', 'government').strip()
+
+            if not name:
+                flash('Category name is required.', 'danger')
             else:
-                cat.name        = name
-                cat.total_seats = total_seats
-                db.session.commit()
-                flash('Admit category updated.', 'success')
+                existing = AdmitCategory.query.filter_by(name=name).first()
+                if existing and existing.id != cat.id:
+                    flash(f'Name "{name}" already in use.', 'danger')
+                else:
+                    try:
+                        total_seats_int = int(total_seats) if total_seats.isdigit() else cat.total_seats
+                        sort_order_int  = int(sort_order)  if sort_order.lstrip('-').isdigit() else cat.sort_order
+                    except (ValueError, TypeError):
+                        total_seats_int = cat.total_seats
+                        sort_order_int  = cat.sort_order
+
+                    # Update quota type via -PY suffix
+                    if quota_type == 'management' and not name.endswith('-PY'):
+                        name = name + '-PY'
+                    elif quota_type == 'government' and name.endswith('-PY'):
+                        name = name[:-3]  # strip -PY
+
+                    cat.name        = name
+                    cat.total_seats = total_seats_int
+                    cat.sort_order  = sort_order_int
+                    db.session.commit()
+                    flash('Admit category updated.', 'success')
 
         elif action == 'delete':
             cat_id = int(request.form.get('cat_id'))
@@ -1837,7 +1882,10 @@ def admin_admit_categories():
 
         return redirect(url_for('main.admin_admit_categories'))
 
-    categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
+    # FIXED: sorted by sort_order asc, name asc
+    categories = AdmitCategory.query.order_by(
+        AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()
+    ).all()
     return render_template('admin_admit_categories.html', categories=categories)
 
 
@@ -1936,11 +1984,15 @@ def admin_category_toggle(cat_id):
 
 # ─────────────────────────────────────────
 #  Admin — Admitted Students
+#  FIXED: sorted by admit_category sort_order, then seat number
 # ─────────────────────────────────────────
 @main.route('/admin/admitted-students')
 @admin_required
 def admin_admitted_students():
-    admit_categories = AdmitCategory.query.order_by(AdmitCategory.name).all()
+    # FIXED: sorted by sort_order
+    admit_categories = AdmitCategory.query.order_by(
+        AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()
+    ).all()
 
     all_allotments = SeatAllotment.query.filter(
         SeatAllotment.admit_category_id.isnot(None),
@@ -2030,7 +2082,6 @@ def admin_document_categories():
 
 # ─────────────────────────────────────────
 #  Admin — Document Verification
-#  CHANGED: removed all_original from summaries (approve gate removed)
 # ─────────────────────────────────────────
 @main.route('/admin/document-verification')
 @admin_required
@@ -2055,7 +2106,6 @@ def admin_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        # CHANGED: all_original removed — approve button no longer gated
         summaries[a.application_id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
         }
@@ -2133,7 +2183,6 @@ def admin_document_overview():
 
 # ─────────────────────────────────────────
 #  Faculty — Document Verification
-#  CHANGED: removed all_original from summaries (approve gate removed)
 # ─────────────────────────────────────────
 @main.route('/faculty/document-verification')
 @faculty_required
@@ -2158,7 +2207,6 @@ def faculty_document_verification():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        # CHANGED: all_original removed — approve button no longer gated
         summaries[a.application_id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
         }
