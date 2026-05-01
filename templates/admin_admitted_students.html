@@ -101,9 +101,9 @@
     font-size: .72rem; font-weight: 600; padding: 2px 9px;
     border-radius: 20px; white-space: nowrap; flex-shrink: 0;
   }
-  .cat-btn-seats.full  { background: #fee2e2; color: #991b1b; }
+  .cat-btn-seats.full    { background: #fee2e2; color: #991b1b; }
   .cat-btn-seats.partial { background: #fef3c7; color: #92400e; }
-  .cat-btn-seats.empty { background: #f3f4f6; color: #6b7280; }
+  .cat-btn-seats.empty   { background: #f3f4f6; color: #6b7280; }
 
   .cat-btn-bar-wrap {
     background: #eef2f8; border-radius: 20px; height: 5px; overflow: hidden;
@@ -116,7 +116,6 @@
 
   .cat-btn-meta { font-size: .73rem; color: #8a9ab0; display: flex; align-items: center; gap: .4rem; }
 
-  /* View details button inside card */
   .cat-btn-view {
     display: inline-flex; align-items: center; gap: .35rem;
     font-size: .75rem; font-weight: 600; color: #7c3aed;
@@ -162,7 +161,6 @@
 
   .as-modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1; }
 
-  /* Modal search */
   .modal-search-wrap {
     display: flex; align-items: center; gap: .5rem;
     background: #f8fafc; border: 1.5px solid #e2e8f0;
@@ -177,7 +175,6 @@
   }
   .modal-search-input::placeholder { color: #b0bac8; }
 
-  /* Table inside modal */
   .as-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid #eef2f8; }
   .as-table {
     width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 700px;
@@ -236,7 +233,6 @@
 
   .no-results-row td { text-align: center; padding: 2rem; color: #8a9ab0; font-style: italic; }
 
-  /* Empty state */
   .empty-state {
     text-align: center; padding: 4rem; color: #8a9ab0;
     background: white; border-radius: 18px; border: 1.5px dashed #e2e8f0;
@@ -262,6 +258,7 @@
   body.dark .as-modal-box    { background: #1a2538; }
   body.dark .as-modal-header { background: #1a2538; border-color: #2d3e54; }
   body.dark .as-modal-title  { color: #eef2ff; }
+  body.dark .as-modal-sub    { color: #8a9ab0; }
   body.dark .as-modal-close  { background: #2d3e54; color: #b9c8e8; }
   body.dark .as-modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .as-modal-body   { background: #1a2538; }
@@ -284,7 +281,6 @@
   @media (max-width: 900px) {
     .quota-layout { grid-template-columns: 1fr; gap: 1rem; }
   }
-
   @media (max-width: 600px) {
     .as-page { padding: 1rem .75rem 4rem; }
     .as-header h2 { font-size: 1.4rem; }
@@ -297,7 +293,6 @@
     .as-modal-body   { padding: 1rem; }
     .as-modal-title  { font-size: 1rem; }
   }
-
   @media (max-width: 400px) {
     .summary-strip { grid-template-columns: 1fr 1fr; }
   }
@@ -348,18 +343,23 @@
     <div id="globalSearchMsg" style="font-size:.8rem;color:#5a6e82;display:none"></div>
   </div>
 
-  <!-- Two-column quota layout -->
-  {# Split categories into govt and mgmt, sorted by sort_order #}
-  {% set govt_cats = [] %}
-  {% set mgmt_cats = [] %}
-  {% for ac in admit_categories | sort(attribute='sort_order') %}
+  {#
+    FIX: Use namespace to avoid Jinja2 scoping bug with list.append() inside loops.
+    Also DO NOT use | sort(attribute='sort_order') — routes.py already returns
+    admit_categories sorted correctly by sort_order ASC from the database.
+    Jinja | sort treats integers as strings causing "10" < "2" ordering bugs.
+    Just iterate admit_categories directly and split into govt/mgmt preserving DB order.
+  #}
+  {% set ns = namespace(govt_cats=[], mgmt_cats=[]) %}
+  {% for ac in admit_categories %}
     {% if ac.name.upper().endswith('-PY') %}
-      {% set _ = mgmt_cats.append(ac) %}
+      {% set ns.mgmt_cats = ns.mgmt_cats + [ac] %}
     {% else %}
-      {% set _ = govt_cats.append(ac) %}
+      {% set ns.govt_cats = ns.govt_cats + [ac] %}
     {% endif %}
   {% endfor %}
 
+  <!-- Two-column quota layout -->
   <div class="quota-layout">
 
     <!-- Government Quota -->
@@ -367,9 +367,9 @@
       <div class="quota-col-header govt">
         <i class="fas fa-university"></i>
         <span>Government Quota</span>
-        <span class="quota-count">{{ govt_cats|length }} categories &bull; {{ govt_cats|sum(attribute='total_seats') }} seats</span>
+        <span class="quota-count">{{ ns.govt_cats|length }} categories</span>
       </div>
-      {% for ac in govt_cats %}
+      {% for ac in ns.govt_cats %}
       {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
       {% set vacant = ac.total_seats - ac.seats_used %}
       <button class="cat-btn govt-btn" onclick="openCatModal('cat-modal-{{ ac.id }}')">
@@ -399,9 +399,9 @@
       <div class="quota-col-header mgmt">
         <i class="fas fa-building"></i>
         <span>Management Quota</span>
-        <span class="quota-count">{{ mgmt_cats|length }} categories &bull; {{ mgmt_cats|sum(attribute='total_seats') }} seats</span>
+        <span class="quota-count">{{ ns.mgmt_cats|length }} categories</span>
       </div>
-      {% for ac in mgmt_cats %}
+      {% for ac in ns.mgmt_cats %}
       {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
       {% set vacant = ac.total_seats - ac.seats_used %}
       <button class="cat-btn" onclick="openCatModal('cat-modal-{{ ac.id }}')">
@@ -440,8 +440,11 @@
 
 </div>
 
-{# ── Category Modals — one per admit category ── #}
-{% for ac in admit_categories | sort(attribute='sort_order') %}
+{#
+  FIX: Modals — iterate admit_categories directly (already sorted by DB).
+  Removed | sort(attribute='sort_order') filter here too.
+#}
+{% for ac in admit_categories %}
 {% set is_mgmt = ac.name.upper().endswith('-PY') %}
 {% set filled_pct = ((ac.seats_used / ac.total_seats * 100)|int) if ac.total_seats > 0 else 0 %}
 
@@ -608,10 +611,10 @@ document.addEventListener('keydown', function(e) {
 
 /* ── Filter rows inside a modal tbody ── */
 function filterModalRows(tbodyId, query) {
-  var q      = query.trim().toLowerCase();
-  var tbody  = document.getElementById(tbodyId);
+  var q     = query.trim().toLowerCase();
+  var tbody = document.getElementById(tbodyId);
   if (!tbody) return;
-  var rows   = tbody.querySelectorAll('tr.assigned, tr.unassigned');
+  var rows    = tbody.querySelectorAll('tr.assigned, tr.unassigned');
   var visible = 0;
   rows.forEach(function(row) {
     var text = (row.dataset.search || '') + row.textContent.toLowerCase();
@@ -619,7 +622,6 @@ function filterModalRows(tbodyId, query) {
     row.style.display = show ? '' : 'none';
     if (show) visible++;
   });
-  /* show/hide no-results row */
   var noRes = tbody.querySelector('.no-results-row');
   if (noRes) noRes.style.display = (visible === 0 && q) ? '' : 'none';
 }
@@ -630,7 +632,6 @@ function globalSearchFn() {
   var msg = document.getElementById('globalSearchMsg');
   if (!q) { msg.style.display = 'none'; return; }
 
-  /* Search across all modals */
   var found = [];
   document.querySelectorAll('.as-modal-overlay').forEach(function(modal) {
     var tbody = modal.querySelector('tbody');
@@ -639,7 +640,7 @@ function globalSearchFn() {
     rows.forEach(function(row) {
       var text = (row.dataset.search || '') + row.textContent.toLowerCase();
       if (text.includes(q)) {
-        var title = modal.querySelector('.as-modal-title');
+        var title   = modal.querySelector('.as-modal-title');
         var catName = title ? title.textContent.trim() : modal.id;
         if (!found.find(function(f) { return f.id === modal.id; })) {
           found.push({ id: modal.id, name: catName });
@@ -654,7 +655,6 @@ function globalSearchFn() {
   } else if (found.length === 1) {
     msg.style.display = 'none';
     openCatModal(found[0].id);
-    /* pre-fill modal search */
     var modal = document.getElementById(found[0].id);
     if (modal) {
       var inp = modal.querySelector('.modal-search-input');

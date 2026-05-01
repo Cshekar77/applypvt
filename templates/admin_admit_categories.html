@@ -310,10 +310,11 @@
             Quota Type <span style="color:#dc3545">*</span>
             <span class="auto-tag" id="auto-tag"><i class="fas fa-magic"></i> auto</span>
           </label>
+          {# FIX: values must match routes.py which checks 'government' and 'management' #}
           <select name="quota_type" id="add-quota-select" required onchange="onQuotaManualChange()">
             <option value="" disabled selected>— type name above or select —</option>
-            <option value="govt">🏛️ Government Quota</option>
-            <option value="mgmt">🏢 Management Quota</option>
+            <option value="government">🏛️ Government Quota</option>
+            <option value="management">🏢 Management Quota</option>
           </select>
           <div class="hint" id="quota-hint">Auto-detected from name. You can also select manually.</div>
         </div>
@@ -342,19 +343,26 @@
     <div class="ac-card">
 
       {% if categories %}
-      {% set total_seats_all = categories | sum(attribute='total_seats') %}
-      {% set govt_cats = [] %}
-      {% set mgmt_cats = [] %}
+      {# 
+        FIX: Use namespace to avoid Jinja2 scoping bug with list.append() in loops.
+        Also categories is already sorted by sort_order from routes.py (DB query),
+        so we just split into govt/mgmt preserving that order — no | sort filter needed.
+      #}
+      {% set ns = namespace(govt_cats=[], mgmt_cats=[], total_seats_all=0) %}
       {% for c in categories %}
-        {% if c.name.upper().endswith('-PY') %}{% set _ = mgmt_cats.append(c) %}
-        {% else %}{% set _ = govt_cats.append(c) %}{% endif %}
+        {% set ns.total_seats_all = ns.total_seats_all + c.total_seats %}
+        {% if c.name.upper().endswith('-PY') %}
+          {% set ns.mgmt_cats = ns.mgmt_cats + [c] %}
+        {% else %}
+          {% set ns.govt_cats = ns.govt_cats + [c] %}
+        {% endif %}
       {% endfor %}
 
       <div class="summary-bar">
         <span class="summary-chip total"><i class="fas fa-layer-group"></i> {{ categories|length }} categories</span>
-        <span class="summary-chip govt"><i class="fas fa-university"></i> {{ govt_cats|length }} Govt</span>
-        <span class="summary-chip mgmt"><i class="fas fa-building"></i> {{ mgmt_cats|length }} Mgmt</span>
-        <span class="summary-chip total"><i class="fas fa-chair"></i> {{ total_seats_all }} total seats</span>
+        <span class="summary-chip govt"><i class="fas fa-university"></i> {{ ns.govt_cats|length }} Govt</span>
+        <span class="summary-chip mgmt"><i class="fas fa-building"></i> {{ ns.mgmt_cats|length }} Mgmt</span>
+        <span class="summary-chip total"><i class="fas fa-chair"></i> {{ ns.total_seats_all }} total seats</span>
       </div>
 
       {# ── GOVERNMENT QUOTA ── #}
@@ -362,16 +370,19 @@
         <div class="quota-section-header">
           <div class="qs-icon govt"><i class="fas fa-university"></i></div>
           <h4>Government Quota</h4>
-          <span class="qs-count govt">{{ govt_cats|length }} categories</span>
+          <span class="qs-count govt">{{ ns.govt_cats|length }} categories</span>
         </div>
-        {% if govt_cats %}
+        {% if ns.govt_cats %}
         <div class="ac-table-wrap">
           <table class="ac-table">
             <thead>
               <tr><th>#</th><th>Sort</th><th>Category</th><th>Total Seats</th><th>Used</th><th>Remaining</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              {% for cat in govt_cats | sort(attribute='sort_order') %}
+              {# FIX: categories already sorted by sort_order from DB — no | sort filter needed.
+                 Jinja | sort on integers can cause string-comparison issues (10 before 2).
+                 The DB query in routes.py uses .order_by(AdmitCategory.sort_order.asc()) which is correct. #}
+              {% for cat in ns.govt_cats %}
               <tr id="row-{{ cat.id }}" data-quota="govt">
                 <td class="serial-cell" data-label="#">{{ loop.index }}</td>
                 <td data-label="Sort"><span class="sort-badge">{{ cat.sort_order }}</span></td>
@@ -431,9 +442,10 @@
                     </div>
                     <div class="edit-field f-quota">
                       <label>Quota Type</label>
+                      {# FIX: values match routes.py ('government'/'management'), govt pre-selected #}
                       <select name="quota_type">
-                        <option value="govt" selected>🏛️ Government Quota</option>
-                        <option value="mgmt">🏢 Management Quota</option>
+                        <option value="government" selected>🏛️ Government Quota</option>
+                        <option value="management">🏢 Management Quota</option>
                       </select>
                     </div>
                     <div class="edit-actions">
@@ -460,16 +472,16 @@
         <div class="quota-section-header">
           <div class="qs-icon mgmt"><i class="fas fa-building"></i></div>
           <h4>Management Quota</h4>
-          <span class="qs-count mgmt">{{ mgmt_cats|length }} categories</span>
+          <span class="qs-count mgmt">{{ ns.mgmt_cats|length }} categories</span>
         </div>
-        {% if mgmt_cats %}
+        {% if ns.mgmt_cats %}
         <div class="ac-table-wrap">
           <table class="ac-table">
             <thead>
               <tr><th>#</th><th>Sort</th><th>Category</th><th>Total Seats</th><th>Used</th><th>Remaining</th><th>Status</th><th>Actions</th></tr>
             </thead>
             <tbody>
-              {% for cat in mgmt_cats | sort(attribute='sort_order') %}
+              {% for cat in ns.mgmt_cats %}
               <tr id="row-{{ cat.id }}" data-quota="mgmt">
                 <td class="serial-cell" data-label="#">{{ loop.index }}</td>
                 <td data-label="Sort"><span class="sort-badge">{{ cat.sort_order }}</span></td>
@@ -529,9 +541,10 @@
                     </div>
                     <div class="edit-field f-quota">
                       <label>Quota Type</label>
+                      {# FIX: values match routes.py ('government'/'management'), mgmt pre-selected #}
                       <select name="quota_type">
-                        <option value="govt">🏛️ Government Quota</option>
-                        <option value="mgmt" selected>🏢 Management Quota</option>
+                        <option value="government">🏛️ Government Quota</option>
+                        <option value="management" selected>🏢 Management Quota</option>
                       </select>
                     </div>
                     <div class="edit-actions">
@@ -574,17 +587,18 @@ var _manualQuota = false;
 
 function syncQuotaFromName(val) {
   if (_manualQuota) return;
-  const sel  = document.getElementById('add-quota-select');
-  const tag  = document.getElementById('auto-tag');
-  const hint = document.getElementById('quota-hint');
+  var sel  = document.getElementById('add-quota-select');
+  var tag  = document.getElementById('auto-tag');
+  var hint = document.getElementById('quota-hint');
   if (!val.trim()) {
     sel.value = ''; sel.className = '';
     tag.style.opacity = '0.4';
     hint.textContent = 'Auto-detected from name. You can also select manually.';
     return;
   }
-  const isMgmt = val.trim().toUpperCase().endsWith('-PY');
-  sel.value = isMgmt ? 'mgmt' : 'govt';
+  var isMgmt = val.trim().toUpperCase().endsWith('-PY');
+  /* FIX: values now match routes.py — 'management' and 'government' */
+  sel.value = isMgmt ? 'management' : 'government';
   sel.className = isMgmt ? 'is-mgmt' : 'is-govt';
   tag.style.opacity = '1';
   hint.textContent = isMgmt
@@ -594,19 +608,20 @@ function syncQuotaFromName(val) {
 
 function onQuotaManualChange() {
   _manualQuota = true;
-  const sel  = document.getElementById('add-quota-select');
-  const tag  = document.getElementById('auto-tag');
-  const hint = document.getElementById('quota-hint');
-  sel.className = sel.value === 'govt' ? 'is-govt' : sel.value === 'mgmt' ? 'is-mgmt' : '';
+  var sel  = document.getElementById('add-quota-select');
+  var tag  = document.getElementById('auto-tag');
+  var hint = document.getElementById('quota-hint');
+  /* FIX: check against 'government' and 'management' to match routes.py */
+  sel.className = sel.value === 'government' ? 'is-govt' : sel.value === 'management' ? 'is-mgmt' : '';
   tag.style.opacity = '0.3';
   hint.textContent = 'Manually selected. Clear the name field to re-enable auto-detect.';
 }
 
-// Reset manual flag when name is cleared
+/* Reset manual flag when name is cleared */
 document.getElementById('add-name-input').addEventListener('input', function() {
   if (!this.value.trim()) {
     _manualQuota = false;
-    const sel = document.getElementById('add-quota-select');
+    var sel = document.getElementById('add-quota-select');
     sel.value = ''; sel.className = '';
     document.getElementById('auto-tag').style.opacity = '0.4';
     document.getElementById('quota-hint').textContent = 'Auto-detected from name. You can also select manually.';
@@ -618,13 +633,13 @@ function toggleEdit(id) {
   document.querySelectorAll('.edit-row').forEach(function(r) {
     if (r.id !== 'edit-' + id) r.style.display = 'none';
   });
-  const row = document.getElementById('edit-' + id);
+  var row = document.getElementById('edit-' + id);
   row.style.display = (row.style.display === 'table-row') ? 'none' : 'table-row';
 }
 
 /* ── Toast ── */
 function showToast(msg) {
-  const t = document.getElementById('ac-toast');
+  var t = document.getElementById('ac-toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
