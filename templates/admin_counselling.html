@@ -20,27 +20,18 @@
     gap: .2rem;
   }
   .cl-summary-card .sc-label {
-    font-size: .68rem;
-    font-weight: 700;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: #8a9ab0;
+    font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: #8a9ab0;
   }
   .cl-summary-card .sc-value {
     font-family: 'Playfair Display', serif;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #0a1f44;
-    line-height: 1.1;
+    font-size: 1.75rem; font-weight: 700; color: #0a1f44; line-height: 1.1;
   }
-  .cl-summary-card .sc-sub {
-    font-size: .72rem;
-    color: #5a6e82;
-  }
-  .cl-summary-card.highlight-rank { border-left: 4px solid #c9a03d; }
-  .cl-summary-card.highlight-total { border-left: 4px solid #0a1f44; }
+  .cl-summary-card .sc-sub { font-size: .72rem; color: #5a6e82; }
+  .cl-summary-card.highlight-rank     { border-left: 4px solid #c9a03d; }
+  .cl-summary-card.highlight-total    { border-left: 4px solid #0a1f44; }
   .cl-summary-card.highlight-allotted { border-left: 4px solid #25c26e; }
-  .cl-summary-card.highlight-pending { border-left: 4px solid #f59e0b; }
+  .cl-summary-card.highlight-pending  { border-left: 4px solid #f59e0b; }
 
   .cl-page { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
   .cl-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
@@ -69,7 +60,6 @@
   .btn-ctrl:hover { opacity: .88; transform: translateY(-1px); }
 
   .cl-body { display: grid; grid-template-columns: 300px 1fr; gap: 1.25rem; align-items: start; }
-
   .cl-left { display: flex; flex-direction: column; gap: 1rem; }
   .cl-card { background: white; border-radius: 16px; border: 1px solid #eef2f8; box-shadow: 0 2px 8px rgba(0,0,0,.05); padding: 1.25rem; }
   .cl-card-title { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #8a9ab0; margin: 0 0 1rem; display: flex; align-items: center; gap: .4rem; }
@@ -112,10 +102,12 @@
   .no-results { text-align: center; padding: 2rem; color: #8a9ab0; display: none; }
   .empty-counsel { text-align: center; padding: 3rem; color: #8a9ab0; background: white; border-radius: 16px; border: 1.5px dashed #dde3ed; }
 
+  /* ── MODAL ── */
   .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(10,31,68,.45); align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
   .modal-box { background: white; border-radius: 22px; width: 100%; max-width: 720px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(10,31,68,.2); animation: modal-in .18s ease; }
   .modal-box.student-modal { max-width: 680px; }
+  .modal-box.seat-track-modal-box { max-width: 900px; }
   @keyframes modal-in { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #eef2f8; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; position: sticky; top: 0; background: white; z-index: 2; border-radius: 22px 22px 0 0; }
   .modal-title { font-size: 1.05rem; font-weight: 700; color: #0a1f44; margin: 0; }
@@ -124,25 +116,63 @@
   .modal-close:hover { background: #fee2e2; color: #991b1b; }
   .modal-body { padding: 1.5rem; }
 
-  .seat-section-header { padding: .65rem 1rem; font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: .5rem; border-bottom: 1px solid; border-radius: 10px 10px 0 0; }
-  .seat-section-header.govt { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
-  .seat-section-header.mgmt { background: #ede9fe; color: #7c3aed; border-color: #ddd6fe; }
-  .seat-section-wrap { border-radius: 10px; overflow: hidden; border: 1px solid #eef2f8; margin-bottom: 1.1rem; }
-  .seat-track-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
-  .seat-track-table th { padding: .45rem .85rem; text-align: left; font-size: .67rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #8a9ab0; background: #fafbfd; border-bottom: 1px solid #eef2f8; }
+  /* ── SEAT TRACKING TWO-COLUMN LAYOUT ── */
+  .seat-track-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 640px) {
+    .seat-track-cols { grid-template-columns: 1fr; gap: 1rem; }
+  }
+
+  .seat-quota-col { display: flex; flex-direction: column; }
+  .seat-quota-header {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .7rem 1rem; border-radius: 12px 12px 0 0;
+    font-size: .8rem; font-weight: 700; letter-spacing: .04em;
+    border-bottom: none;
+  }
+  .seat-quota-header.govt {
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    color: #1d4ed8; border: 1px solid #bfdbfe; border-bottom: none;
+  }
+  .seat-quota-header.mgmt {
+    background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+    color: #7c3aed; border: 1px solid #ddd6fe; border-bottom: none;
+  }
+  .seat-quota-header .sq-count {
+    margin-left: auto; font-size: .72rem; font-weight: 600;
+    opacity: .8; white-space: nowrap;
+  }
+
+  .seat-quota-table-wrap {
+    border: 1px solid #eef2f8; border-top: none;
+    border-radius: 0 0 12px 12px; overflow: hidden;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .seat-quota-header.govt + .seat-quota-table-wrap { border-color: #bfdbfe; }
+  .seat-quota-header.mgmt + .seat-quota-table-wrap { border-color: #ddd6fe; }
+
+  .seat-track-table { width: 100%; border-collapse: collapse; font-size: .83rem; min-width: 260px; }
+  .seat-track-table th { padding: .45rem .85rem; text-align: left; font-size: .67rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #8a9ab0; background: #fafbfd; border-bottom: 1px solid #eef2f8; white-space: nowrap; }
   .seat-track-table td { padding: .55rem .85rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
   .seat-track-table tr:last-child td { border-bottom: none; }
-  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: 3px; overflow: hidden; width: 80px; }
+  .seat-track-table tr:hover td { background: #fafbff; }
+
+  .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: 3px; overflow: hidden; width: 60px; }
   .seats-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #7c3aed, #6d28d9); }
   .seats-bar-fill.govt { background: linear-gradient(90deg, #2563eb, #1d4ed8); }
   .seats-bar-fill.full { background: #dc3545; }
 
+  .seat-empty-msg { text-align: center; padding: 1.5rem; color: #8a9ab0; font-size: .82rem; font-style: italic; }
+
+  /* ── STUDENT MODAL STYLES ── */
   .section-divider { font-size: .7rem; font-weight: 600; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; margin: 1.1rem 0 .65rem; padding-bottom: .35rem; border-bottom: 1px solid #f5f7fa; }
   .section-divider:first-child { margin-top: 0; }
   .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .65rem; }
   .detail-item span { font-size: .68rem; text-transform: uppercase; color: #5a6e82; letter-spacing: .04em; display: block; margin-bottom: 2px; }
   .detail-item strong { font-size: .85rem; color: #0a1f44; }
-
   .req { color: #dc3545; margin-left: 2px; font-size: .8rem; }
 
   .allot-form { background: #f8faff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 1.1rem; margin-top: .5rem; display: flex; flex-direction: column; gap: .85rem; }
@@ -164,12 +194,6 @@
   .fee-preview-row.total-row { font-weight: 800; color: #1a5c3a; font-size: .95rem; margin-top: .2rem; border-top: 1px solid #e8d5a0; padding-top: .3rem; }
   .btn-allot { padding: .6rem 1.3rem; background: #25c26e; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
   .btn-allot:hover { background: #1da85c; }
-
-  .quota-filter-tabs { display: flex; gap: .4rem; margin-bottom: .5rem; flex-wrap: wrap; }
-  .qtab { padding: .3rem .75rem; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: .72rem; font-weight: 600; cursor: pointer; background: white; color: #5a6e82; transition: all .15s; white-space: nowrap; }
-  .qtab.active-govt { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-  .qtab.active-mgmt { background: #ede9fe; color: #7c3aed; border-color: #c4b5fd; }
-  .qtab:not(.active-govt):not(.active-mgmt):hover { background: #f3f4f6; }
 
   .already-allotted { background: #edf9f2; border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem; overflow: hidden; }
   .allotted-info { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; padding: .85rem 1.1rem; }
@@ -197,7 +221,7 @@
   body.dark .cl-summary-card .sc-label { color: #8a9ab0; }
   body.dark .cl-summary-card .sc-value { color: #eef2ff; }
   body.dark .cl-summary-card .sc-sub   { color: #b9c8e8; }
-  body.dark .cl-card, body.dark .list-card, body.dark .modal-box, body.dark .modal-header, body.dark .seat-section-wrap { background: #1a2538; border-color: #2d3e54; }
+  body.dark .cl-card, body.dark .list-card, body.dark .modal-box, body.dark .modal-header { background: #1a2538; border-color: #2d3e54; }
   body.dark .modal-header { background: #1a2538; }
   body.dark .cl-card-title, body.dark .status-label, body.dark .modal-title, body.dark .stu-name, body.dark .detail-item strong, body.dark .list-card-header h4 { color: #eef2ff; }
   body.dark .status-sub, body.dark .modal-sub, body.dark .stu-sub, body.dark .detail-item span, body.dark .section-divider { color: #b9c8e8; }
@@ -207,8 +231,6 @@
   body.dark .list-card-header { border-color: #2d3e54; }
   body.dark .rank-input-row input, body.dark .rank-input-row textarea,
   body.dark .quota-select, body.dark .admit-cat-select, body.dark .fee-cat-select, body.dark .additional-fee-input { background: #0f1c2e; border-color: #2d3e54; color: #eef2ff; }
-  body.dark .seat-track-table th { background: #131e2e; color: #8a9ab0; border-color: #2d3e54; }
-  body.dark .seat-track-table td { border-color: #1e2e42; color: #eef2ff; }
   body.dark .allot-form { background: #131e2e; border-color: #2d3e54; }
   body.dark .allot-form-group label { color: #eef2ff; }
   body.dark .already-allotted { background: #0a2318; border-color: #1a5c3a; }
@@ -220,15 +242,18 @@
   body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .rank-display { color: #eef2ff; }
   body.dark .btn-close-modal, body.dark .btn-cancel-edit { background: #2d3e54; color: #b9c8e8; }
-  body.dark .qtab { background: #1a2538; border-color: #2d3e54; color: #b9c8e8; }
-  body.dark .seat-section-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
-  body.dark .seat-section-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
+  body.dark .seat-quota-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
+  body.dark .seat-quota-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
+  body.dark .seat-quota-table-wrap { border-color: #2d3e54; }
+  body.dark .seat-quota-header.govt + .seat-quota-table-wrap { border-color: #1e3a7a; }
+  body.dark .seat-quota-header.mgmt + .seat-quota-table-wrap { border-color: #4c1d95; }
+  body.dark .seat-track-table th { background: #131e2e; color: #8a9ab0; border-color: #2d3e54; }
+  body.dark .seat-track-table td { border-color: #1e2e42; color: #eef2ff; }
+  body.dark .seat-track-table tr:hover td { background: #1e2e42; }
+  body.dark .seats-bar-wrap { background: #2d3e54; }
 
   /* ── RESPONSIVE ── */
-  @media(max-width: 900px) {
-    .cl-body { grid-template-columns: 1fr; }
-  }
-
+  @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } }
   @media(max-width: 600px) {
     .cl-page { padding: 1rem .75rem 5rem; }
     .cl-header h2 { font-size: 1.35rem; }
@@ -252,9 +277,8 @@
     .cl-summary-card .sc-value { font-size: 1.4rem; }
     .seat-track-table { font-size: .75rem; }
     .seat-track-table th, .seat-track-table td { padding: .4rem .6rem; }
-    .seats-bar-wrap { width: 50px; }
+    .seats-bar-wrap { width: 40px; }
   }
-
   @media(max-width: 380px) {
     .cl-summary-bar { grid-template-columns: 1fr; }
     .detail-grid { grid-template-columns: 1fr; }
@@ -361,7 +385,7 @@
         </form>
       </div>
 
-      {% set total_seats_all = admit_categories | sum(attribute='total_seats') %}
+      {% set total_seats_all  = admit_categories | sum(attribute='total_seats') %}
       {% set filled_seats_all = admit_categories | sum(attribute='seats_used') %}
       <button class="btn-seat-track" onclick="openModal('seat-track-modal')">
         <i class="fas fa-chair"></i> Seat Tracking
@@ -414,98 +438,117 @@
   </div>
 </div>
 
-{# ── SEAT TRACKING MODAL ── #}
+{# ── SEAT TRACKING MODAL ── two-column layout, namespace fix #}
 <div class="modal-overlay" id="seat-track-modal" onclick="closeOnOverlay(event, 'seat-track-modal')">
-  <div class="modal-box">
+  <div class="modal-box seat-track-modal-box">
     <div class="modal-header">
       <div>
         <div class="modal-title"><i class="fas fa-chair" style="color:#7c3aed"></i> Seat Tracking</div>
-        <div class="modal-sub">Live seat availability — Government &amp; Management Quota</div>
+        <div class="modal-sub">Live seat availability — Government &amp; Management Quota side by side</div>
       </div>
       <button class="modal-close" onclick="closeModal('seat-track-modal')">&times;</button>
     </div>
     <div class="modal-body">
 
-      {% set govt_cats = [] %}
-      {% set mgmt_cats = [] %}
+      {#
+        FIX: Use namespace to avoid Jinja2 list.append() scoping bug.
+        admit_categories already sorted by sort_order from routes.py DB query —
+        DO NOT use | sort filter (treats integers as strings, breaks ordering).
+      #}
+      {% set ns = namespace(govt_cats=[], mgmt_cats=[]) %}
       {% for ac in admit_categories %}
-        {% if ac.name.upper().endswith('-PY') %}{% set _ = mgmt_cats.append(ac) %}
-        {% else %}{% set _ = govt_cats.append(ac) %}{% endif %}
+        {% if ac.name.upper().endswith('-PY') %}
+          {% set ns.mgmt_cats = ns.mgmt_cats + [ac] %}
+        {% else %}
+          {% set ns.govt_cats = ns.govt_cats + [ac] %}
+        {% endif %}
       {% endfor %}
 
-      <div class="seat-section-wrap">
-        <div class="seat-section-header govt">
-          <i class="fas fa-university"></i> Government Quota
-          <span style="margin-left:auto;font-size:.72rem;font-weight:600;opacity:.8">
-            {{ govt_cats | sum(attribute='seats_used') }} / {{ govt_cats | sum(attribute='total_seats') }} filled
-          </span>
-        </div>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-          <table class="seat-track-table">
-            <thead>
-              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
-            </thead>
-            <tbody>
-              {% for ac in govt_cats %}
-              <tr>
-                <td><strong>{{ ac.name }}</strong></td>
-                <td>{{ ac.total_seats }}</td>
-                <td>{{ ac.seats_used }}</td>
-                <td>
-                  <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                    {{ ac.seats_remaining }}
-                  </strong>
-                  <div class="seats-bar-wrap">
-                    <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
-                         style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
-                  </div>
-                </td>
-              </tr>
-              {% else %}
-              <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No government quota categories.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div class="seat-track-cols">
 
-      <div class="seat-section-wrap">
-        <div class="seat-section-header mgmt">
-          <i class="fas fa-building"></i> Management Quota
-          <span style="margin-left:auto;font-size:.72rem;font-weight:600;opacity:.8">
-            {{ mgmt_cats | sum(attribute='seats_used') }} / {{ mgmt_cats | sum(attribute='total_seats') }} filled
-          </span>
+        {# ── GOVERNMENT QUOTA COLUMN ── #}
+        <div class="seat-quota-col">
+          <div class="seat-quota-header govt">
+            <i class="fas fa-university"></i>
+            <span>Government Quota</span>
+            <span class="sq-count">
+              {{ ns.govt_cats | sum(attribute='seats_used') }}/{{ ns.govt_cats | sum(attribute='total_seats') }} filled
+            </span>
+          </div>
+          <div class="seat-quota-table-wrap">
+            {% if ns.govt_cats %}
+            <table class="seat-track-table">
+              <thead>
+                <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr>
+              </thead>
+              <tbody>
+                {% for ac in ns.govt_cats %}
+                <tr>
+                  <td><strong>{{ ac.name }}</strong></td>
+                  <td>{{ ac.total_seats }}</td>
+                  <td>{{ ac.seats_used }}</td>
+                  <td>
+                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
+                      {{ ac.seats_remaining }}
+                    </strong>
+                    <div class="seats-bar-wrap">
+                      <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
+                           style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <div class="seat-empty-msg">No government quota categories.</div>
+            {% endif %}
+          </div>
         </div>
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-          <table class="seat-track-table">
-            <thead>
-              <tr><th>Category</th><th>Total</th><th>Filled</th><th>Remaining</th></tr>
-            </thead>
-            <tbody>
-              {% for ac in mgmt_cats %}
-              <tr>
-                <td><strong>{{ ac.name }}</strong></td>
-                <td>{{ ac.total_seats }}</td>
-                <td>{{ ac.seats_used }}</td>
-                <td>
-                  <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                    {{ ac.seats_remaining }}
-                  </strong>
-                  <div class="seats-bar-wrap">
-                    <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
-                         style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
-                  </div>
-                </td>
-              </tr>
-              {% else %}
-              <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:1rem">No management quota categories.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      <p style="font-size:.72rem;color:#8a9ab0;margin-top:.5rem;text-align:right">
+        {# ── MANAGEMENT QUOTA COLUMN ── #}
+        <div class="seat-quota-col">
+          <div class="seat-quota-header mgmt">
+            <i class="fas fa-building"></i>
+            <span>Management Quota</span>
+            <span class="sq-count">
+              {{ ns.mgmt_cats | sum(attribute='seats_used') }}/{{ ns.mgmt_cats | sum(attribute='total_seats') }} filled
+            </span>
+          </div>
+          <div class="seat-quota-table-wrap">
+            {% if ns.mgmt_cats %}
+            <table class="seat-track-table">
+              <thead>
+                <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr>
+              </thead>
+              <tbody>
+                {% for ac in ns.mgmt_cats %}
+                <tr>
+                  <td><strong>{{ ac.name }}</strong></td>
+                  <td>{{ ac.total_seats }}</td>
+                  <td>{{ ac.seats_used }}</td>
+                  <td>
+                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
+                      {{ ac.seats_remaining }}
+                    </strong>
+                    <div class="seats-bar-wrap">
+                      <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
+                           style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <div class="seat-empty-msg">No management quota categories.</div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>{# /seat-track-cols #}
+
+      <p style="font-size:.72rem;color:#8a9ab0;margin-top:.85rem;text-align:right">
         To update seat totals, go to <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600;">Admit Categories</a>
       </p>
     </div>
@@ -538,13 +581,8 @@
             {% if appl.dob %}
               {% set dob = appl.dob | string %}
               {% if '-' in dob and dob | length >= 10 %}
-                {# Format from YYYY-MM-DD to DD/MM/YYYY #}
                 {{ dob[8:10] }}/{{ dob[5:7] }}/{{ dob[0:4] }}
-              {% elif '/' in dob %}
-                {{ dob }}
-              {% else %}
-                {{ dob }}
-              {% endif %}
+              {% else %}{{ dob }}{% endif %}
             {% else %}—{% endif %}
           </strong>
         </div>
@@ -767,13 +805,8 @@ function filterAdmitCatsByQuota(quotaValue, selectId) {
   options.forEach(function(opt) {
     if (!opt.value) return;
     var optQuota = opt.dataset.quota || '';
-    if (!quotaValue || optQuota === quotaValue) {
-      opt.style.display = '';
-      opt.hidden = false;
-    } else {
-      opt.style.display = 'none';
-      opt.hidden = true;
-    }
+    if (!quotaValue || optQuota === quotaValue) { opt.style.display = ''; opt.hidden = false; }
+    else { opt.style.display = 'none'; opt.hidden = true; }
   });
   var current = select.options[select.selectedIndex];
   if (current && current.hidden) {
