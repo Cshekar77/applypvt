@@ -29,15 +29,26 @@ def now_ist():
     return datetime.now(IST)
 
 def utc_to_ist(dt):
+    """
+    FIXED: DB stores naive datetimes that are already in IST.
+    Just attach IST tzinfo — do NOT convert from UTC.
+    """
     if dt is None:
         return None
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
+        return dt.replace(tzinfo=IST)   # label as IST, no conversion
     return dt.astimezone(IST)
 
 def ist_now_naive():
     """Return current IST time as naive datetime (for DB storage)."""
     return datetime.now(IST).replace(tzinfo=None)
+
+def fmt_ist(dt, fmt='%d %b %Y, %I:%M %p'):
+    """Format a DB datetime (naive IST) for display."""
+    aware = utc_to_ist(dt)
+    if aware is None:
+        return '—'
+    return aware.strftime(fmt) + ' IST'
 
 
 # ─────────────────────────────────────────
@@ -153,7 +164,6 @@ def index():
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
-#  FIXED: sorted by sort_order then name
 # ─────────────────────────────────────────
 @main.route('/live')
 def counselling_live():
@@ -178,7 +188,6 @@ def counselling_live():
                     'allotted_at': utc_to_ist(a.allotted_at),
                 }
 
-    # FIXED: sorted by sort_order asc, then name asc
     admit_categories = AdmitCategory.query.filter_by(is_active=True)\
         .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     govt_seats_list  = []
@@ -201,13 +210,12 @@ def counselling_live():
         appl = StudentApplication.query.get(a.application_id)
         if not appl:
             continue
-        allotted_ist = utc_to_ist(a.allotted_at)
         allotment_history.append({
             'rank':        appl.rank or '—',
             'name':        appl.full_name,
             'category':    appl.category_name or '—',
             'quota':       a.quota,
-            'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '—',
+            'allotted_at': fmt_ist(a.allotted_at),
         })
     allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
 
@@ -557,7 +565,6 @@ def student_whatsapp():
 
 # ─────────────────────────────────────────
 #  Student — Live Counselling Tracker
-#  FIXED: sorted by sort_order
 # ─────────────────────────────────────────
 @main.route('/counselling')
 @login_required
@@ -568,10 +575,9 @@ def student_counselling():
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
-            allotted_ist = utc_to_ist(a.allotted_at)
             allotment = {
                 'quota':       a.quota,
-                'allotted_at': allotted_ist
+                'allotted_at': utc_to_ist(a.allotted_at)
             }
     return render_template('student_counselling.html',
                            appl=appl, counselling=counselling,
@@ -584,7 +590,6 @@ def counselling_status_api():
     appl        = StudentApplication.query.filter_by(user_id=current_user.id).first()
     counselling = CounsellingSettings.get()
 
-    # FIXED: sorted by sort_order asc, name asc
     admit_categories = AdmitCategory.query.filter_by(is_active=True)\
         .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     govt_seats = []
@@ -605,20 +610,36 @@ def counselling_status_api():
     if appl:
         a = SeatAllotment.query.filter_by(application_id=appl.id).first()
         if a:
-            allotted_ist = utc_to_ist(a.allotted_at)
             allotment = {
                 'quota':       a.quota,
-                'allotted_at': allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else None
+                'allotted_at': fmt_ist(a.allotted_at)
+            }
+
+    # FIXED: current_student info for live display
+    current_student = None
+    if counselling.current_rank:
+        cs_appl = StudentApplication.query.filter_by(
+            rank=counselling.current_rank, is_verified=True
+        ).first()
+        if cs_appl:
+            cs_allot = SeatAllotment.query.filter_by(application_id=cs_appl.id).first()
+            current_student = {
+                'name':        cs_appl.full_name,
+                'percent_12':  cs_appl.percent_12,
+                'category':    cs_appl.category_name,
+                'allotted':    cs_allot is not None,
+                'allot_quota': cs_allot.quota if cs_allot else None,
             }
 
     return jsonify({
-        'status':       counselling.status,
-        'current_rank': counselling.current_rank,
-        'message':      counselling.message,
-        'my_rank':      appl.rank if appl else None,
-        'govt_seats':   govt_seats,
-        'mgmt_seats':   mgmt_seats,
-        'allotment':    allotment,
+        'status':           counselling.status,
+        'current_rank':     counselling.current_rank,
+        'message':          counselling.message,
+        'my_rank':          appl.rank if appl else None,
+        'govt_seats':       govt_seats,
+        'mgmt_seats':       mgmt_seats,
+        'allotment':        allotment,
+        'current_student':  current_student,
     })
 
 
@@ -1112,6 +1133,7 @@ def export_payments():
 
 # ─────────────────────────────────────────
 #  Admin — Export: Payment Receipts Detail Excel
+#  FIXED: IST display using fmt_ist()
 # ─────────────────────────────────────────
 @main.route('/admin/export/payment-receipts')
 @admin_required
@@ -1138,37 +1160,38 @@ def export_payment_receipts():
 
         if receipts:
             for r in receipts:
+                # FIXED: use utc_to_ist (which now just labels IST correctly)
                 receipt_ist = utc_to_ist(r.created_at)
                 rows.append({
-                    'Rank':              appl.rank or '',
-                    'Student Name':      appl.full_name,
-                    'Email':             appl.email,
-                    'Phone':             appl.phone or '',
-                    'Quota':             a.quota.title() if a.quota else '',
-                    'Category':          appl.category_name or '',
-                    'Total Fees (₹)':    total_fees if fees and fees.total_fees else '',
-                    'Receipt No':        r.receipt_number,
-                    'Amount Paid (₹)':   r.amount_paid,
-                    'Receipt Date':      receipt_ist.strftime('%d %b %Y') if receipt_ist else '',
-                    'Receipt Time (IST)':receipt_ist.strftime('%I:%M %p') if receipt_ist else '',
+                    'Rank':               appl.rank or '',
+                    'Student Name':       appl.full_name,
+                    'Email':              appl.email,
+                    'Phone':              appl.phone or '',
+                    'Quota':              a.quota.title() if a.quota else '',
+                    'Category':           appl.category_name or '',
+                    'Total Fees (₹)':     total_fees if fees and fees.total_fees else '',
+                    'Receipt No':         r.receipt_number,
+                    'Amount Paid (₹)':    r.amount_paid,
+                    'Receipt Date (IST)': receipt_ist.strftime('%d %b %Y') if receipt_ist else '',
+                    'Receipt Time (IST)': receipt_ist.strftime('%I:%M %p') if receipt_ist else '',
                     'Total Paid So Far (₹)': total_paid,
-                    'Remaining (₹)':     remaining if remaining != '' else '',
+                    'Remaining (₹)':      remaining if remaining != '' else '',
                 })
         else:
             rows.append({
-                'Rank':              appl.rank or '',
-                'Student Name':      appl.full_name,
-                'Email':             appl.email,
-                'Phone':             appl.phone or '',
-                'Quota':             a.quota.title() if a.quota else '',
-                'Category':          appl.category_name or '',
-                'Total Fees (₹)':    total_fees if fees and fees.total_fees else '',
-                'Receipt No':        '—',
-                'Amount Paid (₹)':   0,
-                'Receipt Date':      '—',
-                'Receipt Time (IST)':'—',
+                'Rank':               appl.rank or '',
+                'Student Name':       appl.full_name,
+                'Email':              appl.email,
+                'Phone':              appl.phone or '',
+                'Quota':              a.quota.title() if a.quota else '',
+                'Category':           appl.category_name or '',
+                'Total Fees (₹)':     total_fees if fees and fees.total_fees else '',
+                'Receipt No':         '—',
+                'Amount Paid (₹)':    0,
+                'Receipt Date (IST)': '—',
+                'Receipt Time (IST)': '—',
                 'Total Paid So Far (₹)': 0,
-                'Remaining (₹)':     remaining if remaining != '' else '',
+                'Remaining (₹)':      remaining if remaining != '' else '',
             })
 
     rows.sort(key=lambda x: (x['Rank'] if isinstance(x['Rank'], int) else 9999))
@@ -1187,7 +1210,7 @@ def export_payment_receipts():
     headers = list(rows[0].keys()) if rows else [
         'Rank', 'Student Name', 'Email', 'Phone', 'Quota', 'Category',
         'Total Fees (₹)', 'Receipt No', 'Amount Paid (₹)',
-        'Receipt Date', 'Receipt Time (IST)', 'Total Paid So Far (₹)', 'Remaining (₹)'
+        'Receipt Date (IST)', 'Receipt Time (IST)', 'Total Paid So Far (₹)', 'Remaining (₹)'
     ]
 
     for col_idx, header in enumerate(headers, 1):
@@ -1235,6 +1258,7 @@ def export_payment_receipts():
 
 # ─────────────────────────────────────────
 #  Admin — Export: Document Overview Excel
+#  FIXED: IST display using utc_to_ist (corrected)
 # ─────────────────────────────────────────
 @main.route('/admin/export/document-overview')
 @admin_required
@@ -1260,6 +1284,8 @@ def export_document_overview():
         'not_given':  'Not Given',
         'submitted':  'Submitted',
         'original':   'Original',
+        'xerox':      'Xerox',
+        'attested':   'Attested',
         'photocopy':  'Photocopy',
     }
 
@@ -1275,16 +1301,16 @@ def export_document_overview():
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
 
         row = {
-            'Rank':           appl.rank or '',
-            'Student Name':   appl.full_name,
-            'Email':          appl.email,
-            'Phone':          appl.phone or '',
-            'Quota':          a.quota.title() if a.quota else '',
-            'Category':       appl.category_name or '',
-            'Total Docs':     total,
-            'Submitted':      submitted,
-            'Approved':       approved,
-            'Pending':        total - approved,
+            'Rank':         appl.rank or '',
+            'Student Name': appl.full_name,
+            'Email':        appl.email,
+            'Phone':        appl.phone or '',
+            'Quota':        a.quota.title() if a.quota else '',
+            'Category':     appl.category_name or '',
+            'Total Docs':   total,
+            'Submitted':    submitted,
+            'Approved':     approved,
+            'Pending':      total - approved,
         }
 
         for dc in doc_categories:
@@ -1293,9 +1319,8 @@ def export_document_overview():
                 status_label   = STATUS_LABELS.get(doc.status, doc.status or 'Not Given')
                 approved_label = 'Yes' if doc.is_approved else 'No'
                 approved_by    = doc.approved_by_name or ''
-                approved_at    = ''
-                if doc.approved_at:
-                    approved_at = utc_to_ist(doc.approved_at).strftime('%d %b %Y, %I:%M %p IST') if doc.approved_at else ''
+                # FIXED: correct IST label
+                approved_at = fmt_ist(doc.approved_at) if doc.approved_at else ''
             else:
                 status_label   = 'Not Given'
                 approved_label = 'No'
@@ -1380,6 +1405,7 @@ def export_document_overview():
 
 # ─────────────────────────────────────────
 #  Admin — Export: Admitted Students Excel
+#  FIXED: IST display + Govt first then Mgmt sort
 # ─────────────────────────────────────────
 @main.route('/admin/export/admitted-students')
 @admin_required
@@ -1389,7 +1415,6 @@ def export_admitted_students():
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
-    # FIXED: sorted by admit_category sort_order, then seat number
     allotments = (SeatAllotment.query
                   .join(AdmitCategory, SeatAllotment.admit_category_id == AdmitCategory.id)
                   .filter(
@@ -1442,7 +1467,8 @@ def export_admitted_students():
                                if doc_status_map.get(dc.id) and
                                doc_status_map[dc.id].is_approved)
 
-        allotted_ist = utc_to_ist(a.allotted_at)
+        # FIXED: correct IST label
+        allotted_str = fmt_ist(a.allotted_at)
 
         rows.append({
             'Admit Category':        admit_cat_name,
@@ -1457,7 +1483,7 @@ def export_admitted_students():
             'Quota':                 a.quota.title() if a.quota else '',
             'Address':               appl.address or '',
             'Nationality':           appl.nationality or '',
-            'Allotted At (IST)':     allotted_ist.strftime('%d %b %Y, %I:%M %p') if allotted_ist else '',
+            'Allotted At (IST)':     allotted_str,
             'Fee Structure':         fee_cat_name,
             'Base Fee (₹)':          fee_base_amount if fee_base_amount != '' else '',
             'Additional Fee (₹)':    additional_fee,
@@ -1633,9 +1659,6 @@ def admin_counselling():
                 return redirect(url_for('main.admin_counselling'))
 
             if is_edit and existing_allotment:
-                # ── EDIT MODE ──
-                old_admit_cat_id = existing_allotment.admit_category_id
-
                 existing_allotment.quota             = quota
                 existing_allotment.admit_category_id = admit_cat.id
                 existing_allotment.admit_seat_number = admit_cat.seats_used + 1
@@ -1673,7 +1696,6 @@ def admin_counselling():
                 flash(f'⚠️ Seat already allotted to {appl.full_name}. Use the Edit button to change.', 'warning')
 
             else:
-                # ── NEW ALLOTMENT ──
                 seat_number = admit_cat.seats_used + 1
 
                 db.session.add(SeatAllotment(
@@ -1752,10 +1774,8 @@ def admin_counselling():
             )
 
     students = query.order_by(StudentApplication.rank.asc()).all()
-
     allotments = {a.application_id: a for a in SeatAllotment.query.all()}
 
-    # Single GROUP BY query — replaces N per-instance COUNT calls in the template
     seat_counts = dict(
         db.session.query(
             SeatAllotment.admit_category_id,
@@ -1763,7 +1783,6 @@ def admin_counselling():
         ).group_by(SeatAllotment.admit_category_id).all()
     )
 
-    # FIXED: sorted by sort_order asc, name asc
     admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
         .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
     admit_categories = []
@@ -1779,18 +1798,393 @@ def admin_counselling():
             'is_active':       ac.is_active,
         })
 
+    # NEW: document status map for counselling allotment popup color coding
+    doc_categories_all = DocumentCategory.query.filter_by(is_active=True)\
+        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+    all_docs = StudentDocument.query.all()
+    counselling_doc_map = {}
+    for d in all_docs:
+        counselling_doc_map.setdefault(d.application_id, {})[d.doc_category_id] = {
+            'status':      d.status or 'not_given',
+            'is_approved': d.is_approved,
+        }
+
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,
                            cat_seats=cat_seats, students=students,
                            allotments=allotments,
                            admit_categories=admit_categories,
                            fee_categories=fee_categories,
-                           search_q=search_q)
+                           search_q=search_q,
+                           doc_categories=doc_categories_all,
+                           counselling_doc_map=counselling_doc_map)
+
+
+# ─────────────────────────────────────────
+#  Admin — Allotment Acknowledgement PDF
+#  NEW: generates printable PDF split into
+#       student copy (top) + college copy (bottom)
+# ─────────────────────────────────────────
+@main.route('/admin/counselling/acknowledgement/<int:app_id>')
+@admin_required
+def allotment_acknowledgement(app_id):
+    """
+    Generates a printable A4 PDF acknowledgement for seat allotment.
+    Top half = Student Copy, Bottom half = College Copy.
+    Both halves contain: University logo, University name, student details,
+    rank, category, admit category, total fees, issuer signature box.
+    Set UNIVERSITY_LOGO_PATH in config to the path of your logo image.
+    Set UNIVERSITY_NAME in config (default: 'University').
+    """
+    import io
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import cm
+    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                    Table, TableStyle, HRFlowable, Image)
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+
+    appl = StudentApplication.query.get_or_404(app_id)
+    allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+    if not allotment:
+        flash('No seat allotment found for this student.', 'danger')
+        return redirect(url_for('main.admin_counselling'))
+
+    admit_cat_name = '—'
+    if allotment.admit_category_id:
+        ac = AdmitCategory.query.get(allotment.admit_category_id)
+        if ac:
+            admit_cat_name = ac.name
+
+    fees_obj  = StudentFees.query.filter_by(application_id=appl.id).first()
+    total_fees = f"₹ {fees_obj.total_fees:,.2f}" if fees_obj and fees_obj.total_fees else '—'
+
+    allotted_str = fmt_ist(allotment.allotted_at)
+
+    university_name = current_app.config.get('UNIVERSITY_NAME', 'University')
+    # Set UNIVERSITY_LOGO_PATH in your config/.env to the absolute path of logo image
+    logo_path = current_app.config.get('UNIVERSITY_LOGO_PATH', None)
+
+    buffer = io.BytesIO()
+    page_w, page_h = A4
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=1.5*cm, rightMargin=1.5*cm,
+        topMargin=1*cm,    bottomMargin=1*cm,
+    )
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', fontSize=13, fontName='Helvetica-Bold',
+                                 alignment=TA_CENTER, spaceAfter=2)
+    sub_style   = ParagraphStyle('sub',   fontSize=9,  fontName='Helvetica',
+                                 alignment=TA_CENTER, spaceAfter=2)
+    label_style = ParagraphStyle('label', fontSize=9,  fontName='Helvetica-Bold',
+                                 alignment=TA_LEFT)
+    value_style = ParagraphStyle('value', fontSize=9,  fontName='Helvetica',
+                                 alignment=TA_LEFT)
+    copy_style  = ParagraphStyle('copy',  fontSize=8,  fontName='Helvetica-Bold',
+                                 alignment=TA_CENTER, textColor=colors.grey)
+    sign_style  = ParagraphStyle('sign',  fontSize=8,  fontName='Helvetica',
+                                 alignment=TA_RIGHT)
+    wm_style    = ParagraphStyle('wm',    fontSize=28, fontName='Helvetica-Bold',
+                                 textColor=colors.Color(0.85, 0.85, 0.85),
+                                 alignment=TA_CENTER)
+
+    def _half_content(copy_label):
+        """Build content for one half (student or college copy)."""
+        elems = []
+
+        # Watermark placeholder — replace text with Image if you have a logo
+        # WATERMARK: set UNIVERSITY_WATERMARK_TEXT in config, or use an image
+        wm_text = current_app.config.get('UNIVERSITY_WATERMARK_TEXT', university_name.upper())
+        elems.append(Paragraph(wm_text, wm_style))  # ← change this to your watermark image
+
+        # Header row: logo left, university name centre
+        header_data = [[]]
+        if logo_path and os.path.exists(logo_path):
+            header_data = [[Image(logo_path, width=2*cm, height=2*cm),
+                            Paragraph(f'<b>{university_name}</b><br/>'
+                                      f'<font size=8>BCA Admissions {datetime.now().year}</font>',
+                                      title_style),
+                            '']]
+            header_tbl = Table(header_data, colWidths=[2.5*cm, page_w - 7*cm, 2.5*cm])
+        else:
+            header_data = [['',
+                            Paragraph(f'<b>{university_name}</b><br/>'
+                                      f'<font size=8>BCA Admissions {datetime.now().year}</font>',
+                                      title_style),
+                            '']]
+            header_tbl = Table(header_data, colWidths=[2.5*cm, page_w - 7*cm, 2.5*cm])
+
+        header_tbl.setStyle(TableStyle([
+            ('VALIGN',      (0,0), (-1,-1), 'MIDDLE'),
+            ('ALIGN',       (1,0), (1,0),   'CENTER'),
+            ('BOTTOMPADDING',(0,0),(-1,-1),  4),
+        ]))
+        elems.append(header_tbl)
+        elems.append(HRFlowable(width='100%', thickness=1.5, color=colors.darkblue))
+        elems.append(Spacer(1, 0.2*cm))
+
+        elems.append(Paragraph('SEAT ALLOTMENT ACKNOWLEDGEMENT', title_style))
+        elems.append(Paragraph(copy_label, copy_style))
+        elems.append(Spacer(1, 0.3*cm))
+
+        # Details table
+        details = [
+            ['Student Name',    appl.full_name,          'Rank',          str(appl.rank or '—')],
+            ['Caste Category',  appl.category_name or '—', 'Gender',       appl.gender or '—'],
+            ['Admit Category',  admit_cat_name,           'Quota',         (allotment.quota or '—').title()],
+            ['Allotted At',     allotted_str,             'Seat No',       str(allotment.admit_seat_number or '—')],
+            ['Total Fees',      total_fees,               'Academic Year', str(datetime.now().year)],
+        ]
+
+        detail_tbl = Table(
+            [[Paragraph(str(r[0]), label_style), Paragraph(str(r[1]), value_style),
+              Paragraph(str(r[2]), label_style), Paragraph(str(r[3]), value_style)]
+             for r in details],
+            colWidths=[3.5*cm, 6*cm, 3.5*cm, 4*cm]
+        )
+        detail_tbl.setStyle(TableStyle([
+            ('GRID',        (0,0), (-1,-1), 0.4, colors.lightgrey),
+            ('BACKGROUND',  (0,0), (0,-1),  colors.Color(0.93, 0.96, 1.0)),
+            ('BACKGROUND',  (2,0), (2,-1),  colors.Color(0.93, 0.96, 1.0)),
+            ('PADDING',     (0,0), (-1,-1), 5),
+            ('ROWBACKGROUNDS', (0,0), (-1,-1),
+             [colors.white, colors.Color(0.97, 0.97, 1.0)]),
+        ]))
+        elems.append(detail_tbl)
+        elems.append(Spacer(1, 0.4*cm))
+
+        # Signature row
+        sig_tbl = Table(
+            [[Paragraph('Date: _______________', value_style),
+              Paragraph('Signature of Issuing Authority<br/>___________________________<br/>'
+                        '<font size=7>(Name &amp; Designation)</font>', sign_style)]],
+            colWidths=[9*cm, 8*cm]
+        )
+        sig_tbl.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM')]))
+        elems.append(sig_tbl)
+
+        return elems
+
+    story = []
+    story += _half_content('— STUDENT COPY —')
+    story.append(Spacer(1, 0.3*cm))
+    story.append(HRFlowable(width='100%', thickness=1, color=colors.grey,
+                             dash=[3, 3]))
+    story.append(Spacer(1, 0.3*cm))
+    story += _half_content('— COLLEGE COPY —')
+
+    doc.build(story)
+    buffer.seek(0)
+
+    safe_name = re.sub(r'[^a-zA-Z0-9_]', '_', appl.full_name)
+    filename  = f'allotment_acknowledgement_{safe_name}_rank{appl.rank}.pdf'
+    return send_file(buffer, mimetype='application/pdf',
+                     as_attachment=False, download_name=filename)
+
+
+# ─────────────────────────────────────────
+#  Admin — Document Acknowledgement PDF
+#  NEW: generates printable PDF after document
+#       verification — student copy + college copy
+# ─────────────────────────────────────────
+@main.route('/admin/document-verification/acknowledgement/<int:app_id>')
+@admin_required
+def document_acknowledgement(app_id):
+    return _generate_document_acknowledgement_pdf(app_id)
+
+
+@main.route('/faculty/document-verification/acknowledgement/<int:app_id>')
+@faculty_required
+def faculty_document_acknowledgement(app_id):
+    return _generate_document_acknowledgement_pdf(app_id)
+
+
+def _generate_document_acknowledgement_pdf(app_id):
+    """
+    Shared PDF generator for document acknowledgement.
+    One A4 page: top half = Student Copy, bottom half = College Copy.
+    Both halves: University logo, student name, rank, allotted category,
+    allotment time, document list with status, student + college signature boxes.
+    """
+    import io
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import cm
+    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                    Table, TableStyle, HRFlowable, Image)
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+
+    appl = StudentApplication.query.get_or_404(app_id)
+    allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+
+    admit_cat_name = '—'
+    allotted_str   = '—'
+    if allotment:
+        if allotment.admit_category_id:
+            ac = AdmitCategory.query.get(allotment.admit_category_id)
+            if ac:
+                admit_cat_name = ac.name
+        allotted_str = fmt_ist(allotment.allotted_at)
+
+    doc_categories = DocumentCategory.query.filter_by(is_active=True)\
+        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+    student_docs   = StudentDocument.query.filter_by(application_id=app_id).all()
+    doc_status_map = {d.doc_category_id: d for d in student_docs}
+
+    STATUS_DISPLAY = {
+        'original':  ('Original',  colors.Color(0.0,  0.5,  0.2)),
+        'xerox':     ('Xerox',     colors.Color(0.1,  0.3,  0.8)),
+        'attested':  ('Attested',  colors.Color(0.6,  0.4,  0.0)),
+        'not_given': ('Not Given', colors.Color(0.5,  0.5,  0.5)),
+        'submitted': ('Submitted', colors.Color(0.0,  0.4,  0.6)),
+    }
+
+    university_name = current_app.config.get('UNIVERSITY_NAME', 'University')
+    logo_path       = current_app.config.get('UNIVERSITY_LOGO_PATH', None)
+
+    buffer = io.BytesIO()
+    page_w, page_h = A4
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=1.5*cm, rightMargin=1.5*cm,
+        topMargin=0.8*cm,  bottomMargin=0.8*cm,
+    )
+
+    styles     = getSampleStyleSheet()
+    title_sty  = ParagraphStyle('t',  fontSize=12, fontName='Helvetica-Bold',
+                                alignment=TA_CENTER, spaceAfter=2)
+    copy_sty   = ParagraphStyle('cp', fontSize=8,  fontName='Helvetica-Bold',
+                                alignment=TA_CENTER, textColor=colors.grey)
+    label_sty  = ParagraphStyle('lb', fontSize=8,  fontName='Helvetica-Bold',
+                                alignment=TA_LEFT)
+    value_sty  = ParagraphStyle('vl', fontSize=8,  fontName='Helvetica',
+                                alignment=TA_LEFT)
+    sign_sty   = ParagraphStyle('sg', fontSize=8,  fontName='Helvetica',
+                                alignment=TA_CENTER)
+    wm_sty     = ParagraphStyle('wm', fontSize=24, fontName='Helvetica-Bold',
+                                textColor=colors.Color(0.88, 0.88, 0.88),
+                                alignment=TA_CENTER)
+
+    def _half(copy_label):
+        elems = []
+        wm_text = current_app.config.get('UNIVERSITY_WATERMARK_TEXT',
+                                         university_name.upper())
+        elems.append(Paragraph(wm_text, wm_sty))
+
+        if logo_path and os.path.exists(logo_path):
+            hdr = [[Image(logo_path, width=1.8*cm, height=1.8*cm),
+                    Paragraph(f'<b>{university_name}</b><br/>'
+                              f'<font size=7>BCA Admissions — Document Receipt</font>',
+                              title_sty),
+                    '']]
+        else:
+            hdr = [['',
+                    Paragraph(f'<b>{university_name}</b><br/>'
+                              f'<font size=7>BCA Admissions — Document Receipt</font>',
+                              title_sty),
+                    '']]
+
+        hdr_tbl = Table(hdr, colWidths=[2*cm, page_w - 6*cm, 2*cm])
+        hdr_tbl.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('ALIGN',  (1,0), (1,0),   'CENTER'),
+        ]))
+        elems.append(hdr_tbl)
+        elems.append(HRFlowable(width='100%', thickness=1.5, color=colors.darkblue))
+        elems.append(Spacer(1, 0.15*cm))
+
+        elems.append(Paragraph('DOCUMENT VERIFICATION ACKNOWLEDGEMENT', title_sty))
+        elems.append(Paragraph(copy_label, copy_sty))
+        elems.append(Spacer(1, 0.2*cm))
+
+        info = [
+            ['Student Name', appl.full_name,   'Rank',           str(appl.rank or '—')],
+            ['Admit Category', admit_cat_name, 'Caste Category', appl.category_name or '—'],
+            ['Allotted At',  allotted_str,      'Seat No',        str(allotment.admit_seat_number
+                                                                     if allotment else '—')],
+        ]
+        info_tbl = Table(
+            [[Paragraph(str(r[0]), label_sty), Paragraph(str(r[1]), value_sty),
+              Paragraph(str(r[2]), label_sty), Paragraph(str(r[3]), value_sty)]
+             for r in info],
+            colWidths=[3.2*cm, 5.8*cm, 3.2*cm, 4.8*cm]
+        )
+        info_tbl.setStyle(TableStyle([
+            ('GRID',       (0,0), (-1,-1), 0.4, colors.lightgrey),
+            ('BACKGROUND', (0,0), (0,-1),  colors.Color(0.93, 0.96, 1.0)),
+            ('BACKGROUND', (2,0), (2,-1),  colors.Color(0.93, 0.96, 1.0)),
+            ('PADDING',    (0,0), (-1,-1), 4),
+        ]))
+        elems.append(info_tbl)
+        elems.append(Spacer(1, 0.2*cm))
+
+        # Documents table
+        doc_rows = [[
+            Paragraph('#', label_sty),
+            Paragraph('Document Name', label_sty),
+            Paragraph('Status', label_sty),
+            Paragraph('Approved', label_sty),
+        ]]
+        for idx, dc in enumerate(doc_categories, 1):
+            d         = doc_status_map.get(dc.id)
+            status    = d.status if d else 'not_given'
+            disp, col = STATUS_DISPLAY.get(status, ('—', colors.grey))
+            approved  = '✓ Yes' if (d and d.is_approved) else '✗ No'
+            doc_rows.append([
+                Paragraph(str(idx), value_sty),
+                Paragraph(dc.name, value_sty),
+                Paragraph(f'<font color="{col.hexval()}">{disp}</font>', value_sty),
+                Paragraph(approved, value_sty),
+            ])
+
+        doc_tbl = Table(doc_rows, colWidths=[1*cm, 8*cm, 4*cm, 4*cm])
+        doc_tbl.setStyle(TableStyle([
+            ('BACKGROUND',   (0,0), (-1,0),  colors.Color(0.15, 0.25, 0.5)),
+            ('TEXTCOLOR',    (0,0), (-1,0),  colors.white),
+            ('GRID',         (0,0), (-1,-1), 0.4, colors.lightgrey),
+            ('PADDING',      (0,0), (-1,-1), 4),
+            ('ROWBACKGROUNDS',(0,1), (-1,-1),
+             [colors.white, colors.Color(0.97, 0.97, 1.0)]),
+        ]))
+        elems.append(doc_tbl)
+        elems.append(Spacer(1, 0.3*cm))
+
+        # Dual signature row: student left, college right
+        sig_tbl = Table(
+            [[Paragraph('Student Signature<br/><br/>___________________________<br/>'
+                        f'<font size=7>{appl.full_name}</font>', sign_sty),
+              Paragraph('Verified By (College)<br/><br/>___________________________<br/>'
+                        '<font size=7>Name &amp; Designation</font>', sign_sty)]],
+            colWidths=[9*cm, 8*cm]
+        )
+        sig_tbl.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM')]))
+        elems.append(sig_tbl)
+        return elems
+
+    story = []
+    story += _half('— STUDENT COPY —')
+    story.append(Spacer(1, 0.25*cm))
+    story.append(HRFlowable(width='100%', thickness=1, color=colors.grey, dash=[3, 3]))
+    story.append(Spacer(1, 0.25*cm))
+    story += _half('— COLLEGE COPY —')
+
+    doc.build(story)
+    buffer.seek(0)
+
+    safe_name = re.sub(r'[^a-zA-Z0-9_]', '_', appl.full_name)
+    filename  = f'document_acknowledgement_{safe_name}_rank{appl.rank}.pdf'
+    return send_file(buffer, mimetype='application/pdf',
+                     as_attachment=False, download_name=filename)
 
 
 # ─────────────────────────────────────────
 #  Admin — Admit Categories Management
-#  FIXED: add/edit now save sort_order and quota_type
 # ─────────────────────────────────────────
 @main.route('/admin/admit-categories', methods=['GET', 'POST'])
 @admin_required
@@ -1821,8 +2215,6 @@ def admin_admit_categories():
                     total_seats = total_seats_int,
                     sort_order  = sort_order_int,
                 )
-                # Store quota type in name suffix if management (backward compatible)
-                # If quota_type == 'management' and name doesn't end in -PY, append -PY
                 if quota_type == 'management' and not name.endswith('-PY'):
                     new_cat.name = name + '-PY'
                 db.session.add(new_cat)
@@ -1851,11 +2243,10 @@ def admin_admit_categories():
                         total_seats_int = cat.total_seats
                         sort_order_int  = cat.sort_order
 
-                    # Update quota type via -PY suffix
                     if quota_type == 'management' and not name.endswith('-PY'):
                         name = name + '-PY'
                     elif quota_type == 'government' and name.endswith('-PY'):
-                        name = name[:-3]  # strip -PY
+                        name = name[:-3]
 
                     cat.name        = name
                     cat.total_seats = total_seats_int
@@ -1882,7 +2273,6 @@ def admin_admit_categories():
 
         return redirect(url_for('main.admin_admit_categories'))
 
-    # FIXED: sorted by sort_order asc, name asc
     categories = AdmitCategory.query.order_by(
         AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()
     ).all()
@@ -1984,12 +2374,10 @@ def admin_category_toggle(cat_id):
 
 # ─────────────────────────────────────────
 #  Admin — Admitted Students
-#  FIXED: sorted by admit_category sort_order, then seat number
 # ─────────────────────────────────────────
 @main.route('/admin/admitted-students')
 @admin_required
 def admin_admitted_students():
-    # FIXED: sorted by sort_order
     admit_categories = AdmitCategory.query.order_by(
         AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()
     ).all()
@@ -2082,14 +2470,18 @@ def admin_document_categories():
 
 # ─────────────────────────────────────────
 #  Admin — Document Verification
+#  FIXED: fetch ALL ranked students, not just allotted
 # ─────────────────────────────────────────
 @main.route('/admin/document-verification')
 @admin_required
 def admin_document_verification():
-    allotments = (SeatAllotment.query
-                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
-                  .order_by(StudentApplication.rank)
-                  .all())
+    # FIXED: all verified + ranked students (not just allotted)
+    students = (StudentApplication.query
+                .filter_by(is_verified=True)
+                .filter(StudentApplication.rank.isnot(None))
+                .order_by(StudentApplication.rank.asc())
+                .all())
+
     doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
         DocumentCategory.sort_order, DocumentCategory.id).all()
 
@@ -2098,20 +2490,24 @@ def admin_document_verification():
     for d in all_docs:
         doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
 
+    # Build allotment map for display
+    allotment_map = {a.application_id: a for a in SeatAllotment.query.all()}
+
     summaries = {}
-    for a in allotments:
-        appl_docs = doc_map.get(a.application_id, {})
+    for appl in students:
+        appl_docs = doc_map.get(appl.id, {})
         total     = len(doc_categories)
         submitted = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        summaries[a.application_id] = {
+        summaries[appl.id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
         }
 
     return render_template('admin_document_verification.html',
-                           allotments=allotments,
+                           students=students,
+                           allotment_map=allotment_map,
                            doc_categories=doc_categories,
                            doc_map=doc_map,
                            summaries=summaries)
@@ -2183,14 +2579,18 @@ def admin_document_overview():
 
 # ─────────────────────────────────────────
 #  Faculty — Document Verification
+#  FIXED: fetch ALL ranked students, not just allotted
 # ─────────────────────────────────────────
 @main.route('/faculty/document-verification')
 @faculty_required
 def faculty_document_verification():
-    allotments = (SeatAllotment.query
-                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
-                  .order_by(StudentApplication.rank)
-                  .all())
+    # FIXED: all verified + ranked students
+    students = (StudentApplication.query
+                .filter_by(is_verified=True)
+                .filter(StudentApplication.rank.isnot(None))
+                .order_by(StudentApplication.rank.asc())
+                .all())
+
     doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
         DocumentCategory.sort_order, DocumentCategory.id).all()
 
@@ -2199,20 +2599,23 @@ def faculty_document_verification():
     for d in all_docs:
         doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
 
+    allotment_map = {a.application_id: a for a in SeatAllotment.query.all()}
+
     summaries = {}
-    for a in allotments:
-        appl_docs = doc_map.get(a.application_id, {})
+    for appl in students:
+        appl_docs = doc_map.get(appl.id, {})
         total     = len(doc_categories)
         submitted = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        summaries[a.application_id] = {
+        summaries[appl.id] = {
             'total': total, 'submitted': submitted, 'approved': approved,
         }
 
     return render_template('faculty_document_verification.html',
-                           allotments=allotments,
+                           students=students,
+                           allotment_map=allotment_map,
                            doc_categories=doc_categories,
                            doc_map=doc_map,
                            summaries=summaries)
@@ -2312,6 +2715,7 @@ def admin_change_password():
 
 # ─────────────────────────────────────────
 #  Admin — Students
+#  NEW: edit student details, delete single, delete all
 # ─────────────────────────────────────────
 @main.route('/admin/students')
 @admin_required
@@ -2329,6 +2733,132 @@ def admin_students():
     return render_template('admin_students.html', students=students, q=q)
 
 
+@main.route('/admin/students/<int:app_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def admin_edit_student(app_id):
+    """Edit student application details."""
+    appl       = StudentApplication.query.get_or_404(app_id)
+    categories = ApplicationCategory.query.filter_by(is_active=True).all()
+
+    if request.method == 'POST':
+        appl.candidate_name       = request.form.get('candidate_name', appl.candidate_name).strip()
+        appl.mother_name          = request.form.get('mother_name', '').strip()
+        appl.father_name          = request.form.get('father_name', '').strip()
+        appl.dob                  = request.form.get('dob', appl.dob).strip()
+        appl.gender               = request.form.get('gender', appl.gender)
+        appl.phone                = request.form.get('phone', '').strip()
+        appl.parent_mobile        = request.form.get('parent_mobile', '').strip()
+        appl.email                = request.form.get('email', appl.email).strip().lower()
+        appl.address              = request.form.get('address', '').strip()
+        appl.nationality          = request.form.get('nationality', 'Indian').strip()
+        appl.religion             = request.form.get('religion', '').strip()
+        appl.hk_region            = request.form.get('hk_region') == '1'
+        appl.kannada_medium       = request.form.get('kannada_medium') == '1'
+        appl.rural_background     = request.form.get('rural_background') == '1'
+        appl.caste_certificate_no = request.form.get('caste_certificate_no', '').strip()
+        appl.parent_annual_income = request.form.get('parent_annual_income', '').strip()
+        appl.income_certificate_no= request.form.get('income_certificate_no', '').strip()
+        appl.board_10             = request.form.get('board_10', '').strip()
+        appl.board_12             = request.form.get('board_12', '').strip()
+        appl.stream_12            = request.form.get('stream_12', '').strip()
+        appl.combination_12       = request.form.get('combination_12', '').strip()
+
+        cat_id = request.form.get('category_id')
+        if cat_id:
+            appl.category_id = int(cat_id)
+
+        try:
+            appl.percent_10  = float(request.form.get('percent_10', '') or 0)
+        except ValueError:
+            pass
+        try:
+            appl.total_12    = float(request.form.get('total_12', '') or 0)
+            appl.obtained_12 = float(request.form.get('obtained_12', '') or 0)
+            if appl.total_12 and appl.obtained_12:
+                appl.percent_12 = round((appl.obtained_12 / appl.total_12) * 100, 2)
+        except ValueError:
+            pass
+
+        db.session.commit()
+        flash(f'Student "{appl.full_name}" updated successfully.', 'success')
+        return redirect(url_for('main.admin_students'))
+
+    return render_template('admin_edit_student.html',
+                           appl=appl, categories=categories)
+
+
+@main.route('/admin/students/<int:app_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_student(app_id):
+    """
+    Delete a single student — removes from ALL tables:
+    SeatAllotment, StudentDocument, StudentFee, StudentFees,
+    PaymentReceipt, StudentApplication, User.
+    """
+    appl = StudentApplication.query.get_or_404(app_id)
+    name = appl.full_name
+
+    # Delete from all child tables first
+    SeatAllotment.query.filter_by(application_id=appl.id).delete()
+    StudentDocument.query.filter_by(application_id=appl.id).delete()
+
+    # Delete PaymentReceipts via StudentFees
+    fees = StudentFees.query.filter_by(application_id=appl.id).first()
+    if fees:
+        PaymentReceipt.query.filter_by(fees_id=fees.id).delete()
+        db.session.delete(fees)
+
+    PaymentReceipt.query.filter_by(application_id=appl.id).delete()
+    StudentFee.query.filter_by(application_id=appl.id).delete()
+
+    user_id = appl.user_id
+    db.session.delete(appl)
+    db.session.flush()
+
+    if user_id:
+        user = User.query.get(user_id)
+        if user:
+            db.session.delete(user)
+
+    db.session.commit()
+    flash(f'Student "{name}" and all related data deleted.', 'success')
+    return redirect(url_for('main.admin_students'))
+
+
+@main.route('/admin/students/delete-all', methods=['POST'])
+@admin_required
+def admin_delete_all_students():
+    """
+    Delete ALL student applications and all related data.
+    Clears: SeatAllotment, StudentDocument, StudentFee, StudentFees,
+    PaymentReceipt, StudentApplication, User (student accounts only).
+    """
+    # Delete in dependency order
+    StudentDocument.query.delete()
+    SeatAllotment.query.delete()
+    PaymentReceipt.query.delete()
+    StudentFee.query.delete()
+    StudentFees.query.delete()
+
+    # Get user IDs before deleting applications
+    user_ids = [a.user_id for a in StudentApplication.query.all() if a.user_id]
+    StudentApplication.query.delete()
+    db.session.flush()
+
+    # Delete only student users (not admin/faculty accounts)
+    for uid in user_ids:
+        user = User.query.get(uid)
+        if user:
+            db.session.delete(user)
+
+    db.session.commit()
+    flash('All student applications and related data have been deleted.', 'success')
+    return redirect(url_for('main.admin_students'))
+
+
+# ─────────────────────────────────────────
+#  Admin — Verification
+# ─────────────────────────────────────────
 @main.route('/admin/verification')
 @admin_required
 def admin_verification():
