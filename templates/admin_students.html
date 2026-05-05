@@ -14,6 +14,12 @@
   .btn-outline:hover { background: #c9a03d; color: white; }
   .btn-primary { background: #c9a03d; color: #0a1f44; border: none; padding: .4rem 1rem; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: .85rem; display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
   .btn-primary:hover { background: #b58c2e; }
+  .btn-danger  { background: transparent; border: 1px solid #dc3545; color: #dc3545; padding: .4rem .8rem; border-radius: 20px; font-size: .8rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; transition: background .2s, color .2s; }
+  .btn-danger:hover  { background: #dc3545; color: white; }
+  .btn-edit    { background: transparent; border: 1px solid #0d6efd; color: #0d6efd; padding: .3rem .7rem; border-radius: 16px; font-size: .75rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; transition: background .2s, color .2s; }
+  .btn-edit:hover    { background: #0d6efd; color: white; }
+  .btn-del-sm  { background: transparent; border: 1px solid #dc3545; color: #dc3545; padding: .3rem .7rem; border-radius: 16px; font-size: .75rem; cursor: pointer; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; transition: background .2s, color .2s; }
+  .btn-del-sm:hover  { background: #dc3545; color: white; }
   .btn-sm { font-size: .8rem; padding: .3rem .8rem; }
 
   /* ── Student List ── */
@@ -34,6 +40,8 @@
   .student-row .scat  { min-width: 90px; flex-shrink: 0; }
   .student-row .stime { font-size: .75rem; color: #888; white-space: nowrap; min-width: 130px; flex-shrink: 0; }
   .student-row .sstatus { flex-shrink: 0; text-align: right; }
+  /* actions column — stop clicks bubbling to modal */
+  .student-row .sactions { flex-shrink: 0; display: flex; gap: .35rem; align-items: center; }
 
   .badge-success { background: #d4edda; color: #155724; padding: .22rem .6rem; border-radius: 20px; font-size: .73rem; font-weight: 600; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; }
   .badge-warning { background: #fff3cd; color: #856404; padding: .22rem .6rem; border-radius: 20px; font-size: .73rem; font-weight: 600; display: inline-flex; align-items: center; gap: .25rem; white-space: nowrap; }
@@ -53,8 +61,28 @@
   .list-header .scat  { min-width: 90px; flex-shrink: 0; }
   .list-header .stime { min-width: 130px; flex-shrink: 0; }
   .list-header .sstatus { flex-shrink: 0; }
+  .list-header .sactions { flex-shrink: 0; min-width: 100px; }
 
   .empty-state { text-align: center; padding: 3rem; color: #888; background: white; border-radius: 12px; }
+
+  /* ── Confirm Delete Overlay ── */
+  .confirm-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,20,40,.55); backdrop-filter: blur(4px);
+    z-index: 10001; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .confirm-overlay.active { display: flex; }
+  .confirm-box {
+    background: white; border-radius: 16px; padding: 2rem 1.8rem;
+    max-width: 420px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    text-align: center;
+    animation: modalIn .2s ease;
+  }
+  .confirm-box .confirm-icon { font-size: 2.4rem; color: #dc3545; margin-bottom: .7rem; }
+  .confirm-box h4 { color: #0a1f44; font-family: 'Playfair Display', serif; margin: 0 0 .5rem; font-size: 1.2rem; }
+  .confirm-box p  { color: #555; font-size: .88rem; margin: 0 0 1.4rem; }
+  .confirm-actions { display: flex; gap: .75rem; justify-content: center; }
 
   /* ── Modal ── */
   .modal-overlay {
@@ -88,6 +116,11 @@
   }
   .modal-close:hover { background: rgba(255,255,255,.28); }
   .modal-body { padding: 1.4rem; overflow-y: auto; flex: 1; }
+  .modal-footer {
+    padding: 1rem 1.4rem; border-top: 1px solid #f0f0f0;
+    display: flex; gap: .75rem; justify-content: flex-end; flex-shrink: 0;
+    border-radius: 0 0 18px 18px; background: #fafafa;
+  }
 
   .detail-section { margin-bottom: 1.4rem; }
   .detail-section-title {
@@ -115,6 +148,7 @@
   body.dark .empty-state         { background: #1a2538; color: #b9c8e8; }
   body.dark .modal-box           { background: #1a2538; }
   body.dark .modal-body          { background: #1a2538; }
+  body.dark .modal-footer        { background: #111d2e; border-color: #2d3e54; }
   body.dark .detail-section-title { color: #c9a03d; border-color: #3a2e1a; }
   body.dark .detail-label        { color: #5a6e82; }
   body.dark .detail-value        { color: #eef2ff; }
@@ -123,26 +157,29 @@
   body.dark .category-badge      { background: #1e3a2f; color: #81c784; }
   body.dark .bool-yes            { background: #0a2318; color: #4ade80; }
   body.dark .bool-no             { background: #2d3e54; color: #8a9ab0; }
+  body.dark .confirm-box         { background: #1a2538; }
+  body.dark .confirm-box h4      { color: #eef2ff; }
+  body.dark .confirm-box p       { color: #8a9ab0; }
 
   /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .student-row .sactions .btn-edit span,
+    .student-row .sactions .btn-del-sm span { display: none; }
+  }
   @media (max-width: 768px) {
     .student-row .appno,
     .list-header .appno { display: none; }
     .student-row .stime,
     .list-header .stime { display: none; }
   }
-
   @media (max-width: 560px) {
     .page-header-inner h2 { font-size: 1.4rem; }
     .student-row .semail,
     .list-header .semail { display: none; }
     .student-row { padding: .65rem .85rem; gap: .65rem; }
-
-    /* Mobile card-style status row */
     .student-row .sname { font-size: .875rem; }
     .student-row .scat  { min-width: 0; }
   }
-
   @media (max-width: 400px) {
     .student-row .scat,
     .list-header .scat { display: none; }
@@ -152,12 +189,12 @@
     .search-bar input { border-radius: 10px; }
     .search-bar .btn-primary { border-radius: 10px; width: 100%; justify-content: center; }
   }
-
   @media (max-width: 480px) {
     .modal-box { border-radius: 16px; max-height: 95vh; }
     .modal-header { padding: .9rem 1rem; border-radius: 16px 16px 0 0; }
     .modal-body   { padding: 1rem; }
     .detail-grid  { grid-template-columns: 1fr; }
+    .modal-footer { padding: .75rem 1rem; }
   }
 </style>
 
@@ -186,6 +223,7 @@
     <span class="scat">Category</span>
     <span class="stime">Submitted</span>
     <span class="sstatus">Status</span>
+    <span class="sactions">Actions</span>
   </div>
 
   <div class="student-list">
@@ -207,6 +245,16 @@
           <span class="badge-warning"><i class="fas fa-clock"></i> Pending</span>
         {% endif %}
       </span>
+      <!-- Stop row click from firing when action buttons are clicked -->
+      <span class="sactions" onclick="event.stopPropagation()">
+        <a href="{{ url_for('main.admin_edit_student', app_id=s.id) }}" class="btn-edit">
+          <i class="fas fa-pen"></i> <span>Edit</span>
+        </a>
+        <button type="button" class="btn-del-sm"
+                onclick="confirmDelete({{ s.id }}, {{ s.candidate_name | tojson }})">
+          <i class="fas fa-trash"></i> <span>Del</span>
+        </button>
+      </span>
     </div>
     {% endfor %}
   </div>
@@ -218,14 +266,20 @@
   </div>
   {% endif %}
 
-  <div class="bottom-actions" style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap">
+  <div class="bottom-actions" style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
     <a href="{{ url_for('main.export_all') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export All</a>
     <a href="{{ url_for('main.export_verified') }}" class="btn-outline btn-sm"><i class="fas fa-file-excel"></i> Export Verified</a>
     <a href="{{ url_for('main.admin_verification') }}" class="btn-outline btn-sm"><i class="fas fa-clock"></i> Pending Verification</a>
+    {% if students %}
+    <button type="button" class="btn-danger btn-sm" style="margin-left:auto"
+            onclick="confirmDeleteAll()">
+      <i class="fas fa-trash-alt"></i> Delete All Applications
+    </button>
+    {% endif %}
   </div>
 </div>
 
-<!-- Modal -->
+<!-- ── Detail Modal ── -->
 <div class="modal-overlay" id="studentModal" onclick="closeModalOutside(event)">
   <div class="modal-box" id="modalBox">
     <div class="modal-header">
@@ -233,6 +287,39 @@
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- ── Confirm Delete (single) ── -->
+<div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirmOutside(event)">
+  <div class="confirm-box">
+    <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4 id="confirmTitle">Delete Student?</h4>
+    <p id="confirmMsg">This will permanently remove the student and all related data.</p>
+    <div class="confirm-actions">
+      <button class="btn-outline btn-sm" onclick="closeConfirm()"><i class="fas fa-times"></i> Cancel</button>
+      <form id="deleteForm" method="POST" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <button type="submit" class="btn-danger btn-sm"><i class="fas fa-trash"></i> Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Confirm Delete All ── -->
+<div class="confirm-overlay" id="confirmAllOverlay" onclick="closeConfirmAllOutside(event)">
+  <div class="confirm-box">
+    <div class="confirm-icon" style="color:#c0392b"><i class="fas fa-radiation-alt"></i></div>
+    <h4 style="color:#c0392b">Delete ALL Applications?</h4>
+    <p>This will <strong>permanently delete every student</strong>, their accounts, allotments, documents, fees, and receipts. This cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn-outline btn-sm" onclick="closeConfirmAll()"><i class="fas fa-times"></i> Cancel</button>
+      <form method="POST" action="{{ url_for('main.admin_delete_all_students') }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <button type="submit" class="btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Yes, Delete ALL</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -240,23 +327,20 @@
 
 {% block scripts %}
 <script>
-  /* ── DOB formatter: any input → DD/MM/YYYY ── */
+  /* ── DOB formatter ── */
   function formatDOB(dob) {
     if (!dob || dob === '—') return '—';
-    var d = String(dob).split(' ')[0];          // strip time if present
+    var d = String(dob).split(' ')[0];
     var parts = d.includes('-') ? d.split('-') : d.split('/');
     if (parts.length !== 3) return d;
-    if (parts[0].length === 4) {
-      // YYYY-MM-DD → DD/MM/YYYY
-      return parts[2] + '/' + parts[1] + '/' + parts[0];
-    }
-    // Already DD-MM-YYYY or DD/MM/YYYY
+    if (parts[0].length === 4) return parts[2] + '/' + parts[1] + '/' + parts[0];
     return parts[0] + '/' + parts[1] + '/' + parts[2];
   }
 
   var students = [
     {% for s in students %}
     {
+      id:             {{ s.id }},
       name:           {{ (s.candidate_name or '—') | tojson }},
       app_number:     {{ (s.application_number or '—') | tojson }},
       submitted_at:   {{ (s.submitted_at | ist if s.submitted_at else '—') | tojson }},
@@ -285,7 +369,9 @@
       total_12:       {{ (s.total_12|int|string if s.total_12 else '—') | tojson }},
       obtained_12:    {{ (s.obtained_12|int|string if s.obtained_12 else '—') | tojson }},
       percent_12:     {{ ('%.2f'|format(s.percent_12) ~ '%' if s.percent_12 else '—') | tojson }},
-      is_verified:    {{ s.is_verified | tojson }}
+      is_verified:    {{ s.is_verified | tojson }},
+      edit_url:       {{ url_for('main.admin_edit_student', app_id=s.id) | tojson }},
+      delete_url:     {{ url_for('main.admin_delete_student', app_id=s.id) | tojson }}
     }{% if not loop.last %},{% endif %}
     {% endfor %}
   ];
@@ -297,7 +383,10 @@
     return '<div class="detail-item"><span class="detail-label">' + label + '</span><span class="detail-value">' + value + '</span></div>';
   }
 
+  var _currentIdx = null;
+
   function openModal(idx) {
+    _currentIdx = idx;
     var s = students[idx];
     document.getElementById('modalName').textContent = s.name;
 
@@ -360,6 +449,18 @@
     html += '</div>';
 
     document.getElementById('modalBody').innerHTML = html;
+
+    // Footer with Edit + Delete
+    var footer =
+      '<a href="' + s.edit_url + '" class="btn-edit" style="font-size:.85rem;padding:.4rem .9rem">' +
+        '<i class="fas fa-pen"></i> Edit Student' +
+      '</a>' +
+      '<button type="button" class="btn-del-sm" style="font-size:.85rem;padding:.4rem .9rem" ' +
+              'onclick="confirmDelete(' + s.id + ', ' + JSON.stringify(s.name) + ')">' +
+        '<i class="fas fa-trash"></i> Delete Student' +
+      '</button>';
+    document.getElementById('modalFooter').innerHTML = footer;
+
     document.getElementById('studentModal').classList.add('active');
     document.body.style.overflow = 'hidden';
   }
@@ -371,8 +472,44 @@
   function closeModalOutside(e) {
     if (e.target === document.getElementById('studentModal')) closeModal();
   }
+
+  /* ── Single delete confirm ── */
+  function confirmDelete(appId, name) {
+    document.getElementById('confirmTitle').textContent = 'Delete "' + name + '"?';
+    document.getElementById('confirmMsg').textContent =
+      'This will permanently remove this student and all their allotments, documents, fees and receipts.';
+    var form = document.getElementById('deleteForm');
+    form.action = '/admin/students/' + appId + '/delete';
+    document.getElementById('confirmOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function closeConfirmOutside(e) {
+    if (e.target === document.getElementById('confirmOverlay')) closeConfirm();
+  }
+
+  /* ── Delete All confirm ── */
+  function confirmDeleteAll() {
+    document.getElementById('confirmAllOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeConfirmAll() {
+    document.getElementById('confirmAllOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function closeConfirmAllOutside(e) {
+    if (e.target === document.getElementById('confirmAllOverlay')) closeConfirmAll();
+  }
+
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') {
+      closeModal();
+      closeConfirm();
+      closeConfirmAll();
+    }
   });
 </script>
 {% endblock %}
