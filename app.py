@@ -30,6 +30,11 @@ def create_app():
     app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME', 'admin')
     app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', 'admin@bca2026')
 
+    # ── UNIVERSITY CONFIGURATION FOR PDF (FIXED) ──
+    app.config['UNIVERSITY_NAME'] = os.environ.get('UNIVERSITY_NAME', 'University')
+    app.config['UNIVERSITY_WATERMARK_TEXT'] = os.environ.get('UNIVERSITY_WATERMARK_TEXT', '')
+    app.config['UNIVERSITY_LOGO_PATH'] = os.environ.get('UNIVERSITY_LOGO_PATH', '')
+
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     init_db(app)
