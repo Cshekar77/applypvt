@@ -24,8 +24,10 @@
 .pill-approved { background: #d1fae5; color: #065f46; }
 .pill-partial  { background: #fef3c7; color: #92400e; }
 .pill-none     { background: #f3f4f6; color: #6b7280; }
+.pill-not-allotted { background: #f3f4f6; color: #9ca3af; font-style: italic; }
 .btn-verify { background: #0a1f44; color: white; border: none; padding: .4rem 1rem; border-radius: 9px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: background .2s; white-space: nowrap; }
 .btn-verify:hover { background: #0d2857; }
+.btn-verify:disabled { background: #9ca3af; cursor: not-allowed; }
 
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(10,31,68,.5); z-index: 999; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 2rem 1rem; }
 .modal-bg.open { display: flex; }
@@ -36,6 +38,9 @@
 .btn-close { background: #f3f4f6; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; color: #5a6e82; flex-shrink: 0; }
 .btn-close:hover { background: #fee2e2; color: #991b1b; }
 .modal-body { padding: 1.5rem 1.75rem; max-height: 60vh; overflow-y: auto; }
+
+.allotment-badge { display: inline-flex; align-items: center; gap: .4rem; background: #ede9fe; color: #5b21b6; padding: .3rem .85rem; border-radius: 20px; font-size: .78rem; font-weight: 600; margin-bottom: 1rem; }
+.allotment-badge.not-allotted { background: #f3f4f6; color: #6b7280; }
 
 .doc-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-bottom: 1px solid #f0f4f8; flex-wrap: wrap; }
 .doc-row:last-child { border-bottom: none; }
@@ -48,6 +53,7 @@
 .status-btn.active-original  { background: #d1fae5; color: #065f46; border-color: #10b981; }
 .status-btn.active-xerox     { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
 .status-btn.active-attested  { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+.status-btn.active-photocopy { background: #ffe4e6; color: #9f1239; border-color: #f43f5e; }
 .status-btn.active-not_given { background: #f3f4f6; color: #6b7280; border-color: #9ca3af; }
 input.status-radio { display: none; }
 
@@ -84,6 +90,8 @@ body.dark .btn-close { background: #2d3e54; color: #b9c8e8; }
 body.dark .status-btn { background: #2d3e54; color: #b9c8e8; }
 body.dark .btn-cancel { background: #2d3e54; color: #eef2ff; }
 body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
+body.dark .allotment-badge { background: #2d1f54; color: #c4b5fd; }
+body.dark .allotment-badge.not-allotted { background: #1e2e42; color: #6b7280; }
 </style>
 
 {% block navbar_auth %}{% endblock %}
@@ -114,28 +122,43 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
     <input type="text" id="searchInput" placeholder="🔍  Search by name, rank, category..." oninput="filterStudents()">
   </div>
 
-  {% if allotments %}
+  {% if students %}
   <div class="student-list" id="studentList">
-    {% for a in allotments %}
-    {% set appl = a.application %}
-    {% set s = summaries[a.application_id] %}
-    <div class="student-row" data-name="{{ appl.full_name|lower }}" data-rank="{{ appl.rank }}" onclick="openModal({{ appl.id }})">
+    {% for s in students %}
+    {% set allotment = allotment_map.get(s.id) %}
+    {% set summ = summaries.get(s.id) %}
+    <div class="student-row"
+         data-name="{{ s.full_name|lower }}"
+         data-rank="{{ s.rank }}"
+         data-category="{{ s.category_name|lower if s.category_name else '' }}"
+         onclick="openModal({{ s.id }})">
       <div class="sr-left">
-        <div class="sr-rank">{{ appl.rank or '—' }}</div>
+        <div class="sr-rank">{{ s.rank or '—' }}</div>
         <div>
-          <div class="sr-name">{{ appl.full_name }}</div>
-          <div class="sr-meta">{{ appl.email }} &bull; {{ appl.category_name or '—' }} &bull; {{ a.quota|title }}</div>
+          <div class="sr-name">{{ s.full_name }}</div>
+          <div class="sr-meta">
+            {{ s.email }} &bull; {{ s.category_name or '—' }}
+            {% if allotment %}
+              &bull; {{ allotment.quota|title }}
+            {% else %}
+              &bull; <em>Not Allotted</em>
+            {% endif %}
+          </div>
         </div>
       </div>
       <div class="sr-right">
-        {% if s.approved == s.total and s.total > 0 %}
-          <span class="doc-pill pill-approved"><i class="fas fa-check-circle"></i> All Approved ({{ s.approved }}/{{ s.total }})</span>
-        {% elif s.submitted > 0 %}
-          <span class="doc-pill pill-partial"><i class="fas fa-clock"></i> {{ s.submitted }}/{{ s.total }} Submitted</span>
+        {% if not allotment %}
+          <span class="doc-pill pill-not-allotted"><i class="fas fa-minus-circle"></i> Not Allotted</span>
+        {% elif summ and summ.approved == summ.total and summ.total > 0 %}
+          <span class="doc-pill pill-approved"><i class="fas fa-check-circle"></i> All Approved ({{ summ.approved }}/{{ summ.total }})</span>
+        {% elif summ and summ.submitted > 0 %}
+          <span class="doc-pill pill-partial"><i class="fas fa-clock"></i> {{ summ.submitted }}/{{ summ.total }} Submitted</span>
         {% else %}
           <span class="doc-pill pill-none"><i class="fas fa-circle"></i> Not Started</span>
         {% endif %}
-        <button class="btn-verify" onclick="event.stopPropagation(); openModal({{ appl.id }})">
+        <button class="btn-verify"
+          {% if not allotment %}disabled title="Student not allotted"{% endif %}
+          onclick="event.stopPropagation(); {% if allotment %}openModal({{ s.id }}){% endif %}">
           <i class="fas fa-folder-open"></i> Verify Docs
         </button>
       </div>
@@ -145,7 +168,7 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
   {% else %}
   <div class="empty-state">
     <i class="fas fa-users"></i>
-    <p>No allotted students yet.</p>
+    <p>No students found.</p>
   </div>
   {% endif %}
 </div>
@@ -164,6 +187,11 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
       <input type="hidden" name="application_id" id="modalAppId">
       <input type="hidden" name="approve_all" id="approveAllFlag" value="0">
       <div class="modal-body">
+        <div id="modalAllotmentBadge" class="allotment-badge" style="display:none">
+          <i class="fas fa-building"></i>
+          <span id="modalAllotmentText"></span>
+        </div>
+
         {% if doc_categories %}
         {% for dc in doc_categories %}
         <div class="doc-row" id="docrow_{{ dc.id }}">
@@ -174,7 +202,7 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
             {% if dc.description %}<div class="doc-desc">{{ dc.description }}</div>{% endif %}
           </div>
           <div class="status-options">
-            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('not_given','Not Given')] %}
+            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('photocopy','Photocopy'),('not_given','Not Given')] %}
             <button type="button" class="status-btn" data-doc="{{ dc.id }}" data-val="{{ val }}"
               onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
             {% endfor %}
@@ -186,7 +214,6 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
         <p style="color:#5a6e82;text-align:center;padding:2rem">No document categories defined.</p>
         {% endif %}
       </div>
-      <!-- CHANGED: approve button always enabled, no gate, no notice -->
       <div class="modal-footer">
         <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
         <div style="display:flex;gap:.75rem">
@@ -204,14 +231,15 @@ body.dark .btn-save-only { background: #2d3e54; color: #eef2ff; }
 
 <script>
 const studentData = {
-  {% for a in allotments %}
-  {% set appl = a.application %}
-  {{ appl.id }}: {
-    name: "{{ appl.full_name|e }}",
-    meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }} • {{ a.quota|title }}",
+  {% for s in students %}
+  {% set allotment = allotment_map.get(s.id) %}
+  {{ s.id }}: {
+    name: "{{ s.full_name|e }}",
+    meta: "Rank #{{ s.rank or '—' }} • {{ s.category_name or '—' }}{% if allotment %} • {{ allotment.quota|title }}{% endif %}",
+    allotment: {% if allotment %}"{{ allotment.quota|title }}"{% else %}null{% endif %},
     docs: {
       {% for dc in doc_categories %}
-      {% set rec = doc_map.get(appl.id, {}).get(dc.id) %}
+      {% set rec = doc_map.get(s.id, {}).get(dc.id) %}
       {{ dc.id }}: "{{ rec.status if rec else 'not_given' }}",
       {% endfor %}
     }
@@ -222,12 +250,28 @@ const studentData = {
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
+
   document.getElementById('modalStudentName').textContent = d.name;
   document.getElementById('modalStudentMeta').textContent = d.meta;
   document.getElementById('modalAppId').value = appId;
 
+  // Show allotment badge
+  const badge = document.getElementById('modalAllotmentBadge');
+  const badgeText = document.getElementById('modalAllotmentText');
+  if (d.allotment) {
+    badge.style.display = 'inline-flex';
+    badge.className = 'allotment-badge';
+    badgeText.textContent = 'Allotted — ' + d.allotment;
+  } else {
+    badge.style.display = 'inline-flex';
+    badge.className = 'allotment-badge not-allotted';
+    badgeText.textContent = 'Not Allotted';
+  }
+
+  // Reset all status buttons
   document.querySelectorAll('.status-btn').forEach(b => { b.className = 'status-btn'; });
 
+  // Set current doc statuses
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
@@ -255,7 +299,8 @@ function filterStudents() {
   document.querySelectorAll('.student-row').forEach(row => {
     const name = row.dataset.name || '';
     const rank = row.dataset.rank || '';
-    row.style.display = (name.includes(q) || rank.includes(q)) ? '' : 'none';
+    const cat  = row.dataset.category || '';
+    row.style.display = (name.includes(q) || rank.includes(q) || cat.includes(q)) ? '' : 'none';
   });
 }
 

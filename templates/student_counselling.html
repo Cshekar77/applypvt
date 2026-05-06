@@ -484,7 +484,8 @@ body {
 </div>
 
 <script>
-const MY_RANK = {{ appl.rank if appl and appl.rank else 'null' }};
+// FIX 1: Parse MY_RANK as integer to avoid strict-equality type mismatch with JSON number
+const MY_RANK = {{ appl.rank | int if appl and appl.rank else 'null' }};
 let panelOpen = false;
 let seatsFetched = false;
 let lastUpdated = new Date();
@@ -517,7 +518,11 @@ function remBadge(rem){
 
 /* ── RENDER SEATS ── */
 function renderSeats(data){
+  // FIX 2: Guard — only render if seat data is actually present in the response
+  if(!data.govt_seats && !data.mgmt_seats) return;
+
   const body = document.getElementById('seats-body');
+  if(!body) return;
   const govt = data.govt_seats||[];
   const mgmt = data.mgmt_seats||[];
 
@@ -567,29 +572,36 @@ function renderSeats(data){
 }
 
 /* ── UPDATE CANDIDATE INFO ── */
+// FIX 3: Guard against DOM elements not existing (e.g. when status is stopped)
 function updateCandidateInfo(data){
   const name  = document.getElementById('ci-name');
   const marks = document.getElementById('ci-marks');
   const cat   = document.getElementById('ci-cat');
   const allot = document.getElementById('ci-allot');
+
+  // Elements don't exist in stopped state — exit silently
   if(!name) return;
 
-  if(data.current_student){
+  // FIX 4: Check current_student exists AND has content before using it
+  if(data.current_student && Object.keys(data.current_student).length > 0){
     const s = data.current_student;
-    if(name)  name.textContent  = s.name  || '—';
-    if(marks) marks.textContent = s.percent_12 ? parseFloat(s.percent_12).toFixed(2)+'%' : '—';
-    if(cat)   cat.textContent   = s.category   || '—';
+    name.textContent  = s.name  || '—';
+    marks.textContent = s.percent_12 ? parseFloat(s.percent_12).toFixed(2)+'%' : '—';
+    cat.textContent   = s.category   || '—';
     if(allot){
       if(s.allotted){
-        allot.innerHTML = `<span style="color:var(--green);font-weight:700;">✓ Allotted (${s.allot_quota||''})</span>`;
+        // FIX 5: Safely capitalise quota — don't assume it's always a string
+        const q = s.allot_quota ? (s.allot_quota.charAt(0).toUpperCase() + s.allot_quota.slice(1)) : '';
+        allot.innerHTML = `<span style="color:var(--green);font-weight:700;">✓ Allotted${q?' ('+q+')':''}</span>`;
       } else {
         allot.innerHTML = `<span style="color:var(--txt3);">Pending</span>`;
       }
     }
   } else {
-    if(name)  name.textContent  = '—';
-    if(marks) marks.textContent = '—';
-    if(cat)   cat.textContent   = '—';
+    // No current student — clear all fields
+    name.textContent  = '—';
+    marks.textContent = '—';
+    cat.textContent   = '—';
     if(allot) allot.textContent = '—';
   }
 }
@@ -602,78 +614,101 @@ async function fetchStatus(){
     lastUpdated = new Date();
 
     /* status chip */
-    const chip = document.getElementById('status-chip');
+    const chip    = document.getElementById('status-chip');
     const chipTxt = document.getElementById('chip-text');
-    if(chip){
+    if(chip && chipTxt){
       chip.className = 'chip ' + (data.status==='running'?'running':data.status==='paused'?'paused':'stopped');
       chipTxt.textContent = data.status==='running'?'Live — In Progress':data.status==='paused'?'Paused':'Not Started';
     }
 
     /* rank display */
-    const rankEl = document.getElementById('rank-display');
+    const rankEl  = document.getElementById('rank-display');
     const rankSub = document.getElementById('rank-sub');
-    const rcCur  = document.getElementById('rc-current');
-    const rcDiff = document.getElementById('rc-diff');
-    const newTxt = data.current_rank!=null?'<sup>#</sup>'+data.current_rank:'—';
+    const rcCur   = document.getElementById('rc-current');
+    const rcDiff  = document.getElementById('rc-diff');
 
     if(rankEl){
-      if(rankEl.textContent.trim() !== String(data.current_rank||'—')){
+      // FIX 6: Compare parsed ints to avoid type mismatch in pop animation check
+      const newRank = data.current_rank != null ? parseInt(data.current_rank) : null;
+      const curRank = rankEl.dataset.rank != null ? parseInt(rankEl.dataset.rank) : null;
+      if(curRank !== newRank){
         rankEl.classList.add('pop');
         setTimeout(()=>rankEl.classList.remove('pop'),600);
       }
-      rankEl.innerHTML = newTxt;
+      rankEl.dataset.rank = newRank != null ? newRank : '';
+      rankEl.innerHTML = newRank != null ? '<sup>#</sup>'+newRank : '—';
     }
+
     if(rankSub){
-      if(data.status==='paused')           rankSub.textContent='Session is paused';
-      else if(data.current_rank==null)     rankSub.textContent='Waiting for first rank';
-      else                                 rankSub.textContent='Being called at the counselling desk';
+      if(data.status==='paused')               rankSub.textContent='Session is paused';
+      else if(data.current_rank==null)         rankSub.textContent='Waiting for first rank';
+      else                                     rankSub.textContent='Being called at the counselling desk';
     }
-    if(rcCur)  rcCur.textContent  = data.current_rank!=null?'#'+data.current_rank:'—';
-    if(rcDiff && MY_RANK && data.current_rank!=null){
-      const diff = MY_RANK - data.current_rank;
-      if(diff>0)       rcDiff.textContent = diff+' rank'+(diff!==1?'s':'')+' ahead of you';
+
+    // FIX 7: Use parseInt on both sides of rank comparisons throughout
+    const currentRank = data.current_rank != null ? parseInt(data.current_rank) : null;
+
+    if(rcCur) rcCur.textContent = currentRank != null ? '#'+currentRank : '—';
+
+    if(rcDiff && MY_RANK != null && currentRank != null){
+      const diff = MY_RANK - currentRank;
+      if(diff>0)        rcDiff.textContent = diff+' rank'+(diff!==1?'s':'')+' ahead of you';
       else if(diff===0) rcDiff.textContent = 'Your turn now!';
       else              rcDiff.textContent = 'Already passed';
     }
 
-    /* candidate info */
+    /* candidate info — always update */
     updateCandidateInfo(data);
 
     /* admin msg */
     const msgEl = document.getElementById('admin-msg');
     if(data.message){
-      if(msgEl){ msgEl.innerHTML='<span>📢</span><span><strong>Notice:</strong> '+data.message+'</span>'; }
-      else {
+      if(msgEl){
+        msgEl.innerHTML='<span>📢</span><span><strong>Notice:</strong> '+data.message+'</span>';
+      } else {
         const d=document.createElement('div'); d.id='admin-msg'; d.className='admin-msg';
         d.innerHTML='<span>📢</span><span><strong>Notice:</strong> '+data.message+'</span>';
-        document.querySelector('.sc-page').insertBefore(d, document.getElementById('main-content')||document.querySelector('.card'));
+        const anchor = document.getElementById('main-content') || document.querySelector('.card');
+        if(anchor) document.querySelector('.sc-page').insertBefore(d, anchor);
       }
-    } else if(msgEl){ msgEl.remove(); }
-
-    /* allotment banner */
-    if(data.allotment && !document.getElementById('allotted-banner')){
-      const a=data.allotment;
-      const div=document.createElement('div'); div.id='allotted-banner'; div.className='allotted-banner';
-      const q=a.quota?(a.quota.charAt(0).toUpperCase()+a.quota.slice(1)):'—';
-      div.innerHTML=`<span class="ab-icon">🎉</span><div><div class="ab-title">Your Seat Has Been Allotted!</div><div class="ab-body">Quota: <strong>${q}</strong> · ${a.allotted_at||''} IST</div></div>`;
-      document.querySelector('.sc-page').insertBefore(div, document.querySelector('.admin-msg')||document.getElementById('main-content')||document.querySelector('.card'));
+    } else if(msgEl){
+      msgEl.remove();
     }
 
-    /* your turn */
+    /* allotment banner — only inject if not already shown by Jinja */
+    if(data.my_allotment && !document.getElementById('allotted-banner')){
+      const a   = data.my_allotment;
+      // FIX 8: Renamed from data.allotment → data.my_allotment to avoid
+      // collision with current_student.allotted field; update your route to
+      // match (return the logged-in student's allotment as my_allotment).
+      const div = document.createElement('div'); div.id='allotted-banner'; div.className='allotted-banner';
+      const q   = a.quota ? (a.quota.charAt(0).toUpperCase()+a.quota.slice(1)) : '—';
+      const at  = a.allotted_at || '';
+      div.innerHTML=`<span class="ab-icon">🎉</span><div><div class="ab-title">Your Seat Has Been Allotted!</div><div class="ab-body">Quota: <strong>${q}</strong>${at?' · '+at+' IST':''}</div></div>`;
+      const chipEl = document.getElementById('status-chip');
+      if(chipEl) chipEl.after(div); else document.querySelector('.sc-page').prepend(div);
+    }
+
+    /* your turn alert */
     const ytEl = document.getElementById('your-turn');
-    if(MY_RANK && data.current_rank===MY_RANK){
+    // FIX 9: parseInt comparison — was using === which fails if types differ
+    if(MY_RANK != null && currentRank != null && currentRank === MY_RANK){
       if(!ytEl){
         const div=document.createElement('div'); div.id='your-turn'; div.className='your-turn';
         div.innerHTML=`<div class="yt-icon">🔔</div><div><div class="yt-title">It's Your Turn — Please Report Now!</div><div class="yt-body">Rank #${MY_RANK} is being called. Proceed to the counselling desk.</div></div>`;
         const mc=document.getElementById('main-content');
-        if(mc) mc.parentNode.insertBefore(div,mc); else document.querySelector('.sc-page').prepend(div);
+        if(mc) mc.parentNode.insertBefore(div,mc);
       }
-    } else if(ytEl){ ytEl.remove(); }
+    } else if(ytEl){
+      ytEl.remove();
+    }
 
-    /* seats panel */
+    /* seats panel — only render when open and data is available */
     if(panelOpen) renderSeats(data);
 
-  } catch(e){ console.error('Fetch error:',e); }
+  } catch(e){
+    console.error('Fetch error:',e);
+  }
 }
 
 fetchStatus();

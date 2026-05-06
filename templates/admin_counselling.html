@@ -117,54 +117,25 @@
   .modal-body { padding: 1.5rem; }
 
   /* ── SEAT TRACKING TWO-COLUMN LAYOUT ── */
-  .seat-track-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.25rem;
-  }
-  @media (max-width: 640px) {
-    .seat-track-cols { grid-template-columns: 1fr; gap: 1rem; }
-  }
-
+  .seat-track-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 640px) { .seat-track-cols { grid-template-columns: 1fr; gap: 1rem; } }
   .seat-quota-col { display: flex; flex-direction: column; }
-  .seat-quota-header {
-    display: flex; align-items: center; gap: .6rem;
-    padding: .7rem 1rem; border-radius: 12px 12px 0 0;
-    font-size: .8rem; font-weight: 700; letter-spacing: .04em;
-    border-bottom: none;
-  }
-  .seat-quota-header.govt {
-    background: linear-gradient(135deg, #dbeafe, #eff6ff);
-    color: #1d4ed8; border: 1px solid #bfdbfe; border-bottom: none;
-  }
-  .seat-quota-header.mgmt {
-    background: linear-gradient(135deg, #ede9fe, #f5f3ff);
-    color: #7c3aed; border: 1px solid #ddd6fe; border-bottom: none;
-  }
-  .seat-quota-header .sq-count {
-    margin-left: auto; font-size: .72rem; font-weight: 600;
-    opacity: .8; white-space: nowrap;
-  }
-
-  .seat-quota-table-wrap {
-    border: 1px solid #eef2f8; border-top: none;
-    border-radius: 0 0 12px 12px; overflow: hidden;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-  }
+  .seat-quota-header { display: flex; align-items: center; gap: .6rem; padding: .7rem 1rem; border-radius: 12px 12px 0 0; font-size: .8rem; font-weight: 700; letter-spacing: .04em; border-bottom: none; }
+  .seat-quota-header.govt { background: linear-gradient(135deg, #dbeafe, #eff6ff); color: #1d4ed8; border: 1px solid #bfdbfe; border-bottom: none; }
+  .seat-quota-header.mgmt { background: linear-gradient(135deg, #ede9fe, #f5f3ff); color: #7c3aed; border: 1px solid #ddd6fe; border-bottom: none; }
+  .seat-quota-header .sq-count { margin-left: auto; font-size: .72rem; font-weight: 600; opacity: .8; white-space: nowrap; }
+  .seat-quota-table-wrap { border: 1px solid #eef2f8; border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .seat-quota-header.govt + .seat-quota-table-wrap { border-color: #bfdbfe; }
   .seat-quota-header.mgmt + .seat-quota-table-wrap { border-color: #ddd6fe; }
-
   .seat-track-table { width: 100%; border-collapse: collapse; font-size: .83rem; min-width: 260px; }
   .seat-track-table th { padding: .45rem .85rem; text-align: left; font-size: .67rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #8a9ab0; background: #fafbfd; border-bottom: 1px solid #eef2f8; white-space: nowrap; }
   .seat-track-table td { padding: .55rem .85rem; border-bottom: 1px solid #f5f7fa; color: #1a2c3e; }
   .seat-track-table tr:last-child td { border-bottom: none; }
   .seat-track-table tr:hover td { background: #fafbff; }
-
   .seats-bar-wrap { background: #eef2f8; border-radius: 20px; height: 5px; margin-top: 3px; overflow: hidden; width: 60px; }
   .seats-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #7c3aed, #6d28d9); }
   .seats-bar-fill.govt { background: linear-gradient(90deg, #2563eb, #1d4ed8); }
   .seats-bar-fill.full { background: #dc3545; }
-
   .seat-empty-msg { text-align: center; padding: 1.5rem; color: #8a9ab0; font-size: .82rem; font-style: italic; }
 
   /* ── STUDENT MODAL STYLES ── */
@@ -216,6 +187,48 @@
   .btn-close-modal:hover { background: #e5e7eb; }
   .admit-badge-display { display: inline-block; font-size: .75rem; font-weight: 800; padding: 2px 9px; border-radius: 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; margin-left: .3rem; }
 
+  /* ── NEW: Document color-coding ── */
+  .doc-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: .45rem;
+    margin-top: .4rem;
+  }
+  .doc-status-item {
+    display: flex; align-items: center; gap: .45rem;
+    padding: .38rem .6rem; border-radius: 8px;
+    font-size: .75rem; font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .doc-status-item .doc-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .doc-status-item .doc-badge { font-size: .65rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; flex-shrink: 0; white-space: nowrap; }
+
+  /* Status colour palette */
+  .doc-s-not_given  { background: #f8f9fa; border-color: #e2e8f0; color: #9ca3af; }
+  .doc-s-not_given  .doc-badge { background: #e5e7eb; color: #6b7280; }
+  .doc-s-submitted  { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+  .doc-s-submitted  .doc-badge { background: #dbeafe; color: #1d4ed8; }
+  .doc-s-original   { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+  .doc-s-original   .doc-badge { background: #dcfce7; color: #15803d; }
+  .doc-s-xerox      { background: #fffbeb; border-color: #fde68a; color: #b45309; }
+  .doc-s-xerox      .doc-badge { background: #fef3c7; color: #b45309; }
+  .doc-s-attested   { background: #faf5ff; border-color: #e9d5ff; color: #7c3aed; }
+  .doc-s-attested   .doc-badge { background: #ede9fe; color: #7c3aed; }
+  .doc-s-photocopy  { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+  .doc-s-photocopy  .doc-badge { background: #ffedd5; color: #c2410c; }
+
+  /* Approved tick overlay */
+  .doc-status-item.is-approved { border-style: solid; }
+  .doc-status-item.is-approved .doc-badge::after { content: ' ✓'; }
+
+  /* Summary pill row */
+  .doc-summary-pills { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .6rem; }
+  .doc-pill { font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; display: inline-flex; align-items: center; gap: .25rem; }
+  .doc-pill-total    { background: #f1f5f9; color: #475569; }
+  .doc-pill-submitted{ background: #dbeafe; color: #1d4ed8; }
+  .doc-pill-approved { background: #dcfce7; color: #15803d; }
+  .doc-pill-pending  { background: #fef3c7; color: #b45309; }
+
   /* ── DARK MODE ── */
   body.dark .cl-summary-card { background: #1a2538; border-color: #2d3e54; }
   body.dark .cl-summary-card .sc-label { color: #8a9ab0; }
@@ -251,6 +264,17 @@
   body.dark .seat-track-table td { border-color: #1e2e42; color: #eef2ff; }
   body.dark .seat-track-table tr:hover td { background: #1e2e42; }
   body.dark .seats-bar-wrap { background: #2d3e54; }
+  body.dark .doc-status-item.doc-s-not_given { background: #1e2e42; border-color: #2d3e54; color: #8a9ab0; }
+  body.dark .doc-status-item.doc-s-not_given .doc-badge { background: #2d3e54; color: #8a9ab0; }
+  body.dark .doc-status-item.doc-s-submitted { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
+  body.dark .doc-status-item.doc-s-original  { background: #052e16; border-color: #166534; color: #4ade80; }
+  body.dark .doc-status-item.doc-s-xerox     { background: #1c1500; border-color: #a16207; color: #fde68a; }
+  body.dark .doc-status-item.doc-s-attested  { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
+  body.dark .doc-status-item.doc-s-photocopy { background: #1c0a00; border-color: #9a3412; color: #fed7aa; }
+  body.dark .doc-pill-total    { background: #1e2e42; color: #b9c8e8; }
+  body.dark .doc-pill-submitted{ background: #0d2346; color: #93c5fd; }
+  body.dark .doc-pill-approved { background: #052e16; color: #4ade80; }
+  body.dark .doc-pill-pending  { background: #1c1500; color: #fde68a; }
 
   /* ── RESPONSIVE ── */
   @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } }
@@ -278,10 +302,12 @@
     .seat-track-table { font-size: .75rem; }
     .seat-track-table th, .seat-track-table td { padding: .4rem .6rem; }
     .seats-bar-wrap { width: 40px; }
+    .doc-status-grid { grid-template-columns: 1fr 1fr; }
   }
   @media(max-width: 380px) {
     .cl-summary-bar { grid-template-columns: 1fr; }
     .detail-grid { grid-template-columns: 1fr; }
+    .doc-status-grid { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -438,7 +464,7 @@
   </div>
 </div>
 
-{# ── SEAT TRACKING MODAL ── two-column layout, namespace fix #}
+{# ── SEAT TRACKING MODAL ── #}
 <div class="modal-overlay" id="seat-track-modal" onclick="closeOnOverlay(event, 'seat-track-modal')">
   <div class="modal-box seat-track-modal-box">
     <div class="modal-header">
@@ -449,12 +475,6 @@
       <button class="modal-close" onclick="closeModal('seat-track-modal')">&times;</button>
     </div>
     <div class="modal-body">
-
-      {#
-        FIX: Use namespace to avoid Jinja2 list.append() scoping bug.
-        admit_categories already sorted by sort_order from routes.py DB query —
-        DO NOT use | sort filter (treats integers as strings, breaks ordering).
-      #}
       {% set ns = namespace(govt_cats=[], mgmt_cats=[]) %}
       {% for ac in admit_categories %}
         {% if ac.name.upper().endswith('-PY') %}
@@ -465,22 +485,16 @@
       {% endfor %}
 
       <div class="seat-track-cols">
-
-        {# ── GOVERNMENT QUOTA COLUMN ── #}
         <div class="seat-quota-col">
           <div class="seat-quota-header govt">
             <i class="fas fa-university"></i>
             <span>Government Quota</span>
-            <span class="sq-count">
-              {{ ns.govt_cats | sum(attribute='seats_used') }}/{{ ns.govt_cats | sum(attribute='total_seats') }} filled
-            </span>
+            <span class="sq-count">{{ ns.govt_cats | sum(attribute='seats_used') }}/{{ ns.govt_cats | sum(attribute='total_seats') }} filled</span>
           </div>
           <div class="seat-quota-table-wrap">
             {% if ns.govt_cats %}
             <table class="seat-track-table">
-              <thead>
-                <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr>
-              </thead>
+              <thead><tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr></thead>
               <tbody>
                 {% for ac in ns.govt_cats %}
                 <tr>
@@ -488,9 +502,7 @@
                   <td>{{ ac.total_seats }}</td>
                   <td>{{ ac.seats_used }}</td>
                   <td>
-                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                      {{ ac.seats_remaining }}
-                    </strong>
+                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">{{ ac.seats_remaining }}</strong>
                     <div class="seats-bar-wrap">
                       <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% else %}govt{% endif %}"
                            style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
@@ -500,27 +512,20 @@
                 {% endfor %}
               </tbody>
             </table>
-            {% else %}
-            <div class="seat-empty-msg">No government quota categories.</div>
-            {% endif %}
+            {% else %}<div class="seat-empty-msg">No government quota categories.</div>{% endif %}
           </div>
         </div>
 
-        {# ── MANAGEMENT QUOTA COLUMN ── #}
         <div class="seat-quota-col">
           <div class="seat-quota-header mgmt">
             <i class="fas fa-building"></i>
             <span>Management Quota</span>
-            <span class="sq-count">
-              {{ ns.mgmt_cats | sum(attribute='seats_used') }}/{{ ns.mgmt_cats | sum(attribute='total_seats') }} filled
-            </span>
+            <span class="sq-count">{{ ns.mgmt_cats | sum(attribute='seats_used') }}/{{ ns.mgmt_cats | sum(attribute='total_seats') }} filled</span>
           </div>
           <div class="seat-quota-table-wrap">
             {% if ns.mgmt_cats %}
             <table class="seat-track-table">
-              <thead>
-                <tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr>
-              </thead>
+              <thead><tr><th>Category</th><th>Total</th><th>Filled</th><th>Left</th></tr></thead>
               <tbody>
                 {% for ac in ns.mgmt_cats %}
                 <tr>
@@ -528,9 +533,7 @@
                   <td>{{ ac.total_seats }}</td>
                   <td>{{ ac.seats_used }}</td>
                   <td>
-                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">
-                      {{ ac.seats_remaining }}
-                    </strong>
+                    <strong style="color:{% if ac.seats_remaining == 0 %}#dc3545{% elif ac.seats_remaining <= 3 %}#f59e0b{% else %}#25c26e{% endif %}">{{ ac.seats_remaining }}</strong>
                     <div class="seats-bar-wrap">
                       <div class="seats-bar-fill {% if ac.seats_remaining == 0 %}full{% endif %}"
                            style="width:{% if ac.total_seats > 0 %}{{ ((ac.seats_used / ac.total_seats) * 100)|int }}{% else %}0{% endif %}%"></div>
@@ -540,13 +543,10 @@
                 {% endfor %}
               </tbody>
             </table>
-            {% else %}
-            <div class="seat-empty-msg">No management quota categories.</div>
-            {% endif %}
+            {% else %}<div class="seat-empty-msg">No management quota categories.</div>{% endif %}
           </div>
         </div>
-
-      </div>{# /seat-track-cols #}
+      </div>
 
       <p style="font-size:.72rem;color:#8a9ab0;margin-top:.85rem;text-align:right">
         To update seat totals, go to <a href="{{ url_for('main.admin_admit_categories') }}" style="color:#7c3aed;font-weight:600;">Admit Categories</a>
@@ -556,8 +556,19 @@
 </div>
 
 {# ── STUDENT MODALS ── #}
-{% for appl in students %}{% set allotment = allotments.get(appl.id) %}
+{% for appl in students %}
+{% set allotment = allotments.get(appl.id) %}
 {% set sf = appl.student_fee[0] if appl.student_fee else None %}
+{# Document data for this student #}
+{% set appl_docs = counselling_doc_map.get(appl.id, {}) %}
+{% set doc_total     = doc_categories | length %}
+{% set doc_submitted = namespace(count=0) %}
+{% set doc_approved  = namespace(count=0) %}
+{% for dc in doc_categories %}
+  {% set d = appl_docs.get(dc.id, {}) %}
+  {% if d.get('status', 'not_given') != 'not_given' %}{% set doc_submitted.count = doc_submitted.count + 1 %}{% endif %}
+  {% if d.get('is_approved', false) %}{% set doc_approved.count = doc_approved.count + 1 %}{% endif %}
+{% endfor %}
 
 <div class="modal-overlay" id="cs-modal-{{ appl.id }}" onclick="closeOnOverlay(event, 'cs-modal-{{ appl.id }}')">
   <div class="modal-box student-modal">
@@ -580,8 +591,7 @@
           <strong>
             {% if appl.dob %}
               {% set dob = appl.dob | string %}
-              {% if '-' in dob and dob | length >= 10 %}
-                {{ dob[8:10] }}/{{ dob[5:7] }}/{{ dob[0:4] }}
+              {% if '-' in dob and dob | length >= 10 %}{{ dob[8:10] }}/{{ dob[5:7] }}/{{ dob[0:4] }}
               {% else %}{{ dob }}{% endif %}
             {% else %}—{% endif %}
           </strong>
@@ -593,6 +603,46 @@
         <div class="detail-item"><span>12th %</span><strong>{{ '%.2f'|format(appl.percent_12) if appl.percent_12 else '—' }}{% if appl.percent_12 %}%{% endif %}</strong></div>
         <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
       </div>
+
+      {# ── NEW: Document Status Section ── #}
+      {% if doc_categories %}
+      <div class="section-divider"><i class="fas fa-folder-open"></i> Document Status</div>
+
+      {# Summary pills #}
+      <div class="doc-summary-pills">
+        <span class="doc-pill doc-pill-total"><i class="fas fa-file"></i> {{ doc_total }} Total</span>
+        <span class="doc-pill doc-pill-submitted"><i class="fas fa-upload"></i> {{ doc_submitted.count }} Submitted</span>
+        <span class="doc-pill doc-pill-approved"><i class="fas fa-check-circle"></i> {{ doc_approved.count }} Approved</span>
+        {% set doc_pending_count = doc_total - doc_approved.count %}
+        <span class="doc-pill doc-pill-pending"><i class="fas fa-clock"></i> {{ doc_pending_count }} Pending</span>
+      </div>
+
+      {# Color-coded doc grid #}
+      <div class="doc-status-grid">
+        {% for dc in doc_categories %}
+          {% set d = appl_docs.get(dc.id, {}) %}
+          {% set status = d.get('status', 'not_given') %}
+          {% set approved = d.get('is_approved', false) %}
+
+          {# Human-readable label map #}
+          {% if status == 'original' %}{% set status_label = 'Original' %}
+          {% elif status == 'xerox' %}{% set status_label = 'Xerox' %}
+          {% elif status == 'attested' %}{% set status_label = 'Attested' %}
+          {% elif status == 'submitted' %}{% set status_label = 'Submitted' %}
+          {% elif status == 'photocopy' %}{% set status_label = 'Photocopy' %}
+          {% else %}{% set status_label = 'Not Given' %}{% endif %}
+
+          <div class="doc-status-item doc-s-{{ status }} {% if approved %}is-approved{% endif %}"
+               title="{{ dc.name }}: {{ status_label }}{% if approved %} ✓ Approved{% endif %}">
+            <i class="fas {% if status == 'not_given' %}fa-times-circle{% elif approved %}fa-check-circle{% else %}fa-file-alt{% endif %}"
+               style="font-size:.75rem;flex-shrink:0"></i>
+            <span class="doc-name">{{ dc.name }}</span>
+            <span class="doc-badge">{{ status_label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {# ── END Document Status Section ── #}
 
       <div class="section-divider"><i class="fas fa-chair"></i> Seat Allotment</div>
 

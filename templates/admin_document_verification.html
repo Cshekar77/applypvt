@@ -36,6 +36,15 @@
 .sr-meta { font-size: .78rem; color: #5a6e82; margin-top: .15rem; word-break: break-all; }
 .sr-right { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; }
 
+/* Allotment badge */
+.allot-badge {
+  font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.allot-badge.govt { background: #cce5ff; color: #004085; }
+.allot-badge.mgmt { background: #fff3cd; color: #856404; }
+.allot-badge.none { background: #f3f4f6; color: #6b7280; }
+
 .doc-pill { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 600; white-space: nowrap; }
 .pill-approved { background: #d1fae5; color: #065f46; }
 .pill-partial  { background: #fef3c7; color: #92400e; }
@@ -73,6 +82,20 @@
   display: flex; align-items: center; justify-content: center;
 }
 .btn-close:hover { background: #fee2e2; color: #991b1b; }
+
+/* ── Modal allotment info strip ── */
+.modal-allot-strip {
+  background: #f0fdf4; border-bottom: 1px solid #bbf7d0;
+  padding: .6rem 1.5rem; font-size: .8rem; color: #15803d;
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.modal-allot-strip.not-allotted {
+  background: #fafafa; border-bottom: 1px solid #e2e8f0;
+  color: #6b7280;
+}
+.modal-allot-strip i { flex-shrink: 0; }
+
 .modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1; }
 
 /* ── Doc rows in modal ── */
@@ -90,7 +113,7 @@
   padding: .35rem .75rem; border-radius: 20px; font-size: .75rem;
   font-weight: 600; border: 2px solid transparent; cursor: pointer;
   transition: all .15s; background: #f3f4f6; color: #374151;
-  min-height: 34px; /* better tap target on mobile */
+  min-height: 34px;
   white-space: nowrap;
 }
 .status-btn:hover { border-color: #0a1f44; }
@@ -98,6 +121,8 @@
 .status-btn.active-xerox     { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
 .status-btn.active-attested  { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
 .status-btn.active-not_given { background: #f3f4f6; color: #6b7280; border-color: #9ca3af; }
+.status-btn.active-submitted { background: #ede9fe; color: #5b21b6; border-color: #8b5cf6; }
+.status-btn.active-photocopy { background: #fff7ed; color: #c2410c; border-color: #f97316; }
 input.status-radio { display: none; }
 
 /* ── Modal footer ── */
@@ -106,6 +131,7 @@ input.status-radio { display: none; }
   display: flex; justify-content: space-between; align-items: center;
   gap: .75rem; flex-wrap: wrap; flex-shrink: 0;
 }
+.modal-footer-left { display: flex; align-items: center; gap: .5rem; }
 .modal-footer-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
 .btn-cancel { background: #f3f4f6; color: #374151; padding: .55rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; font-size: .875rem; cursor: pointer; white-space: nowrap; }
 .btn-cancel:hover { background: #e5e7eb; }
@@ -113,6 +139,8 @@ input.status-radio { display: none; }
 .btn-save-only:hover { background: #dbe4f0; }
 .btn-approve { background: #10b981; color: white; padding: .55rem 1.4rem; border-radius: 10px; border: none; font-weight: 700; font-size: .875rem; cursor: pointer; transition: background .2s; white-space: nowrap; }
 .btn-approve:hover { background: #059669; }
+.btn-ack { background: #7c3aed; color: white; padding: .55rem 1.1rem; border-radius: 10px; border: none; font-weight: 600; font-size: .82rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; transition: background .2s; }
+.btn-ack:hover { background: #6d28d9; }
 
 /* ── Flash ── */
 .flash-msg { padding: .75rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: .875rem; }
@@ -127,25 +155,20 @@ input.status-radio { display: none; }
 @media (max-width: 600px) {
   .dv-page { padding: 1rem .75rem 4rem; }
   .dv-header h2 { font-size: 1.35rem; }
-
-  /* Student rows stack */
   .student-row { flex-direction: column; align-items: flex-start; }
   .sr-left { width: 100%; }
   .sr-right { width: 100%; justify-content: flex-start; }
-
-  /* Modal */
   .modal-bg { padding: .5rem; }
   .modal-box { border-radius: 16px; max-height: calc(100vh - 1rem); }
   .modal-header { padding: 1rem; }
   .modal-body { padding: 1rem; }
   .modal-footer { padding: .85rem 1rem; flex-direction: column; align-items: stretch; }
   .modal-footer-actions { width: 100%; }
-  .btn-cancel, .btn-save-only, .btn-approve { width: 100%; justify-content: center; text-align: center; }
-
-  /* Doc rows stack */
+  .btn-cancel, .btn-save-only, .btn-approve, .btn-ack { width: 100%; justify-content: center; text-align: center; }
   .doc-row { flex-direction: column; gap: .6rem; }
   .status-options { width: 100%; }
   .status-btn { flex: 1 1 auto; text-align: center; justify-content: center; }
+  .modal-allot-strip { padding: .6rem 1rem; }
 }
 
 /* ── Dark mode ── */
@@ -166,6 +189,8 @@ body.dark .btn-close         { background: #2d3e54; color: #b9c8e8; }
 body.dark .status-btn        { background: #2d3e54; color: #b9c8e8; }
 body.dark .btn-cancel        { background: #2d3e54; color: #eef2ff; }
 body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
+body.dark .modal-allot-strip { background: #052e16; border-color: #166534; }
+body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #2d3e54; color: #8a9ab0; }
 </style>
 
 {% block navbar_auth %}{% endblock %}
@@ -175,7 +200,12 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
     <div>
       <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
       <h2 style="margin-top:.75rem">Document Verification</h2>
-      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">Mark and approve submitted documents for allotted students</p>
+      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">
+        Mark and approve submitted documents for ranked students
+        <span style="background:#e8f4ff;color:#0a1f44;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:.4rem">
+          {{ students|length }} students
+        </span>
+      </p>
     </div>
   </div>
 
@@ -197,11 +227,11 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
     <input type="text" id="searchInput" placeholder="🔍  Search by name, rank, category..." oninput="filterStudents()">
   </div>
 
-  {% if allotments %}
+  {% if students %}
   <div class="student-list" id="studentList">
-    {% for a in allotments %}
-    {% set appl = a.application %}
-    {% set s = summaries[a.application_id] %}
+    {% for appl in students %}
+    {% set allotment = allotment_map.get(appl.id) %}
+    {% set s = summaries[appl.id] %}
     <div class="student-row"
          data-name="{{ appl.full_name|lower }}"
          data-rank="{{ appl.rank }}"
@@ -210,10 +240,32 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
         <div class="sr-rank">{{ appl.rank or '—' }}</div>
         <div style="min-width:0">
           <div class="sr-name">{{ appl.full_name }}</div>
-          <div class="sr-meta">{{ appl.email }} &bull; {{ appl.category_name or '—' }} &bull; {{ a.quota|title }}</div>
+          <div class="sr-meta">
+            {{ appl.email }} &bull; {{ appl.category_name or '—' }}
+            {% if allotment %}
+              &bull; {{ allotment.quota|title }} Quota
+              {% if allotment.admit_seat_label %}
+                &bull; <strong>{{ allotment.admit_seat_label }}</strong>
+              {% endif %}
+            {% else %}
+              &bull; <em style="color:#f59e0b">Not Allotted</em>
+            {% endif %}
+          </div>
         </div>
       </div>
       <div class="sr-right">
+        {# Allotment badge #}
+        {% if allotment %}
+          {% if allotment.quota == 'management' %}
+            <span class="allot-badge mgmt"><i class="fas fa-building"></i> Management</span>
+          {% else %}
+            <span class="allot-badge govt"><i class="fas fa-university"></i> Government</span>
+          {% endif %}
+        {% else %}
+          <span class="allot-badge none"><i class="fas fa-clock"></i> Pending Allotment</span>
+        {% endif %}
+
+        {# Doc status pill #}
         {% if s.approved == s.total and s.total > 0 %}
           <span class="doc-pill pill-approved"><i class="fas fa-check-circle"></i> All Approved ({{ s.approved }}/{{ s.total }})</span>
         {% elif s.submitted > 0 %}
@@ -221,6 +273,7 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
         {% else %}
           <span class="doc-pill pill-none"><i class="fas fa-circle"></i> Not Started</span>
         {% endif %}
+
         <button class="btn-verify" onclick="event.stopPropagation(); openModal({{ appl.id }})">
           <i class="fas fa-folder-open"></i> Verify Docs
         </button>
@@ -231,7 +284,7 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
   {% else %}
   <div class="empty-state">
     <i class="fas fa-users"></i>
-    <p>No allotted students yet.</p>
+    <p>No ranked students yet.</p>
   </div>
   {% endif %}
 </div>
@@ -246,6 +299,13 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
       </div>
       <button class="btn-close" onclick="closeModal()">&times;</button>
     </div>
+
+    {# Allotment info strip — filled by JS #}
+    <div class="modal-allot-strip" id="modalAllotStrip">
+      <i class="fas fa-info-circle"></i>
+      <span id="modalAllotText">—</span>
+    </div>
+
     <form method="POST" action="{{ url_for('main.admin_save_document') }}" id="verifyForm">
       <input type="hidden" name="application_id" id="modalAppId">
       <input type="hidden" name="approve_all" id="approveAllFlag" value="0">
@@ -260,7 +320,7 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
             {% if dc.description %}<div class="doc-desc">{{ dc.description }}</div>{% endif %}
           </div>
           <div class="status-options">
-            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('not_given','Not Given')] %}
+            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('submitted','Submitted'),('photocopy','Photocopy'),('not_given','Not Given')] %}
             <button type="button" class="status-btn"
               data-doc="{{ dc.id }}" data-val="{{ val }}"
               onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
@@ -274,8 +334,13 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
         {% endif %}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <div class="modal-footer-left">
+          <a id="modalAckLink" href="#" target="_blank" class="btn-ack" style="display:none">
+            <i class="fas fa-file-pdf"></i> Print Acknowledgement
+          </a>
+        </div>
         <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
           <button type="submit" class="btn-save-only"
             onclick="document.getElementById('approveAllFlag').value='0'">
             <i class="fas fa-save"></i> Save Only
@@ -294,11 +359,14 @@ body.dark .btn-save-only     { background: #2d3e54; color: #eef2ff; }
 {% block scripts %}
 <script>
 const studentData = {
-  {% for a in allotments %}
-  {% set appl = a.application %}
+  {% for appl in students %}
+  {% set allotment = allotment_map.get(appl.id) %}
   {{ appl.id }}: {
-    name: "{{ appl.full_name|e }}",
-    meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }} • {{ a.quota|title }}",
+    name: {{ appl.full_name | tojson }},
+    meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }}",
+    allotted: {{ 'true' if allotment else 'false' }},
+    allotText: {% if allotment %}"{{ allotment.quota|title }} Quota{% if allotment.admit_seat_label %} — {{ allotment.admit_seat_label }}{% endif %}"{% else %}"Not yet allotted"{% endif %},
+    ackUrl: {% if allotment %}"{{ url_for('main.document_acknowledgement', app_id=appl.id) }}"{% else %}null{% endif %},
     docs: {
       {% for dc in doc_categories %}
       {% set rec = doc_map.get(appl.id, {}).get(dc.id) %}
@@ -312,12 +380,36 @@ const studentData = {
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
+
   document.getElementById('modalStudentName').textContent = d.name;
   document.getElementById('modalStudentMeta').textContent = d.meta;
   document.getElementById('modalAppId').value = appId;
 
+  // Allotment strip
+  const strip   = document.getElementById('modalAllotStrip');
+  const stripTxt = document.getElementById('modalAllotText');
+  const ackLink  = document.getElementById('modalAckLink');
+  if (d.allotted) {
+    strip.className = 'modal-allot-strip';
+    strip.querySelector('i').className = 'fas fa-check-circle';
+    stripTxt.textContent = 'Allotted — ' + d.allotText;
+    if (d.ackUrl) {
+      ackLink.href = d.ackUrl;
+      ackLink.style.display = 'inline-flex';
+    } else {
+      ackLink.style.display = 'none';
+    }
+  } else {
+    strip.className = 'modal-allot-strip not-allotted';
+    strip.querySelector('i').className = 'fas fa-clock';
+    stripTxt.textContent = 'Not yet allotted — documents can still be recorded';
+    ackLink.style.display = 'none';
+  }
+
+  // Reset all status buttons
   document.querySelectorAll('.status-btn').forEach(function(b) { b.className = 'status-btn'; });
 
+  // Set current statuses
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
@@ -351,12 +443,9 @@ function filterStudents() {
   });
 }
 
-/* Close on overlay click */
 document.getElementById('verifyModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
-
-/* Close on Escape */
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
