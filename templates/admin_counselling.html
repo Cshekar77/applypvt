@@ -166,6 +166,30 @@
   .btn-allot { padding: .6rem 1.3rem; background: #25c26e; color: white; border: none; border-radius: 9px; font-weight: 700; font-size: .85rem; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
   .btn-allot:hover { background: #1da85c; }
 
+  /* Print Acknowledgement Button */
+  .btn-print-ack {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: #1F3864;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-print-ack:hover {
+    background: #152a4d;
+    transform: translateY(-1px);
+  }
+
   .already-allotted { background: #edf9f2; border-radius: 12px; border: 1px solid #a8dfc0; margin-top: .5rem; overflow: hidden; }
   .allotted-info { display: flex; align-items: center; gap: .85rem; flex-wrap: wrap; padding: .85rem 1.1rem; }
   .allotted-info p { margin: 0; font-size: .83rem; color: #1a5c3a; flex: 1; min-width: 150px; }
@@ -604,7 +628,7 @@
         <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
       </div>
 
-      {# ── NEW: Document Status Section ── #}
+      {# ── Document Status Section ── #}
       {% if doc_categories %}
       <div class="section-divider"><i class="fas fa-folder-open"></i> Document Status</div>
 
@@ -807,6 +831,17 @@
         </div>
         <div><button type="submit" class="btn-allot"><i class="fas fa-check"></i> Allot Seat</button></div>
       </form>
+      {% endif %}
+
+      {# ── PRINT ACKNOWLEDGEMENT BUTTON (FIXED) ── #}
+      {% if allotment %}
+      <div style="margin-top: 1rem;">
+        <a href="{{ url_for('main.allotment_acknowledgement', app_id=appl.id) }}" 
+           target="_blank"
+           class="btn-print-ack">
+          <i class="fas fa-print"></i> Print Acknowledgement
+        </a>
+      </div>
       {% endif %}
 
       <div style="margin-top:1rem">
