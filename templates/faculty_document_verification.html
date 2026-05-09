@@ -147,9 +147,11 @@ body.dark .allotment-badge.not-allotted { background: #1e2e42; color: #6b7280; }
         </div>
       </div>
       <div class="sr-right">
-        {% if not allotment %}
+        {% if summ and summ.approved == summ.total and summ.total > 0 %}
+          <span class="doc-pill pill-approved"><i class="fas fa-check-circle"></i> All Approved ({{ summ.approved }}/{{ summ.total }})</span>
+        {% elif not allotment %}
           <span class="doc-pill pill-not-allotted"><i class="fas fa-minus-circle"></i> Not Allotted</span>
-        {% elif summ and summ.approved == summ.total and summ.total > 0 %}
+        {% elif summ and summ.submitted > 0 %}
           <span class="doc-pill pill-approved"><i class="fas fa-check-circle"></i> All Approved ({{ summ.approved }}/{{ summ.total }})</span>
         {% elif summ and summ.submitted > 0 %}
           <span class="doc-pill pill-partial"><i class="fas fa-clock"></i> {{ summ.submitted }}/{{ summ.total }} Submitted</span>
