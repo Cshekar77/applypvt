@@ -1937,7 +1937,7 @@ def allotment_acknowledgement(app_id):
             ['Caste Category',  appl.category_name or '—', 'Gender',       appl.gender or '—'],
             ['Admit Category',  admit_cat_name,           'Quota',         (allotment.quota or '—').title()],
             ['Allotted At',     allotted_str,             'Seat No',       str(allotment.admit_seat_number or '—')],
-            ['Total Fees',      total_fees,               'Academic Year', str(datetime.now().year)],
+            ['Total Fees',      total_fees,               'Academic Year', '2026-2027'],
         ]
 
         detail_tbl = Table(
@@ -1955,13 +1955,13 @@ def allotment_acknowledgement(app_id):
              [colors.white, colors.Color(0.97, 0.97, 1.0)]),
         ]))
         elems.append(detail_tbl)
-        elems.append(Spacer(1, 0.4*cm))
+        elems.append(Spacer(1, 1.2*cm))
 
         # Signature row
         sig_tbl = Table(
             [[Paragraph('Date: _______________', value_style),
-              Paragraph('Signature of Issuing Authority<br/>___________________________<br/>'
-                        '<font size=7>(Name &amp; Designation)</font>', sign_style)]],
+              Paragraph('Signature of Issuing Authority<br/><br/><br/>___________________________<br/>'
+          '<font size=7>(Name &amp; Designation)</font>', sign_style),
             colWidths=[9*cm, 8*cm]
         )
         sig_tbl.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM')]))
