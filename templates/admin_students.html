@@ -251,7 +251,7 @@
           <i class="fas fa-pen"></i> <span>Edit</span>
         </a>
         <button type="button" class="btn-del-sm"
-                onclick="confirmDelete({{ s.id }}, {{ s.candidate_name | tojson }})">
+                onclick="confirmDelete({{ s.id }}, {{ s.candidate_name | tojson | replace('"', '&quot;') }})">
           <i class="fas fa-trash"></i> <span>Del</span>
         </button>
       </span>
