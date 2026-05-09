@@ -2747,6 +2747,13 @@ def admin_edit_student(app_id):
         appl.mother_name          = request.form.get('mother_name', '').strip()
         appl.father_name          = request.form.get('father_name', '').strip()
         appl.dob                  = request.form.get('dob', appl.dob).strip()
+        new_dob = request.form.get('dob', '').strip()
+        if new_dob and appl.user_id:
+            new_password = _dob_to_password(new_dob)
+            if new_password:
+                user = User.query.get(appl.user_id)
+                if user:
+                    user.password_hash = generate_password_hash(new_password)
         appl.gender               = request.form.get('gender', appl.gender)
         appl.phone                = request.form.get('phone', '').strip()
         appl.parent_mobile        = request.form.get('parent_mobile', '').strip()

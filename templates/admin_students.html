@@ -479,7 +479,7 @@
     document.getElementById('confirmMsg').textContent =
       'This will permanently remove this student and all their allotments, documents, fees and receipts.';
     var form = document.getElementById('deleteForm');
-    form.action = "{{ url_for('main.admin_delete_student', app_id=0) }}".replace('/0', '/' + appId);
+    form.action = "{{ url_for('main.admin_delete_student', app_id=0) }}".replace('/0/delete', '/' + appId + '/delete');
     document.getElementById('confirmOverlay').classList.add('active');
     document.body.style.overflow = 'hidden';
   }
