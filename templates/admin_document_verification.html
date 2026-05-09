@@ -120,7 +120,7 @@
 .status-btn.active-original  { background: #d1fae5; color: #065f46; border-color: #10b981; }
 .status-btn.active-xerox     { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
 .status-btn.active-attested  { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
-.status-btn.active-not_given { background: #f3f4f6; color: #6b7280; border-color: #9ca3af; }
+.status-btn.active-not_given { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
 .status-btn.active-submitted { background: #ede9fe; color: #5b21b6; border-color: #8b5cf6; }
 .status-btn.active-photocopy { background: #fff7ed; color: #c2410c; border-color: #f97316; }
 input.status-radio { display: none; }
@@ -320,7 +320,7 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
             {% if dc.description %}<div class="doc-desc">{{ dc.description }}</div>{% endif %}
           </div>
           <div class="status-options">
-            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('photocopy','Photocopy'),('not_given','Not Given')] %}
+            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('not_given','Not Given')] %}
             <button type="button" class="status-btn"
               data-doc="{{ dc.id }}" data-val="{{ val }}"
               onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
@@ -413,7 +413,7 @@ function openModal(appId) {
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
-    const resolvedStatus = status === 'submitted' ? 'not_given' : status;
+    const resolvedStatus = status === 'submitted' ? 'not_given' : status === 'photocopy' ? 'xerox' : status;
     const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${resolvedStatus}"]`);
     if (btn) btn.classList.add('active-' + resolvedStatus);
   }

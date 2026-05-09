@@ -54,7 +54,7 @@
 .status-btn.active-xerox     { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
 .status-btn.active-attested  { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
 .status-btn.active-photocopy { background: #ffe4e6; color: #9f1239; border-color: #f43f5e; }
-.status-btn.active-not_given { background: #f3f4f6; color: #6b7280; border-color: #9ca3af; }
+.status-btn.active-not_given { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
 input.status-radio { display: none; }
 
 .modal-footer { padding: 1.25rem 1.75rem; border-top: 1px solid #eef2f8; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
@@ -157,8 +157,7 @@ body.dark .allotment-badge.not-allotted { background: #1e2e42; color: #6b7280; }
           <span class="doc-pill pill-none"><i class="fas fa-circle"></i> Not Started</span>
         {% endif %}
         <button class="btn-verify"
-          {% if not allotment %}disabled title="Student not allotted"{% endif %}
-          onclick="event.stopPropagation(); {% if allotment %}openModal({{ s.id }}){% endif %}">
+          onclick="event.stopPropagation(); openModal({{ s.id }})">
           <i class="fas fa-folder-open"></i> Verify Docs
         </button>
       </div>
@@ -202,7 +201,7 @@ body.dark .allotment-badge.not-allotted { background: #1e2e42; color: #6b7280; }
             {% if dc.description %}<div class="doc-desc">{{ dc.description }}</div>{% endif %}
           </div>
           <div class="status-options">
-            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('photocopy','Photocopy'),('not_given','Not Given')] %}
+            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('not_given','Not Given')] %}
             <button type="button" class="status-btn" data-doc="{{ dc.id }}" data-val="{{ val }}"
               onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
             {% endfor %}
@@ -275,8 +274,9 @@ function openModal(appId) {
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
-    const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${status}"]`);
-    if (btn) btn.classList.add('active-' + status);
+    const resolvedStatus = status === 'submitted' ? 'not_given' : status === 'photocopy' ? 'xerox' : status;
+    const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${resolvedStatus}"]`);
+    if (btn) btn.classList.add('active-' + resolvedStatus);
   }
 
   document.getElementById('verifyModal').classList.add('open');
