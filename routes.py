@@ -1735,7 +1735,8 @@ def admin_counselling():
                 _sync_student_fees(appl.id)
                 db.session.commit()
                 flash(f'✅ Seat allotted to {appl.full_name} ({quota.title()} Quota) — {admit_cat.name}({seat_number})!', 'success')
-
+                if request.form.get('print_after') == '1':
+                    return redirect(url_for('main.allotment_acknowledgement', app_id=appl.id))
         elif action == 'revoke_seat':
             app_id = request.form.get('app_id')
             try:
