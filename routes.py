@@ -1858,7 +1858,7 @@ def allotment_acknowledgement(app_id):
             admit_cat_name = ac.name
 
     fees_obj  = StudentFees.query.filter_by(application_id=appl.id).first()
-    total_fees = f"₹ {fees_obj.total_fees:,.2f}" if fees_obj and fees_obj.total_fees else '—'
+    total_fees = f"Rs {fees_obj.total_fees:,.2f}" if fees_obj and fees_obj.total_fees else '—'
 
     allotted_str = fmt_ist(allotment.allotted_at)
 
