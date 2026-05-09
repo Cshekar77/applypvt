@@ -1958,10 +1958,11 @@ def allotment_acknowledgement(app_id):
         elems.append(Spacer(1, 1.2*cm))
 
         # Signature row
+        # Signature row
         sig_tbl = Table(
             [[Paragraph('Date: _______________', value_style),
               Paragraph('Signature of Issuing Authority<br/><br/><br/>___________________________<br/>'
-          '<font size=7>(Name &amp; Designation)</font>', sign_style),
+                        '<font size=7>(Name &amp; Designation)</font>', sign_style)]],
             colWidths=[9*cm, 8*cm]
         )
         sig_tbl.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM')]))
