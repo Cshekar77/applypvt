@@ -320,7 +320,7 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
             {% if dc.description %}<div class="doc-desc">{{ dc.description }}</div>{% endif %}
           </div>
           <div class="status-options">
-            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('submitted','Submitted'),('photocopy','Photocopy'),('not_given','Not Given')] %}
+            {% for val, label in [('original','Original'),('xerox','Xerox'),('attested','Attested'),('photocopy','Photocopy'),('not_given','Not Given')] %}
             <button type="button" class="status-btn"
               data-doc="{{ dc.id }}" data-val="{{ val }}"
               onclick="setStatus({{ dc.id }}, '{{ val }}', this)">{{ label }}</button>
@@ -413,8 +413,9 @@ function openModal(appId) {
   for (const [docId, status] of Object.entries(d.docs)) {
     const input = document.getElementById('status_input_' + docId);
     if (input) input.value = status;
-    const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${status}"]`);
-    if (btn) btn.classList.add('active-' + status);
+    const resolvedStatus = status === 'submitted' ? 'not_given' : status;
+    const btn = document.querySelector(`.status-btn[data-doc="${docId}"][data-val="${resolvedStatus}"]`);
+    if (btn) btn.classList.add('active-' + resolvedStatus);
   }
 
   document.getElementById('verifyModal').classList.add('open');
