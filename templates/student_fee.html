@@ -2,181 +2,479 @@
 {% block title %}My Fee Structure — BCA Admissions{% endblock %}
 {% block content %}
 <style>
-  .fee-page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-  .btn-back {
-    display: inline-flex; align-items: center; gap: .4rem;
-    color: #5a6e82; text-decoration: none; font-size: .88rem; transition: color .2s;
-    margin-bottom: 1.5rem;
-  }
-  .btn-back:hover { color: #0a1f44; }
+:root {
+  --ink:       #0e1117;
+  --ink2:      #2c3340;
+  --ink3:      #5a6578;
+  --gold:      #c9922a;
+  --gold2:     #e8b84b;
+  --gold-pale: #fdf6e8;
+  --gold-bdr:  #e8d5a8;
+  --cream:     #fafaf7;
+  --white:     #ffffff;
+  --border:    #eaeae4;
+  --green:     #1a7a52;
+  --green-bg:  #edf7f2;
+  --green-bdr: #a8d9c0;
+  --amber:     #b45309;
+  --amber-bg:  #fff7ed;
+  --amber-bdr: #fed7aa;
+  --shadow:    0 2px 12px rgba(14,17,23,0.07);
+  --shadow-lg: 0 8px 40px rgba(14,17,23,0.12);
+}
 
-  .fee-page-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.9rem; color: #0a1f44; margin: 0 0 1.5rem;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* No fee state */
-  .no-fee-card {
-    background: #f5f7fa; border-radius: 18px; border: 1.5px dashed #dde3ed;
-    padding: 2.5rem; text-align: center; color: #8a9ab0;
-  }
-  .no-fee-card i { font-size: 2rem; margin-bottom: .75rem; display: block; color: #c9a03d; }
-  .no-fee-card p { margin: 0; font-size: .9rem; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+}
 
-  /* Fee breakdown card */
-  .fee-card {
-    background: white; border-radius: 20px;
-    border: 1px solid #eef2f8;
-    box-shadow: 0 4px 20px rgba(10,31,68,.08);
-    overflow: hidden;
-  }
-  .fee-card-header {
-    background: linear-gradient(135deg, #0a1f44, #1e3a60);
-    padding: 1.5rem 1.75rem; color: white;
-  }
-  .fee-card-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem; margin: 0 0 .35rem; font-weight: 700;
-  }
-  .fee-card-header p { margin: 0; font-size: .82rem; opacity: .75; }
+.fee-page {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 6rem;
+}
 
-  .fee-rows { padding: 0; }
-  .fee-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 1.75rem; border-bottom: 1px solid #f5f7fa;
-    gap: 1rem;
-  }
-  .fee-row:last-child { border-bottom: none; }
-  .fee-row-label {
-    display: flex; align-items: center; gap: .65rem;
-    font-size: .88rem; color: #5a6e82;
-  }
-  .fee-row-label i { color: #c9a03d; width: 16px; text-align: center; }
-  .fee-row-label strong { color: #0a1f44; font-size: .9rem; display: block; }
-  .fee-row-label span  { color: #5a6e82; font-size: .78rem; }
-  .fee-row-amount {
-    font-size: 1rem; font-weight: 700; color: #0a1f44;
-    font-family: 'Courier New', monospace; white-space: nowrap;
-  }
-  .fee-row-amount.additional { color: #b45309; }
-  .fee-row-amount.zero       { color: #9ca3af; }
+/* ── BACK ── */
+.btn-back {
+  display: inline-flex; align-items: center; gap: .4rem;
+  color: var(--ink3); text-decoration: none; font-size: .82rem;
+  font-weight: 500; margin-bottom: 2rem; letter-spacing: .01em;
+  transition: color .2s;
+}
+.btn-back:hover { color: var(--ink); }
+.btn-back i { font-size: .75rem; }
 
-  /* Total row */
-  .fee-total-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.25rem 1.75rem;
-    background: linear-gradient(135deg, #fffdf5, #fff8e8);
-    border-top: 2px solid #e8d5a0;
-    gap: 1rem;
-  }
-  .fee-total-label {
-    font-size: 1rem; font-weight: 700; color: #0a1f44;
-    display: flex; align-items: center; gap: .5rem;
-  }
-  .fee-total-label i { color: #c9a03d; }
-  .fee-total-amount {
-    font-size: 1.5rem; font-weight: 800; color: #1a5c3a;
-    font-family: 'Courier New', monospace;
-  }
+/* ── HEADER ── */
+.fee-header {
+  margin-bottom: 2rem;
+}
+.fee-header-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: .6rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.fee-header-eyebrow::before {
+  content: ''; display: inline-block;
+  width: 20px; height: 1px; background: var(--gold);
+}
+.fee-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem; font-weight: 600; color: var(--ink);
+  line-height: 1.1; letter-spacing: -.02em;
+}
+.fee-header h1 em {
+  font-style: italic; color: var(--gold);
+}
+.fee-header-sub {
+  margin-top: .5rem; font-size: .85rem; color: var(--ink3);
+  font-weight: 400;
+}
 
-  /* Not allotted notice */
-  .notice-card {
-    background: #fffbea; border: 1.5px solid #fde68a;
-    border-radius: 14px; padding: 1rem 1.25rem;
-    font-size: .85rem; color: #92400e; margin-bottom: 1.5rem;
-    display: flex; align-items: center; gap: .65rem;
-  }
+/* ── NOTICE CARD ── */
+.notice-card {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-bdr);
+  border-radius: 12px; padding: .9rem 1.1rem;
+  font-size: .84rem; color: var(--amber);
+  display: flex; align-items: flex-start; gap: .65rem;
+  margin-bottom: 1.5rem; line-height: 1.5;
+}
+.notice-card i { margin-top: .1rem; flex-shrink: 0; }
 
-  /* dark */
-  body.dark .fee-page-title { color: #eef2ff; }
-  body.dark .fee-card        { background: #1a2538; border-color: #2d3e54; }
-  body.dark .fee-row         { border-color: #1e2e42; }
-  body.dark .fee-row-label strong { color: #eef2ff; }
-  body.dark .fee-row-label span   { color: #b9c8e8; }
-  body.dark .fee-row-amount  { color: #eef2ff; }
-  body.dark .fee-total-row   { background: #1a1408; border-color: #c9a03d44; }
-  body.dark .fee-total-label { color: #eef2ff; }
-  body.dark .no-fee-card     { background: #1a2538; border-color: #2d3e54; }
+/* ── STUDENT IDENTITY STRIP ── */
+.student-strip {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.student-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--ink), var(--ink2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 700; color: var(--gold2);
+  flex-shrink: 0;
+}
+.student-name {
+  font-weight: 600; font-size: .95rem; color: var(--ink);
+  line-height: 1.2;
+}
+.student-meta {
+  font-size: .75rem; color: var(--ink3); margin-top: .15rem;
+  font-family: 'DM Mono', monospace; letter-spacing: .03em;
+}
+.student-quota {
+  margin-left: auto; flex-shrink: 0;
+  font-size: .7rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; padding: .3rem .75rem;
+  border-radius: 99px; white-space: nowrap;
+}
+.quota-govt { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.quota-mgmt { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+
+/* ── FEE CARD ── */
+.fee-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: rise .5s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* card top bar */
+.fee-card-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2), #f5d78e);
+}
+
+.fee-card-body { padding: 1.75rem; }
+
+.fee-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: .58rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.fee-section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* fee line items */
+.fee-lines { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1.5rem; }
+
+.fee-line {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: .9rem 1.1rem;
+  background: var(--cream); border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: border-color .2s, box-shadow .2s;
+}
+.fee-line:hover { border-color: var(--gold-bdr); box-shadow: 0 2px 8px rgba(201,146,42,.08); }
+
+.fee-line-left { display: flex; align-items: center; gap: .8rem; min-width: 0; }
+.fee-line-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+}
+.fee-line-icon.base  { background: #fef3c7; color: var(--gold); }
+.fee-line-icon.extra { background: var(--amber-bg); color: var(--amber); }
+
+.fee-line-name {
+  font-size: .88rem; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fee-line-desc {
+  font-size: .73rem; color: var(--ink3); margin-top: .1rem;
+}
+
+.fee-line-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: .95rem; font-weight: 500;
+  white-space: nowrap; flex-shrink: 0;
+}
+.fee-line-amount.base  { color: var(--ink); }
+.fee-line-amount.extra { color: var(--amber); }
+.fee-line-amount.zero  { color: #c0c8d4; }
+
+/* divider */
+.fee-divider {
+  border: none; border-top: 1.5px dashed var(--gold-bdr);
+  margin: 0 0 1.25rem;
+}
+
+/* total */
+.fee-total {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(135deg, var(--gold-pale), #fff9f0);
+  border: 1.5px solid var(--gold-bdr);
+  border-radius: 14px; padding: 1.25rem 1.4rem;
+}
+.fee-total-left { display: flex; flex-direction: column; gap: .2rem; }
+.fee-total-label {
+  font-family: 'DM Mono', monospace;
+  font-size: .58rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold);
+}
+.fee-total-note {
+  font-size: .75rem; color: var(--ink3);
+}
+.fee-total-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem; font-weight: 700; line-height: 1;
+  color: var(--ink); letter-spacing: -.02em;
+}
+.fee-total-amount span {
+  font-size: .9rem; font-weight: 400;
+  color: var(--ink3); margin-right: .1rem;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── PAYMENT STATUS ── */
+.payment-status-section { margin-top: 1.25rem; }
+
+.payment-status-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.pstat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.pstat-title {
+  font-family: 'DM Mono', monospace;
+  font-size: .58rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.pstat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .88rem; padding: .55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.pstat-row:last-child { border-bottom: none; padding-bottom: 0; }
+.pstat-key { color: var(--ink3); }
+.pstat-val { font-weight: 600; color: var(--ink); font-family: 'DM Mono', monospace; font-size: .85rem; }
+.pstat-val.paid    { color: var(--green); }
+.pstat-val.pending { color: var(--amber); }
+.pstat-val.cleared { color: var(--green); }
+
+/* progress bar */
+.pay-progress-wrap { margin: 1rem 0 .25rem; }
+.pay-progress-label {
+  display: flex; justify-content: space-between;
+  font-size: .72rem; color: var(--ink3); margin-bottom: .4rem;
+}
+.pay-bar {
+  height: 6px; background: var(--border); border-radius: 99px; overflow: hidden;
+}
+.pay-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--green), #34d399);
+  transition: width 1s ease;
+}
+.pay-bar-fill.full { background: linear-gradient(90deg, #059669, #10b981); }
+
+/* ── EMPTY STATES ── */
+.empty-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3rem 2rem; text-align: center;
+  box-shadow: var(--shadow);
+}
+.empty-icon {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: var(--gold-pale); border: 1px solid var(--gold-bdr);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; margin: 0 auto 1.25rem;
+}
+.empty-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 600; color: var(--ink);
+  margin-bottom: .4rem;
+}
+.empty-body { font-size: .85rem; color: var(--ink3); line-height: 1.6; }
+
+/* ── DARK MODE ── */
+body.dark {
+  background: #0e1117;
+  color: #e8eaf0;
+}
+body.dark .fee-page-title { color: #eef2ff; }
+body.dark .student-strip,
+body.dark .fee-card,
+body.dark .payment-status-card,
+body.dark .empty-card { background: #1a2234; border-color: #2d3a50; }
+body.dark .fee-line { background: #111827; border-color: #2d3a50; }
+body.dark .fee-line:hover { border-color: #c9922a44; }
+body.dark .fee-line-name  { color: #e8eaf0; }
+body.dark .fee-line-desc  { color: #8a9ab8; }
+body.dark .fee-line-amount.base { color: #e8eaf0; }
+body.dark .fee-total { background: #1a1408; border-color: #c9922a44; }
+body.dark .fee-total-amount { color: #e8eaf0; }
+body.dark .pstat-row { border-color: #2d3a50; }
+body.dark .pstat-key { color: #8a9ab8; }
+body.dark .pstat-val { color: #e8eaf0; }
+body.dark .pay-bar { background: #2d3a50; }
+body.dark .fee-section-label { color: #8a9ab8; }
+body.dark .fee-section-label::after { background: #2d3a50; }
+body.dark .fee-divider { border-color: #2d3a5066; }
+body.dark .student-name { color: #e8eaf0; }
+body.dark .btn-back { color: #8a9ab8; }
+body.dark .btn-back:hover { color: #e8eaf0; }
+body.dark .empty-title { color: #e8eaf0; }
+body.dark .empty-body { color: #8a9ab8; }
+body.dark .fee-header h1 { color: #e8eaf0; }
+
+/* responsive */
+@media(max-width:480px){
+  .fee-page { padding: 1.25rem .85rem 5rem; }
+  .fee-header h1 { font-size: 2rem; }
+  .fee-total-amount { font-size: 2rem; }
+  .fee-card-body { padding: 1.25rem; }
+  .student-strip { flex-wrap: wrap; }
+  .student-quota { margin-left: 0; }
+}
 </style>
 
 <div class="fee-page">
+
   <a href="{{ url_for('main.student_dashboard') }}" class="btn-back">
-    <i class="fas fa-arrow-left"></i> Back to Dashboard
+    <i class="fas fa-arrow-left"></i> Dashboard
   </a>
 
-  <h2 class="fee-page-title"><i class="fas fa-receipt" style="color:#c9a03d"></i> My Fee Structure</h2>
+  <div class="fee-header">
+    <div class="fee-header-eyebrow">Fee Structure</div>
+    <h1>Your <em>Fees</em></h1>
+    <div class="fee-header-sub">BCA Admissions 2026–27</div>
+  </div>
 
   {% if not allotment %}
   <div class="notice-card">
-    <i class="fas fa-info-circle"></i>
-    Your seat has not been allotted yet. Fee details will appear here once you are allotted a seat.
+    <i class="fas fa-hourglass-half"></i>
+    <span>Your seat hasn't been allotted yet. Fee details will appear here once counselling is complete.</span>
   </div>
   {% endif %}
 
   {% if student_fee %}
+
+  {# Student identity strip #}
+  <div class="student-strip">
+    <div class="student-avatar">{{ appl.full_name[0] | upper }}</div>
+    <div>
+      <div class="student-name">{{ appl.full_name }}</div>
+      <div class="student-meta">Rank #{{ appl.rank or '—' }} &nbsp;·&nbsp; {{ appl.category_name or '—' }}</div>
+    </div>
+    {% if allotment %}
+    <div class="student-quota {% if allotment.quota == 'government' %}quota-govt{% else %}quota-mgmt{% endif %}">
+      {{ allotment.quota | title }} Quota
+    </div>
+    {% endif %}
+  </div>
+
+  {# Fee breakdown #}
   <div class="fee-card">
-    <div class="fee-card-header">
-      <h3>Fee Breakdown</h3>
-      <p>{{ appl.full_name }} &mdash; Rank #{{ appl.rank or '—' }}</p>
-    </div>
+    <div class="fee-card-bar"></div>
+    <div class="fee-card-body">
 
-    <div class="fee-rows">
+      <div class="fee-section-label">Breakdown</div>
 
-      {# Base fee category #}
-      <div class="fee-row">
-        <div class="fee-row-label">
-          <i class="fas fa-tag"></i>
-          <div>
-            <strong>{{ student_fee.fee_category.name if student_fee.fee_category else 'Fee Category' }}</strong>
-            <span>Base fee structure</span>
+      <div class="fee-lines">
+        <div class="fee-line">
+          <div class="fee-line-left">
+            <div class="fee-line-icon base"><i class="fas fa-tag"></i></div>
+            <div>
+              <div class="fee-line-name">{{ student_fee.fee_category.name if student_fee.fee_category else 'Base Fee' }}</div>
+              <div class="fee-line-desc">Tuition & base charges</div>
+            </div>
+          </div>
+          <div class="fee-line-amount base {% if student_fee.base_amount == 0 %}zero{% endif %}">
+            ₹{{ '{:,.2f}'.format(student_fee.base_amount) }}
           </div>
         </div>
-        <div class="fee-row-amount {% if student_fee.base_amount == 0 %}zero{% endif %}">
-          ₹{{ '%.2f'|format(student_fee.base_amount) }}
-        </div>
-      </div>
 
-      {# Additional fee #}
-      {% if student_fee.additional_fee and student_fee.additional_fee > 0 %}
-      <div class="fee-row">
-        <div class="fee-row-label">
-          <i class="fas fa-plus-circle"></i>
-          <div>
-            <strong>Additional Charges</strong>
-            <span>Extra fee applied at the time of counselling</span>
+        {% if student_fee.additional_fee and student_fee.additional_fee > 0 %}
+        <div class="fee-line">
+          <div class="fee-line-left">
+            <div class="fee-line-icon extra"><i class="fas fa-plus"></i></div>
+            <div>
+              <div class="fee-line-name">Additional Charges</div>
+              <div class="fee-line-desc">Applied during counselling</div>
+            </div>
           </div>
+          <div class="fee-line-amount extra">+ ₹{{ '{:,.2f}'.format(student_fee.additional_fee) }}</div>
         </div>
-        <div class="fee-row-amount additional">
-          + ₹{{ '%.2f'|format(student_fee.additional_fee) }}
+        {% endif %}
+      </div>
+
+      <hr class="fee-divider">
+
+      <div class="fee-total">
+        <div class="fee-total-left">
+          <div class="fee-total-label">Total Payable</div>
+          <div class="fee-total-note">Academic Year 2026–27</div>
         </div>
+        <div class="fee-total-amount"><span>₹</span>{{ '{:,.2f}'.format(student_fee.total_amount) }}</div>
       </div>
-      {% endif %}
 
-    </div>
-
-    {# Total #}
-    <div class="fee-total-row">
-      <div class="fee-total-label">
-        <i class="fas fa-rupee-sign"></i> Total Fees Payable
-      </div>
-      <div class="fee-total-amount">₹{{ '%.2f'|format(student_fee.total_amount) }}</div>
     </div>
   </div>
 
+  {# Payment status if fees are set #}
+  {% set fees_obj = appl.student_fees[0] if appl.student_fees else None %}
+  {% if fees_obj and fees_obj.total_fees %}
+  <div class="payment-status-section">
+    <div class="payment-status-card">
+
+      <div class="pstat-header">
+        <div class="pstat-title">Payment Status</div>
+      </div>
+
+      {% set total   = fees_obj.total_fees | float %}
+      {% set paid    = fees_obj.total_paid | float %}
+      {% set balance = fees_obj.balance_remaining | float %}
+      {% set pct     = ((paid / total * 100) | int) if total > 0 else 0 %}
+
+      <div class="pay-progress-wrap">
+        <div class="pay-progress-label">
+          <span>₹{{ '{:,.2f}'.format(paid) }} paid</span>
+          <span>{{ pct }}%</span>
+        </div>
+        <div class="pay-bar">
+          <div class="pay-bar-fill {% if balance <= 0 %}full{% endif %}" style="width:{{ pct }}%"></div>
+        </div>
+      </div>
+
+      <div class="pstat-row">
+        <span class="pstat-key">Total Fees</span>
+        <span class="pstat-val">₹{{ '{:,.2f}'.format(total) }}</span>
+      </div>
+      <div class="pstat-row">
+        <span class="pstat-key">Amount Paid</span>
+        <span class="pstat-val paid">₹{{ '{:,.2f}'.format(paid) }}</span>
+      </div>
+      <div class="pstat-row">
+        <span class="pstat-key">Balance Due</span>
+        <span class="pstat-val {% if balance <= 0 %}cleared{% else %}pending{% endif %}">
+          {% if balance <= 0 %}Cleared ✓{% else %}₹{{ '{:,.2f}'.format(balance) }}{% endif %}
+        </span>
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+
   {% elif allotment %}
-  <div class="no-fee-card">
-    <i class="fas fa-hourglass-half"></i>
-    <p>Your seat has been allotted but fee details have not been assigned yet.<br>
-       Please check back later or contact the admissions office.</p>
+  <div class="empty-card">
+    <div class="empty-icon">⏳</div>
+    <div class="empty-title">Fee details pending</div>
+    <p class="empty-body">Your seat is confirmed but fee details haven't been assigned yet.<br>Please check back or contact the admissions office.</p>
   </div>
 
   {% else %}
-  <div class="no-fee-card">
-    <i class="fas fa-info-circle"></i>
-    <p>Fee structure will be assigned to you during the counselling process.<br>
-       Please attend your counselling session.</p>
+  <div class="empty-card">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">No fees assigned yet</div>
+    <p class="empty-body">Fee structure will be assigned during your counselling session.<br>Please attend as per your scheduled rank.</p>
   </div>
   {% endif %}
+
 </div>
 {% endblock %}
