@@ -40,8 +40,8 @@ def utc_to_ist(dt):
     return dt.astimezone(IST)
 
 def ist_now_naive():
-    """Return current IST time as naive datetime (for DB storage)."""
-    return datetime.now(IST).replace(tzinfo=None)
+    """Return current UTC time as naive datetime (for DB storage)."""
+    return datetime.utcnow()
 
 def fmt_ist(dt, fmt='%d %b %Y, %I:%M %p'):
     """Format a DB datetime (naive IST) for display."""
