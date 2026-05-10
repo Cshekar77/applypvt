@@ -30,13 +30,13 @@ def now_ist():
 
 def utc_to_ist(dt):
     """
-    FIXED: DB stores naive datetimes that are already in IST.
-    Just attach IST tzinfo — do NOT convert from UTC.
+    DB stores naive datetimes in UTC. Convert to IST (+5:30).
     """
     if dt is None:
         return None
+    from datetime import timezone
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=IST)   # label as IST, no conversion
+        dt = dt.replace(tzinfo=timezone.utc)  # treat as UTC
     return dt.astimezone(IST)
 
 def ist_now_naive():
