@@ -309,6 +309,7 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
     <form method="POST" action="{{ url_for('main.admin_save_document') }}" id="verifyForm">
       <input type="hidden" name="application_id" id="modalAppId">
       <input type="hidden" name="approve_all" id="approveAllFlag" value="0">
+      <input type="hidden" name="print_after_save" id="printAfterSave" value="0">
       <div class="modal-body">
         {% if doc_categories %}
         {% for dc in doc_categories %}
@@ -339,17 +340,21 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
             <i class="fas fa-file-pdf"></i> Print Acknowledgement
           </a>
         </div>
-        <div class="modal-footer-actions">
-          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="btn-save-only"
-            onclick="document.getElementById('approveAllFlag').value='0'">
-            <i class="fas fa-save"></i> Save Only
-          </button>
-          <button type="submit" class="btn-approve"
-            onclick="document.getElementById('approveAllFlag').value='1'">
-            <i class="fas fa-check-double"></i> Save &amp; Approve All
-          </button>
-        </div>
+       <div class="modal-footer-actions">
+  <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+  <button type="submit" class="btn-save-only"
+    onclick="document.getElementById('approveAllFlag').value='0'; document.getElementById('printAfterSave').value='0'">
+    <i class="fas fa-save"></i> Save Only
+  </button>
+  <button type="submit" class="btn-approve"
+    onclick="document.getElementById('approveAllFlag').value='1'; document.getElementById('printAfterSave').value='0'">
+    <i class="fas fa-check-double"></i> Save &amp; Approve All
+  </button>
+  <button type="submit" class="btn-approve" style="background:#7c3aed"
+    onclick="document.getElementById('approveAllFlag').value='1'; document.getElementById('printAfterSave').value='1'">
+    <i class="fas fa-print"></i> Approve &amp; Print
+  </button>
+</div>
       </div>
     </form>
   </div>
@@ -450,5 +455,15 @@ document.getElementById('verifyModal').addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
+// Auto-open PDF after Approve & Print
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const printId = params.get('print_app_id');
+  if (printId && studentData[printId] && studentData[printId].ackUrl) {
+    window.open(studentData[printId].ackUrl, '_blank');
+    window.history.replaceState({}, '', window.location.pathname);
+    openModal(parseInt(printId));  // re-open the modal for that student
+  }
+})();
 </script>
 {% endblock %}

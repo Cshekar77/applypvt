@@ -2539,6 +2539,11 @@ def admin_save_document():
 
     db.session.commit()
     flash('Documents saved successfully.', 'success')
+
+    print_after = request.form.get('print_after_save') == '1'
+    app_id = request.form.get('application_id', type=int)
+    if print_after and app_id:
+        return redirect(url_for('main.admin_document_verification', print_app_id=app_id))
     return redirect(url_for('main.admin_document_verification'))
 
 
