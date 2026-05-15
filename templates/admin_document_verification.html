@@ -342,18 +342,24 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
         </div>
        <div class="modal-footer-actions">
   <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-  <button type="submit" class="btn-save-only"
-    onclick="document.getElementById('approveAllFlag').value='0'; document.getElementById('printAfterSave').value='0'">
-    <i class="fas fa-save"></i> Save Only
-  </button>
-  <button type="submit" class="btn-approve"
-    onclick="document.getElementById('approveAllFlag').value='1'; document.getElementById('printAfterSave').value='0'">
-    <i class="fas fa-check-double"></i> Save &amp; Approve All
-  </button>
-  <button type="submit" class="btn-approve" style="background:#7c3aed"
-    onclick="document.getElementById('approveAllFlag').value='1'; document.getElementById('printAfterSave').value='1'">
-    <i class="fas fa-print"></i> Approve &amp; Print
-  </button>
+  <button type="button" class="btn-save-only"
+  onclick="document.getElementById('approveAllFlag').value='0';
+           document.getElementById('printAfterSave').value='0';
+           document.getElementById('verifyForm').submit()">
+  <i class="fas fa-save"></i> Save Only
+</button>
+<button type="button" class="btn-approve"
+  onclick="document.getElementById('approveAllFlag').value='1';
+           document.getElementById('printAfterSave').value='0';
+           document.getElementById('verifyForm').submit()">
+  <i class="fas fa-check-double"></i> Save &amp; Approve All
+</button>
+<button type="button" class="btn-approve" style="background:#7c3aed"
+  onclick="document.getElementById('approveAllFlag').value='1';
+           document.getElementById('printAfterSave').value='1';
+           document.getElementById('verifyForm').submit()">
+  <i class="fas fa-print"></i> Approve &amp; Print
+</button>
 </div>
       </div>
     </form>
@@ -371,7 +377,7 @@ const studentData = {
     meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }}",
     allotted: {{ 'true' if allotment else 'false' }},
     allotText: {% if allotment %}"{{ allotment.quota|title }} Quota{% if allotment.admit_seat_label %} — {{ allotment.admit_seat_label }}{% endif %}"{% else %}"Not yet allotted"{% endif %},
-    ackUrl: {% if allotment %}"{{ url_for('main.document_acknowledgement', app_id=appl.id) }}"{% else %}null{% endif %},
+    ackUrl: "{{ url_for('main.document_acknowledgement', app_id=appl.id) }}",
     docs: {
       {% for dc in doc_categories %}
       {% set rec = doc_map.get(appl.id, {}).get(dc.id) %}
@@ -398,18 +404,14 @@ function openModal(appId) {
     strip.className = 'modal-allot-strip';
     strip.querySelector('i').className = 'fas fa-check-circle';
     stripTxt.textContent = 'Allotted — ' + d.allotText;
-    if (d.ackUrl) {
-      ackLink.href = d.ackUrl;
-      ackLink.style.display = 'inline-flex';
-    } else {
-      ackLink.style.display = 'none';
-    }
   } else {
     strip.className = 'modal-allot-strip not-allotted';
     strip.querySelector('i').className = 'fas fa-clock';
     stripTxt.textContent = 'Not yet allotted — documents can still be recorded';
-    ackLink.style.display = 'none';
   }
+  ackLink.href = d.ackUrl;
+  ackLink.style.display = 'inline-flex';
+
 
   // Reset all status buttons
   document.querySelectorAll('.status-btn').forEach(function(b) { b.className = 'status-btn'; });
