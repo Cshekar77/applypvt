@@ -460,11 +460,14 @@ document.addEventListener('keydown', function(e) {
 // Auto-open PDF after Approve & Print
 (function() {
   const params = new URLSearchParams(window.location.search);
-  const printId = params.get('print_app_id');
-  if (printId && studentData[printId] && studentData[printId].ackUrl) {
-    window.open(studentData[printId].ackUrl, '_blank');
-    window.history.replaceState({}, '', window.location.pathname);
-    openModal(parseInt(printId));  // re-open the modal for that student
+  const printIdStr = params.get('print_app_id');
+  if (printIdStr) {
+    const printId = parseInt(printIdStr);
+    if (studentData[printId] && studentData[printId].ackUrl) {
+      window.open(studentData[printId].ackUrl, '_blank');
+      window.history.replaceState({}, '', window.location.pathname);
+      openModal(printId);
+    }
   }
 })();
 </script>

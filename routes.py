@@ -2132,20 +2132,23 @@ def _generate_document_acknowledgement_pdf(app_id):
             Paragraph('Document Name', label_sty),
             Paragraph('Status', label_sty),
             Paragraph('Approved', label_sty),
+            Paragraph('Approved By', label_sty),
         ]]
         for idx, dc in enumerate(doc_categories, 1):
-            d         = doc_status_map.get(dc.id)
-            status    = d.status if d else 'not_given'
-            disp, col = STATUS_DISPLAY.get(status, ('—', colors.grey))
-            approved  = '✓ Yes' if (d and d.is_approved) else '✗ No'
+            d            = doc_status_map.get(dc.id)
+            status       = d.status if d else 'not_given'
+            disp, col    = STATUS_DISPLAY.get(status, ('—', colors.grey))
+            approved     = '✓ Yes' if (d and d.is_approved) else '✗ No'
+            approved_by  = (d.approved_by_name or '—') if (d and d.is_approved) else '—'
             doc_rows.append([
                 Paragraph(str(idx), value_sty),
                 Paragraph(dc.name, value_sty),
                 Paragraph(f'<font color="{col.hexval()}">{disp}</font>', value_sty),
                 Paragraph(approved, value_sty),
+                Paragraph(approved_by, value_sty),
             ])
 
-        doc_tbl = Table(doc_rows, colWidths=[1*cm, 8*cm, 4*cm, 4*cm])
+        doc_tbl = Table(doc_rows, colWidths=[0.6*cm, 5.8*cm, 2.8*cm, 2.2*cm, 3.8*cm])
         doc_tbl.setStyle(TableStyle([
             ('BACKGROUND',   (0,0), (-1,0),  colors.Color(0.15, 0.25, 0.5)),
             ('TEXTCOLOR',    (0,0), (-1,0),  colors.white),
