@@ -470,6 +470,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Auto-open PDF after Approve & Print (after page reload with saved data)
+// Show print button after Approve & Print (instead of auto-opening which gets blocked)
 (function() {
   const params = new URLSearchParams(window.location.search);
   const printIdStr = params.get('print_app_id');
@@ -479,24 +480,42 @@ document.addEventListener('keydown', function(e) {
       // Clear the URL parameter so it doesn't keep triggering
       window.history.replaceState({}, '', window.location.pathname);
       
-      // Open the PDF in a new tab with the latest saved data
-      window.open(studentData[printId].ackUrl, '_blank');
-      
-      // Show success toast
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position:fixed; bottom:2rem; right:2rem;
-        background:#10b981; color:white; padding:.75rem 1.25rem;
-        border-radius:12px; z-index:9999; font-weight:500;
-        box-shadow:0 4px 12px rgba(0,0,0,.15);
-        font-size:.875rem;
-        animation: fadeOut 3s ease forwards;
+      // Show a fixed banner at the top with a PRINT button
+      const banner = document.createElement('div');
+      banner.id = 'printBanner';
+      banner.style.cssText = `
+        position:fixed; top:0; left:0; right:0;
+        background:#7c3aed; color:white; padding:1rem;
+        text-align:center; z-index:10000; font-weight:600;
+        box-shadow:0 4px 12px rgba(0,0,0,.2);
+        display:flex; align-items:center; justify-content:center;
+        gap:1rem; flex-wrap:wrap;
       `;
-      toast.innerHTML = '<i class="fas fa-check-circle"></i> Documents approved! Print window opened.';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+      banner.innerHTML = `
+        <i class="fas fa-check-circle" style="font-size:1.2rem"></i>
+        <span>Documents approved successfully!</span>
+        <a href="${studentData[printId].ackUrl}" target="_blank" 
+           style="background:white; color:#7c3aed; padding:0.5rem 1.2rem; 
+                  border-radius:8px; text-decoration:none; font-weight:700;
+                  display:inline-flex; align-items:center; gap:0.5rem;">
+          <i class="fas fa-print"></i> Print Acknowledgement
+        </a>
+        <button onclick="this.parentElement.remove()" 
+                style="background:transparent; border:1px solid white; color:white;
+                       padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">
+          Close
+        </button>
+      `;
+      document.body.appendChild(banner);
       
+      // Also open the modal so admin can see the approved status
       openModal(printId);
+      
+      // Auto-hide banner after 10 seconds
+      setTimeout(() => {
+        const b = document.getElementById('printBanner');
+        if (b) b.remove();
+      }, 10000);
     }
   }
 })();
