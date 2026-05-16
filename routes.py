@@ -2016,11 +2016,11 @@ def _generate_document_acknowledgement_pdf(app_id):
     doc_status_map = {d.doc_category_id: d for d in student_docs}
 
     STATUS_DISPLAY = {
-        'original':  ('Original',  colors.Color(0.0,  0.5,  0.2)),
-        'xerox':     ('Xerox',     colors.Color(0.1,  0.3,  0.8)),
-        'attested':  ('Attested',  colors.Color(0.6,  0.4,  0.0)),
-        'not_given': ('Not Given', colors.Color(0.5,  0.5,  0.5)),
-        'submitted': ('Submitted', colors.Color(0.0,  0.4,  0.6)),
+        'original':  ('Original',  '#008032'),
+        'xerox':     ('Xerox',     '#1a4dcc'),
+        'attested':  ('Attested',  '#996600'),
+        'not_given': ('Not Given', '#808080'),
+        'submitted': ('Submitted', '#006699'),
     }
 
     university_name = current_app.config.get('UNIVERSITY_NAME', 'University')
@@ -2124,7 +2124,7 @@ def _generate_document_acknowledgement_pdf(app_id):
             doc_rows.append([
                 Paragraph(str(idx), value_sty),
                 Paragraph(dc.name, value_sty),
-                Paragraph(f'<font color="{col.hexval()}">{disp}</font>', value_sty),
+                Paragraph(f'<font color="{col}">{disp}</font>', value_sty),
                 Paragraph(approved, value_sty),
                 Paragraph(approved_by, value_sty),
             ])
@@ -2171,7 +2171,13 @@ def _generate_document_acknowledgement_pdf(app_id):
     filename  = f'document_acknowledgement_{safe_name}_rank{appl.rank}.pdf'
     return send_file(buffer, mimetype='application/pdf',
                      as_attachment=False, download_name=filename)
-
+# ─────────────────────────────────────────
+#  Admin — Document Acknowledgement PDF Route
+# ─────────────────────────────────────────
+@main.route('/admin/document-verification/acknowledgement/<int:app_id>')
+@admin_required
+def document_acknowledgement(app_id):
+    return _generate_document_acknowledgement_pdf(app_id)
 # ─────────────────────────────────────────
 #  Admin — Admit Categories Management
 # ─────────────────────────────────────────
