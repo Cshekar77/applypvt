@@ -397,14 +397,21 @@ function approveAndPrint() {
   const ackUrl = studentData[appId]?.ackUrl;
   
   if (ackUrl) {
-    // Open PDF in NEW TAB right now (user click - browser ALLOWS this)
+    // Open PDF in new tab
     window.open(ackUrl, '_blank');
+    
+    // Wait 1 second for PDF to start loading, then submit form
+    setTimeout(function() {
+      document.getElementById('approveAllFlag').value = '1';
+      document.getElementById('printAfterSave').value = '0';
+      document.getElementById('verifyForm').submit();
+    }, 1000);
+  } else {
+    // Just submit if no URL
+    document.getElementById('approveAllFlag').value = '1';
+    document.getElementById('printAfterSave').value = '0';
+    document.getElementById('verifyForm').submit();
   }
-  
-  // Then submit the form to save approvals
-  document.getElementById('approveAllFlag').value = '1';
-  document.getElementById('printAfterSave').value = '0';  // Don't need print_after_save anymore
-  document.getElementById('verifyForm').submit();
 }
 
 function openModal(appId) {
