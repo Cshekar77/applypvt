@@ -340,27 +340,18 @@ body.dark .modal-allot-strip.not-allotted { background: #1a2538; border-color: #
             <i class="fas fa-file-pdf"></i> Print Acknowledgement
           </a>
         </div>
-       <div class="modal-footer-actions">
-  <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-  <button type="button" class="btn-save-only"
-  onclick="document.getElementById('approveAllFlag').value='0';
-           document.getElementById('printAfterSave').value='0';
-           document.getElementById('verifyForm').submit()">
-  <i class="fas fa-save"></i> Save Only
-</button>
-<button type="button" class="btn-approve"
-  onclick="document.getElementById('approveAllFlag').value='1';
-           document.getElementById('printAfterSave').value='0';
-           document.getElementById('verifyForm').submit()">
-  <i class="fas fa-check-double"></i> Save &amp; Approve All
-</button>
-<button type="button" class="btn-approve" style="background:#7c3aed"
-  onclick="document.getElementById('approveAllFlag').value='1';
-           document.getElementById('printAfterSave').value='1';
-           document.getElementById('verifyForm').submit()">
-  <i class="fas fa-print"></i> Approve &amp; Print
-</button>
-</div>
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button type="button" class="btn-save-only" onclick="saveOnly()">
+            <i class="fas fa-save"></i> Save Only
+          </button>
+          <button type="button" class="btn-approve" onclick="approveAll()">
+            <i class="fas fa-check-double"></i> Save &amp; Approve All
+          </button>
+          <button type="button" class="btn-approve" style="background:#7c3aed" onclick="approveAndPrint()">
+            <i class="fas fa-print"></i> Approve &amp; Print
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -388,6 +379,34 @@ const studentData = {
   {% endfor %}
 };
 
+// Helper functions for buttons
+function saveOnly() {
+  document.getElementById('approveAllFlag').value = '0';
+  document.getElementById('printAfterSave').value = '0';
+  document.getElementById('verifyForm').submit();
+}
+
+function approveAll() {
+  document.getElementById('approveAllFlag').value = '1';
+  document.getElementById('printAfterSave').value = '0';
+  document.getElementById('verifyForm').submit();
+}
+
+function approveAndPrint() {
+  const appId = document.getElementById('modalAppId').value;
+  const ackUrl = studentData[appId]?.ackUrl;
+  
+  if (ackUrl) {
+    // Open print window NOW (user click - browser allows this!)
+    window.open(ackUrl, '_blank');
+  }
+  
+  // Then submit the form
+  document.getElementById('approveAllFlag').value = '1';
+  document.getElementById('printAfterSave').value = '1';
+  document.getElementById('verifyForm').submit();
+}
+
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
@@ -411,7 +430,6 @@ function openModal(appId) {
   }
   ackLink.href = d.ackUrl;
   ackLink.style.display = 'inline-flex';
-
 
   // Reset all status buttons
   document.querySelectorAll('.status-btn').forEach(function(b) { b.className = 'status-btn'; });
@@ -457,8 +475,8 @@ document.getElementById('verifyModal').addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
-// Auto-open PDF after Approve & Print
-// Auto-open PDF after Approve & Print
+
+// Show success toast if print_app_id is present (fallback)
 (function() {
   const params = new URLSearchParams(window.location.search);
   const printIdStr = params.get('print_app_id');
@@ -466,31 +484,35 @@ document.addEventListener('keydown', function(e) {
     const printId = parseInt(printIdStr);
     if (studentData[printId] && studentData[printId].ackUrl) {
       window.history.replaceState({}, '', window.location.pathname);
-      const banner = document.createElement('div');
-      banner.style.cssText = `
-        position:fixed; top:1rem; left:50%; transform:translateX(-50%);
-        background:#7c3aed; color:white; padding:.75rem 1.5rem;
-        border-radius:12px; z-index:9999; font-weight:600;
-        box-shadow:0 4px 20px rgba(0,0,0,.25);
-        display:flex; align-items:center; gap:.75rem; font-size:.9rem;
-        white-space:nowrap;
+      
+      // Show success toast
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position:fixed; bottom:2rem; right:2rem;
+        background:#10b981; color:white; padding:.75rem 1.25rem;
+        border-radius:12px; z-index:9999; font-weight:500;
+        box-shadow:0 4px 12px rgba(0,0,0,.15);
+        font-size:.875rem;
+        animation: fadeOut 3s ease forwards;
       `;
-      banner.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        Documents approved!
-        <a href="${studentData[printId].ackUrl}" target="_blank"
-           style="color:white;text-decoration:underline;cursor:pointer;font-weight:700;">
-          Click to Print Acknowledgement
-        </a>
-        <button onclick="this.parentElement.remove()"
-          style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;line-height:1;">
-          &times;
-        </button>
-      `;
-      document.body.appendChild(banner);
+      toast.innerHTML = '<i class="fas fa-check-circle"></i> Documents approved!';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+      
       openModal(printId);
     }
   }
 })();
+
+// Add fadeOut animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeOut {
+    0% { opacity: 1; transform: translateY(0); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); visibility: hidden; }
+  }
+`;
+document.head.appendChild(style);
 </script>
 {% endblock %}
