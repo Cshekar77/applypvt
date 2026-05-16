@@ -2178,6 +2178,11 @@ def _generate_document_acknowledgement_pdf(app_id):
 @admin_required
 def document_acknowledgement(app_id):
     return _generate_document_acknowledgement_pdf(app_id)
+
+@main.route('/faculty/document-verification/acknowledgement/<int:app_id>')
+@faculty_required
+def faculty_document_acknowledgement(app_id):
+    return _generate_document_acknowledgement_pdf(app_id)
 # ─────────────────────────────────────────
 #  Admin — Admit Categories Management
 # ─────────────────────────────────────────
