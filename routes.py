@@ -1988,7 +1988,6 @@ def allotment_acknowledgement(app_id):
                      as_attachment=False, download_name=filename)
 
 
-# ─────────────────────────────────────────
 def _generate_document_acknowledgement_pdf(app_id):
     """
     Shared PDF generator for document acknowledgement.
@@ -1997,6 +1996,7 @@ def _generate_document_acknowledgement_pdf(app_id):
     document list with status, student + college signature boxes.
     """
     import io
+    from datetime import datetime
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
     from reportlab.lib.units import cm
@@ -2171,7 +2171,6 @@ def _generate_document_acknowledgement_pdf(app_id):
     filename  = f'document_acknowledgement_{safe_name}_rank{appl.rank}.pdf'
     return send_file(buffer, mimetype='application/pdf',
                      as_attachment=False, download_name=filename)
-
 
 # ─────────────────────────────────────────
 #  Admin — Admit Categories Management
