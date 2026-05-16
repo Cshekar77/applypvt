@@ -393,15 +393,8 @@ function approveAll() {
 }
 
 function approveAndPrint() {
-  const appId = document.getElementById('modalAppId').value;
-  const ackUrl = studentData[appId]?.ackUrl;
-  
-  if (ackUrl) {
-    // Open print window NOW (user click - browser allows this!)
-    window.open(ackUrl, '_blank');
-  }
-  
-  // Then submit the form
+  // Submit the form to save approvals first
+  // The PDF will open after page reload via the print_app_id parameter
   document.getElementById('approveAllFlag').value = '1';
   document.getElementById('printAfterSave').value = '1';
   document.getElementById('verifyForm').submit();
@@ -476,14 +469,18 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
 
-// Show success toast if print_app_id is present (fallback)
+// Auto-open PDF after Approve & Print (after page reload with saved data)
 (function() {
   const params = new URLSearchParams(window.location.search);
   const printIdStr = params.get('print_app_id');
   if (printIdStr) {
     const printId = parseInt(printIdStr);
     if (studentData[printId] && studentData[printId].ackUrl) {
+      // Clear the URL parameter so it doesn't keep triggering
       window.history.replaceState({}, '', window.location.pathname);
+      
+      // Open the PDF in a new tab with the latest saved data
+      window.open(studentData[printId].ackUrl, '_blank');
       
       // Show success toast
       const toast = document.createElement('div');
@@ -495,7 +492,7 @@ document.addEventListener('keydown', function(e) {
         font-size:.875rem;
         animation: fadeOut 3s ease forwards;
       `;
-      toast.innerHTML = '<i class="fas fa-check-circle"></i> Documents approved!';
+      toast.innerHTML = '<i class="fas fa-check-circle"></i> Documents approved! Print window opened.';
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3000);
       
