@@ -393,10 +393,17 @@ function approveAll() {
 }
 
 function approveAndPrint() {
-  // Submit the form to save approvals first
-  // The PDF will open after page reload via the print_app_id parameter
+  const appId = document.getElementById('modalAppId').value;
+  const ackUrl = studentData[appId]?.ackUrl;
+  
+  if (ackUrl) {
+    // Open PDF in NEW TAB right now (user click - browser ALLOWS this)
+    window.open(ackUrl, '_blank');
+  }
+  
+  // Then submit the form to save approvals
   document.getElementById('approveAllFlag').value = '1';
-  document.getElementById('printAfterSave').value = '1';
+  document.getElementById('printAfterSave').value = '0';  // Don't need print_after_save anymore
   document.getElementById('verifyForm').submit();
 }
 
