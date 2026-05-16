@@ -396,24 +396,35 @@ function approveAndPrint() {
   const appId = document.getElementById('modalAppId').value;
   const ackUrl = studentData[appId]?.ackUrl;
   
-  if (ackUrl) {
-    // Open PDF in new tab
-    window.open(ackUrl, '_blank');
-    
-    // Wait 1 second for PDF to start loading, then submit form
-    setTimeout(function() {
-      document.getElementById('approveAllFlag').value = '1';
-      document.getElementById('printAfterSave').value = '0';
-      document.getElementById('verifyForm').submit();
-    }, 1000);
-  } else {
-    // Just submit if no URL
-    document.getElementById('approveAllFlag').value = '1';
-    document.getElementById('printAfterSave').value = '0';
-    document.getElementById('verifyForm').submit();
+  if (!ackUrl) {
+    alert('Acknowledgement URL not available');
+    return;
   }
+  
+  // Set form values
+  document.getElementById('approveAllFlag').value = '1';
+  document.getElementById('printAfterSave').value = '0';
+  
+  // Get form data
+  const form = document.getElementById('verifyForm');
+  const formData = new FormData(form);
+  
+  // Submit via fetch (async, no page refresh yet)
+  fetch(form.action, {
+    method: 'POST',
+    body: formData
+  })
+  .then(function(response) {
+    // After save completes, open PDF in new tab
+    window.open(ackUrl, '_blank');
+    // Then reload the page to show updated status
+    window.location.reload();
+  })
+  .catch(function(error) {
+    console.error('Error:', error);
+    alert('Error saving documents. Please try again.');
+  });
 }
-
 function openModal(appId) {
   const d = studentData[appId];
   if (!d) return;
