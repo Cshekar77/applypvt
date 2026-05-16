@@ -1989,28 +1989,12 @@ def allotment_acknowledgement(app_id):
 
 
 # ─────────────────────────────────────────
-#  Admin — Document Acknowledgement PDF
-#  NEW: generates printable PDF after document
-#       verification — student copy + college copy
-# ─────────────────────────────────────────
-@main.route('/admin/document-verification/acknowledgement/<int:app_id>')
-@admin_required
-def document_acknowledgement(app_id):
-    return _generate_document_acknowledgement_pdf(app_id)
-
-
-@main.route('/faculty/document-verification/acknowledgement/<int:app_id>')
-@faculty_required
-def faculty_document_acknowledgement(app_id):
-    return _generate_document_acknowledgement_pdf(app_id)
-
-
 def _generate_document_acknowledgement_pdf(app_id):
     """
     Shared PDF generator for document acknowledgement.
     One A4 page: top half = Student Copy, bottom half = College Copy.
-    Both halves: University logo, student name, rank, allotted category,
-    allotment time, document list with status, student + college signature boxes.
+    Both halves: University logo, student name, rank, application number,
+    document list with status, student + college signature boxes.
     """
     import io
     from reportlab.lib.pagesizes import A4
@@ -2022,16 +2006,9 @@ def _generate_document_acknowledgement_pdf(app_id):
     from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
     appl = StudentApplication.query.get_or_404(app_id)
-    allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
-
-    admit_cat_name = '—'
-    allotted_str   = '—'
-    if allotment:
-        if allotment.admit_category_id:
-            ac = AdmitCategory.query.get(allotment.admit_category_id)
-            if ac:
-                admit_cat_name = ac.name
-        allotted_str = fmt_ist(allotment.allotted_at)
+    
+    # Generate Application Number
+    application_number = f"BCA/{datetime.now().year}/{str(appl.id).zfill(6)}"
 
     doc_categories = DocumentCategory.query.filter_by(is_active=True)\
         .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
@@ -2059,7 +2036,7 @@ def _generate_document_acknowledgement_pdf(app_id):
     )
 
     styles     = getSampleStyleSheet()
-    title_sty  = ParagraphStyle('t',  fontSize=12, fontName='Helvetica-Bold',
+    title_sty  = ParagraphStyle('t',  fontSize=13, fontName='Helvetica-Bold',
                                 alignment=TA_CENTER, spaceAfter=2)
     copy_sty   = ParagraphStyle('cp', fontSize=8,  fontName='Helvetica-Bold',
                                 alignment=TA_CENTER, textColor=colors.grey)
@@ -2072,6 +2049,10 @@ def _generate_document_acknowledgement_pdf(app_id):
     wm_sty     = ParagraphStyle('wm', fontSize=24, fontName='Helvetica-Bold',
                                 textColor=colors.Color(0.88, 0.88, 0.88),
                                 alignment=TA_CENTER)
+    
+    # Header style for table - made larger and bolder to fix blurry issue
+    header_sty = ParagraphStyle('header', fontSize=9, fontName='Helvetica-Bold',
+                                alignment=TA_CENTER, textColor=colors.white)
 
     def _half(copy_label):
         elems = []
@@ -2105,34 +2086,34 @@ def _generate_document_acknowledgement_pdf(app_id):
         elems.append(Paragraph(copy_label, copy_sty))
         elems.append(Spacer(1, 0.2*cm))
 
+        # Updated info table - removed Admit Category, Allotted At, Seat No
+        # Added Application Number
         info = [
             ['Student Name', appl.full_name,   'Rank',           str(appl.rank or '—')],
-            ['Admit Category', admit_cat_name, 'Caste Category', appl.category_name or '—'],
-            ['Allotted At',  allotted_str,      'Seat No',        str(allotment.admit_seat_number
-                                                                     if allotment else '—')],
+            ['Application No.', application_number, 'Caste Category', appl.category_name or '—'],
         ]
         info_tbl = Table(
             [[Paragraph(str(r[0]), label_sty), Paragraph(str(r[1]), value_sty),
               Paragraph(str(r[2]), label_sty), Paragraph(str(r[3]), value_sty)]
              for r in info],
-            colWidths=[3.2*cm, 5.8*cm, 3.2*cm, 4.8*cm]
+            colWidths=[3.5*cm, 5.5*cm, 3.5*cm, 4.5*cm]
         )
         info_tbl.setStyle(TableStyle([
             ('GRID',       (0,0), (-1,-1), 0.4, colors.lightgrey),
             ('BACKGROUND', (0,0), (0,-1),  colors.Color(0.93, 0.96, 1.0)),
             ('BACKGROUND', (2,0), (2,-1),  colors.Color(0.93, 0.96, 1.0)),
-            ('PADDING',    (0,0), (-1,-1), 4),
+            ('PADDING',    (0,0), (-1,-1), 5),
         ]))
         elems.append(info_tbl)
         elems.append(Spacer(1, 0.2*cm))
 
-        # Documents table
+        # Documents table - fixed header to be clearly visible
         doc_rows = [[
-            Paragraph('#', label_sty),
-            Paragraph('Document Name', label_sty),
-            Paragraph('Status', label_sty),
-            Paragraph('Approved', label_sty),
-            Paragraph('Approved By', label_sty),
+            Paragraph('#', header_sty),
+            Paragraph('Document Name', header_sty),
+            Paragraph('Status', header_sty),
+            Paragraph('Approved', header_sty),
+            Paragraph('Approved By', header_sty),
         ]]
         for idx, dc in enumerate(doc_categories, 1):
             d            = doc_status_map.get(dc.id)
@@ -2148,12 +2129,16 @@ def _generate_document_acknowledgement_pdf(app_id):
                 Paragraph(approved_by, value_sty),
             ])
 
-        doc_tbl = Table(doc_rows, colWidths=[0.6*cm, 5.8*cm, 2.8*cm, 2.2*cm, 3.8*cm])
+        doc_tbl = Table(doc_rows, colWidths=[0.7*cm, 5.8*cm, 2.8*cm, 2.2*cm, 3.5*cm])
         doc_tbl.setStyle(TableStyle([
             ('BACKGROUND',   (0,0), (-1,0),  colors.Color(0.15, 0.25, 0.5)),
             ('TEXTCOLOR',    (0,0), (-1,0),  colors.white),
+            ('FONTNAME',     (0,0), (-1,0),  'Helvetica-Bold'),
+            ('FONTSIZE',     (0,0), (-1,0),  9),
+            ('ALIGN',        (0,0), (-1,0),  'CENTER'),
+            ('VALIGN',       (0,0), (-1,0),  'MIDDLE'),
             ('GRID',         (0,0), (-1,-1), 0.4, colors.lightgrey),
-            ('PADDING',      (0,0), (-1,-1), 4),
+            ('PADDING',      (0,0), (-1,-1), 5),
             ('ROWBACKGROUNDS',(0,1), (-1,-1),
              [colors.white, colors.Color(0.97, 0.97, 1.0)]),
         ]))
