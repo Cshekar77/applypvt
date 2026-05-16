@@ -521,28 +521,23 @@ body {
 }
 
 /* FORCE LIGHT MODE HERO VISIBILITY - FIX */
+/* FORCE LIGHT MODE FIX - PUT THIS AT THE VERY TOP OF STYLE TAG */
 [data-theme="light"] .hero-title {
-  color: #1a0f05 !important;
+  color: #000000 !important;
 }
 
 [data-theme="light"] .hero-title em {
-  color: #b8860b !important;
-  -webkit-text-fill-color: #b8860b !important;
-  background: none !important;
-  text-shadow: none !important;
+  color: #d4a017 !important;
+  -webkit-text-fill-color: #d4a017 !important;
+  background: transparent !important;
 }
 
-[data-theme="light"] .hero-kicker,
-[data-theme="light"] .hero-kicker * {
-  color: #4a3520 !important;
-}
-
-[data-theme="light"] .kicker-line {
-  background: #b8860b !important;
+[data-theme="light"] .hero-kicker {
+  color: #333333 !important;
 }
 
 [data-theme="light"] .hero-sub {
-  color: #4a3520 !important;
+  color: #333333 !important;
 }
 </style>
 
@@ -581,16 +576,16 @@ body {
 
 <div class="page">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-kicker">
-      <span class="kicker-line"></span>
-      Live Counselling Session
-      <span class="kicker-line"></span>
-    </div>
-    <h1 class="hero-title">Seat<br><em>Allotment</em></h1>
-    <p class="hero-sub">Public · No login required · Auto-refreshes every 30s</p>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-kicker">
+    <span class="kicker-line"></span>
+    Live Counselling Session
+    <span class="kicker-line"></span>
   </div>
+  <h1 class="hero-title" style="color: #000000 !important;">Seat<br><em style="color: #d4a017 !important; -webkit-text-fill-color: #d4a017 !important;">Allotment</em></h1>
+  <p class="hero-sub" style="color: #333333 !important;">Public · No login required · Auto-refreshes every 30s</p>
+</div>
 
   <!-- STOPPED STATE -->
   {% if cs.status == 'stopped' %}
