@@ -458,14 +458,36 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
 // Auto-open PDF after Approve & Print
+// Auto-open PDF after Approve & Print
 (function() {
   const params = new URLSearchParams(window.location.search);
   const printIdStr = params.get('print_app_id');
   if (printIdStr) {
     const printId = parseInt(printIdStr);
     if (studentData[printId] && studentData[printId].ackUrl) {
-      window.open(studentData[printId].ackUrl, '_blank');
       window.history.replaceState({}, '', window.location.pathname);
+      const banner = document.createElement('div');
+      banner.style.cssText = `
+        position:fixed; top:1rem; left:50%; transform:translateX(-50%);
+        background:#7c3aed; color:white; padding:.75rem 1.5rem;
+        border-radius:12px; z-index:9999; font-weight:600;
+        box-shadow:0 4px 20px rgba(0,0,0,.25);
+        display:flex; align-items:center; gap:.75rem; font-size:.9rem;
+        white-space:nowrap;
+      `;
+      banner.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        Documents approved!
+        <a href="${studentData[printId].ackUrl}" target="_blank"
+           style="color:white;text-decoration:underline;cursor:pointer;font-weight:700;">
+          Click to Print Acknowledgement
+        </a>
+        <button onclick="this.parentElement.remove()"
+          style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;line-height:1;">
+          &times;
+        </button>
+      `;
+      document.body.appendChild(banner);
       openModal(printId);
     }
   }

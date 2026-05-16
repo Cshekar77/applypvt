@@ -2556,10 +2556,12 @@ def admin_save_document():
 @main.route('/admin/document-overview')
 @admin_required
 def admin_document_overview():
-    allotments = (SeatAllotment.query
-                  .join(StudentApplication, SeatAllotment.application_id == StudentApplication.id)
-                  .order_by(StudentApplication.rank)
-                  .all())
+    students = (StudentApplication.query
+                .filter_by(is_verified=True)
+                .filter(StudentApplication.rank.isnot(None))
+                .order_by(StudentApplication.rank.asc())
+                .all())
+
     doc_categories = DocumentCategory.query.filter_by(is_active=True).order_by(
         DocumentCategory.sort_order, DocumentCategory.id).all()
 
@@ -2568,24 +2570,26 @@ def admin_document_overview():
     for d in all_docs:
         doc_map.setdefault(d.application_id, {})[d.doc_category_id] = d
 
+    allotment_map = {a.application_id: a for a in SeatAllotment.query.all()}
+
     summaries = {}
-    for a in allotments:
-        appl_docs = doc_map.get(a.application_id, {})
+    for appl in students:
+        appl_docs = doc_map.get(appl.id, {})
         total     = len(doc_categories)
         submitted = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].status != 'not_given')
         approved  = sum(1 for dc in doc_categories
                         if appl_docs.get(dc.id) and appl_docs[dc.id].is_approved)
-        summaries[a.application_id] = {
+        summaries[appl.id] = {
             'total': total, 'submitted': submitted, 'approved': approved
         }
 
     return render_template('admin_document_overview.html',
-                           allotments=allotments,
+                           students=students,
+                           allotment_map=allotment_map,
                            doc_categories=doc_categories,
                            doc_map=doc_map,
                            summaries=summaries)
-
 
 # ─────────────────────────────────────────
 #  Faculty — Document Verification

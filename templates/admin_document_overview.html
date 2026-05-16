@@ -169,7 +169,7 @@ body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
     <div>
       <a href="{{ url_for('main.admin_dashboard') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
       <h2 style="margin-top:.75rem">Document Overview</h2>
-      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">Full document submission &amp; approval summary for all admitted students</p>
+      <p style="color:#5a6e82;font-size:.875rem;margin:.25rem 0 0">Full document submission &amp; approval summary for all ranked students</p>
     </div>
     <a href="{{ url_for('main.admin_document_verification') }}"
        style="display:inline-flex;align-items:center;gap:.5rem;background:#0a1f44;color:white;padding:.55rem 1.2rem;border-radius:10px;font-size:.875rem;font-weight:600;text-decoration:none;white-space:nowrap">
@@ -180,14 +180,14 @@ body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
   <!-- Summary -->
   <div class="summary-strip">
     <div class="sum-card">
-      <div class="sum-num">{{ allotments|length }}</div>
-      <div class="sum-lbl">Allotted Students</div>
+<div class="sum-num">{{ students|length }}</div>
+      <div class="sum-lbl">Ranked Students</div>
     </div>
     <div class="sum-card sum-green">
       <div class="sum-num">
         {% set fully_approved_count = namespace(val=0) %}
-        {% for a in allotments %}
-          {% set s = summaries.get(a.application_id, {}) %}
+        {% for appl in students %}
+          {% set s = summaries.get(appl.id, {}) %}
           {% if s.get('approved', 0) == s.get('total', 0) and s.get('total', 0) > 0 %}
             {% set fully_approved_count.val = fully_approved_count.val + 1 %}
           {% endif %}
@@ -206,12 +206,12 @@ body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
     <input type="text" id="searchInput" placeholder="🔍  Search by name or rank..." oninput="filterStudents()">
   </div>
 
-  {% if allotments %}
+  {% if students %}
   <div class="student-list" id="studentList">
-    {% for a in allotments %}
-    {% set appl = a.application %}
-    {% set s = summaries[a.application_id] %}
-    {% set appl_docs = doc_map.get(a.application_id, {}) %}
+    {% for appl in students %}
+    {% set allotment = allotment_map.get(appl.id) %}
+    {% set s = summaries[appl.id] %}
+    {% set appl_docs = doc_map.get(appl.id, {}) %}
     <div class="student-row"
          data-name="{{ appl.full_name|lower }}"
          data-rank="{{ appl.rank }}"
@@ -220,7 +220,9 @@ body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
         <div class="sr-rank">{{ appl.rank or '—' }}</div>
         <div style="min-width:0">
           <div class="sr-name">{{ appl.full_name }}</div>
-          <div class="sr-meta">{{ appl.email }} &bull; {{ appl.category_name or '—' }} &bull; {{ a.quota|title }}</div>
+          <div class="sr-meta">{{ appl.email }} &bull; {{ appl.category_name or '—' }}
+            {% if allotment %}&bull; {{ allotment.quota|title }} Quota{% else %}&bull; <em style="color:#f59e0b">Not Allotted</em>{% endif %}
+          </div>
         </div>
       </div>
       <div class="sr-right">
@@ -251,7 +253,7 @@ body.dark .btn-cancel       { background: #2d3e54; color: #eef2ff; }
   {% else %}
   <div class="empty-state">
     <i class="fas fa-users"></i>
-    <p>No allotted students yet.</p>
+    <p>No ranked students yet.</p>
   </div>
   {% endif %}
 </div>
@@ -297,12 +299,12 @@ function toIST(utcDateStr) {
 }
 
 const overviewData = {
-  {% for a in allotments %}
-  {% set appl = a.application %}
-  {% set appl_docs = doc_map.get(a.application_id, {}) %}
+  {% for appl in students %}
+  {% set allotment = allotment_map.get(appl.id) %}
+  {% set appl_docs = doc_map.get(appl.id, {}) %}
   {{ appl.id }}: {
     name: "{{ appl.full_name|e }}",
-    meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }} • {{ a.quota|title }}",
+    meta: "Rank #{{ appl.rank or '—' }} • {{ appl.category_name or '—' }}{% if allotment %} • {{ allotment.quota|title }} Quota{% endif %}",
     docs: [
       {% for dc in doc_categories %}
       {% set rec = appl_docs.get(dc.id) %}
