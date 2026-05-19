@@ -244,18 +244,16 @@ body {
 
 /* Light mode specific hero fix */
 [data-theme="light"] .hero-title {
-  color: #1a0f05;
+  color: var(--text-primary);
 }
 [data-theme="light"] .hero-title em {
-  color: #b8860b;
-  -webkit-text-fill-color: #b8860b;
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
   text-shadow: none;
 }
-[data-theme="light"] .hero-kicker {
-  color: #4a3520;
-}
+[data-theme="light"] .hero-kicker,
 [data-theme="light"] .hero-sub {
-  color: #4a3520;
+  color: var(--text-secondary);
 }
 
 /* Dark mode specific hero glow */
@@ -520,25 +518,7 @@ body {
   .rank-big{font-size:4.5rem;}
 }
 
-/* FORCE LIGHT MODE HERO VISIBILITY - FIX */
-/* FORCE LIGHT MODE FIX - PUT THIS AT THE VERY TOP OF STYLE TAG */
-/* Force hero text dark in light mode */
-[data-theme="light"] .hero-title {
-  color: #2c1a0a !important;
-}
 
-[data-theme="light"] .hero-title em {
-  color: #c27e0a !important;
-  -webkit-text-fill-color: #c27e0a !important;
-}
-
-[data-theme="light"] .hero-kicker {
-  color: #6b4c2a !important;
-}
-
-[data-theme="light"] .hero-sub {
-  color: #6b4c2a !important;
-}
 </style>
 
 <!-- BG DECORATION -->
@@ -579,12 +559,12 @@ body {
 <!-- HERO -->
 <div class="hero">
   <div class="hero-kicker">
-    <span class="kicker-line" style="background: #d4a017 !important;"></span>
-    <span style="color: #4a3520 !important;">Live Counselling Session</span>
-    <span class="kicker-line" style="background: #d4a017 !important;"></span>
+    <span class="kicker-line"></span>
+    <span>Live Counselling Session</span>
+    <span class="kicker-line"></span>
   </div>
-  <h1 class="hero-title" style="color: #000000 !important; text-shadow: none !important;">Seat<br><em style="color: #d4a017 !important; background: none !important; -webkit-text-fill-color: #d4a017 !important;">Allotment</em></h1>
-  <p class="hero-sub" style="color: #4a3520 !important;">Public · No login required · Auto-refreshes every 30s</p>
+  <h1 class="hero-title">Seat<br><em>Allotment</em></h1>
+  <p class="hero-sub">Public · No login required · Auto-refreshes every 30s</p>
 </div>
 
   <!-- STOPPED STATE -->
