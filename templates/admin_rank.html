@@ -213,7 +213,7 @@
         </thead>
         <tbody>
           {% for s in students %}
-          <tr data-percent12="{{ s.percent_12 or 0 }}" data-id="{{ s.id }}">
+          <tr data-percent12="{{ s.percent_12 or 0 }}" data-percent10="{{ s.percent_10 or 0 }}" data-id="{{ s.id }}">
             <td>
               {% if s.rank %}
                 <span class="rank-badge">#{{ s.rank }}</span>
@@ -297,23 +297,28 @@
   }
 
   function hodAutoRank() {
-    if (!confirm('Auto-generate ranks based on 12th percentage (highest = Rank 1)?\nThis will overwrite existing rank inputs.')) return;
+  if (!confirm('Auto-generate ranks based on 12th % (tiebreaker: 10th %)?\nThis will overwrite existing rank inputs.')) return;
 
-    var tbody = document.querySelector('#rank-table tbody');
-    var rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
+  var tbody = document.querySelector('#rank-table tbody');
+  var rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
 
-    rows.sort(function(a, b) {
-      return (parseFloat(b.dataset.percent12) || 0) - (parseFloat(a.dataset.percent12) || 0);
-    });
+  rows.sort(function(a, b) {
+    var p12a = parseFloat(a.dataset.percent12) || 0;
+    var p12b = parseFloat(b.dataset.percent12) || 0;
+    if (p12b !== p12a) return p12b - p12a;          // primary: 12th % desc
+    var p10a = parseFloat(a.dataset.percent10) || 0;
+    var p10b = parseFloat(b.dataset.percent10) || 0;
+    return p10b - p10a;                              // tiebreaker: 10th % desc
+  });
 
-    tbody.innerHTML = '';
-    rows.forEach(function(row, index) {
-      var input = row.querySelector('input[name^="rank_"]');
-      if (input) input.value = index + 1;
-      tbody.appendChild(row);
-    });
+  tbody.innerHTML = '';
+  rows.forEach(function(row, index) {
+    var input = row.querySelector('input[name^="rank_"]');
+    if (input) input.value = index + 1;
+    tbody.appendChild(row);
+  });
 
-    showToast('Ranks auto-generated! Click "Save Ranks" to save.', 'success');
-  }
+  showToast('Ranks auto-generated! Click "Save Ranks" to save.', 'success');
+}
 </script>
 {% endblock %}

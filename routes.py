@@ -2938,7 +2938,11 @@ def admin_rank():
                      .order_by(StudentApplication.rank.asc()).all()
     else:
         students = StudentApplication.query.filter_by(is_verified=True)\
-                     .order_by(StudentApplication.submitted_at).all()
+                     .order_by(
+                         StudentApplication.percent_12.desc().nullslast(),
+                         StudentApplication.percent_10.desc().nullslast(),
+                         StudentApplication.submitted_at.asc()
+                     ).all()
     return render_template('admin_rank.html', students=students)
 
 
@@ -2958,6 +2962,20 @@ def save_ranks():
     flash('Ranks saved.', 'success')
     return redirect(url_for('main.admin_rank'))
 
+@main.route('/admin/rank/auto-assign', methods=['POST'])
+@admin_required
+def auto_assign_ranks():
+    students = StudentApplication.query.filter_by(is_verified=True)\
+                 .order_by(
+                     StudentApplication.percent_12.desc().nullslast(),
+                     StudentApplication.percent_10.desc().nullslast(),
+                     StudentApplication.submitted_at.asc()
+                 ).all()
+    for i, appl in enumerate(students, start=1):
+        appl.rank = i
+    db.session.commit()
+    flash(f'Ranks auto-assigned to {len(students)} student(s) based on 12th % → 10th % tiebreaker.', 'success')
+    return redirect(url_for('main.admin_rank'))
 
 @main.route('/admin/form-control', methods=['GET', 'POST'])
 @admin_required
