@@ -12,9 +12,9 @@
 {% endfor %}
 
 <div class="section-divider"><i class="fas fa-user"></i> Student Details</div>
-<div class="detail-grid">
+<div class="detail-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
   <div class="detail-item"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
-  <div class="detail-item"><span>Email</span><strong>{{ appl.email }}</strong></div>
+  <div class="detail-item"><span>Email</span><strong style="word-break:break-all;font-size:.8rem">{{ appl.email }}</strong></div>
   <div class="detail-item"><span>Phone</span><strong>{{ appl.phone or '—' }}</strong></div>
   <div class="detail-item">
     <span>Date of Birth</span>

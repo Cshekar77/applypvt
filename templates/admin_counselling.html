@@ -141,9 +141,9 @@
   /* ── STUDENT MODAL STYLES ── */
   .section-divider { font-size: .7rem; font-weight: 600; color: #5a6e82; text-transform: uppercase; letter-spacing: .05em; margin: 1.1rem 0 .65rem; padding-bottom: .35rem; border-bottom: 1px solid #f5f7fa; }
   .section-divider:first-child { margin-top: 0; }
-  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .65rem; }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .65rem .85rem; }
   .detail-item span { font-size: .68rem; text-transform: uppercase; color: #5a6e82; letter-spacing: .04em; display: block; margin-bottom: 2px; }
-  .detail-item strong { font-size: .85rem; color: #0a1f44; }
+  .detail-item strong { font-size: .85rem; color: #0a1f44; word-break: break-all; }
   .req { color: #dc3545; margin-left: 2px; font-size: .8rem; }
 
   .allot-form { background: #f8faff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 1.1rem; margin-top: .5rem; display: flex; flex-direction: column; gap: .85rem; }
@@ -679,12 +679,35 @@ function updateFeePreview(appId, feeCatValue, addFeeValue) {
 
 function allotAndPrint(formId, appId) {
   var form = document.getElementById(formId);
+  if (!form) {
+    alert('Form not found. Please close and reopen the student modal.');
+    return;
+  }
+
+  var quota    = form.querySelector('select[name="quota"]');
+  var admitCat = form.querySelector('select[name="admit_category_id"]');
+  var feeCat   = form.querySelector('select[name="fee_category_id"]');
+
+  if (!quota || !quota.value) {
+    alert('Please select a Quota first.'); if (quota) quota.focus(); return;
+  }
+  if (!admitCat || !admitCat.value) {
+    alert('Please select an Admit Category.'); if (admitCat) admitCat.focus(); return;
+  }
+  if (!feeCat || !feeCat.value) {
+    alert('Please select a Fee Structure.'); if (feeCat) feeCat.focus(); return;
+  }
+
   document.getElementById('print-after-allot-' + appId).value = '1';
   var data = new FormData(form);
   fetch(window.location.href, { method: 'POST', body: data })
+    .then(function(r) { return r.ok ? r : Promise.reject(r); })
     .then(function() {
       window.open("{{ url_for('main.allotment_acknowledgement', app_id=0) }}".replace('/0', '/' + appId), '_blank');
       window.location.reload();
+    })
+    .catch(function() {
+      alert('Something went wrong. Please try again.');
     });
 }
 
