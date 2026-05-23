@@ -1802,13 +1802,18 @@ def admin_counselling():
     # NEW: document status map for counselling allotment popup color coding
     doc_categories_all = DocumentCategory.query.filter_by(is_active=True)\
         .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
-    all_docs = StudentDocument.query.all()
+
+    student_ids = [s.id for s in students]
     counselling_doc_map = {}
-    for d in all_docs:
-        counselling_doc_map.setdefault(d.application_id, {})[d.doc_category_id] = {
-            'status':      d.status or 'not_given',
-            'is_approved': d.is_approved,
-        }
+    if student_ids:
+        relevant_docs = StudentDocument.query.filter(
+            StudentDocument.application_id.in_(student_ids)
+        ).all()
+        for d in relevant_docs:
+            counselling_doc_map.setdefault(d.application_id, {})[d.doc_category_id] = {
+                'status':      d.status or 'not_given',
+                'is_approved': d.is_approved,
+            }
 
     return render_template('admin_counselling.html',
                            cs=cs, categories=categories,
@@ -1820,6 +1825,53 @@ def admin_counselling():
                            doc_categories=doc_categories_all,
                            counselling_doc_map=counselling_doc_map)
 
+
+# ─────────────────────────────────────────
+#  Admin — Counselling Student Modal (AJAX)
+# ─────────────────────────────────────────
+@main.route('/admin/counselling/student-modal/<int:app_id>')
+@admin_required
+def counselling_student_modal(app_id):
+    appl      = StudentApplication.query.get_or_404(app_id)
+    allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
+    sf        = appl.student_fee[0] if appl.student_fee else None
+
+    doc_categories = DocumentCategory.query.filter_by(is_active=True)\
+        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+    student_docs   = StudentDocument.query.filter_by(application_id=appl.id).all()
+    appl_docs      = {d.doc_category_id: {'status': d.status or 'not_given',
+                                           'is_approved': d.is_approved} for d in student_docs}
+
+    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+    seat_counts = dict(
+        db.session.query(SeatAllotment.admit_category_id,
+                         db.func.count(SeatAllotment.id))
+        .group_by(SeatAllotment.admit_category_id).all()
+    )
+    admit_categories = []
+    for ac in admit_categories_raw:
+        used      = seat_counts.get(ac.id, 0)
+        remaining = max(0, ac.total_seats - used)
+        admit_categories.append({
+            'id': ac.id, 'name': ac.name,
+            'total_seats': ac.total_seats,
+            'seats_used': used,
+            'seats_remaining': remaining,
+            'is_active': ac.is_active,
+        })
+
+    fee_categories = FeeCategory.query.filter_by(is_active=True)\
+        .order_by(FeeCategory.name).all()
+
+    return render_template('_counselling_student_modal.html',
+                           appl=appl,
+                           allotment=allotment,
+                           sf=sf,
+                           doc_categories=doc_categories,
+                           appl_docs=appl_docs,
+                           admit_categories=admit_categories,
+                           fee_categories=fee_categories)
 
 # ─────────────────────────────────────────
 #  Admin — Allotment Acknowledgement PDF

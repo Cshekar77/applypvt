@@ -1,0 +1,248 @@
+{% set allotment = allotment %}
+{% set sf = sf %}
+
+{# Document counts #}
+{% set doc_total = doc_categories | length %}
+{% set doc_submitted = namespace(count=0) %}
+{% set doc_approved  = namespace(count=0) %}
+{% for dc in doc_categories %}
+  {% set d = appl_docs.get(dc.id, {}) %}
+  {% if d.get('status', 'not_given') != 'not_given' %}{% set doc_submitted.count = doc_submitted.count + 1 %}{% endif %}
+  {% if d.get('is_approved', false) %}{% set doc_approved.count = doc_approved.count + 1 %}{% endif %}
+{% endfor %}
+
+<div class="section-divider"><i class="fas fa-user"></i> Student Details</div>
+<div class="detail-grid">
+  <div class="detail-item"><span>Full Name</span><strong>{{ appl.full_name }}</strong></div>
+  <div class="detail-item"><span>Email</span><strong>{{ appl.email }}</strong></div>
+  <div class="detail-item"><span>Phone</span><strong>{{ appl.phone or '—' }}</strong></div>
+  <div class="detail-item">
+    <span>Date of Birth</span>
+    <strong>
+      {% if appl.dob %}
+        {% set dob = appl.dob | string %}
+        {% if '-' in dob and dob | length >= 10 %}{{ dob[8:10] }}/{{ dob[5:7] }}/{{ dob[0:4] }}
+        {% else %}{{ dob }}{% endif %}
+      {% else %}—{% endif %}
+    </strong>
+  </div>
+  <div class="detail-item"><span>Gender</span><strong>{{ appl.gender or '—' }}</strong></div>
+  <div class="detail-item"><span>Nationality</span><strong>{{ appl.nationality or '—' }}</strong></div>
+  <div class="detail-item"><span>Category</span><strong>{{ appl.category_name or '—' }}</strong></div>
+  <div class="detail-item"><span>10th %</span><strong>{{ '%.2f'|format(appl.percent_10) if appl.percent_10 else '—' }}{% if appl.percent_10 %}%{% endif %}</strong></div>
+  <div class="detail-item"><span>12th %</span><strong>{{ '%.2f'|format(appl.percent_12) if appl.percent_12 else '—' }}{% if appl.percent_12 %}%{% endif %}</strong></div>
+  <div class="detail-item"><span>Rank</span><strong>#{{ appl.rank }}</strong></div>
+</div>
+
+{% if doc_categories %}
+<div class="section-divider"><i class="fas fa-folder-open"></i> Document Status</div>
+<div class="doc-summary-pills">
+  <span class="doc-pill doc-pill-total"><i class="fas fa-file"></i> {{ doc_total }} Total</span>
+  <span class="doc-pill doc-pill-submitted"><i class="fas fa-upload"></i> {{ doc_submitted.count }} Submitted</span>
+  <span class="doc-pill doc-pill-approved"><i class="fas fa-check-circle"></i> {{ doc_approved.count }} Approved</span>
+  <span class="doc-pill doc-pill-pending"><i class="fas fa-clock"></i> {{ doc_total - doc_approved.count }} Pending</span>
+</div>
+<div class="doc-status-grid">
+  {% for dc in doc_categories %}
+    {% set d = appl_docs.get(dc.id, {}) %}
+    {% set status = d.get('status', 'not_given') %}
+    {% set approved = d.get('is_approved', false) %}
+    {% if status == 'original' %}{% set status_label = 'Original' %}
+    {% elif status == 'xerox' %}{% set status_label = 'Xerox' %}
+    {% elif status == 'attested' %}{% set status_label = 'Attested' %}
+    {% elif status == 'submitted' %}{% set status_label = 'Submitted' %}
+    {% elif status == 'photocopy' %}{% set status_label = 'Photocopy' %}
+    {% else %}{% set status_label = 'Not Given' %}{% endif %}
+    <div class="doc-status-item doc-s-{{ status }} {% if approved %}is-approved{% endif %}"
+         title="{{ dc.name }}: {{ status_label }}{% if approved %} ✓ Approved{% endif %}">
+      <i class="fas {% if status == 'not_given' %}fa-times-circle{% elif approved %}fa-check-circle{% else %}fa-file-alt{% endif %}"
+         style="font-size:.75rem;flex-shrink:0"></i>
+      <span class="doc-name">{{ dc.name }}</span>
+      <span class="doc-badge">{{ status_label }}</span>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="section-divider"><i class="fas fa-chair"></i> Seat Allotment</div>
+
+{% if allotment %}
+<div class="already-allotted">
+  <div class="allotted-info">
+    <i class="fas fa-check-circle" style="color:#25c26e;font-size:1.2rem;flex-shrink:0"></i>
+    <p>
+      Allotted under <strong>{{ allotment.quota|title }} Quota</strong>
+      {% if allotment.admit_seat_label %}&mdash; <span class="admit-badge-display">{{ allotment.admit_seat_label }}</span>{% endif %}
+      {% if allotment.allotted_at %}<br><small style="opacity:.7">{{ allotment.allotted_at | ist }}</small>{% endif %}
+    </p>
+    <div class="allotted-actions">
+      <button type="button" class="btn-edit-allot" onclick="toggleEditAllotment('edit-allot-{{ appl.id }}')">
+        <i class="fas fa-pen"></i> Edit
+      </button>
+      <form method="POST" action="/admin/counselling" onsubmit="return confirm('Revoke allotment for {{ appl.full_name }}?')">
+        <input type="hidden" name="action" value="revoke_seat"/>
+        <input type="hidden" name="app_id" value="{{ appl.id }}"/>
+        <button type="submit" class="btn-revoke"><i class="fas fa-undo"></i> Revoke</button>
+      </form>
+    </div>
+  </div>
+  <div class="edit-allotment-form" id="edit-allot-{{ appl.id }}">
+    <div class="edit-form-title"><i class="fas fa-pen"></i> Edit Allotment Details</div>
+    <form method="POST" action="/admin/counselling" id="edit-allot-form-{{ appl.id }}">
+      <input type="hidden" name="action" value="allot_seat"/>
+      <input type="hidden" name="app_id" value="{{ appl.id }}"/>
+      <input type="hidden" name="is_edit" value="1"/>
+      <div class="allot-form-row">
+        <div class="allot-form-group">
+          <label><i class="fas fa-landmark"></i> Quota <span class="req">*</span></label>
+          <select name="quota" class="quota-select" required
+            onchange="filterAdmitCatsByQuota(this.value, 'edit-admit-cat-{{ appl.id }}')">
+            <option value="">— Choose Quota —</option>
+            <option value="government" {% if allotment.quota == 'government' %}selected{% endif %}>Government Quota</option>
+            <option value="management" {% if allotment.quota == 'management' %}selected{% endif %}>Management Quota</option>
+          </select>
+        </div>
+        <div class="allot-form-group">
+          <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category <span class="req">*</span></label>
+          <select name="admit_category_id" class="admit-cat-select" required
+            id="edit-admit-cat-{{ appl.id }}"
+            onchange="updateSeatHint(this, 'edit-hint-{{ appl.id }}')">
+            <option value="">— Select Category —</option>
+            {% for ac in admit_categories %}
+            {% set is_mgmt_ac = ac.name.upper().endswith('-PY') %}
+            <option value="{{ ac.id }}"
+              data-remaining="{{ ac.seats_remaining }}"
+              data-total="{{ ac.total_seats }}"
+              data-quota="{{ 'management' if is_mgmt_ac else 'government' }}"
+              {% if allotment.admit_category_id == ac.id %}selected{% endif %}>
+              {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left)
+            </option>
+            {% endfor %}
+          </select>
+          <div class="seat-hint" id="edit-hint-{{ appl.id }}"></div>
+        </div>
+      </div>
+      <div class="allot-form-row">
+        <div class="allot-form-group">
+          <label><i class="fas fa-rupee-sign" style="color:#c9a03d"></i> Fee Structure <span class="req">*</span></label>
+          <select name="fee_category_id" class="fee-cat-select" required
+            onchange="updateFeePreview('edit-{{ appl.id }}', this.value, null)">
+            <option value="">— Select Fee Structure —</option>
+            {% for fc in fee_categories %}
+            <option value="{{ fc.id }}" data-amount="{{ fc.amount }}"
+              {% if sf and sf.fee_category_id == fc.id %}selected{% endif %}>
+              {{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="allot-form-group">
+          <label><i class="fas fa-plus-circle" style="color:#b45309"></i> Additional Fee (₹)</label>
+          <div class="additional-fee-wrap">
+            <span class="currency-prefix">₹</span>
+            <input type="number" name="additional_fee" min="0" step="0.01"
+              value="{{ sf.additional_fee if sf else 0 }}"
+              class="additional-fee-input"
+              oninput="updateFeePreview('edit-{{ appl.id }}', null, this.value)"
+              id="add-fee-edit-{{ appl.id }}"/>
+          </div>
+        </div>
+      </div>
+      <div class="fee-total-preview" id="fee-preview-edit-{{ appl.id }}" style="display:none">
+        <div class="fee-preview-row"><span>Base Fee</span><span id="preview-base-edit-{{ appl.id }}">₹0.00</span></div>
+        <div class="fee-preview-row"><span>Additional</span><span id="preview-add-edit-{{ appl.id }}">₹0.00</span></div>
+        <div class="fee-preview-row total-row"><span><i class="fas fa-equals"></i> Total</span><span id="preview-total-edit-{{ appl.id }}">₹0.00</span></div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.25rem">
+        <button type="submit" class="btn-save-edit"><i class="fas fa-save"></i> Save Changes</button>
+        <button type="button" class="btn-cancel-edit" onclick="toggleEditAllotment('edit-allot-{{ appl.id }}')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div style="margin-top:1rem">
+  <a href="/admin/counselling/acknowledgement/{{ appl.id }}" target="_blank" class="btn-print-ack">
+    <i class="fas fa-print"></i> Print Acknowledgement
+  </a>
+</div>
+
+{% else %}
+<form method="POST" action="/admin/counselling" class="allot-form" id="allot-form-{{ appl.id }}">
+  <input type="hidden" name="action" value="allot_seat"/>
+  <input type="hidden" name="app_id" value="{{ appl.id }}"/>
+  <div class="allot-form-row">
+    <div class="allot-form-group">
+      <label><i class="fas fa-landmark"></i> Quota <span class="req">*</span></label>
+      <select name="quota" class="quota-select" required
+        onchange="filterAdmitCatsByQuota(this.value, 'admit-cat-{{ appl.id }}')">
+        <option value="">— Choose Quota —</option>
+        <option value="government">Government Quota</option>
+        <option value="management">Management Quota</option>
+      </select>
+    </div>
+    <div class="allot-form-group">
+      <label><i class="fas fa-tag" style="color:#7c3aed"></i> Admit Category <span class="req">*</span></label>
+      <select name="admit_category_id" class="admit-cat-select" required
+        id="admit-cat-{{ appl.id }}"
+        onchange="updateSeatHint(this, 'hint-{{ appl.id }}')">
+        <option value="">— Select Quota first —</option>
+        {% for ac in admit_categories %}
+        {% set is_mgmt_ac = ac.name.upper().endswith('-PY') %}
+        <option value="{{ ac.id }}"
+          data-remaining="{{ ac.seats_remaining }}"
+          data-total="{{ ac.total_seats }}"
+          data-quota="{{ 'management' if is_mgmt_ac else 'government' }}"
+          {% if ac.seats_remaining == 0 %}disabled{% endif %}>
+          {{ ac.name }} ({{ ac.seats_remaining }}/{{ ac.total_seats }} left){% if ac.seats_remaining == 0 %} — FULL{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+      <div class="seat-hint" id="hint-{{ appl.id }}"></div>
+    </div>
+  </div>
+  <div class="allot-form-row">
+    <div class="allot-form-group">
+      <label><i class="fas fa-rupee-sign" style="color:#c9a03d"></i> Fee Structure <span class="req">*</span></label>
+      <select name="fee_category_id" class="fee-cat-select" required
+        onchange="updateFeePreview('{{ appl.id }}', this.value, null)">
+        <option value="">— Select Fee Structure —</option>
+        {% for fc in fee_categories %}
+        <option value="{{ fc.id }}" data-amount="{{ fc.amount }}">
+          {{ fc.name }} — ₹{{ '%.2f'|format(fc.amount) }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="allot-form-group">
+      <label><i class="fas fa-plus-circle" style="color:#b45309"></i> Additional Fee (₹)</label>
+      <div class="additional-fee-wrap">
+        <span class="currency-prefix">₹</span>
+        <input type="number" name="additional_fee" min="0" step="0.01" value="0"
+          class="additional-fee-input"
+          oninput="updateFeePreview('{{ appl.id }}', null, this.value)"
+          id="add-fee-{{ appl.id }}"/>
+      </div>
+    </div>
+  </div>
+  <div class="fee-total-preview" id="fee-preview-{{ appl.id }}" style="display:none">
+    <div class="fee-preview-row"><span>Base Fee</span><span id="preview-base-{{ appl.id }}">₹0.00</span></div>
+    <div class="fee-preview-row"><span>Additional</span><span id="preview-add-{{ appl.id }}">₹0.00</span></div>
+    <div class="fee-preview-row total-row"><span><i class="fas fa-equals"></i> Total Fees</span><span id="preview-total-{{ appl.id }}">₹0.00</span></div>
+  </div>
+  <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+    <button type="submit" class="btn-allot"><i class="fas fa-check"></i> Allot Seat</button>
+    <button type="button" class="btn-allot" style="background:#1F3864"
+            onclick="allotAndPrint('allot-form-{{ appl.id }}', {{ appl.id }})">
+      <i class="fas fa-print"></i> Allot &amp; Print
+    </button>
+    <input type="hidden" name="print_after" id="print-after-allot-{{ appl.id }}" value="0"/>
+  </div>
+</form>
+{% endif %}
+
+<div style="margin-top:1rem">
+  <button type="button" class="btn-close-modal" onclick="closeModal('cs-modal-ajax')">
+    <i class="fas fa-times"></i> Close
+  </button>
+</div>
