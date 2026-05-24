@@ -315,6 +315,45 @@ def counselling_live_status_api():
         'allotment_history': allotment_history,
     })
 
+# ─────────────────────────────────────────
+#  Smartboard Live Display
+# ─────────────────────────────────────────
+@main.route('/livesmrt45')
+def smartboard_live():
+    cs = CounsellingSettings.get()
+
+    total_ranked   = StudentApplication.query.filter(
+        StudentApplication.rank.isnot(None)).count()
+    total_allotted = SeatAllotment.query.count()
+
+    admit_categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+
+    govt_seats = []
+    mgmt_seats = []
+    total_seats_all = 0
+
+    for ac in admit_categories:
+        total_seats_all += ac.total_seats
+        entry = {
+            'name':      ac.name,
+            'total':     ac.total_seats,
+            'vacant':    ac.seats_remaining,
+            'is_full':   ac.seats_remaining <= 0,
+            'is_low':    0 < ac.seats_remaining <= 3,
+        }
+        if ac.name.upper().endswith('-PY'):
+            mgmt_seats.append(entry)
+        else:
+            govt_seats.append(entry)
+
+    return render_template('smartboard_live.html',
+                           cs=cs,
+                           total_ranked=total_ranked,
+                           total_allotted=total_allotted,
+                           total_seats=total_seats_all,
+                           govt_seats=govt_seats,
+                           mgmt_seats=mgmt_seats)
 
 # ─────────────────────────────────────────
 #  POST API — Register Student
