@@ -711,7 +711,7 @@ body {
         <div class="cl-detail-grid">
           <div>
             <div class="cl-dl">Student Name</div>
-            <div class="cl-dv" id="studentNameVal">{{ student.full_name }}</div>
+            <div class="cl-dv" id="studentNameVal">{{ student.full_name | upper }}</div>
           </div>
           <div>
             <div class="cl-dl">Rank</div>
@@ -731,7 +731,7 @@ body {
           <div class="allot-icon">✓</div>
           <div>
             <div class="allot-tag">Seat Allotted</div>
-            <div class="allot-name" id="allotmentNameVal">{% if allotment %}{{ student.full_name }} — {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}{% endif %}</div>
+            <div class="allot-name" id="allotmentNameVal">{% if allotment %}{{ student.full_name | upper }} — {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}{% endif %}</div>
             <div class="allot-time" id="allotmentTimeVal">{% if allotment %}{{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST{% endif %}</div>
           </div>
         </div>
@@ -908,7 +908,7 @@ body {
             <tr>
               <td style="color:var(--ink-3);font-size:.74rem;">{{ loop.index }}</td>
               <td><span class="r-pill">#{{ h.rank }}</span></td>
-              <td style="font-weight:600;color:var(--ink);">{{ h.name }}</td>
+              <td style="font-weight:600;color:var(--ink);">{{ h.name | upper }}</td>
               <td style="font-size:.79rem;">{{ h.category }}</td>
               <td><span class="q-pill {{ h.quota }}">{{ h.quota|title }}</span></td>
               <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">{{ h.allotted_at }}</td>
@@ -1052,7 +1052,7 @@ async function refreshLiveNumbers(){
       const percentEl  = document.getElementById('studentPercentVal');
       const categoryEl = document.getElementById('studentCategoryVal');
       const name = data.student.full_name || '—';
-      if (nameEl)     nameEl.textContent     = name;
+      if (nameEl)     nameEl.textContent     = name.toUpperCase();
       if (rankEl)     rankEl.textContent     = `#${data.student.rank ?? '—'}`;
       if (percentEl)  percentEl.textContent  = fmtPercent(data.student.percent_12);
       if (categoryEl) categoryEl.textContent = data.student.category_name || '—';
@@ -1064,7 +1064,7 @@ async function refreshLiveNumbers(){
       const allotTime  = document.getElementById('allotmentTimeVal');
       if (data.allotment){
         const quota = data.allotment.quota === 'government' ? 'Government Quota' : 'Management Quota';
-        if (allotName) allotName.textContent = `${name} — ${quota}`;
+        if (allotName) allotName.textContent = `${name.toUpperCase()} — ${quota}`;
         if (allotTime) allotTime.textContent = `${data.allotment.allotted_at} IST`;
         if (successBox) successBox.style.display = '';
         if (pendingBox) pendingBox.style.display  = 'none';

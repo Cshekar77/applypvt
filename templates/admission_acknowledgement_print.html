@@ -191,7 +191,7 @@
     </div>
 
     <div class="copy-label">{{ copy_label }}</div>
-    <h1 class="title">BANGALORE UNIVERITY</h1>
+    <h1 class="title">BANGALORE UNIVERSITY</h1>
     <p class="subtitle">Provisional Admission card for Admission to BCA Course - 2026 -2027</p>
 
     <table class="details" role="presentation">
@@ -201,7 +201,7 @@
         <col style="width:32%">
       </colgroup>
       <tr>
-        <td colspan="3"><span class="label">Name of the Candidate:</span> <span class="value">{{ ack.name }}</span></td>
+        <td colspan="3"><span class="label">Name of the Candidate:</span> <span class="value">{{ ack.name | upper }}</span></td>
       </tr>
       <tr>
         <td><span class="label">Category:</span> <span class="value">{{ ack.category }}</span></td>
@@ -236,7 +236,7 @@
       <div class="cut-label">CUT</div>
     </div>
 
-    {{ copy_block('College Copy') }}
+    {{ copy_block('Student Copy') }}
   </main>
 </body>
 </html>
