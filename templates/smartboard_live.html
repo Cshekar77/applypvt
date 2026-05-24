@@ -27,10 +27,8 @@
     --border-l2: rgba(212, 160, 23, 0.5);
     --card-l: rgba(255, 255, 255, 0.9);
     --shadow-l: 0 4px 24px rgba(90, 50, 0, 0.12);
-    --teal: #0A7C6E;
-    --teal-bg: rgba(10, 124, 110, 0.10);
-    --red: #C0392B;
-    --red-bg: rgba(192, 57, 43, 0.10);
+    --green: #10B981;
+    --green-bg: rgba(16, 185, 129, 0.10);
     --blue: #1A5FB4;
     --blue-bg: rgba(26, 95, 180, 0.10);
   }
@@ -49,10 +47,8 @@
     --border-l2: rgba(240, 192, 64, 0.35);
     --card-l: rgba(255, 255, 255, 0.06);
     --shadow-l: 0 4px 24px rgba(0, 0, 0, 0.40);
-    --teal: #22D3C0;
-    --teal-bg: rgba(34, 211, 192, 0.10);
-    --red: #FF6B6B;
-    --red-bg: rgba(255, 107, 107, 0.10);
+    --green: #34D399;
+    --green-bg: rgba(52, 211, 153, 0.10);
     --blue: #60A5FA;
     --blue-bg: rgba(96, 165, 250, 0.10);
   }
@@ -93,7 +89,7 @@
   }
 
   .container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 24px 20px 20px;
   }
@@ -185,7 +181,7 @@
 
   .seat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, auto));
     gap: 16px;
   }
 
@@ -194,10 +190,11 @@
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-l);
     border-radius: 20px;
-    padding: 20px 16px;
+    padding: 18px 16px;
     text-align: center;
     transition: all 0.3s;
     box-shadow: var(--shadow-l);
+    width: 100%;
   }
   .seat-card:hover {
     transform: translateY(-3px);
@@ -205,34 +202,46 @@
   }
 
   .card-category {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 800;
     color: var(--ink);
-    margin-bottom: 16px;
-    padding-bottom: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
     border-bottom: 2px solid var(--gold);
     display: inline-block;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .card-category::-webkit-scrollbar {
+    display: none;
   }
 
   .total-seats {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   .total-label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--ink-3);
   }
   .total-number {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--ink);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000000;
     line-height: 1.2;
+  }
+  [data-theme="dark"] .total-number {
+    color: rgba(255, 255, 255, 0.7);
   }
 
   .vacant-info {
-    margin-top: 8px;
+    margin-top: 12px;
     padding-top: 8px;
     border-top: 1px solid var(--border-l);
   }
@@ -244,12 +253,12 @@
     color: var(--ink-3);
   }
   .vacant-number {
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--green);
+    line-height: 1;
+    letter-spacing: -2px;
   }
-  .vacant-number.available { color: var(--teal); }
-  .vacant-number.low { color: var(--gold-deep); }
-  .vacant-number.full { color: var(--red); }
 
   .loading {
     text-align: center;
@@ -330,10 +339,7 @@
   }
   .t-cat { font-weight: 800; color: var(--gold); }
   .t-lbl { color: var(--ink-3); font-size: 9px; font-weight: 600; margin: 0 4px; }
-  .t-vacant { font-weight: 900; font-size: 13px; }
-  .t-vacant.green { color: var(--teal); }
-  .t-vacant.amber { color: var(--gold-deep); }
-  .t-vacant.red { color: var(--red); }
+  .t-vacant { font-weight: 900; font-size: 13px; color: var(--green); }
   .t-total { color: var(--gold); font-weight: 800; }
   .ticker-head {
     display: inline-flex;
@@ -347,18 +353,27 @@
   .ticker-head.govt-h { color: var(--blue); }
   .ticker-head.mgmt-h { color: #ffd200; }
 
+  /* Horizontal scroll for category name on mobile if needed */
   @media (max-width: 640px) {
     .container { padding: 16px; }
     .header h1 { font-size: 1.5rem; }
+    .header p { display: none; }
     .stat-value { font-size: 1.5rem; }
     .stat-card { padding: 12px 20px; min-width: 100px; }
-    .seat-grid { gap: 12px; }
-    .seat-card { padding: 16px 12px; }
-    .card-category { font-size: 1rem; }
-    .total-number { font-size: 1.5rem; }
-    .vacant-number { font-size: 1.3rem; }
+    .seat-grid { gap: 12px; grid-template-columns: repeat(auto-fill, minmax(170px, auto)); }
+    .seat-card { padding: 14px 12px; }
+    .card-category { font-size: 0.85rem; white-space: normal; word-break: keep-all; }
+    .total-number { font-size: 1.1rem; }
+    .vacant-number { font-size: 2.8rem; letter-spacing: -1px; }
     .ticker-item { font-size: 10px; padding: 0 12px; }
     .ticker-label { font-size: 8px; padding: 0 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .seat-grid { grid-template-columns: repeat(auto-fill, minmax(150px, auto)); }
+    .card-category { font-size: 0.75rem; }
+    .vacant-number { font-size: 2.4rem; }
+    .total-number { font-size: 1rem; }
   }
 </style>
 </head>
@@ -369,7 +384,7 @@
 <div class="container">
   <div class="header">
     <h1>Live Seat Availability</h1>
-    <p>Real-time seat tracking • Auto-refreshes every 30 seconds</p>
+    <p>Real-time seat tracking</p>
   </div>
 
   <div class="stats-row">
@@ -433,7 +448,7 @@
   let trackHalfW = 0;
   let countdown = 30;
   let refreshTimer;
-  const SPEED = 30;
+  const SPEED = 28;
   const PAUSE_MS = 5000;
 
   const track = document.getElementById('tickerTrack');
@@ -450,12 +465,6 @@
     const saved = localStorage.getItem('seat_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
   })();
-
-  function getVacantClass(remaining) {
-    if (remaining <= 0) return 'full';
-    if (remaining <= 3) return 'low';
-    return 'available';
-  }
 
   function escapeHtml(str) {
     if (!str) return '';
@@ -477,19 +486,18 @@
     }
 
     container.innerHTML = seats.map(seat => {
-      const vacantClass = getVacantClass(seat.remaining);
       const displayRemaining = seat.remaining <= 0 ? 'FULL' : seat.remaining;
 
       return `
         <div class="seat-card">
-          <div class="card-category">${escapeHtml(seat.category)}</div>
+          <div class="card-category" title="${escapeHtml(seat.category)}">${escapeHtml(seat.category)}</div>
           <div class="total-seats">
             <div class="total-label">TOTAL SEATS</div>
             <div class="total-number">${seat.total}</div>
           </div>
           <div class="vacant-info">
             <div class="vacant-label">VACANT</div>
-            <div class="vacant-number ${vacantClass}">${displayRemaining}</div>
+            <div class="vacant-number">${displayRemaining}</div>
           </div>
         </div>
       `;
@@ -501,14 +509,10 @@
     let html = `<span class="ticker-head ${headCls}">${headText}</span>`;
     seats.forEach(s => {
       const isFull = s.remaining <= 0;
-      const isLow = !isFull && s.remaining <= 3;
-      let vacantClass = 'green';
-      if (isFull) vacantClass = 'red';
-      else if (isLow) vacantClass = 'amber';
       html += `<span class="ticker-item">
         <span class="t-cat">${escapeHtml(s.category)}</span>
         <span class="t-lbl">Vacant:</span>
-        <span class="t-vacant ${vacantClass}">${isFull ? 'FULL' : s.remaining}</span>
+        <span class="t-vacant">${isFull ? 'FULL' : s.remaining}</span>
         <span class="ticker-sep">◆</span>
         <span class="t-lbl">Total:</span>
         <span class="t-total">${s.total}</span>
@@ -612,27 +616,21 @@
     }
   }
 
-  // Countdown Timer
-  function startCountdown() {
-    const countdownEl = document.getElementById('countdown');
-    if (!countdownEl) return;
+  // Auto-refresh in background (no display text)
+  function startAutoRefresh() {
     if (refreshTimer) clearInterval(refreshTimer);
-
     refreshTimer = setInterval(() => {
       countdown--;
-      if (countdownEl) countdownEl.textContent = countdown;
-      
       if (countdown <= 0) {
         countdown = 30;
         fetchData();
-        if (countdownEl) countdownEl.textContent = countdown;
       }
     }, 1000);
   }
 
   // Initial load
   fetchData();
-  startCountdown();
+  startAutoRefresh();
   setTimeout(enterScroll, 1000);
 </script>
 </body>
