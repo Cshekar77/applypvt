@@ -2062,7 +2062,7 @@ def _generate_document_acknowledgement_pdf(app_id):
     
     # Header style for table - made larger and bolder to fix blurry issue
     header_sty = ParagraphStyle('header', fontSize=9, fontName='Helvetica-Bold',
-                                alignment=TA_CENTER, textColor=colors.white)
+                                alignment=TA_CENTER, textColor=colors.black)
 
     def _half(copy_label):
         elems = []
@@ -2109,10 +2109,8 @@ def _generate_document_acknowledgement_pdf(app_id):
             colWidths=[3.5*cm, 5.5*cm, 3.5*cm, 4.5*cm]
         )
         info_tbl.setStyle(TableStyle([
-            ('GRID',       (0,0), (-1,-1), 0.4, colors.lightgrey),
-            ('BACKGROUND', (0,0), (0,-1),  colors.Color(0.93, 0.96, 1.0)),
-            ('BACKGROUND', (2,0), (2,-1),  colors.Color(0.93, 0.96, 1.0)),
-            ('PADDING',    (0,0), (-1,-1), 5),
+            ('GRID',    (0,0), (-1,-1), 0.5, colors.black),
+            ('PADDING', (0,0), (-1,-1), 5),
         ]))
         elems.append(info_tbl)
         elems.append(Spacer(1, 0.2*cm))
@@ -2134,23 +2132,19 @@ def _generate_document_acknowledgement_pdf(app_id):
             doc_rows.append([
                 Paragraph(str(idx), value_sty),
                 Paragraph(dc.name, value_sty),
-                Paragraph(f'<font color="{col}">{disp}</font>', value_sty),
+                Paragraph(disp, value_sty),
                 Paragraph(approved, value_sty),
                 Paragraph(approved_by, value_sty),
             ])
 
         doc_tbl = Table(doc_rows, colWidths=[0.7*cm, 5.8*cm, 2.8*cm, 2.2*cm, 3.5*cm])
         doc_tbl.setStyle(TableStyle([
-            ('BACKGROUND',   (0,0), (-1,0),  colors.Color(0.15, 0.25, 0.5)),
-            ('TEXTCOLOR',    (0,0), (-1,0),  colors.white),
-            ('FONTNAME',     (0,0), (-1,0),  'Helvetica-Bold'),
-            ('FONTSIZE',     (0,0), (-1,0),  9),
-            ('ALIGN',        (0,0), (-1,0),  'CENTER'),
-            ('VALIGN',       (0,0), (-1,0),  'MIDDLE'),
-            ('GRID',         (0,0), (-1,-1), 0.4, colors.lightgrey),
-            ('PADDING',      (0,0), (-1,-1), 5),
-            ('ROWBACKGROUNDS',(0,1), (-1,-1),
-             [colors.white, colors.Color(0.97, 0.97, 1.0)]),
+            ('FONTNAME',  (0,0), (-1,0),  'Helvetica-Bold'),
+            ('FONTSIZE',  (0,0), (-1,0),  9),
+            ('ALIGN',     (0,0), (-1,0),  'CENTER'),
+            ('VALIGN',    (0,0), (-1,-1), 'MIDDLE'),
+            ('GRID',      (0,0), (-1,-1), 0.5, colors.black),
+            ('PADDING',   (0,0), (-1,-1), 5),
         ]))
         elems.append(doc_tbl)
         elems.append(Spacer(1, 0.3*cm))
