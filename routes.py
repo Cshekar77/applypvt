@@ -1815,7 +1815,44 @@ def admin_counselling():
     cat_seats      = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
     fee_categories = FeeCategory.query.filter_by(is_active=True).order_by(FeeCategory.name).all()
 
-    search_q  = request.args.get('q', ''
+    search_q  = request.args.get('q', '')
+
+    # Ranked students (optionally filtered by search)
+    stu_q = StudentApplication.query.filter(StudentApplication.rank.isnot(None))
+    if search_q:
+        stu_q = stu_q.filter(
+            db.or_(
+                StudentApplication.full_name.ilike(f'%{search_q}%'),
+                db.cast(StudentApplication.rank, db.String).ilike(f'%{search_q}%'),
+            )
+        )
+    students = stu_q.order_by(StudentApplication.rank.asc()).all()
+
+    allotments = {a.application_id: a
+                  for a in SeatAllotment.query.all()}
+
+    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+    seat_counts = dict(
+        db.session.query(SeatAllotment.admit_category_id,
+                         db.func.count(SeatAllotment.id))
+        .group_by(SeatAllotment.admit_category_id).all()
+    )
+    admit_categories = []
+    for ac in admit_categories_raw:
+        used      = seat_counts.get(ac.id, 0)
+        remaining = max(0, ac.total_seats - used)
+        admit_categories.append({
+            'id': ac.id, 'name': ac.name,
+            'total_seats': ac.total_seats,
+            'seats_used': used,
+            'seats_remaining': remaining,
+            'is_active': ac.is_active,
+        })
+
+    doc_categories_all = DocumentCategory.query.filter_by(is_active=True)\
+        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+
     student_ids = [s.id for s in students]
     counselling_doc_map = {}
     if student_ids:
@@ -1850,42 +1887,6 @@ def counselling_student_modal(app_id):
     sf        = appl.student_fee[0] if appl.student_fee else None
 
     doc_categories = DocumentCategory.query.filter_by(is_active=True)\
-        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
-    student_docs   = StudentDocument.query.filter_by(application_id=appl.id).all()
-    appl_docs      = {d.doc_category_id: {'status': d.status or 'not_given',
-                                           'is_approved': d.is_approved} for d in student_docs}
-
-    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
-        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
-    seat_counts = dict(
-        db.session.query(SeatAllotment.admit_category_id,
-                         db.func.count(SeatAllotment.id))
-        .group_by(SeatAllotment.admit_category_id).all()
-    )
-    admit_categories = []
-    for ac in admit_categories_raw:
-        used      = seat_counts.get(ac.id, 0)
-        remaining = max(0, ac.total_seats - used)
-        admit_categories.append({
-            'id': ac.id, 'name': ac.name,
-            'total_seats': ac.total_seats,
-            'seats_used': used,
-            'seats_remaining': remaining,
-            'is_active': ac.is_active,
-        })
-
-    fee_categories = FeeCategory.query.filter_by(is_active=True)\
-        .order_by(FeeCategory.name).all()
-
-    return render_template('_counselling_student_modal.html',
-                           appl=appl,
-                           allotment=allotment,
-                           sf=sf,
-                           doc_categories=doc_categories,
-                           appl_docs=appl_docs,
-                           admit_categories=admit_categories,
-                           fee_categories=fee_categories)
-rue)\
         .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
     student_docs   = StudentDocument.query.filter_by(application_id=appl.id).all()
     appl_docs      = {d.doc_category_id: {'status': d.status or 'not_given',
