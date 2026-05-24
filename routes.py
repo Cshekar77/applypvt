@@ -161,6 +161,17 @@ def index():
     settings = FormSettings.get()
     return render_template('index.html', settings=settings)
 
+@main.route('/api/seat-matrix')
+def api_seat_matrix():
+    categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+    return jsonify([{
+        'name':      ac.name,
+        'total':     ac.total_seats,
+        'used':      ac.seats_used,
+        'remaining': ac.seats_remaining,
+        'is_mgmt':   ac.name.upper().endswith('-PY'),
+    } for ac in categories])
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
@@ -1802,8 +1813,20 @@ def admin_counselling():
             allotment = SeatAllotment.query.filter_by(application_id=app_id).first()
             if allotment:
                 db.session.delete(allotment)
-                db.session.commit()
-                flash('✅ Seat allotment revoked.', 'info')
+
+            sf = StudentFee.query.filter_by(application_id=app_id).first()
+            if sf:
+                db.session.delete(sf)
+
+            fees = StudentFees.query.filter_by(application_id=app_id).first()
+            if fees:
+                PaymentReceipt.query.filter_by(fees_id=fees.id).delete()
+                db.session.delete(fees)
+
+            PaymentReceipt.query.filter_by(application_id=app_id).delete()
+
+            db.session.commit()
+            flash('✅ Seat allotment and fees revoked.', 'info')
 
         return redirect(url_for('main.admin_counselling'))
 
@@ -1820,14 +1843,27 @@ def admin_counselling():
     # Ranked students (optionally filtered by search)
     stu_q = StudentApplication.query.filter(StudentApplication.rank.isnot(None))
     if search_q:
+<<<<<<< HEAD
         stu_q = stu_q.filter(
             db.or_(
                 StudentApplication.full_name.ilike(f'%{search_q}%'),
                 db.cast(StudentApplication.rank, db.String).ilike(f'%{search_q}%'),
+=======
+        if search_q.isdigit():
+            query = query.filter(StudentApplication.rank == int(search_q))
+        else:
+            query = query.filter(
+                StudentApplication.candidate_name.ilike(f'%{search_q}%')
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
             )
         )
     students = stu_q.order_by(StudentApplication.rank.asc()).all()
 
+<<<<<<< HEAD
+=======
+    students = query.order_by(StudentApplication.rank.asc()).all()
+
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
     allotments = {a.application_id: a
                   for a in SeatAllotment.query.all()}
 

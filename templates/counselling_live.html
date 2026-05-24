@@ -4,10 +4,11 @@
 
 {% block content %}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+<<<<<<< HEAD
 /* ── THEME SYSTEM ── */
 [data-theme="light"] {
   --bg-primary:   #fef9e8;
@@ -83,48 +84,122 @@
   --seat-empty-b: rgba(255,255,255,0.12);
   --row-hover:    rgba(255,255,255,0.03);
   --pill-bg:      rgba(255,255,255,0.08);
+=======
+/* ══════════════════════════════════════
+   THEME VARIABLES
+══════════════════════════════════════ */
+:root {
+  --gold:       #D4A017;
+  --gold-light: #F5C842;
+  --gold-deep:  #A07010;
+  --gold-glow:  rgba(212,160,23,0.35);
+  --white:      #FFFFFF;
+  --off-white:  #FBF7EE;
+  --cream:      #F5EDD8;
+  --ink:        #1A1208;
+  --ink-2:      #3D2E10;
+  --ink-3:      #6B5530;
+  --border-l:   rgba(212,160,23,0.25);
+  --border-l2:  rgba(212,160,23,0.5);
+  --card-l:     rgba(255,255,255,0.9);
+  --shadow-l:   0 4px 24px rgba(90,50,0,0.12);
+  --shadow-l2:  0 16px 48px rgba(90,50,0,0.18);
+  --teal:       #0A7C6E;
+  --teal-bg:    rgba(10,124,110,0.10);
+  --teal-bdr:   rgba(10,124,110,0.28);
+  --red:        #C0392B;
+  --red-bg:     rgba(192,57,43,0.10);
+  --red-bdr:    rgba(192,57,43,0.28);
+  --blue:       #1A5FB4;
+  --blue-bg:    rgba(26,95,180,0.10);
+  --blue-bdr:   rgba(26,95,180,0.28);
+}
+
+[data-theme="dark"] {
+  --gold:       #F0C040;
+  --gold-light: #FFD966;
+  --gold-deep:  #C89A20;
+  --gold-glow:  rgba(240,192,64,0.30);
+  --white:      #F5F0E8;
+  --off-white:  #1C1810;
+  --cream:      #14110A;
+  --ink:        #F5F0E8;
+  --ink-2:      rgba(245,240,232,0.70);
+  --ink-3:      rgba(245,240,232,0.40);
+  --border-l:   rgba(240,192,64,0.15);
+  --border-l2:  rgba(240,192,64,0.35);
+  --card-l:     rgba(255,255,255,0.06);
+  --shadow-l:   0 4px 24px rgba(0,0,0,0.40);
+  --shadow-l2:  0 16px 48px rgba(0,0,0,0.55);
+  --teal:       #22D3C0;
+  --teal-bg:    rgba(34,211,192,0.10);
+  --teal-bdr:   rgba(34,211,192,0.28);
+  --red:        #FF6B6B;
+  --red-bg:     rgba(255,107,107,0.10);
+  --red-bdr:    rgba(255,107,107,0.28);
+  --blue:       #60A5FA;
+  --blue-bg:    rgba(96,165,250,0.10);
+  --blue-bdr:   rgba(96,165,250,0.28);
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 }
 
 html { scroll-behavior: smooth; }
 
 body {
+<<<<<<< HEAD
   font-family: 'Space Grotesk', sans-serif;
   background: var(--bg-primary) !important;
   color: var(--text-primary) !important;
   transition: background .4s, color .4s;
   line-height: 1.45;
+=======
+  font-family: 'DM Sans', sans-serif;
+  background: var(--off-white);
+  color: var(--ink);
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
 }
 
 .navbar, .site-main { padding: 0 !important; max-width: 100% !important; }
 .navbar { display: none !important; }
 
-/* ── BG DECORATION ── */
-.bg-wrap {
+/* ══════════════════════════════════════
+   BACKGROUND
+══════════════════════════════════════ */
+.cl-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
 }
-.bg-orb {
-  position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0;
-  animation: orb-float 12s ease-in-out infinite;
-}
-[data-theme="light"] .bg-orb { opacity: 1; }
-[data-theme="dark"]  .bg-orb { opacity: 1; }
 
-@keyframes orb-float {
-  0%,100% { transform: translate(0,0) scale(1); }
-  33%      { transform: translate(30px,-20px) scale(1.05); }
-  66%      { transform: translate(-20px,15px) scale(0.97); }
+[data-theme="light"] .cl-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(212,160,23,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(212,160,23,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(245,200,66,0.06) 0%, transparent 70%);
 }
 
+<<<<<<< HEAD
 .bg-grain {
   position: fixed; inset: 0; z-index: 1; pointer-events: none;
   background-image: var(--noise);
   opacity: 0.65; mix-blend-mode: overlay;
+=======
+[data-theme="dark"] .cl-bg::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 0%, rgba(240,192,64,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(240,192,64,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(20,15,5,0.8) 0%, transparent 70%);
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 }
 [data-theme="light"] .bg-grain { opacity: 0.45; }
 [data-theme="dark"] .bg-grain { opacity: 0.7; }
 
+<<<<<<< HEAD
 /* ── TOP NAV ── */
 .top-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -133,36 +208,71 @@ body {
   border-bottom: 1px solid var(--border);
   padding: 0 1.5rem;
   height: 64px;
+=======
+/* ══════════════════════════════════════
+   TOP NAV
+══════════════════════════════════════ */
+.cl-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 58px;
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
   display: flex; align-items: center; justify-content: space-between;
-  transition: background .4s, border-color .4s;
+  padding: 0 1.25rem;
+  background: var(--card-l);
+  border-bottom: 1px solid var(--border-l);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  transition: background 0.4s, border-color 0.4s;
 }
-.nav-brand {
-  display: flex; align-items: center; gap: 0.75rem;
+.cl-nav-brand {
+  display: flex; align-items: center; gap: 0.65rem;
 }
-.nav-emblem {
-  width: 34px; height: 34px; border-radius: 8px;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
+.cl-nav-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; box-shadow: 0 2px 12px var(--gold-glow);
-  flex-shrink: 0;
+  font-size: 1rem; flex-shrink: 0;
+  box-shadow: 0 2px 10px var(--gold-glow);
 }
-.nav-titles { display: flex; flex-direction: column; }
-.nav-title-main {
-  font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 700;
-  color: var(--text-primary); line-height: 1.1; letter-spacing: 0.01em;
+.cl-nav-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.92rem; font-weight: 700;
+  color: var(--ink); letter-spacing: 0.01em;
+  line-height: 1.1;
 }
-.nav-title-sub {
-  font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; font-weight: 400;
-  color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase;
-  margin-top: 1px;
+.cl-nav-sub {
+  font-family: 'DM Mono', monospace; font-size: 0.5rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3);
 }
-.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.cl-nav-right { display: flex; align-items: center; gap: 0.65rem; }
 
-/* ── THEME TOGGLE ── */
+/* Status pill */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.8rem; border-radius: 99px;
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.status-pill.running { background: var(--teal-bg); border: 1px solid var(--teal-bdr); color: var(--teal); }
+.status-pill.paused  { background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.3); color: var(--gold-deep); }
+.status-pill.stopped { background: var(--red-bg); border: 1px solid var(--red-bdr); color: var(--red); }
+[data-theme="dark"] .status-pill.paused { color: var(--gold); }
+
+.pulse { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.pulse.running { background: var(--teal); animation: pulse-anim 1.4s ease-in-out infinite; }
+.pulse.paused  { background: var(--gold); }
+.pulse.stopped { background: var(--red); }
+@keyframes pulse-anim {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+  50% { opacity: 0.6; box-shadow: 0 0 0 5px transparent; }
+}
+
+/* Theme toggle */
 .theme-btn {
-  width: 52px; height: 28px; border-radius: 99px; border: 1.5px solid var(--border2);
-  background: var(--bg-card2); cursor: pointer; position: relative;
-  transition: background .3s, border-color .3s; padding: 0; outline: none;
+  width: 48px; height: 26px; border-radius: 99px;
+  border: 1.5px solid var(--border-l2);
+  background: var(--card-l); cursor: pointer;
+  position: relative; padding: 0; outline: none;
+  transition: background 0.3s, border-color 0.3s;
   display: flex; align-items: center;
 }
 .theme-btn:focus-visible,
@@ -171,14 +281,15 @@ body {
   outline-offset: 2px;
 }
 .theme-knob {
-  position: absolute; top: 3px;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  position: absolute; top: 2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
   box-shadow: 0 2px 8px var(--gold-glow);
-  transition: left .3s cubic-bezier(.4,0,.2,1);
+  transition: left 0.3s cubic-bezier(.4,0,.2,1);
+  font-size: 0.55rem;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.6rem;
 }
+<<<<<<< HEAD
 [data-theme="light"] .theme-knob { left: 3px; }
 [data-theme="dark"]  .theme-knob { left: 25px; }
 .theme-icons { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; pointer-events: none; }
@@ -200,30 +311,44 @@ body {
 .pulse.paused  { background: var(--gold); }
 .pulse.stopped { background: var(--rose); }
 @keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor} 50%{opacity:.6;box-shadow:0 0 0 5px transparent} }
+=======
+[data-theme="light"] .theme-knob { left: 2px; }
+[data-theme="dark"]  .theme-knob { left: 24px; }
+.theme-icons {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4px; pointer-events: none;
+  font-size: 0.58rem; opacity: 0.5;
+}
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 
-/* ── MAIN LAYOUT ── */
-.page { position: relative; z-index: 10; padding-top: 60px; }
-.wrap { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; }
+/* ══════════════════════════════════════
+   PAGE WRAPPER
+══════════════════════════════════════ */
+.cl-page { position: relative; z-index: 10; padding-top: 58px; }
+.cl-wrap { max-width: 860px; margin: 0 auto; padding: 0 1.1rem; }
 
+<<<<<<< HEAD
 /* ── HERO ── */
 .hero {
   padding: 4.2rem 1.5rem 3rem;
+=======
+/* ══════════════════════════════════════
+   HERO BANNER
+══════════════════════════════════════ */
+.cl-hero {
+  padding: 3rem 1.1rem 2.5rem;
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
   text-align: center;
-  animation: rise .7s ease both;
+  animation: fade-up 0.6s ease both;
 }
-.hero-kicker {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+.cl-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: 1.2rem;
 }
+<<<<<<< HEAD
 .kicker-line {
   width: 32px;
   height: 2px;
@@ -258,14 +383,27 @@ body {
 [data-theme="light"] .hero-kicker,
 [data-theme="light"] .hero-sub {
   color: #5a3a10;
+=======
+[data-theme="dark"] .cl-hero-eyebrow { color: var(--gold); }
+.cl-hero-line { width: 28px; height: 2px; background: var(--gold); border-radius: 2px; }
+.cl-hero-h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 10vw, 5.5rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.1rem;
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 }
+[data-theme="light"] .cl-hero-h1 { color: var(--ink); }
+[data-theme="dark"]  .cl-hero-h1 { color: #FFFFFF; }
 
-.hero-title em {
+.cl-hero-h1 em {
   font-style: italic;
   color: var(--gold);
-  background: none;
   -webkit-text-fill-color: var(--gold);
 }
+<<<<<<< HEAD
 .hero-sub {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
@@ -623,27 +761,408 @@ body {
 
   .refresh-label{font-size:0.56rem;letter-spacing:0.08em;}
   .refresh-track{width:68vw;}
+=======
+[data-theme="dark"] .cl-hero-h1 em {
+  text-shadow: 0 0 30px var(--gold-glow);
+}
+.cl-hero-sub {
+  font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-3);
 }
 
+/* ══════════════════════════════════════
+   CARD BASE
+══════════════════════════════════════ */
+.cl-card {
+  background: var(--card-l);
+  border: 1px solid var(--border-l);
+  border-radius: 20px;
+  box-shadow: var(--shadow-l);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  transition: background 0.4s, border-color 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
 
+/* ══════════════════════════════════════
+   STATE CARDS (stopped / paused / waiting)
+══════════════════════════════════════ */
+.cl-state {
+  padding: 0 1.1rem 2rem;
+  animation: fade-up 0.5s ease both;
+}
+.cl-state-inner {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+}
+.cl-state-icon { font-size: 2.6rem; margin-bottom: 1.2rem; display: block; animation: float-icon 3.5s ease-in-out infinite; }
+@keyframes float-icon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.cl-state-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 0.6rem;
+}
+.cl-state-body { font-size: 0.9rem; color: var(--ink-3); line-height: 1.75; }
+
+/* ══════════════════════════════════════
+   CURRENTLY CALLING — BIG RANK CARD
+══════════════════════════════════════ */
+.cl-rank-wrap {
+  padding: 0 1.1rem 1.25rem;
+  animation: fade-up 0.5s 0.05s ease both;
+}
+.cl-rank-top {
+  padding: 2.2rem 1.75rem 1.75rem;
+  background: linear-gradient(135deg, rgba(212,160,23,0.13) 0%, rgba(212,160,23,0.05) 100%);
+  border-bottom: 1px solid var(--border-l);
+  position: relative; overflow: hidden;
+}
+[data-theme="dark"] .cl-rank-top {
+  background: linear-gradient(135deg, rgba(240,192,64,0.12) 0%, rgba(240,192,64,0.04) 100%);
+}
+.cl-rank-deco {
+  position: absolute; right: -50px; top: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  border: 1px solid var(--border-l2); opacity: 0.4;
+  pointer-events: none;
+}
+.cl-rank-deco2 {
+  position: absolute; right: -90px; top: -90px;
+  width: 300px; height: 300px; border-radius: 50%;
+  border: 1px solid var(--border-l); opacity: 0.2;
+  pointer-events: none;
+}
+.cl-rank-label {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: 0.4rem;
+}
+[data-theme="dark"] .cl-rank-label { color: var(--gold); opacity: 0.7; }
+.cl-rank-row { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+.cl-rank-num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(4.5rem, 16vw, 7.5rem);
+  font-weight: 900; line-height: 0.88;
+  letter-spacing: -0.04em;
+  color: var(--gold);
+}
+[data-theme="dark"] .cl-rank-num { text-shadow: 0 0 40px var(--gold-glow); }
+.cl-rank-num sup {
+  font-size: 0.22em; font-family: 'DM Sans', sans-serif;
+  font-weight: 400; color: var(--ink-3); vertical-align: super; letter-spacing: 0;
+}
+.live-badge {
+  align-self: flex-start; margin-top: 0.6rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--teal-bg); border: 1px solid var(--teal-bdr);
+  color: var(--teal); padding: 0.32rem 0.85rem; border-radius: 99px;
+  font-family: 'DM Mono', monospace; font-size: 0.56rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse-anim 1.2s infinite; }
+
+.cl-rank-body { padding: 1.75rem; }
+.cl-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 420px) { .cl-detail-grid { grid-template-columns: 1fr; gap: 1rem; } }
+.cl-dl { font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.28rem; }
+.cl-dv { font-size: 1rem; font-weight: 600; color: var(--ink); }
+.cl-dv.pct { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700; color: var(--gold); line-height: 1; }
+[data-theme="dark"] .cl-dv.pct { text-shadow: 0 0 18px var(--gold-glow); }
+
+/* Allotment box */
+.allot-box {
+  border-radius: 14px; padding: 1rem 1.2rem;
+  display: flex; align-items: flex-start; gap: 1rem;
+}
+.allot-box.success { background: var(--teal-bg); border: 1px solid var(--teal-bdr); }
+.allot-box.pending { background: rgba(212,160,23,0.07); border: 1px solid rgba(212,160,23,0.2); }
+.allot-icon {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+}
+.allot-box.success .allot-icon { background: var(--teal); color: #fff; }
+.allot-box.pending  .allot-icon { background: rgba(212,160,23,0.15); color: var(--gold-deep); border: 1px solid var(--border-l2); }
+[data-theme="dark"] .allot-box.pending .allot-icon { color: var(--gold); }
+.allot-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 0.22rem;
+}
+.allot-box.success .allot-tag { color: var(--teal); }
+.allot-box.pending  .allot-tag { color: var(--gold-deep); }
+[data-theme="dark"] .allot-box.pending .allot-tag { color: var(--gold); }
+.allot-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+.allot-time { font-size: 0.72rem; color: var(--ink-3); margin-top: 0.12rem; }
+
+/* Admin message */
+.admin-msg {
+  margin-top: 1rem; border-radius: 12px; padding: 0.85rem 1.1rem;
+  background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.3);
+  font-size: 0.85rem; color: var(--gold-deep); display: flex; gap: 0.6rem; align-items: flex-start; line-height: 1.6;
+}
+[data-theme="dark"] .admin-msg { color: var(--gold); background: rgba(240,192,64,0.08); border-color: rgba(240,192,64,0.2); }
+
+/* ══════════════════════════════════════
+   STATS ROW
+══════════════════════════════════════ */
+.cl-stats {
+  padding: 0 1.1rem 1.5rem;
+  animation: fade-up 0.5s 0.1s ease both;
+}
+.cl-stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+}
+@media (max-width: 380px) {
+  .cl-stats-grid { grid-template-columns: 1fr 1fr; }
+  .cl-stats-grid .cl-stat:last-child { grid-column: span 2; }
+}
+.cl-stat {
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-radius: 16px; padding: 1.2rem 0.75rem; text-align: center;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  cursor: default; box-shadow: var(--shadow-l);
+}
+.cl-stat:hover { transform: translateY(-4px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
+.cl-stat-num {
+  font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 700;
+  line-height: 1; margin-bottom: 0.28rem; letter-spacing: -0.03em; color: var(--ink);
+}
+.cl-stat-num.gold { color: var(--gold); }
+[data-theme="dark"] .cl-stat-num.gold { text-shadow: 0 0 16px var(--gold-glow); }
+.cl-stat-num.teal { color: var(--teal); }
+.cl-stat-lbl {
+  font-family: 'DM Mono', monospace; font-size: 0.53rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+
+/* ══════════════════════════════════════
+   SECTION HEADINGS
+══════════════════════════════════════ */
+.cl-sec-head {
+  display: flex; align-items: center; gap: 0.85rem;
+  margin: 2rem 0 1rem; padding: 0 1.1rem;
+}
+.cl-sec-title {
+  font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+  color: var(--ink-2); white-space: nowrap;
+}
+.cl-sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-l2), transparent); }
+
+.cl-quota-bar {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 1.5rem 1.1rem 0.9rem; padding: 0;
+}
+.cl-quota-badge {
+  font-family: 'DM Mono', monospace; font-size: 0.56rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.28rem 0.9rem; border-radius: 99px; white-space: nowrap;
+}
+.cl-quota-badge.govt { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
+.cl-quota-badge.mgmt { background: rgba(212,160,23,0.12); color: var(--gold-deep); border: 1px solid rgba(212,160,23,0.35); }
+[data-theme="dark"] .cl-quota-badge.mgmt { color: var(--gold); border-color: rgba(240,192,64,0.35); background: rgba(240,192,64,0.10); }
+.cl-quota-line { flex: 1; height: 1px; background: var(--border-l); }
+
+/* ══════════════════════════════════════
+   SEAT CARDS GRID
+══════════════════════════════════════ */
+.cl-seats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 0.75rem; padding: 0 1.1rem;
+}
+@media (max-width: 480px) { .cl-seats-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 340px) { .cl-seats-grid { grid-template-columns: 1fr; } }
+
+.cl-seat-card {
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-radius: 16px; padding: 1.1rem 1.1rem;
+  box-shadow: var(--shadow-l);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  animation: fade-up 0.4s ease both;
+}
+.cl-seat-card:hover { transform: translateY(-3px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
+.cl-sc-name {
+  font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-l);
+}
+.cl-sc-row { display: flex; align-items: center; justify-content: space-between; }
+.cl-sc-lbl { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.cl-sc-right { display: flex; align-items: center; gap: 0.5rem; }
+.cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
+.cl-sc-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.52rem; font-weight: 500;
+  padding: 0.12rem 0.52rem; border-radius: 6px; white-space: nowrap;
+}
+.cl-sc-tag.avail { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
+.cl-sc-tag.full  { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bdr); }
+.cl-sc-bar { height: 5px; background: var(--border-l); border-radius: 99px; overflow: hidden; margin-top: 0.6rem; }
+.cl-sc-fill { height: 100%; border-radius: 99px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+.cl-sc-fill.govt { background: linear-gradient(90deg, var(--blue), #60A5FA); }
+.cl-sc-fill.mgmt { background: linear-gradient(90deg, var(--gold-deep), var(--gold-light)); }
+.cl-sc-fill.full { background: linear-gradient(90deg, var(--red), #FF8A80); }
+
+/* ══════════════════════════════════════
+   VISUAL SEAT MAP
+══════════════════════════════════════ */
+.cl-smap {
+  margin: 1.5rem 1.1rem 0;
+  padding: 1.4rem;
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-radius: 20px; box-shadow: var(--shadow-l);
+  animation: fade-up 0.5s ease both;
+}
+.cl-smap-top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.1rem;
+}
+.cl-smap-title {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);
+}
+.cl-smap-legend { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+.cl-leg { display: flex; align-items: center; gap: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.53rem; color: var(--ink-3); }
+.cl-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.cl-leg-dot.g { background: linear-gradient(135deg, var(--blue), #60A5FA); }
+.cl-leg-dot.m { background: linear-gradient(135deg, var(--gold-deep), var(--gold-light)); }
+.cl-leg-dot.e { background: var(--border-l); border: 1px solid var(--border-l2); }
+.cl-seat-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+.cl-sseat {
+  width: 18px; height: 18px; border-radius: 4px;
+  cursor: default; transition: transform 0.2s;
+  animation: seat-pop 0.3s ease both;
+}
+@keyframes seat-pop { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
+.cl-sseat:hover { transform: scale(1.7) translateY(-2px); z-index: 20; position: relative; }
+.cl-sseat.g { background: linear-gradient(135deg, var(--blue), #60A5FA); box-shadow: 0 0 5px rgba(26,95,180,0.35); }
+.cl-sseat.m { background: linear-gradient(135deg, var(--gold-deep), var(--gold-light)); box-shadow: 0 0 5px var(--gold-glow); }
+.cl-sseat.e { background: var(--border-l); border: 1px solid var(--border-l2); }
+
+/* ══════════════════════════════════════
+   ALLOTMENT HISTORY
+══════════════════════════════════════ */
+.cl-hist-wrap { margin: 1.5rem 1.1rem 0; }
+.cl-hist-btn {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-radius: 16px; padding: 1rem 1.2rem;
+  cursor: pointer; outline: none;
+  box-shadow: var(--shadow-l);
+  transition: background 0.25s, border-color 0.25s, border-radius 0.2s;
+  animation: fade-up 0.5s ease both;
+}
+.cl-hist-btn:hover { border-color: var(--border-l2); }
+.cl-hist-btn.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+.cl-hist-left { display: flex; align-items: center; gap: 0.7rem; }
+.cl-hist-title { font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 700; color: var(--ink); }
+.cl-hist-count {
+  background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr);
+  font-family: 'DM Mono', monospace; font-size: 0.54rem; font-weight: 500;
+  padding: 0.12rem 0.52rem; border-radius: 99px;
+}
+.cl-chevron { font-size: 0.68rem; color: var(--ink-3); transition: transform 0.25s; }
+.cl-hist-btn.open .cl-chevron { transform: rotate(180deg); }
+.cl-hist-panel {
+  display: none;
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+  overflow: hidden; box-shadow: var(--shadow-l);
+}
+.cl-hist-panel.open { display: block; }
+.cl-hist-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cl-htable { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 460px; }
+.cl-htable thead th {
+  background: rgba(212,160,23,0.07); font-family: 'DM Mono', monospace;
+  font-size: 0.53rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-3); padding: 0.7rem 1rem; text-align: left;
+  border-bottom: 1px solid var(--border-l); white-space: nowrap;
+}
+[data-theme="dark"] .cl-htable thead th { background: rgba(240,192,64,0.05); }
+.cl-htable tbody td { padding: 0.68rem 1rem; border-bottom: 1px solid var(--border-l); color: var(--ink-2); vertical-align: middle; }
+.cl-htable tbody tr:last-child td { border-bottom: none; }
+.cl-htable tbody tr:hover td { background: rgba(212,160,23,0.05); }
+[data-theme="dark"] .cl-htable tbody tr:hover td { background: rgba(240,192,64,0.04); }
+.r-pill {
+  display: inline-block; font-family: 'Playfair Display', serif;
+  font-size: 0.88rem; font-weight: 700; color: var(--gold);
+  background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.25);
+  padding: 0.06rem 0.52rem; border-radius: 6px;
+}
+[data-theme="dark"] .r-pill { background: rgba(240,192,64,0.10); border-color: rgba(240,192,64,0.25); color: var(--gold); }
+.q-pill {
+  display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.52rem;
+  font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 0.12rem 0.52rem; border-radius: 99px; white-space: nowrap;
+}
+.q-pill.government { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
+.q-pill.management { background: rgba(212,160,23,0.12); color: var(--gold-deep); border: 1px solid rgba(212,160,23,0.3); }
+[data-theme="dark"] .q-pill.management { color: var(--gold); border-color: rgba(240,192,64,0.3); background: rgba(240,192,64,0.10); }
+.cl-hist-empty { text-align: center; padding: 2.5rem; color: var(--ink-3); font-size: 0.87rem; }
+
+/* ══════════════════════════════════════
+   REFRESH BAR
+══════════════════════════════════════ */
+.cl-refresh {
+  margin: 2rem 1.1rem 4rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  animation: fade-up 0.5s ease both;
+}
+.cl-refresh-label {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-3); display: flex; align-items: center; gap: 0.35rem;
+}
+.cl-refresh-count { color: var(--teal); font-weight: 600; }
+.cl-refresh-track { width: 180px; height: 3px; background: var(--border-l); border-radius: 99px; overflow: hidden; }
+.cl-refresh-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-light));
+  border-radius: 99px; transform-origin: left;
+  animation: drain 30s linear forwards;
+}
+@keyframes drain { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+
+/* ══════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
+}
+
+/* ══════════════════════════════════════
+   MOBILE OVERRIDES
+══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .cl-hero { padding: 2.2rem 1.1rem 2rem; }
+  .cl-rank-top { padding: 1.75rem 1.25rem 1.5rem; }
+  .cl-rank-body { padding: 1.4rem 1.25rem; }
+  .cl-stat-num { font-size: 1.8rem; }
+  .cl-smap, .cl-hist-wrap { margin-left: 1.1rem; margin-right: 1.1rem; }
+}
+@media (max-width: 360px) {
+  .cl-hero-h1 { font-size: 2.5rem; }
+  .cl-rank-num { font-size: 4rem; }
+  .cl-nav-name { font-size: 0.8rem; }
+  .cl-nav-sub { display: none; }
+}
 </style>
 
-<!-- BG DECORATION -->
-<div class="bg-wrap" id="bgWrap">
-  <!-- orbs injected by JS -->
-</div>
-<div class="bg-grain"></div>
+<!-- Background -->
+<div class="cl-bg"></div>
 
-<!-- TOP NAV -->
-<nav class="top-nav">
-  <div class="nav-brand">
-    <div class="nav-emblem">🎓</div>
-    <div class="nav-titles">
-      <div class="nav-title-main">Bangalore University</div>
-      <div class="nav-title-sub">BCA Admissions · 2026–27</div>
+<!-- Top Nav -->
+<nav class="cl-nav">
+  <div class="cl-nav-brand">
+    <div class="cl-nav-icon">🎓</div>
+    <div>
+      <div class="cl-nav-name">Bangalore University</div>
+      <div class="cl-nav-sub">BCA Admissions · 2026–27</div>
     </div>
   </div>
-  <div class="nav-right">
+  <div class="cl-nav-right">
     {% if cs.status == 'running' %}
       <span class="status-pill running" id="statusPill"><span class="pulse running"></span><span id="statusText">Live</span></span>
     {% elif cs.status == 'paused' %}
@@ -651,48 +1170,51 @@ body {
     {% else %}
       <span class="status-pill stopped" id="statusPill"><span class="pulse stopped"></span><span id="statusText">Not Started</span></span>
     {% endif %}
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle light/dark">
-      <span class="theme-icons">
-        <span class="theme-icon">☀️</span>
-        <span class="theme-icon">🌙</span>
-      </span>
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+      <span class="theme-icons"><span>☀️</span><span>🌙</span></span>
       <span class="theme-knob"></span>
     </button>
   </div>
 </nav>
 
-<div class="page">
+<div class="cl-page">
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-kicker">
-    <span class="kicker-line"></span>
-    <span>Live Counselling Session</span>
-    <span class="kicker-line"></span>
+  <!-- Hero -->
+  <div class="cl-hero">
+    <div class="cl-hero-eyebrow">
+      <span class="cl-hero-line"></span>
+      Live Counselling Session
+      <span class="cl-hero-line"></span>
+    </div>
+    <h1 class="cl-hero-h1">Seat<br><em>Allotment</em></h1>
+    <p class="cl-hero-sub">Public · No login required · Auto-refreshes every 30s</p>
   </div>
+<<<<<<< HEAD
   <h1 class="hero-title">Seat<br><em>Allotment</em></h1>
 </div>
+=======
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 
-  <!-- STOPPED STATE -->
+  <!-- STOPPED -->
   {% if cs.status == 'stopped' %}
-  <div class="state-wrap">
-    <div class="card">
-      <div class="state-card-inner">
-        <span class="state-icon">🎓</span>
-        <div class="state-title">Counselling Not Started</div>
-        <p class="state-body">The counselling process has not begun.<br>Please check back later or contact the admissions office.</p>
+  <div class="cl-state">
+    <div class="cl-card">
+      <div class="cl-state-inner">
+        <span class="cl-state-icon">🎓</span>
+        <div class="cl-state-title">Counselling Not Started</div>
+        <p class="cl-state-body">The counselling process has not begun.<br>Please check back later or contact the admissions office.</p>
       </div>
     </div>
   </div>
 
-  <!-- PAUSED STATE -->
+  <!-- PAUSED -->
   {% elif cs.status == 'paused' %}
-  <div class="state-wrap">
-    <div class="card">
-      <div class="state-card-inner">
-        <span class="state-icon">⏸</span>
-        <div class="state-title">Session Paused</div>
-        <p class="state-body">The counselling session is on a short break.<br>It will resume shortly — please wait.</p>
+  <div class="cl-state">
+    <div class="cl-card">
+      <div class="cl-state-inner">
+        <span class="cl-state-icon">⏸</span>
+        <div class="cl-state-title">Session Paused</div>
+        <p class="cl-state-body">The counselling session is on a short break.<br>It will resume shortly — please wait.</p>
         {% if cs.message %}
         <div class="admin-msg" style="margin-top:1.5rem;text-align:left;"><span>📢</span><span>{{ cs.message }}</span></div>
         {% endif %}
@@ -700,20 +1222,21 @@ body {
     </div>
   </div>
 
-  <!-- WAITING STATE -->
+  <!-- WAITING -->
   {% elif cs.status == 'running' and not cs.current_rank %}
-  <div class="state-wrap">
-    <div class="card">
-      <div class="state-card-inner">
-        <span class="state-icon">⏳</span>
-        <div class="state-title">Waiting for First Rank</div>
-        <p class="state-body">Counselling has started. Admin will call the first rank shortly.</p>
+  <div class="cl-state">
+    <div class="cl-card">
+      <div class="cl-state-inner">
+        <span class="cl-state-icon">⏳</span>
+        <div class="cl-state-title">Waiting for First Rank</div>
+        <p class="cl-state-body">Counselling has started.<br>Admin will call the first rank shortly.</p>
       </div>
     </div>
   </div>
 
-  <!-- ACTIVE STATE -->
+  <!-- ACTIVE -->
   {% else %}
+<<<<<<< HEAD
   <!-- RANK CARD -->
   <div class="rank-section">
     <div class="card rank-card">
@@ -723,11 +1246,24 @@ body {
         <div class="rank-label">Currently Calling</div>
         <div class="rank-number-row">
           <div class="rank-big" id="currentRankHero"><sup>#</sup>{{ cs.current_rank }}</div>
+=======
+
+  <!-- Currently Calling -->
+  <div class="cl-rank-wrap">
+    <div class="cl-card">
+      <div class="cl-rank-top">
+        <div class="cl-rank-deco"></div>
+        <div class="cl-rank-deco2"></div>
+        <div class="cl-rank-label">Currently Calling</div>
+        <div class="cl-rank-row">
+          <div class="cl-rank-num" id="currentRankHero"><sup>#</sup>{{ cs.current_rank }}</div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
           <span class="live-badge"><span class="live-dot"></span>Live Now</span>
         </div>
       </div>
-      <div class="rank-body">
+      <div class="cl-rank-body">
         {% if student %}
+<<<<<<< HEAD
         <div class="detail-grid">
           <div><div class="d-label">Student Name</div><div class="d-val" id="studentNameVal">{{ student.full_name }}</div></div>
           <div><div class="d-label">Rank</div><div class="d-val" id="studentRankVal">#{{ student.rank }}</div></div>
@@ -743,23 +1279,53 @@ body {
           <div>
             <div class="allot-type">Seat Allotted</div>
             <div class="allot-main" id="allotmentNameVal">{% if allotment %}{{ student.full_name }} — {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}{% endif %}</div>
+=======
+        <div class="cl-detail-grid">
+          <div>
+            <div class="cl-dl">Student Name</div>
+            <div class="cl-dv" id="studentNameVal">{{ student.full_name }}</div>
+          </div>
+          <div>
+            <div class="cl-dl">Rank</div>
+            <div class="cl-dv" id="studentRankVal">#{{ student.rank }}</div>
+          </div>
+          <div>
+            <div class="cl-dl">12th Percentage</div>
+            <div class="cl-dv pct" id="studentPercentVal">{% if student.percent_12 %}{{ "%.2f"|format(student.percent_12) }}%{% else %}—{% endif %}</div>
+          </div>
+          <div>
+            <div class="cl-dl">Category</div>
+            <div class="cl-dv" id="studentCategoryVal">{{ student.category_name or '—' }}</div>
+          </div>
+        </div>
+
+        <div class="allot-box success" id="allotBoxSuccess" {% if not allotment %}style="display:none"{% endif %}>
+          <div class="allot-icon">✓</div>
+          <div>
+            <div class="allot-tag">Seat Allotted</div>
+            <div class="allot-name" id="allotmentNameVal">{% if allotment %}{{ student.full_name }} — {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}{% endif %}</div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
             <div class="allot-time" id="allotmentTimeVal">{% if allotment %}{{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST{% endif %}</div>
           </div>
         </div>
         <div class="allot-box pending" id="allotBoxPending" {% if allotment %}style="display:none"{% endif %}>
+<<<<<<< HEAD
           <div class="allot-icon-wrap">⏳</div>
+=======
+          <div class="allot-icon">⏳</div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
           <div>
-            <div class="allot-type">Pending</div>
-            <div class="allot-main" style="font-weight:400;color:var(--text-muted);">Seat not yet allotted for this rank</div>
+            <div class="allot-tag">Pending</div>
+            <div class="allot-name" style="font-weight:400;color:var(--ink-3);">Seat not yet allotted for this rank</div>
           </div>
         </div>
 
         {% else %}
         <div class="allot-box pending">
-          <div class="allot-icon-wrap">ℹ</div>
+          <div class="allot-icon">ℹ</div>
           <div>
-            <div class="allot-type">No Record</div>
-            <div class="allot-main" style="font-weight:400;color:var(--text-muted);">No student found for Rank #{{ cs.current_rank }}</div>
+            <div class="allot-tag">No Record</div>
+            <div class="allot-name" style="font-weight:400;color:var(--ink-3);">No student found for Rank #{{ cs.current_rank }}</div>
           </div>
         </div>
         {% endif %}
@@ -771,35 +1337,50 @@ body {
     </div>
   </div>
 
+<<<<<<< HEAD
   <!-- STATS -->
   <div class="stats-section">
     <div class="stats-row">
       <div class="stat"><div class="stat-num" id="totalRankedNum">{{ total_ranked }}</div><div class="stat-lbl">Total Ranked</div></div>
       <div class="stat"><div class="stat-num" id="currentRankStat" style="color:var(--gold);">{{ cs.current_rank }}</div><div class="stat-lbl">Current Rank</div></div>
       <div class="stat"><div class="stat-num" id="totalAllottedNum" style="color:var(--teal);">{{ total_allotted }}</div><div class="stat-lbl">Seats Allotted</div></div>
+=======
+  <!-- Stats -->
+  <div class="cl-stats">
+    <div class="cl-stats-grid">
+      <div class="cl-stat">
+        <div class="cl-stat-num" id="totalRankedNum">{{ total_ranked }}</div>
+        <div class="cl-stat-lbl">Total Ranked</div>
+      </div>
+      <div class="cl-stat">
+        <div class="cl-stat-num gold" id="currentRankStat">{{ cs.current_rank }}</div>
+        <div class="cl-stat-lbl">Current Rank</div>
+      </div>
+      <div class="cl-stat">
+        <div class="cl-stat-num teal" id="totalAllottedNum">{{ total_allotted }}</div>
+        <div class="cl-stat-lbl">Seats Allotted</div>
+      </div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
     </div>
   </div>
   {% endif %}
 
-  <!-- SEAT AVAILABILITY — always visible -->
+  <!-- Seat Availability -->
   {% if govt_seats_list or mgmt_seats_list %}
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-title">Live Seat Availability</span>
-      <span class="sec-line"></span>
-    </div>
+  <div class="cl-sec-head">
+    <span class="cl-sec-title">Live Seat Availability</span>
+    <span class="cl-sec-line"></span>
   </div>
   {% endif %}
 
   {% if govt_seats_list %}
-  <div class="wrap">
-    <div class="quota-head">
-      <span class="quota-badge govt">🏛 Government Quota</span>
-      <span class="quota-line"></span>
-    </div>
+  <div class="cl-quota-bar">
+    <span class="cl-quota-badge govt">🏛 Government Quota</span>
+    <span class="cl-quota-line"></span>
   </div>
-  <div class="seats-grid">
+  <div class="cl-seats-grid">
     {% for item in govt_seats_list %}
+<<<<<<< HEAD
     <div class="seat-card" style="animation-delay:{{ loop.index0 * 0.06 }}s" data-seat-quota="government" data-seat-category="{{ item.category|e }}">
       <div class="sc-name">{{ item.category }}</div>
       <div class="sc-row">
@@ -807,13 +1388,28 @@ body {
         <div class="sc-right">
           <span class="sc-frac" data-seat-frac>{{ item.filled }} / {{ item.total }}</span>
           <span class="sc-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}" data-seat-tag>
+=======
+    <div class="cl-seat-card" style="animation-delay:{{ loop.index0 * 0.05 }}s"
+         data-seat-quota="government" data-seat-category="{{ item.category|e }}">
+      <div class="cl-sc-name">{{ item.category }}</div>
+      <div class="cl-sc-row">
+        <span class="cl-sc-lbl">Seats</span>
+        <div class="cl-sc-right">
+          <span class="cl-sc-frac" data-seat-frac>{{ item.filled }} / {{ item.total }}</span>
+          <span class="cl-sc-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}" data-seat-tag>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
             {% if item.remaining == 0 %}Full{% else %}{{ item.remaining }} left{% endif %}
           </span>
         </div>
       </div>
       {% if item.total > 0 %}
+<<<<<<< HEAD
       <div class="sc-bar">
         <div class="sc-fill govt-fill {% if item.remaining == 0 %}full{% endif %}" data-seat-fill style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
+=======
+      <div class="cl-sc-bar">
+        <div class="cl-sc-fill govt {% if item.remaining == 0 %}full{% endif %}" data-seat-fill style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
       </div>
       {% endif %}
     </div>
@@ -822,14 +1418,13 @@ body {
   {% endif %}
 
   {% if mgmt_seats_list %}
-  <div class="wrap">
-    <div class="quota-head" style="margin-top:1.5rem;">
-      <span class="quota-badge mgmt">🏢 Management Quota</span>
-      <span class="quota-line"></span>
-    </div>
+  <div class="cl-quota-bar" style="margin-top:1.75rem;">
+    <span class="cl-quota-badge mgmt">🏢 Management Quota</span>
+    <span class="cl-quota-line"></span>
   </div>
-  <div class="seats-grid" style="{% if govt_seats_list %}{% endif %}">
+  <div class="cl-seats-grid">
     {% for item in mgmt_seats_list %}
+<<<<<<< HEAD
     <div class="seat-card" style="animation-delay:{{ loop.index0 * 0.06 }}s" data-seat-quota="management" data-seat-category="{{ item.category|e }}">
       <div class="sc-name">{{ item.category }}</div>
       <div class="sc-row">
@@ -837,13 +1432,28 @@ body {
         <div class="sc-right">
           <span class="sc-frac" data-seat-frac>{{ item.filled }} / {{ item.total }}</span>
           <span class="sc-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}" data-seat-tag>
+=======
+    <div class="cl-seat-card" style="animation-delay:{{ loop.index0 * 0.05 }}s"
+         data-seat-quota="management" data-seat-category="{{ item.category|e }}">
+      <div class="cl-sc-name">{{ item.category }}</div>
+      <div class="cl-sc-row">
+        <span class="cl-sc-lbl">Seats</span>
+        <div class="cl-sc-right">
+          <span class="cl-sc-frac" data-seat-frac>{{ item.filled }} / {{ item.total }}</span>
+          <span class="cl-sc-tag {% if item.remaining == 0 %}full{% else %}avail{% endif %}" data-seat-tag>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
             {% if item.remaining == 0 %}Full{% else %}{{ item.remaining }} left{% endif %}
           </span>
         </div>
       </div>
       {% if item.total > 0 %}
+<<<<<<< HEAD
       <div class="sc-bar">
         <div class="sc-fill mgmt-fill {% if item.remaining == 0 %}full{% endif %}" data-seat-fill style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
+=======
+      <div class="cl-sc-bar">
+        <div class="cl-sc-fill mgmt {% if item.remaining == 0 %}full{% endif %}" data-seat-fill style="width:{{ ((item.filled / item.total) * 100)|int }}%"></div>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
       </div>
       {% endif %}
     </div>
@@ -851,27 +1461,27 @@ body {
   </div>
   {% endif %}
 
-  <!-- SEAT MAP — Govt=Blue, Mgmt=Amber -->
+  <!-- Visual Seat Map -->
   {% set all_seats = govt_seats_list + mgmt_seats_list %}
   {% if all_seats %}
-  <div class="smap-section">
-    <div class="smap-top">
-      <div class="smap-title">Visual Seat Map</div>
-      <div class="smap-legend">
-        <div class="leg"><div class="leg-dot govt-filled"></div>Govt Filled</div>
-        <div class="leg"><div class="leg-dot mgmt-filled"></div>Mgmt Filled</div>
-        <div class="leg"><div class="leg-dot empty"></div>Free</div>
+  <div class="cl-smap">
+    <div class="cl-smap-top">
+      <div class="cl-smap-title">Visual Seat Map</div>
+      <div class="cl-smap-legend">
+        <div class="cl-leg"><div class="cl-leg-dot g"></div>Govt Filled</div>
+        <div class="cl-leg"><div class="cl-leg-dot m"></div>Mgmt Filled</div>
+        <div class="cl-leg"><div class="cl-leg-dot e"></div>Free</div>
       </div>
     </div>
-    <div class="seat-grid" id="seatGrid">
+    <div class="cl-seat-grid">
       {% set ns = namespace(idx=0) %}
       {% for item in govt_seats_list %}
         {% for i in range(item.total) %}
           {% set ns.idx = ns.idx + 1 %}
           {% if i < item.filled %}
-            <div class="sseat govt-seat" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.01)|round(3) }}s"></div>
+            <div class="cl-sseat g" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% else %}
-            <div class="sseat empty" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.01)|round(3) }}s"></div>
+            <div class="cl-sseat e" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% endif %}
         {% endfor %}
       {% endfor %}
@@ -879,9 +1489,9 @@ body {
         {% for i in range(item.total) %}
           {% set ns.idx = ns.idx + 1 %}
           {% if i < item.filled %}
-            <div class="sseat mgmt-seat" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.01)|round(3) }}s"></div>
+            <div class="cl-sseat m" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% else %}
-            <div class="sseat empty" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.01)|round(3) }}s"></div>
+            <div class="cl-sseat e" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% endif %}
         {% endfor %}
       {% endfor %}
@@ -889,20 +1499,20 @@ body {
   </div>
   {% endif %}
 
-  <!-- ALLOTMENT HISTORY -->
-  <div class="hist-wrap">
-    <button class="hist-btn" id="histBtn" onclick="toggleHist()">
-      <div class="hist-left">
+  <!-- Allotment History -->
+  <div class="cl-hist-wrap">
+    <button class="cl-hist-btn" id="histBtn" onclick="toggleHist()">
+      <div class="cl-hist-left">
         <span>🏅</span>
-        <span class="hist-title">Allotment History</span>
-        <span class="hist-count">{{ allotment_history|length }}</span>
+        <span class="cl-hist-title">Allotment History</span>
+        <span class="cl-hist-count">{{ allotment_history|length }}</span>
       </div>
-      <span class="chevron">▼</span>
+      <span class="cl-chevron">▼</span>
     </button>
-    <div class="hist-panel" id="histPanel">
+    <div class="cl-hist-panel" id="histPanel">
       {% if allotment_history %}
-      <div class="hist-scroll">
-        <table class="hist-table">
+      <div class="cl-hist-scroll">
+        <table class="cl-htable">
           <thead>
             <tr>
               <th>#</th><th>Rank</th><th>Student Name</th>
@@ -912,41 +1522,48 @@ body {
           <tbody>
             {% for h in allotment_history %}
             <tr>
-              <td style="color:var(--text-muted);font-size:.75rem;">{{ loop.index }}</td>
+              <td style="color:var(--ink-3);font-size:.74rem;">{{ loop.index }}</td>
               <td><span class="r-pill">#{{ h.rank }}</span></td>
-              <td style="font-weight:600;color:var(--text-primary);">{{ h.name }}</td>
-              <td style="font-size:.8rem;">{{ h.category }}</td>
+              <td style="font-weight:600;color:var(--ink);">{{ h.name }}</td>
+              <td style="font-size:.79rem;">{{ h.category }}</td>
               <td><span class="q-pill {{ h.quota }}">{{ h.quota|title }}</span></td>
-              <td style="font-size:.74rem;white-space:nowrap;">{{ h.allotted_at }}</td>
+              <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">{{ h.allotted_at }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       {% else %}
-      <div class="hist-empty">No seats allotted yet.</div>
+      <div class="cl-hist-empty">No seats allotted yet.</div>
       {% endif %}
     </div>
   </div>
 
-  <!-- REFRESH BAR -->
-  <div class="refresh-wrap">
-    <div class="refresh-label">Auto-refresh in <span class="refresh-count" id="cd">30</span>s</div>
-    <div class="refresh-track"><div class="refresh-fill" id="rf"></div></div>
+  <!-- Refresh Bar -->
+  <div class="cl-refresh">
+    <div class="cl-refresh-label">Auto-refresh in <span class="cl-refresh-count" id="cd">30</span>s</div>
+    <div class="cl-refresh-track"><div class="cl-refresh-fill"></div></div>
   </div>
 
-</div><!-- /page -->
+</div><!-- /cl-page -->
 {% endblock %}
 
 {% block scripts %}
 <script>
 const LIVE_STATUS_API = "{{ url_for('main.counselling_live_status_api') }}";
+<<<<<<< HEAD
 const INITIAL_STATUS = "{{ cs.status }}";
 const INITIAL_HAS_RANK = {{ 'true' if cs.current_rank else 'false' }};
 
 /* ── THEME ── */
+=======
+const INITIAL_STATUS  = "{{ cs.status }}";
+const INITIAL_HAS_RANK = {{ 'true' if cs.current_rank else 'false' }};
+
+/* ── THEME INIT ── */
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 (function(){
-  const saved = localStorage.getItem('cl-theme') || 'dark';
+  const saved = localStorage.getItem('cl-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 })();
 
@@ -955,9 +1572,9 @@ function toggleTheme(){
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   html.setAttribute('data-theme', next);
   localStorage.setItem('cl-theme', next);
-  renderOrbs();
 }
 
+<<<<<<< HEAD
 /* ── DYNAMIC ORB BG ── */
 function renderOrbs(){
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -1156,12 +1773,164 @@ const timer=setInterval(async ()=>{
   }
 },1000);
 
+=======
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 /* ── HISTORY TOGGLE ── */
 function toggleHist(){
   document.getElementById('histBtn').classList.toggle('open');
   document.getElementById('histPanel').classList.toggle('open');
 }
 
+<<<<<<< HEAD
+=======
+/* ── GENTLE FLOATING SEATS ── */
+(function(){
+  const seats = document.querySelectorAll('.cl-sseat');
+  if (!seats.length) return;
+  let t = 0;
+  function anim(){
+    t += 0.016;
+    seats.forEach((s, i) => {
+      if (!s.matches(':hover'))
+        s.style.transform = `translateY(${Math.sin(t + i * 0.25) * 2.5}px)`;
+    });
+    requestAnimationFrame(anim);
+  }
+  anim();
+})();
+
+/* ── HELPERS ── */
+function fmtPercent(v){
+  if (v === null || v === undefined || Number.isNaN(Number(v))) return '—';
+  return `${Number(v).toFixed(2)}%`;
+}
+
+function updateStatusPill(status){
+  const pill = document.querySelector('.status-pill');
+  if (!pill) return;
+  pill.classList.remove('running', 'paused', 'stopped');
+  pill.classList.add(status);
+  const pulse = pill.querySelector('.pulse');
+  if (pulse){ pulse.classList.remove('running','paused','stopped'); pulse.classList.add(status); }
+  const text = pill.childNodes[pill.childNodes.length - 1];
+  if (text && text.nodeType === 3){
+    if (status === 'running') text.textContent = 'Live';
+    else if (status === 'paused') text.textContent = 'Paused';
+    else text.textContent = 'Not Started';
+  }
+}
+
+function updateSeatCards(quota, seats){
+  seats.forEach(function(item){
+    const safeCategory = (window.CSS && window.CSS.escape) ? CSS.escape(item.category) : item.category.replace(/"/g, '\\"');
+    const card = document.querySelector(`.cl-seat-card[data-seat-quota="${quota}"][data-seat-category="${safeCategory}"]`);
+    if (!card) return;
+    const frac = card.querySelector('[data-seat-frac]');
+    const tag  = card.querySelector('[data-seat-tag]');
+    const fill = card.querySelector('[data-seat-fill]');
+    if (frac) frac.textContent = `${item.filled} / ${item.total}`;
+    if (tag){
+      const isFull = Number(item.remaining) === 0;
+      tag.textContent = isFull ? 'Full' : `${item.remaining} left`;
+      tag.classList.toggle('full', isFull);
+      tag.classList.toggle('avail', !isFull);
+    }
+    if (fill){
+      const width = Number(item.total) > 0 ? Math.floor((Number(item.filled) / Number(item.total)) * 100) : 0;
+      fill.style.width = `${Math.max(0, Math.min(100, width))}%`;
+      fill.classList.toggle('full', Number(item.remaining) === 0);
+    }
+  });
+}
+
+async function refreshLiveNumbers(){
+  try {
+    const res = await fetch(LIVE_STATUS_API, { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // If status mode changed (e.g. stopped→running, or rank appeared for first time), reload once
+    const hasRankNow = data.current_rank !== null && data.current_rank !== undefined;
+    if (data.status !== INITIAL_STATUS || hasRankNow !== INITIAL_HAS_RANK){
+      window.location.reload();
+      return;
+    }
+
+    updateStatusPill(data.status);
+
+    // Update rank display
+    const rankHero = document.getElementById('currentRankHero');
+    const rankStat = document.getElementById('currentRankStat');
+    const rankVal  = data.current_rank ?? '—';
+    if (rankHero) rankHero.innerHTML = `<sup>#</sup>${rankVal}`;
+    if (rankStat) rankStat.textContent = rankVal;
+
+    // Update stats
+    const totalRanked  = document.getElementById('totalRankedNum');
+    const totalAllotted = document.getElementById('totalAllottedNum');
+    if (totalRanked)   totalRanked.textContent   = data.total_ranked   ?? '—';
+    if (totalAllotted) totalAllotted.textContent = data.total_allotted ?? '—';
+
+    // Update student details
+    if (data.student){
+      const nameEl     = document.getElementById('studentNameVal');
+      const rankEl     = document.getElementById('studentRankVal');
+      const percentEl  = document.getElementById('studentPercentVal');
+      const categoryEl = document.getElementById('studentCategoryVal');
+      const name = data.student.full_name || '—';
+      if (nameEl)     nameEl.textContent     = name;
+      if (rankEl)     rankEl.textContent     = `#${data.student.rank ?? '—'}`;
+      if (percentEl)  percentEl.textContent  = fmtPercent(data.student.percent_12);
+      if (categoryEl) categoryEl.textContent = data.student.category_name || '—';
+
+      // Update allotment box
+      const successBox = document.getElementById('allotBoxSuccess');
+      const pendingBox = document.getElementById('allotBoxPending');
+      const allotName  = document.getElementById('allotmentNameVal');
+      const allotTime  = document.getElementById('allotmentTimeVal');
+      if (data.allotment){
+        const quota = data.allotment.quota === 'government' ? 'Government Quota' : 'Management Quota';
+        if (allotName) allotName.textContent = `${name} — ${quota}`;
+        if (allotTime) allotTime.textContent = `${data.allotment.allotted_at} IST`;
+        if (successBox) successBox.style.display = '';
+        if (pendingBox) pendingBox.style.display  = 'none';
+      } else {
+        if (successBox) successBox.style.display = 'none';
+        if (pendingBox) pendingBox.style.display  = '';
+      }
+    }
+
+    // Update seat cards
+    updateSeatCards('government', data.govt_seats_list || []);
+    updateSeatCards('management', data.mgmt_seats_list || []);
+
+  } catch(e){
+    // Silent fail — keep last rendered values
+  }
+}
+
+/* ── COUNTDOWN + AJAX REFRESH ── */
+let s = 30;
+const cdEl = document.getElementById('cd');
+const rfEl = document.querySelector('.cl-refresh-fill');
+
+const timer = setInterval(async () => {
+  s--;
+  if (cdEl) cdEl.textContent = s;
+  if (s <= 0){
+    await refreshLiveNumbers();
+    s = 30;
+    if (cdEl) cdEl.textContent = s;
+    if (rfEl){
+      rfEl.style.animation = 'none';
+      void rfEl.offsetHeight;
+      rfEl.style.animation = 'drain 30s linear forwards';
+    }
+  }
+}, 1000);
+
+// Also run once on load to sync immediately
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
 refreshLiveNumbers();
 </script>
 {% endblock %}

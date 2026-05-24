@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="en">
 <head>
@@ -240,3 +241,247 @@
   </main>
 </body>
 </html>
+=======
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admission Acknowledgement</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 6mm;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Times New Roman", Georgia, serif;
+      color: #111;
+      background: #fff;
+    }
+
+    .sheet {
+      width: calc(210mm - 12mm);
+      height: calc(297mm - 12mm);
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      gap: 0;
+      position: relative;
+    }
+
+    .copy {
+      border: 1.2px solid #000;
+      position: relative;
+      overflow: hidden;
+      padding: 7mm 8mm 6mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .copy-label {
+      text-align: right;
+      font-size: 5.4mm;
+      font-weight: 700;
+      margin: 0 0 1.2mm;
+      position: relative;
+      z-index: 2;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 6.6mm;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      margin: 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 4.5mm;
+      font-weight: 600;
+      margin: 1.2mm 0 4.4mm;
+      position: relative;
+      z-index: 2;
+    }
+
+    table.details {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 4.25mm;
+      position: relative;
+      z-index: 2;
+    }
+
+    table.details td {
+      vertical-align: top;
+      padding: 2.8mm 1.5mm;
+      border-bottom: 0.9px solid #333;
+      line-height: 1.28;
+      word-wrap: break-word;
+    }
+
+    table.details tr:last-child td {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 400;
+    }
+
+    .value {
+      font-weight: 700;
+    }
+
+    .signature-area {
+      margin-top: auto;
+      padding-top: 4.2mm;
+      position: relative;
+      z-index: 2;
+      transform: translateY(-25mm);
+    }
+
+    .signature-space {
+      height: 4mm;
+    }
+
+
+    .signature-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+      font-size: 4.6mm;
+      font-weight: 700;
+    }
+
+    .signature-row div:last-child {
+      text-align: right;
+      padding-right: 1mm;
+    }
+
+    .cut-band {
+      height: 7mm;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cut-line {
+      width: 100%;
+      border-top: 1.2px dashed #000;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .cut-label {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      padding: 0 3.5mm;
+      font-size: 3.7mm;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+
+    .watermark {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+      opacity: 0.19;
+    }
+
+    .wm-line {
+      white-space: nowrap;
+      color: #595959;
+      font-size: 3.4mm;
+      line-height: 6.2mm;
+      letter-spacing: 0.15px;
+      transform: translateX(-3mm);
+      user-select: none;
+    }
+
+    .wm-line:nth-child(even) {
+      transform: translateX(8mm);
+    }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% macro copy_block(copy_label) -%}
+  <section class="copy">
+    <div class="watermark" aria-hidden="true">
+      {% for _ in range(30) %}
+      <div class="wm-line">Bangalore University BCA Admission &nbsp;&nbsp; Bangalore University BCA Admission &nbsp;&nbsp; Bangalore University BCA Admission &nbsp;&nbsp; Bangalore University BCA Admission</div>
+      {% endfor %}
+    </div>
+
+    <div class="copy-label">{{ copy_label }}</div>
+    <h1 class="title">BANGALORE UNIVERITY</h1>
+    <p class="subtitle">Provisional Admission card for Admission to BCA Course - 2026 -2027</p>
+
+    <table class="details" role="presentation">
+      <colgroup>
+        <col style="width:34%">
+        <col style="width:34%">
+        <col style="width:32%">
+      </colgroup>
+      <tr>
+        <td colspan="3"><span class="label">Name of the Candidate:</span> <span class="value">{{ ack.name }}</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">Category:</span> <span class="value">{{ ack.category }}</span></td>
+        <td><span class="label">Application Number:</span> <span class="value">{{ ack.application_number[-3:] }}</span></td>
+        <td><span class="label">Rank Number:</span> <span class="value">{{ ack.rank_number }}</span></td>
+      </tr>
+      <tr>
+        <td colspan="2"><span class="label">Admit Category:</span> <span class="value">{{ ack.admit_category }}</span></td>
+        <td><span class="label">Admission Type:</span> <span class="value">{{ ack.admission_type }}</span></td>
+      </tr>
+      <tr>
+        <td colspan="2"><span class="label">Date of Admission:</span> <span class="value">{{ ack.date_of_admission }}</span></td>
+        <td><span class="label">Fee to be Paid:</span> <span class="value">{{ ack.fee_to_be_paid }}</span></td>
+      </tr>
+    </table>
+
+    <div class="signature-area">
+      <div class="signature-space"></div>
+      <div class="signature-row">
+        <div>Admission Committee Member</div>
+        <div>Admission Committee Chairperson</div>
+      </div>
+    </div>
+  </section>
+  {%- endmacro %}
+
+  <main class="sheet">
+    {{ copy_block('University Copy') }}
+
+    <div class="cut-band" aria-hidden="true">
+      <div class="cut-line"></div>
+      <div class="cut-label">CUT</div>
+    </div>
+
+    {{ copy_block('College Copy') }}
+  </main>
+</body>
+</html>
+>>>>>>> 89fc6f4477857f33f96f00b3dd8dd32717ec2ac0
