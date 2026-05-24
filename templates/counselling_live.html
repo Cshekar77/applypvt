@@ -452,7 +452,8 @@ body {
 }
 .cl-sc-row { display: flex; align-items: center; justify-content: space-between; }
 .cl-sc-lbl { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-.cl-sc-right { display: flex; align-items: center; gap: 0.5rem; }
+.cl-sc-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
 .cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
 .cl-sc-tag {
   font-family: 'DM Mono', monospace; font-size: 0.52rem; font-weight: 500;
@@ -488,7 +489,7 @@ body {
 .cl-leg { display: flex; align-items: center; gap: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.53rem; color: var(--ink-3); }
 .cl-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .cl-leg-dot.g { background: linear-gradient(135deg, var(--blue), #60A5FA); }
-.cl-leg-dot.m { background: linear-gradient(135deg, var(--gold-deep), var(--gold-light)); }
+.cl-leg-dot.m { background: linear-gradient(135deg, #FF8C00, #FFA500); }
 .cl-leg-dot.e { background: var(--border-l); border: 1px solid var(--border-l2); }
 .cl-seat-grid { display: flex; flex-wrap: wrap; gap: 5px; }
 .cl-sseat {
@@ -603,6 +604,8 @@ body {
   .cl-rank-body { padding: 1.4rem 1.25rem; }
   .cl-stat-num { font-size: 1.8rem; }
   .cl-smap, .cl-hist-wrap { margin-left: 1.1rem; margin-right: 1.1rem; }
+  .cl-sc-frac { white-space: nowrap; font-size: 0.75rem; }
+  .cl-sc-tag { font-size: 0.48rem; white-space: nowrap; }
 }
 @media (max-width: 360px) {
   .cl-hero-h1 { font-size: 2.5rem; }
