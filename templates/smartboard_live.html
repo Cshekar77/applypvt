@@ -2,304 +2,519 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Seat Display</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Live Seat Availability | BCA Admissions 2026</title>
 <style>
-  :root {
-    --bg:        #eef2ff;
-    --surface:   #ffffff;
-    --border:    #c0c8e8;
-    --text:      #0a0a30;
-    --muted:     #4455aa;
-    --green:     #006b30;
-    --amber:     #a05c00;
-    --red:       #b80000;
-    --govt-bg:   #d0ffe8;
-    --govt-bdr:  #00a050;
-    --govt-lbl:  #004d26;
-    --mgmt-bg:   #fff3cc;
-    --mgmt-bdr:  #c07000;
-    --mgmt-lbl:  #7a4a00;
-    --card-bg:   #ffffff;
-    --card-bdr:  #b0bce8;
-    --topbar-bg: #1a1a3e;
-    --rank-bg:   #f59e0b;
-  }
-  [data-theme="dark"] {
-    --bg:        #0a0a14;
-    --surface:   #111127;
-    --border:    #2a2a4a;
-    --text:      #ffffff;
-    --muted:     #9999bb;
-    --green:     #00ff88;
-    --amber:     #ffcc00;
-    --red:       #ff4444;
-    --govt-bg:   #0a2e1e;
-    --govt-bdr:  #00ff88;
-    --govt-lbl:  #00ff88;
-    --mgmt-bg:   #2e1a00;
-    --mgmt-bdr:  #ffcc00;
-    --mgmt-lbl:  #ffcc00;
-    --card-bg:   #13132a;
-    --card-bdr:  #2a2a5a;
-    --topbar-bg: #0d0d22;
-    --rank-bg:   #f59e0b;
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #D4A017;
+    --gold-light: #F5C842;
+    --gold-deep: #A07010;
+    --gold-glow: rgba(212, 160, 23, 0.35);
+    --white: #FFFFFF;
+    --off-white: #FBF7EE;
+    --ink: #1A1208;
+    --ink-2: #3D2E10;
+    --ink-3: #6B5530;
+    --border-l: rgba(212, 160, 23, 0.25);
+    --border-l2: rgba(212, 160, 23, 0.5);
+    --card-l: rgba(255, 255, 255, 0.9);
+    --shadow-l: 0 4px 24px rgba(90, 50, 0, 0.12);
+    --teal: #0A7C6E;
+    --teal-bg: rgba(10, 124, 110, 0.10);
+    --red: #C0392B;
+    --red-bg: rgba(192, 57, 43, 0.10);
+    --blue: #1A5FB4;
+    --blue-bg: rgba(26, 95, 180, 0.10);
+  }
+
+  [data-theme="dark"] {
+    --gold: #F0C040;
+    --gold-light: #FFD966;
+    --gold-deep: #C89A20;
+    --gold-glow: rgba(240, 192, 64, 0.30);
+    --white: #F5F0E8;
+    --off-white: #1C1810;
+    --ink: #F5F0E8;
+    --ink-2: rgba(245, 240, 232, 0.70);
+    --ink-3: rgba(245, 240, 232, 0.40);
+    --border-l: rgba(240, 192, 64, 0.15);
+    --border-l2: rgba(240, 192, 64, 0.35);
+    --card-l: rgba(255, 255, 255, 0.06);
+    --shadow-l: 0 4px 24px rgba(0, 0, 0, 0.40);
+    --teal: #22D3C0;
+    --teal-bg: rgba(34, 211, 192, 0.10);
+    --red: #FF6B6B;
+    --red-bg: rgba(255, 107, 107, 0.10);
+    --blue: #60A5FA;
+    --blue-bg: rgba(96, 165, 250, 0.10);
+  }
+
   body {
-    background: var(--bg);
-    font-family: 'Segoe UI', Arial, sans-serif;
-    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    background: var(--off-white);
+    color: var(--ink);
     min-height: 100vh;
-    overflow-x: hidden;
-    padding-bottom: 56px;
+    transition: background 0.3s, color 0.3s;
+    padding-bottom: 60px;
   }
 
   .theme-btn {
-    position: fixed; top: 14px; right: 16px; z-index: 999;
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--text); font-size: 20px; width: 40px; height: 40px;
-    border-radius: 50%; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-l);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-l);
+    color: var(--gold);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-l);
+  }
+  .theme-btn:hover {
+    transform: scale(1.05);
+    border-color: var(--gold);
+    box-shadow: 0 0 20px var(--gold-glow);
   }
 
-  /* TOP BAR */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-around;
-    padding: 0.85rem 1.5rem;
-    background: var(--topbar-bg);
-    border-bottom: 3px solid var(--rank-bg);
-    flex-wrap: wrap; gap: 10px;
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 20px;
   }
-  .topbar-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .topbar-label { font-size: 11px; color: #aaaacc; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
-  .topbar-value { font-size: 2.5rem; font-weight: 900; color: #ffffff; line-height: 1; }
-  .divider { width: 1.5px; background: #333366; height: 64px; }
 
-  .rank-badge {
-    background: var(--rank-bg); color: #000;
-    font-size: 3.2rem; font-weight: 900;
-    padding: 0.2rem 1.6rem; border-radius: 12px; line-height: 1.15;
-    display: flex; flex-direction: column; align-items: center;
-    box-shadow: 0 0 28px #f59e0b99;
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 20px 0 10px;
   }
-  .rank-badge .rlabel { font-size: 10px; font-weight: 900; letter-spacing: 3px; color: #7a4d00; text-transform: uppercase; }
-
-  /* BOARD */
-  .board { padding: 1.2rem 1.4rem 0.5rem; }
-  .quota-section { margin-bottom: 1.5rem; }
-  .quota-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
-  .quota-pill {
-    display: inline-block; font-size: 0.82rem; font-weight: 900;
-    letter-spacing: 3px; text-transform: uppercase;
-    padding: 6px 22px; border-radius: 30px; border: 2.5px solid; white-space: nowrap;
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
   }
-  .quota-pill.govt { background: var(--govt-bg); color: var(--govt-lbl); border-color: var(--govt-bdr); }
-  .quota-pill.mgmt { background: var(--mgmt-bg); color: var(--mgmt-lbl); border-color: var(--mgmt-bdr); }
-  .quota-line { flex: 1; height: 2px; background: var(--border); }
-
-  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-
-  .cat-card {
-    background: var(--card-bg); border: 2.5px solid var(--card-bdr);
-    border-radius: 16px; padding: 1.1rem 1.3rem 1rem;
-    display: flex; flex-direction: column; gap: 1px;
-    position: relative; overflow: hidden; transition: border-color 0.3s;
+  .header p {
+    color: var(--ink-3);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
   }
-  .cat-card.is-full { border-color: var(--red); background: #ffe8e8; }
-  .cat-card.is-low  { border-color: var(--amber); }
-  [data-theme="dark"] .cat-card.is-full { background: #2a0a0a; }
 
-  .cat-name { font-size: 2.1rem; font-weight: 900; letter-spacing: 1px; color: var(--text); line-height: 1; }
-  .cat-card.is-full .cat-name { color: var(--red); }
-
-  .cat-total-label { font-size: 0.65rem; color: var(--muted); font-weight: 700; letter-spacing: 1.5px; margin-top: 7px; text-transform: uppercase; }
-  .cat-total-val   { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; }
-
-  .cat-vacant-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 6px; font-weight: 700; }
-  .cat-vacant { font-size: 5rem; font-weight: 900; line-height: 1; letter-spacing: -2px; }
-  .v-green { color: var(--green); }
-  .v-amber { color: var(--amber); }
-  .v-red   { color: var(--red); }
-  [data-theme="dark"] .v-green { text-shadow: 0 0 18px #00ff8866; }
-  [data-theme="dark"] .v-amber { text-shadow: 0 0 18px #ffcc0066; }
-  [data-theme="dark"] .v-red   { text-shadow: 0 0 18px #ff444466; }
-
-  .full-badge {
-    position: absolute; top: 10px; right: 10px;
-    background: var(--red); color: #fff;
-    font-size: 10px; font-weight: 900; letter-spacing: 2px;
-    padding: 3px 9px; border-radius: 5px;
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
   }
-  .no-cats { color: var(--muted); font-size: 1rem; padding: 0.8rem 0; font-style: italic; }
+  .stat-card {
+    background: var(--card-l);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-l);
+    border-radius: 20px;
+    padding: 16px 32px;
+    text-align: center;
+    min-width: 140px;
+    box-shadow: var(--shadow-l);
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
 
-  /* TICKER */
+  .quota-section {
+    margin-bottom: 32px;
+  }
+  .quota-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .quota-badge {
+    padding: 8px 24px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .quota-badge.govt {
+    background: var(--blue-bg);
+    color: var(--blue);
+    border: 1px solid rgba(26, 95, 180, 0.3);
+  }
+  .quota-badge.mgmt {
+    background: rgba(212, 160, 23, 0.12);
+    color: var(--gold-deep);
+    border: 1px solid var(--border-l2);
+  }
+  [data-theme="dark"] .quota-badge.mgmt {
+    color: var(--gold);
+  }
+  .quota-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-l2), transparent);
+  }
+
+  .seat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .seat-card {
+    background: var(--card-l);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-l);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-l);
+  }
+  .seat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-l2);
+  }
+
+  .card-category {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+  }
+
+  .total-seats {
+    margin-bottom: 12px;
+  }
+  .total-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-3);
+  }
+  .total-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .vacant-info {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-l);
+  }
+  .vacant-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-3);
+  }
+  .vacant-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+  }
+  .vacant-number.available { color: var(--teal); }
+  .vacant-number.low { color: var(--gold-deep); }
+  .vacant-number.full { color: var(--red); }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--ink-3);
+  }
+
+  /* Ticker Styles */
   .ticker-wrap {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: 50px; background: #0d0d22;
-    border-top: 2.5px solid #f59e0b;
-    display: flex; align-items: center;
-    overflow: hidden; z-index: 100;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background: rgba(10, 10, 26, 0.95);
+    backdrop-filter: blur(16px);
+    border-top: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    z-index: 100;
   }
-  /* label changes colour based on which quota is showing */
+  [data-theme="light"] .ticker-wrap {
+    background: rgba(245, 240, 232, 0.95);
+  }
   .ticker-label {
-    font-size: 11px; font-weight: 900; letter-spacing: 2px;
-    text-transform: uppercase; padding: 0 14px; height: 100%;
-    display: flex; align-items: center; white-space: nowrap;
-    flex-shrink: 0; min-width: 110px; justify-content: center;
-    transition: background 0.5s, color 0.5s;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 0 20px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.3s;
   }
-  .ticker-label.govt-mode { background: #00a050; color: #000; }
-  .ticker-label.mgmt-mode { background: #f59e0b; color: #000; }
-  .ticker-label.pause-mode { background: #222244; color: #aaaacc; }
-
-  .ticker-outer { flex: 1; overflow: hidden; position: relative; height: 100%; }
+  .ticker-label.govt-mode {
+    background: linear-gradient(135deg, var(--blue), #0083b0);
+    color: white;
+  }
+  .ticker-label.mgmt-mode {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #000;
+  }
+  .ticker-label.pause-mode {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink-3);
+  }
+  .ticker-outer {
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+  }
   .ticker-track {
-    display: inline-flex; align-items: center; height: 100%;
-    white-space: nowrap; will-change: transform;
-    position: absolute; left: 0; top: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    white-space: nowrap;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
-
   .ticker-item {
-    display: inline-flex; align-items: center;
-    padding: 0 22px; font-size: 14px; font-weight: 700;
-    color: #ffffff; letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
   }
-  .ticker-sep  { color: #f59e0b; font-size: 16px; margin: 0 2px; }
-  .t-cat       { color: #ffffff; font-weight: 800; }
-  .t-lbl       { color: #ccccee; font-size: 12px; font-weight: 600; }
-  .t-vn-g      { color: #00ff88; font-size: 17px; font-weight: 900; }
-  .t-vn-a      { color: #ffcc00; font-size: 17px; font-weight: 900; }
-  .t-vn-r      { color: #ff6666; font-size: 17px; font-weight: 900; }
-  .t-tot       { color: #ffdd88; font-size: 15px; font-weight: 800; }
+  .ticker-sep {
+    color: var(--gold);
+    font-size: 12px;
+    margin: 0 6px;
+  }
+  .t-cat { font-weight: 800; color: var(--gold); }
+  .t-lbl { color: var(--ink-3); font-size: 9px; font-weight: 600; margin: 0 4px; }
+  .t-vacant { font-weight: 900; font-size: 13px; }
+  .t-vacant.green { color: var(--teal); }
+  .t-vacant.amber { color: var(--gold-deep); }
+  .t-vacant.red { color: var(--red); }
+  .t-total { color: var(--gold); font-weight: 800; }
   .ticker-head {
-    display: inline-flex; align-items: center; padding: 0 22px;
-    font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
   }
-  .ticker-head.govt-h { color: #00ff88; }
-  .ticker-head.mgmt-h { color: #ffcc00; }
+  .ticker-head.govt-h { color: var(--blue); }
+  .ticker-head.mgmt-h { color: #ffd200; }
+
+  @media (max-width: 640px) {
+    .container { padding: 16px; }
+    .header h1 { font-size: 1.5rem; }
+    .stat-value { font-size: 1.5rem; }
+    .stat-card { padding: 12px 20px; min-width: 100px; }
+    .seat-grid { gap: 12px; }
+    .seat-card { padding: 16px 12px; }
+    .card-category { font-size: 1rem; }
+    .total-number { font-size: 1.5rem; }
+    .vacant-number { font-size: 1.3rem; }
+    .ticker-item { font-size: 10px; padding: 0 12px; }
+    .ticker-label { font-size: 8px; padding: 0 12px; }
+  }
 </style>
 </head>
 <body>
 
-<button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+<button class="theme-btn" onclick="toggleTheme()">🌓</button>
 
-<div class="topbar">
-  <div class="topbar-stat">
-    <span class="topbar-label">Total Ranked</span>
-    <span class="topbar-value" id="val-ranked">—</span>
+<div class="container">
+  <div class="header">
+    <h1>Live Seat Availability</h1>
+    <p>Real-time seat tracking • Auto-refreshes every 30 seconds</p>
   </div>
-  <div class="divider"></div>
-  <div class="topbar-stat">
-    <span class="topbar-label">Allotted</span>
-    <span class="topbar-value" id="val-allotted">—</span>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Ranked</div>
+      <div class="stat-value" id="totalRanked">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Seats Allotted</div>
+      <div class="stat-value" id="totalAllotted">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Current Rank</div>
+      <div class="stat-value" id="currentRank">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Remaining</div>
+      <div class="stat-value" id="remainingSeats">—</div>
+    </div>
   </div>
-  <div class="divider"></div>
-  <div class="rank-badge">
-    <span class="rlabel">Current Rank</span>
-    <span id="val-rank">—</span>
+
+  <!-- Government Quota -->
+  <div class="quota-section">
+    <div class="quota-header">
+      <div class="quota-badge govt">🏛 GOVERNMENT QUOTA</div>
+      <div class="quota-line"></div>
+    </div>
+    <div class="seat-grid" id="govtGrid">
+      <div class="loading">Loading seat data...</div>
+    </div>
   </div>
-  <div class="divider"></div>
-  <div class="topbar-stat">
-    <span class="topbar-label">Remaining</span>
-    <span class="topbar-value" id="val-remaining">—</span>
-  </div>
-  <div class="divider"></div>
-  <div class="topbar-stat">
-    <span class="topbar-label">Total Seats</span>
-    <span class="topbar-value" id="val-total-seats">—</span>
+
+  <!-- Management Quota -->
+  <div class="quota-section">
+    <div class="quota-header">
+      <div class="quota-badge mgmt">💼 MANAGEMENT QUOTA</div>
+      <div class="quota-line"></div>
+    </div>
+    <div class="seat-grid" id="mgmtGrid">
+      <div class="loading">Loading seat data...</div>
+    </div>
   </div>
 </div>
 
-<div class="board">
-  <div class="quota-section">
-    <div class="quota-header">
-      <div class="quota-pill govt">🏛 Government Quota</div>
-      <div class="quota-line"></div>
-    </div>
-    <div class="cat-grid" id="govt-grid"><p class="no-cats">Loading...</p></div>
-  </div>
-  <div class="quota-section">
-    <div class="quota-header">
-      <div class="quota-pill mgmt">💼 Management Quota</div>
-      <div class="quota-line"></div>
-    </div>
-    <div class="cat-grid" id="mgmt-grid"><p class="no-cats">Loading...</p></div>
-  </div>
-</div>
-
+<!-- Ticker -->
 <div class="ticker-wrap">
   <div class="ticker-label govt-mode" id="tickerLabel">🏛 GOVT</div>
-  <div class="ticker-outer" id="tickerOuter">
+  <div class="ticker-outer">
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
 </div>
 
 <script>
-  // ── Theme ──
-  function toggleTheme() {
-    const h = document.documentElement;
-    h.dataset.theme = h.dataset.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('smrt_theme', h.dataset.theme);
-  }
-  (function() {
-    const s = localStorage.getItem('smrt_theme');
-    if (s) document.documentElement.dataset.theme = s;
-  })();
-
-  // ── Card builder ──
-  function cardHTML(s) {
-    const isFull = s.remaining <= 0;
-    const isLow  = !isFull && s.remaining <= 3;
-    const cls    = isFull ? 'is-full' : isLow ? 'is-low' : '';
-    const vcls   = isFull ? 'v-red' : isLow ? 'v-amber' : 'v-green';
-    const badge  = isFull ? '<div class="full-badge">FULL</div>' : '';
-    return `<div class="cat-card ${cls}">
-      ${badge}
-      <div class="cat-name">${s.name}</div>
-      <div class="cat-total-label">Total Seats</div>
-      <div class="cat-total-val">${s.total}</div>
-      <div class="cat-vacant-label">Vacant Seats</div>
-      <div class="cat-vacant ${vcls}">${s.remaining}</div>
-    </div>`;
-  }
-
-  // ── Ticker state machine ──
-  // States: 'govt-scroll' → 'pause' → 'mgmt-scroll' → 'pause' → repeat
-  const SPEED      = 55;    // px per second — human readable
-  const PAUSE_MS   = 5000;  // 5 second pause between quotas
-
-  let govtSeats = [];
-  let mgmtSeats = [];
+  const API_URL = "{{ url_for('main.counselling_live_status_api') }}";
+  let govtSeats = [], mgmtSeats = [];
   let tickerState = 'govt-scroll';
-  let tickerPos   = 0;
-  let animId      = null;
-  let lastTs      = null;
-  let pauseTimer  = null;
-  let trackHalfW  = 0;
+  let tickerPos = 0;
+  let animId = null;
+  let lastTs = null;
+  let pauseTimer = null;
+  let trackHalfW = 0;
+  let countdown = 30;
+  let refreshTimer;
+  const SPEED = 30;
+  const PAUSE_MS = 5000;
 
   const track = document.getElementById('tickerTrack');
   const label = document.getElementById('tickerLabel');
 
+  function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('seat_theme', next);
+  }
+
+  (function() {
+    const saved = localStorage.getItem('seat_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  })();
+
+  function getVacantClass(remaining) {
+    if (remaining <= 0) return 'full';
+    if (remaining <= 3) return 'low';
+    return 'available';
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function renderSeatCards(containerId, seats) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!seats || seats.length === 0) {
+      container.innerHTML = '<div class="loading">No categories configured</div>';
+      return;
+    }
+
+    container.innerHTML = seats.map(seat => {
+      const vacantClass = getVacantClass(seat.remaining);
+      const displayRemaining = seat.remaining <= 0 ? 'FULL' : seat.remaining;
+
+      return `
+        <div class="seat-card">
+          <div class="card-category">${escapeHtml(seat.category)}</div>
+          <div class="total-seats">
+            <div class="total-label">TOTAL SEATS</div>
+            <div class="total-number">${seat.total}</div>
+          </div>
+          <div class="vacant-info">
+            <div class="vacant-label">VACANT</div>
+            <div class="vacant-number ${vacantClass}">${displayRemaining}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Ticker Functions
   function buildTrackHTML(seats, headCls, headText) {
     let html = `<span class="ticker-head ${headCls}">${headText}</span>`;
     seats.forEach(s => {
       const isFull = s.remaining <= 0;
-      const isLow  = !isFull && s.remaining <= 3;
-      const vcls   = isFull ? 't-vn-r' : isLow ? 't-vn-a' : 't-vn-g';
-      const vdisp  = isFull
-        ? `<span class="${vcls}">FULL</span>`
-        : `<span class="${vcls}">${s.remaining}</span>`;
+      const isLow = !isFull && s.remaining <= 3;
+      let vacantClass = 'green';
+      if (isFull) vacantClass = 'red';
+      else if (isLow) vacantClass = 'amber';
       html += `<span class="ticker-item">
-        <span class="t-cat">${s.name}</span>&nbsp;
-        <span class="t-lbl">Vacant:</span>&nbsp;${vdisp}&nbsp;
-        <span class="t-lbl">|</span>&nbsp;
-        <span class="t-lbl">Total:</span>&nbsp;<span class="t-tot">${s.total}</span>
+        <span class="t-cat">${escapeHtml(s.category)}</span>
+        <span class="t-lbl">Vacant:</span>
+        <span class="t-vacant ${vacantClass}">${isFull ? 'FULL' : s.remaining}</span>
         <span class="ticker-sep">◆</span>
+        <span class="t-lbl">Total:</span>
+        <span class="t-total">${s.total}</span>
+        <span class="ticker-sep">●</span>
       </span>`;
     });
-    // Double for seamless scroll measurement
     return html + html;
   }
 
@@ -313,11 +528,10 @@
     lastTs = null;
     function step(ts) {
       if (lastTs === null) lastTs = ts;
-      const dt = Math.min((ts - lastTs) / 1000, 0.1); // cap dt to avoid jump after tab switch
+      const dt = Math.min((ts - lastTs) / 1000, 0.1);
       lastTs = ts;
       tickerPos += SPEED * dt;
       if (tickerPos >= trackHalfW) {
-        // completed one full pass — go to pause
         tickerPos = 0;
         track.style.transform = 'translateX(0)';
         animId = null;
@@ -333,11 +547,10 @@
   function enterPause() {
     stopAnim();
     label.className = 'ticker-label pause-mode';
-    label.textContent = '⏸ PAUSE';
+    label.textContent = '⏸ PAUSED';
     track.innerHTML = '';
     pauseTimer = setTimeout(() => {
-      // switch quota
-      tickerState = (tickerState === 'govt-scroll') ? 'mgmt-scroll' : 'govt-scroll';
+      tickerState = tickerState === 'govt-scroll' ? 'mgmt-scroll' : 'govt-scroll';
       enterScroll();
     }, PAUSE_MS);
   }
@@ -345,20 +558,17 @@
   function enterScroll() {
     stopAnim();
     tickerPos = 0;
-
     if (tickerState === 'govt-scroll') {
       label.className = 'ticker-label govt-mode';
-      label.textContent = '🏛 GOVT';
+      label.textContent = '🏛 GOVT QUOTA';
       if (!govtSeats.length) { enterPause(); return; }
-      track.innerHTML = buildTrackHTML(govtSeats, 'govt-h', '▶ GOVERNMENT QUOTA SEATS');
+      track.innerHTML = buildTrackHTML(govtSeats, 'govt-h', '▶ GOVERNMENT QUOTA');
     } else {
       label.className = 'ticker-label mgmt-mode';
-      label.textContent = '💼 MGMT';
+      label.textContent = '💼 MGMT QUOTA';
       if (!mgmtSeats.length) { enterPause(); return; }
-      track.innerHTML = buildTrackHTML(mgmtSeats, 'mgmt-h', '▶ MANAGEMENT QUOTA SEATS');
+      track.innerHTML = buildTrackHTML(mgmtSeats, 'mgmt-h', '▶ MANAGEMENT QUOTA');
     }
-
-    // measure after render
     requestAnimationFrame(() => {
       trackHalfW = track.scrollWidth / 2;
       track.style.transform = 'translateX(0)';
@@ -366,45 +576,64 @@
     });
   }
 
-  // ── AJAX refresh ──
-  function refresh() {
-    fetch('/api/seat-matrix')
-      .then(r => r.json())
-      .then(data => {
-        govtSeats = data.filter(d => !d.is_mgmt);
-        mgmtSeats = data.filter(d => d.is_mgmt);
+  // Fetch Data
+  async function fetchData() {
+    try {
+      const response = await fetch(API_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error('API error');
+      const data = await response.json();
 
-        document.getElementById('govt-grid').innerHTML = govtSeats.length
-          ? govtSeats.map(cardHTML).join('')
-          : '<p class="no-cats">No government quota categories configured.</p>';
+      document.getElementById('totalRanked').textContent = data.total_ranked ?? '—';
+      document.getElementById('totalAllotted').textContent = data.total_allotted ?? '—';
+      document.getElementById('currentRank').textContent = data.current_rank ?? '—';
+      
+      const remaining = (data.total_ranked || 0) - (data.total_allotted || 0);
+      document.getElementById('remainingSeats').textContent = remaining >= 0 ? remaining : '—';
 
-        document.getElementById('mgmt-grid').innerHTML = mgmtSeats.length
-          ? mgmtSeats.map(cardHTML).join('')
-          : '<p class="no-cats">No management quota categories configured.</p>';
+      // Update seat data for ticker
+      govtSeats = (data.govt_seats_list || []).map(s => ({
+        category: s.category,
+        total: s.total,
+        filled: s.filled,
+        remaining: s.remaining
+      }));
+      mgmtSeats = (data.mgmt_seats_list || []).map(s => ({
+        category: s.category,
+        total: s.total,
+        filled: s.filled,
+        remaining: s.remaining
+      }));
 
-        document.getElementById('val-total-seats').textContent =
-          data.reduce((a, d) => a + d.total, 0);
-      })
-      .catch(() => {});
+      renderSeatCards('govtGrid', govtSeats);
+      renderSeatCards('mgmtGrid', mgmtSeats);
 
-    fetch('/live/status')
-      .then(r => r.json())
-      .then(d => {
-        document.getElementById('val-ranked').textContent    = d.total_ranked   ?? '—';
-        document.getElementById('val-allotted').textContent  = d.total_allotted ?? '—';
-        document.getElementById('val-rank').textContent      = d.current_rank   ?? '—';
-        const rem = (d.total_ranked || 0) - (d.total_allotted || 0);
-        document.getElementById('val-remaining').textContent = rem >= 0 ? rem : '—';
-      })
-      .catch(() => {});
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
   }
 
-  // Start
-  refresh();
-  setInterval(refresh, 10000);
+  // Countdown Timer
+  function startCountdown() {
+    const countdownEl = document.getElementById('countdown');
+    if (!countdownEl) return;
+    if (refreshTimer) clearInterval(refreshTimer);
 
-  // Kick off ticker after first data likely loaded
-  setTimeout(enterScroll, 800);
+    refreshTimer = setInterval(() => {
+      countdown--;
+      if (countdownEl) countdownEl.textContent = countdown;
+      
+      if (countdown <= 0) {
+        countdown = 30;
+        fetchData();
+        if (countdownEl) countdownEl.textContent = countdown;
+      }
+    }, 1000);
+  }
+
+  // Initial load
+  fetchData();
+  startCountdown();
+  setTimeout(enterScroll, 1000);
 </script>
 </body>
 </html>
