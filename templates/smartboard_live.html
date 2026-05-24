@@ -28,9 +28,11 @@
     --card-l: rgba(255, 255, 255, 0.9);
     --shadow-l: 0 4px 24px rgba(90, 50, 0, 0.12);
     --green: #10B981;
-    --green-bg: rgba(16, 185, 129, 0.10);
+    --red: #EF4444;
     --blue: #1A5FB4;
     --blue-bg: rgba(26, 95, 180, 0.10);
+    --orange: #f7971e;
+    --orange-bg: rgba(247, 151, 30, 0.10);
   }
 
   [data-theme="dark"] {
@@ -48,9 +50,11 @@
     --card-l: rgba(255, 255, 255, 0.06);
     --shadow-l: 0 4px 24px rgba(0, 0, 0, 0.40);
     --green: #34D399;
-    --green-bg: rgba(52, 211, 153, 0.10);
+    --red: #FF6B6B;
     --blue: #60A5FA;
     --blue-bg: rgba(96, 165, 250, 0.10);
+    --orange: #ffd200;
+    --orange-bg: rgba(255, 210, 0, 0.10);
   }
 
   body {
@@ -160,18 +164,18 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
   }
-  .quota-badge.govt {
+  .quota-badge.regular {
     background: var(--blue-bg);
     color: var(--blue);
     border: 1px solid rgba(26, 95, 180, 0.3);
   }
-  .quota-badge.mgmt {
-    background: rgba(212, 160, 23, 0.12);
-    color: var(--gold-deep);
-    border: 1px solid var(--border-l2);
+  .quota-badge.payment {
+    background: var(--orange-bg);
+    color: var(--orange);
+    border: 1px solid rgba(247, 151, 30, 0.3);
   }
-  [data-theme="dark"] .quota-badge.mgmt {
-    color: var(--gold);
+  [data-theme="dark"] .quota-badge.payment {
+    color: var(--orange);
   }
   .quota-line {
     flex: 1;
@@ -202,7 +206,7 @@
   }
 
   .card-category {
-    font-size: 1rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: var(--ink);
     margin-bottom: 14px;
@@ -231,7 +235,7 @@
     color: var(--ink-3);
   }
   .total-number {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #000000;
     line-height: 1.2;
@@ -253,11 +257,14 @@
     color: var(--ink-3);
   }
   .vacant-number {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 900;
     color: var(--green);
     line-height: 1;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
+  }
+  .vacant-number.nil {
+    color: var(--red);
   }
 
   .loading {
@@ -297,11 +304,11 @@
     flex-shrink: 0;
     transition: all 0.3s;
   }
-  .ticker-label.govt-mode {
+  .ticker-label.regular-mode {
     background: linear-gradient(135deg, var(--blue), #0083b0);
     color: white;
   }
-  .ticker-label.mgmt-mode {
+  .ticker-label.payment-mode {
     background: linear-gradient(135deg, #f7971e, #ffd200);
     color: #000;
   }
@@ -339,7 +346,9 @@
   }
   .t-cat { font-weight: 800; color: var(--gold); }
   .t-lbl { color: var(--ink-3); font-size: 9px; font-weight: 600; margin: 0 4px; }
-  .t-vacant { font-weight: 900; font-size: 13px; color: var(--green); }
+  .t-vacant { font-weight: 900; font-size: 13px; }
+  .t-vacant.green { color: var(--green); }
+  .t-vacant.red { color: var(--red); }
   .t-total { color: var(--gold); font-weight: 800; }
   .ticker-head {
     display: inline-flex;
@@ -350,10 +359,9 @@
     letter-spacing: 2px;
     text-transform: uppercase;
   }
-  .ticker-head.govt-h { color: var(--blue); }
-  .ticker-head.mgmt-h { color: #ffd200; }
+  .ticker-head.regular-h { color: var(--blue); }
+  .ticker-head.payment-h { color: #ffd200; }
 
-  /* Horizontal scroll for category name on mobile if needed */
   @media (max-width: 640px) {
     .container { padding: 16px; }
     .header h1 { font-size: 1.5rem; }
@@ -362,18 +370,18 @@
     .stat-card { padding: 12px 20px; min-width: 100px; }
     .seat-grid { gap: 12px; grid-template-columns: repeat(auto-fill, minmax(170px, auto)); }
     .seat-card { padding: 14px 12px; }
-    .card-category { font-size: 0.85rem; white-space: normal; word-break: keep-all; }
-    .total-number { font-size: 1.1rem; }
-    .vacant-number { font-size: 2.8rem; letter-spacing: -1px; }
+    .card-category { font-size: 1.1rem; white-space: normal; word-break: keep-all; }
+    .total-number { font-size: 0.9rem; }
+    .vacant-number { font-size: 2rem; }
     .ticker-item { font-size: 10px; padding: 0 12px; }
     .ticker-label { font-size: 8px; padding: 0 12px; }
   }
 
   @media (max-width: 480px) {
     .seat-grid { grid-template-columns: repeat(auto-fill, minmax(150px, auto)); }
-    .card-category { font-size: 0.75rem; }
-    .vacant-number { font-size: 2.4rem; }
-    .total-number { font-size: 1rem; }
+    .card-category { font-size: 1rem; }
+    .vacant-number { font-size: 1.8rem; }
+    .total-number { font-size: 0.85rem; }
   }
 </style>
 </head>
@@ -406,24 +414,24 @@
     </div>
   </div>
 
-  <!-- Government Quota -->
+  <!-- Regular Seats -->
   <div class="quota-section">
     <div class="quota-header">
-      <div class="quota-badge govt">🏛 GOVERNMENT QUOTA</div>
+      <div class="quota-badge regular">🏛 REGULAR SEATS</div>
       <div class="quota-line"></div>
     </div>
-    <div class="seat-grid" id="govtGrid">
+    <div class="seat-grid" id="regularGrid">
       <div class="loading">Loading seat data...</div>
     </div>
   </div>
 
-  <!-- Management Quota -->
+  <!-- Payment Seats -->
   <div class="quota-section">
     <div class="quota-header">
-      <div class="quota-badge mgmt">💼 MANAGEMENT QUOTA</div>
+      <div class="quota-badge payment">💼 PAYMENT SEATS</div>
       <div class="quota-line"></div>
     </div>
-    <div class="seat-grid" id="mgmtGrid">
+    <div class="seat-grid" id="paymentGrid">
       <div class="loading">Loading seat data...</div>
     </div>
   </div>
@@ -431,7 +439,7 @@
 
 <!-- Ticker -->
 <div class="ticker-wrap">
-  <div class="ticker-label govt-mode" id="tickerLabel">🏛 GOVT</div>
+  <div class="ticker-label regular-mode" id="tickerLabel">🏛 REGULAR</div>
   <div class="ticker-outer">
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
@@ -439,8 +447,8 @@
 
 <script>
   const API_URL = "{{ url_for('main.counselling_live_status_api') }}";
-  let govtSeats = [], mgmtSeats = [];
-  let tickerState = 'govt-scroll';
+  let regularSeats = [], paymentSeats = [];
+  let tickerState = 'regular-scroll';
   let tickerPos = 0;
   let animId = null;
   let lastTs = null;
@@ -486,7 +494,9 @@
     }
 
     container.innerHTML = seats.map(seat => {
-      const displayRemaining = seat.remaining <= 0 ? 'FULL' : seat.remaining;
+      const isNil = seat.remaining <= 0;
+      const displayRemaining = isNil ? 'NIL' : seat.remaining;
+      const nilClass = isNil ? 'nil' : '';
 
       return `
         <div class="seat-card">
@@ -497,7 +507,7 @@
           </div>
           <div class="vacant-info">
             <div class="vacant-label">VACANT</div>
-            <div class="vacant-number">${displayRemaining}</div>
+            <div class="vacant-number ${nilClass}">${displayRemaining}</div>
           </div>
         </div>
       `;
@@ -508,11 +518,13 @@
   function buildTrackHTML(seats, headCls, headText) {
     let html = `<span class="ticker-head ${headCls}">${headText}</span>`;
     seats.forEach(s => {
-      const isFull = s.remaining <= 0;
+      const isNil = s.remaining <= 0;
+      const vacantClass = isNil ? 'red' : 'green';
+      const displayVacant = isNil ? 'NIL' : s.remaining;
       html += `<span class="ticker-item">
         <span class="t-cat">${escapeHtml(s.category)}</span>
         <span class="t-lbl">Vacant:</span>
-        <span class="t-vacant">${isFull ? 'FULL' : s.remaining}</span>
+        <span class="t-vacant ${vacantClass}">${displayVacant}</span>
         <span class="ticker-sep">◆</span>
         <span class="t-lbl">Total:</span>
         <span class="t-total">${s.total}</span>
@@ -554,7 +566,7 @@
     label.textContent = '⏸ PAUSED';
     track.innerHTML = '';
     pauseTimer = setTimeout(() => {
-      tickerState = tickerState === 'govt-scroll' ? 'mgmt-scroll' : 'govt-scroll';
+      tickerState = tickerState === 'regular-scroll' ? 'payment-scroll' : 'regular-scroll';
       enterScroll();
     }, PAUSE_MS);
   }
@@ -562,16 +574,16 @@
   function enterScroll() {
     stopAnim();
     tickerPos = 0;
-    if (tickerState === 'govt-scroll') {
-      label.className = 'ticker-label govt-mode';
-      label.textContent = '🏛 GOVT QUOTA';
-      if (!govtSeats.length) { enterPause(); return; }
-      track.innerHTML = buildTrackHTML(govtSeats, 'govt-h', '▶ GOVERNMENT QUOTA');
+    if (tickerState === 'regular-scroll') {
+      label.className = 'ticker-label regular-mode';
+      label.textContent = '🏛 REGULAR SEATS';
+      if (!regularSeats.length) { enterPause(); return; }
+      track.innerHTML = buildTrackHTML(regularSeats, 'regular-h', '▶ REGULAR SEATS');
     } else {
-      label.className = 'ticker-label mgmt-mode';
-      label.textContent = '💼 MGMT QUOTA';
-      if (!mgmtSeats.length) { enterPause(); return; }
-      track.innerHTML = buildTrackHTML(mgmtSeats, 'mgmt-h', '▶ MANAGEMENT QUOTA');
+      label.className = 'ticker-label payment-mode';
+      label.textContent = '💼 PAYMENT SEATS';
+      if (!paymentSeats.length) { enterPause(); return; }
+      track.innerHTML = buildTrackHTML(paymentSeats, 'payment-h', '▶ PAYMENT SEATS');
     }
     requestAnimationFrame(() => {
       trackHalfW = track.scrollWidth / 2;
@@ -594,29 +606,29 @@
       const remaining = (data.total_ranked || 0) - (data.total_allotted || 0);
       document.getElementById('remainingSeats').textContent = remaining >= 0 ? remaining : '—';
 
-      // Update seat data for ticker
-      govtSeats = (data.govt_seats_list || []).map(s => ({
+      // Update seat data
+      regularSeats = (data.govt_seats_list || []).map(s => ({
         category: s.category,
         total: s.total,
         filled: s.filled,
         remaining: s.remaining
       }));
-      mgmtSeats = (data.mgmt_seats_list || []).map(s => ({
+      paymentSeats = (data.mgmt_seats_list || []).map(s => ({
         category: s.category,
         total: s.total,
         filled: s.filled,
         remaining: s.remaining
       }));
 
-      renderSeatCards('govtGrid', govtSeats);
-      renderSeatCards('mgmtGrid', mgmtSeats);
+      renderSeatCards('regularGrid', regularSeats);
+      renderSeatCards('paymentGrid', paymentSeats);
 
     } catch (error) {
       console.error('Fetch error:', error);
     }
   }
 
-  // Auto-refresh in background (no display text)
+  // Auto-refresh in background
   function startAutoRefresh() {
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(() => {
