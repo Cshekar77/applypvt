@@ -60,7 +60,7 @@
   .btn-ctrl:hover { opacity: .88; transform: translateY(-1px); }
 
   .cl-body { display: grid; grid-template-columns: 300px 1fr; gap: 1.25rem; align-items: start; }
-  .cl-left { display: flex; flex-direction: column; gap: 1rem; }
+  .cl-left { display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
   .cl-card { background: white; border-radius: 16px; border: 1px solid #eef2f8; box-shadow: 0 2px 8px rgba(0,0,0,.05); padding: 1.25rem; }
   .cl-card-title { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #8a9ab0; margin: 0 0 1rem; display: flex; align-items: center; gap: .4rem; }
   .rank-display { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; color: #0a1f44; line-height: 1; margin-bottom: .3rem; }
@@ -71,7 +71,9 @@
   .rank-input-row textarea { resize: none; }
   .btn-next-rank { padding: .55rem 1.1rem; background: #c9a03d; color: white; border: none; border-radius: 9px; font-size: .85rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; transition: all .2s; box-shadow: 0 3px 10px rgba(201,160,61,.3); width: 100%; justify-content: center; margin-bottom: .5rem; }
   .btn-next-rank:hover { transform: translateY(-2px); }
-  .btn-seat-track { width: 100%; padding: .65rem 1rem; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 12px; font-size: .85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; transition: all .2s; box-shadow: 0 3px 12px rgba(124,58,237,.25); }
+  .btn-allot-current { width: 100%; padding: .58rem 1rem; background: linear-gradient(135deg, #25c26e, #1da85c); color: white; border: none; border-radius: 10px; font-size: .85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .45rem; transition: all .2s; box-shadow: 0 3px 10px rgba(37,194,110,.28); margin-bottom: .5rem; }
+  .btn-allot-current:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(37,194,110,.38); }
+  .btn-allot-current:disabled { background: #b0bac8; box-shadow: none; cursor: not-allowed; transform: none; }
   .btn-seat-track:hover { transform: translateY(-2px); }
   .seat-track-badge { background: rgba(255,255,255,.25); padding: 1px 7px; border-radius: 20px; font-size: .72rem; font-weight: 700; }
 
@@ -248,6 +250,7 @@
   body.dark .modal-close:hover { background: #4a1515; color: #f87171; }
   body.dark .rank-display { color: #eef2ff; }
   body.dark .btn-close-modal, body.dark .btn-cancel-edit { background: #2d3e54; color: #b9c8e8; }
+  body.dark .btn-allot-current { background: linear-gradient(135deg, #1a9e5a, #157a45); }
   body.dark .seat-quota-header.govt { background: #0d2346; border-color: #1e3a7a; color: #93c5fd; }
   body.dark .seat-quota-header.mgmt { background: #1e1035; border-color: #4c1d95; color: #c4b5fd; }
   body.dark .seat-quota-table-wrap { border-color: #2d3e54; }
@@ -270,7 +273,7 @@
   body.dark .doc-pill-pending  { background: #1c1500; color: #fde68a; }
 
   /* ── RESPONSIVE ── */
-  @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } }
+  @media(max-width: 900px) { .cl-body { grid-template-columns: 1fr; } .cl-left { position: static; max-height: none; overflow-y: visible; } }
   @media(max-width: 600px) {
     .cl-page { padding: 1rem .75rem 5rem; }
     .cl-header h2 { font-size: 1.35rem; }
@@ -391,6 +394,15 @@
           <input type="hidden" name="action" value="next_rank"/>
           <button type="submit" class="btn-next-rank"><i class="fas fa-forward"></i> Next → #{{ cs.current_rank + 1 }}</button>
         </form>
+        {# Allot Seat for current rank student #}
+        {% set cur_stu = students | selectattr('rank', 'equalto', cs.current_rank) | list | first %}
+        {% if cur_stu %}
+        <button class="btn-allot-current"
+          onclick="openStudentModal({{ cur_stu.id }}, '{{ cur_stu.full_name | replace("'", "\\'") }}', '{{ cur_stu.email }}', '{{ cur_stu.phone or '' }}', '{{ cur_stu.category_name or '' }}')"
+        ><i class="fas fa-chair"></i> Allot Seat — {{ cur_stu.full_name.split()[0] }}</button>
+        {% else %}
+        <button class="btn-allot-current" disabled><i class="fas fa-chair"></i> No student at Rank #{{ cs.current_rank }}</button>
+        {% endif %}
         {% endif %}
         <form method="POST">
           <input type="hidden" name="action" value="update_rank"/>

@@ -241,7 +241,12 @@ def counselling_live_status_api():
             is_verified=True
         ).first()
         if student:
-            pass  # Currently called student is always pending on the live page
+            a = SeatAllotment.query.filter_by(application_id=student.id).first()
+            if a:
+                allotment = {
+                    'quota': a.quota,
+                    'allotted_at': fmt_ist(a.allotted_at, '%d %b %Y at %I:%M %p'),
+                }
 
     admit_categories = AdmitCategory.query.filter_by(is_active=True)\
         .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
@@ -271,7 +276,7 @@ def counselling_live_status_api():
             'rank': student.rank if student else None,
             'percent_12': student.percent_12 if student else None,
             'category_name': student.category_name if student else None,
-            'quota': None,
+            'quota': allotment['quota'] if allotment else None,
         },
         'allotment': allotment,
         'govt_seats_list': govt_seats_list,
