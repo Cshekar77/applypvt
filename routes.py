@@ -161,6 +161,17 @@ def index():
     settings = FormSettings.get()
     return render_template('index.html', settings=settings)
 
+@main.route('/api/seat-matrix')
+def api_seat_matrix():
+    categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+    return jsonify([{
+        'name':      ac.name,
+        'total':     ac.total_seats,
+        'used':      ac.seats_used,
+        'remaining': ac.seats_remaining,
+        'is_mgmt':   ac.name.upper().endswith('-PY'),
+    } for ac in categories])
 
 # ─────────────────────────────────────────
 #  Public — Live Counselling Tracker
@@ -1748,8 +1759,23 @@ def admin_counselling():
             allotment = SeatAllotment.query.filter_by(application_id=app_id).first()
             if allotment:
                 db.session.delete(allotment)
-                db.session.commit()
-                flash('✅ Seat allotment revoked.', 'info')
+
+            # Revoke fee assignment
+            sf = StudentFee.query.filter_by(application_id=app_id).first()
+            if sf:
+                db.session.delete(sf)
+
+            # Revoke StudentFees (total) and its receipts
+            fees = StudentFees.query.filter_by(application_id=app_id).first()
+            if fees:
+                PaymentReceipt.query.filter_by(fees_id=fees.id).delete()
+                db.session.delete(fees)
+
+            # Also delete any orphaned receipts directly on application_id
+            PaymentReceipt.query.filter_by(application_id=app_id).delete()
+
+            db.session.commit()
+            flash('✅ Seat allotment and fees revoked.', 'info')
 
         return redirect(url_for('main.admin_counselling'))
 

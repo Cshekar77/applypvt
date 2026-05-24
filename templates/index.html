@@ -57,6 +57,7 @@
 <body>
     <div id="root"></div>
 
+    {% raw %}
     <script type="module">
         import React, { useState, useEffect } from 'https://esm.sh/react@19';
         import ReactDOM from 'https://esm.sh/react-dom@19/client';
@@ -90,7 +91,7 @@
 
         const html = htm.bind(React.createElement);
 
-        const SITE = {
+         const SITE = {
             univEN: "Bangalore University",
             univKN: "ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾಲಯ",
             deptEN: "Department of Computer Science & Applications",
@@ -445,83 +446,7 @@
                                             </div>
                                         `}
 
-                                        ${activeModal === 'seats' && html`
-                                            <div className="space-y-6">
-                                                <div className="flex justify-center mb-4">
-                                                    <h4 className="text-xl font-bold text-navy border-b-2 border-gold pb-1 uppercase tracking-widest">Provisional Seat Matrix</h4>
-                                                </div>
-                                                <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
-                                                    <table className="w-full text-xs text-left border-collapse min-w-[1000px]">
-                                                        <thead className="bg-navy text-white uppercase tracking-widest font-mono text-[0.55rem]">
-                                                            <tr>
-                                                                <th className="p-3 border-r border-white/10 text-center">Sl. No.</th>
-                                                                <th className="p-3 border-r border-white/10 min-w-[200px]">
-                                                                    B.C.A. Under Graduate programme<br/>
-                                                                    (a) Machine Learning,<br/>
-                                                                    (b) Data Science<br/>
-                                                                    (c) Full Stack Development.
-                                                                </th>
-                                                                <th className="p-3 border-r border-white/10 text-center">GM<br/>44%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">SC<br/>17%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">ST<br/>7%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">Cat-I<br/>4%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">IIA<br/>15%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">IIB<br/>4%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">IIIA<br/>4%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">IIIB<br/>5%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">HK<br/>8%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">PWD<br/>5%</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">KM</th>
-                                                                <th className="p-3 border-r border-white/10 text-center">RL</th>
-                                                                <th className="p-3 text-center bg-gold text-navy font-bold">Total intake</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-navy/5 text-navy/80 font-mono">
-                                                            <tr className="hover:bg-paper-dark transition-colors">
-                                                                <td className="p-3 text-center border-r border-navy/5">1.</td>
-                                                                <td className="p-3 font-bold border-r border-navy/5">Regular fees</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">33</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">13</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">5</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">11</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">4</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">7*</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">4*</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
-                                                                <td className="p-3 text-center font-bold text-navy bg-gold/5">90</td>
-                                                            </tr>
-                                                            <tr className="hover:bg-paper-dark transition-colors">
-                                                                <td className="p-3 text-center border-r border-navy/5">2.</td>
-                                                                <td className="p-3 font-bold border-r border-navy/5">Payment fees</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">32</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">12</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">5</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">11</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">3</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">4</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">8*</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">5*</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
-                                                                <td className="p-3 text-center border-r border-navy/5">2</td>
-                                                                <td className="p-3 text-center font-bold text-navy bg-gold/5">90</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div className="flex flex-wrap gap-4 text-[0.65rem] text-text-muted italic px-2 font-medium">
-                                                    <span><b>HK</b>—Hyderabad Karnataka</span>
-                                                    <span><b>RL</b>—Rural</span>
-                                                    <span><b>PWD</b>—Persons with Disabilities</span>
-                                                    <span><b>KM</b>—Kannada Medium Quota</span>
-                                                </div>
-                                            </div>
-                                        `}
+                                        ${activeModal === 'seats' && html`<${SeatMatrixModal} t=${t} />`}
 
                                         ${activeModal === 'fees' && html`
                                             <div className="space-y-12">
@@ -721,8 +646,86 @@
             `;
         }
 
+        function SeatMatrixModal({ t }) {
+            const [rows, setRows] = React.useState(null);
+            const [error, setError] = React.useState(null);
+
+            React.useEffect(() => {
+                fetch('/api/seat-matrix')
+                    .then(r => r.json())
+                    .then(data => setRows(data))
+                    .catch(() => setError('Failed to load seat data.'));
+            }, []);
+
+            if (error) return html`<p className="text-red-500 text-sm">${error}</p>`;
+            if (!rows) return html`
+                <div className="flex items-center justify-center py-16 gap-4 text-text-muted">
+                    <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                    Loading seat matrix...
+                </div>
+            `;
+
+            const govt = rows.filter(r => !r.is_mgmt);
+            const mgmt = rows.filter(r =>  r.is_mgmt);
+
+            const Section = ({ title, data, accent }) => html`
+                <div className="space-y-3">
+                    <h5 className="text-sm font-bold uppercase tracking-widest text-navy flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full inline-block" style=${{ background: accent }} />
+                        ${title}
+                    </h5>
+                    <div className="overflow-x-auto rounded-2xl border border-navy/5 card-shadow">
+                        <table className="w-full text-xs text-left border-collapse">
+                            <thead>
+                                <tr style=${{ background: '#0c1a35' }} className="text-white uppercase tracking-widest font-mono text-[0.55rem]">
+                                    <th className="p-3 border-r border-white/10">Category</th>
+                                    <th className="p-3 border-r border-white/10 text-center">Total</th>
+                                    <th className="p-3 border-r border-white/10 text-center">Filled</th>
+                                    <th className="p-3 text-center" style=${{ background: accent, color: '#0c1a35', fontWeight: 'bold' }}>Available</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-navy/5">
+                                ${data.map((r, i) => html`
+                                    <tr key=${i} className="hover:bg-paper-dark transition-colors">
+                                        <td className="p-3 font-bold text-navy border-r border-navy/5">${r.name}</td>
+                                        <td className="p-3 text-center font-mono border-r border-navy/5">${r.total}</td>
+                                        <td className="p-3 text-center font-mono border-r border-navy/5 text-text-muted">${r.used}</td>
+                                        <td className="p-3 text-center font-mono font-bold" style=${{
+                                            color: r.remaining === 0 ? '#dc2626' : r.remaining <= 3 ? '#d97706' : '#16a34a'
+                                        }}>${r.remaining}</td>
+                                    </tr>
+                                `)}
+                                <tr style=${{ background: '#0c1a35' }} className="text-white font-bold text-xs">
+                                    <td className="p-3 uppercase tracking-widest">Total</td>
+                                    <td className="p-3 text-center font-mono">${data.reduce((s,r) => s+r.total, 0)}</td>
+                                    <td className="p-3 text-center font-mono">${data.reduce((s,r) => s+r.used, 0)}</td>
+                                    <td className="p-3 text-center font-mono" style=${{ color: accent }}>${data.reduce((s,r) => s+r.remaining, 0)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            return html`
+                <div className="space-y-8">
+                    <div className="flex justify-center mb-2">
+                        <h4 className="text-xl font-bold text-navy border-b-2 border-gold pb-1 uppercase tracking-widest">
+                            Live Seat Matrix
+                        </h4>
+                    </div>
+                    ${govt.length > 0 && html`<${Section} title="Government Quota" data=${govt} accent="#c8963c" />`}
+                    ${mgmt.length > 0 && html`<${Section} title="Management Quota" data=${mgmt} accent="#60a5fa" />`}
+                    ${rows.length === 0 && html`
+                        <p className="text-center text-text-muted py-8">No seat categories configured yet.</p>
+                    `}
+                </div>
+            `;
+        }
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(React.createElement(App));
     </script>
+    {% endraw %}
 </body>
 </html>

@@ -2,13 +2,11 @@ Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Flask-WTF==1.2.1
-Flask-Mail==0.10.0
 WTForms==3.1.2
 Werkzeug==3.0.3
 openpyxl==3.1.2
 email-validator==2.2.0
 python-dotenv==1.0.1
-
-
-
-
+pandas==2.1.4
+requests==2.31.0
+reportlab==4.0.7
