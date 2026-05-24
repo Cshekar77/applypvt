@@ -4,8 +4,6 @@
 
 {% block content %}
 <style>
-/* Using system fonts — no Google import needed */
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* ══════════════════════════════════════
@@ -128,13 +126,14 @@ body {
   box-shadow: 0 2px 10px var(--gold-glow);
 }
 .cl-nav-name {
-  font-family: 'Playfair Display', serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 0.92rem; font-weight: 700;
   color: var(--ink); letter-spacing: 0.01em;
   line-height: 1.1;
 }
 .cl-nav-sub {
-  font-family: 'DM Mono', monospace; font-size: 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.5rem;
   letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3);
 }
 .cl-nav-right { display: flex; align-items: center; gap: 0.65rem; }
@@ -143,7 +142,8 @@ body {
 .status-pill {
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.3rem 0.8rem; border-radius: 99px;
-  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.58rem;
   font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
 }
 .status-pill.running { background: var(--teal-bg); border: 1px solid var(--teal-bdr); color: var(--teal); }
@@ -203,14 +203,15 @@ body {
 }
 .cl-hero-eyebrow {
   display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.6rem;
   letter-spacing: 0.25em; text-transform: uppercase;
   color: var(--gold-deep); margin-bottom: 1.2rem;
 }
 [data-theme="dark"] .cl-hero-eyebrow { color: var(--gold); }
 .cl-hero-line { width: 28px; height: 2px; background: var(--gold); border-radius: 2px; }
 .cl-hero-h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(2.8rem, 10vw, 5.5rem);
   font-weight: 900;
   line-height: 0.95;
@@ -229,7 +230,8 @@ body {
   text-shadow: 0 0 30px var(--gold-glow);
 }
 .cl-hero-sub {
-  font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.62rem;
   letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--ink-3);
 }
@@ -261,7 +263,7 @@ body {
 .cl-state-icon { font-size: 2.6rem; margin-bottom: 1.2rem; display: block; animation: float-icon 3.5s ease-in-out infinite; }
 @keyframes float-icon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 .cl-state-title {
-  font-family: 'Playfair Display', serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 1.7rem; font-weight: 700;
   color: var(--ink); margin-bottom: 0.6rem;
 }
@@ -296,14 +298,15 @@ body {
   pointer-events: none;
 }
 .cl-rank-label {
-  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.58rem;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--gold-deep); margin-bottom: 0.4rem;
 }
 [data-theme="dark"] .cl-rank-label { color: var(--gold); opacity: 0.7; }
 .cl-rank-row { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
 .cl-rank-num {
-  font-family: 'Playfair Display', serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(4.5rem, 16vw, 7.5rem);
   font-weight: 900; line-height: 0.88;
   letter-spacing: -0.04em;
@@ -311,7 +314,7 @@ body {
 }
 [data-theme="dark"] .cl-rank-num { text-shadow: 0 0 40px var(--gold-glow); }
 .cl-rank-num sup {
-  font-size: 0.22em; font-family: 'DM Sans', sans-serif;
+  font-size: 0.22em; font-family: Arial, Helvetica, sans-serif;
   font-weight: 400; color: var(--ink-3); vertical-align: super; letter-spacing: 0;
 }
 .live-badge {
@@ -319,7 +322,8 @@ body {
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: var(--teal-bg); border: 1px solid var(--teal-bdr);
   color: var(--teal); padding: 0.32rem 0.85rem; border-radius: 99px;
-  font-family: 'DM Mono', monospace; font-size: 0.56rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.56rem;
   letter-spacing: 0.12em; text-transform: uppercase;
 }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse-anim 1.2s infinite; }
@@ -330,9 +334,16 @@ body {
   margin-bottom: 1.5rem;
 }
 @media (max-width: 420px) { .cl-detail-grid { grid-template-columns: 1fr; gap: 1rem; } }
-.cl-dl { font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.28rem; }
+.cl-dl {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 0.28rem;
+}
 .cl-dv { font-size: 1rem; font-weight: 600; color: var(--ink); }
-.cl-dv.pct { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 700; color: var(--gold); line-height: 1; }
+.cl-dv.pct {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.9rem; font-weight: 700; color: var(--gold); line-height: 1;
+}
 [data-theme="dark"] .cl-dv.pct { text-shadow: 0 0 18px var(--gold-glow); }
 
 /* Allotment box */
@@ -350,7 +361,8 @@ body {
 .allot-box.pending  .allot-icon { background: rgba(212,160,23,0.15); color: var(--gold-deep); border: 1px solid var(--border-l2); }
 [data-theme="dark"] .allot-box.pending .allot-icon { color: var(--gold); }
 .allot-tag {
-  font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.14em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.54rem; letter-spacing: 0.14em;
   text-transform: uppercase; margin-bottom: 0.22rem;
 }
 .allot-box.success .allot-tag { color: var(--teal); }
@@ -389,14 +401,16 @@ body {
 }
 .cl-stat:hover { transform: translateY(-4px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
 .cl-stat-num {
-  font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 2.1rem; font-weight: 700;
   line-height: 1; margin-bottom: 0.28rem; letter-spacing: -0.03em; color: var(--ink);
 }
 .cl-stat-num.gold { color: var(--gold); }
 [data-theme="dark"] .cl-stat-num.gold { text-shadow: 0 0 16px var(--gold-glow); }
 .cl-stat-num.teal { color: var(--teal); }
 .cl-stat-lbl {
-  font-family: 'DM Mono', monospace; font-size: 0.53rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.53rem;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
 }
 
@@ -408,7 +422,8 @@ body {
   margin: 2rem 0 1rem; padding: 0 1.1rem;
 }
 .cl-sec-title {
-  font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem; font-weight: 700;
   color: var(--ink-2); white-space: nowrap;
 }
 .cl-sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-l2), transparent); }
@@ -418,7 +433,8 @@ body {
   margin: 1.5rem 1.1rem 0.9rem; padding: 0;
 }
 .cl-quota-badge {
-  font-family: 'DM Mono', monospace; font-size: 0.56rem; font-weight: 500;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.56rem; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase;
   padding: 0.28rem 0.9rem; border-radius: 99px; white-space: nowrap;
 }
@@ -446,17 +462,22 @@ body {
 }
 .cl-seat-card:hover { transform: translateY(-3px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
 .cl-sc-name {
-  font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem; font-weight: 700;
   color: var(--ink); margin-bottom: 0.8rem; padding-bottom: 0.6rem;
   border-bottom: 1px solid var(--border-l);
 }
 .cl-sc-row { display: flex; align-items: center; justify-content: space-between; }
-.cl-sc-lbl { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.cl-sc-lbl {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-3);
+}
 .cl-sc-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
-.cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); }
 .cl-sc-tag {
-  font-family: 'DM Mono', monospace; font-size: 0.52rem; font-weight: 500;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.52rem; font-weight: 500;
   padding: 0.12rem 0.52rem; border-radius: 6px; white-space: nowrap;
 }
 .cl-sc-tag.avail { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
@@ -482,11 +503,16 @@ body {
   flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.1rem;
 }
 .cl-smap-title {
-  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.58rem;
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);
 }
 .cl-smap-legend { display: flex; gap: 0.9rem; flex-wrap: wrap; }
-.cl-leg { display: flex; align-items: center; gap: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.53rem; color: var(--ink-3); }
+.cl-leg {
+  display: flex; align-items: center; gap: 0.35rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.53rem; color: var(--ink-3);
+}
 .cl-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .cl-leg-dot.g { background: linear-gradient(135deg, var(--blue), #60A5FA); }
 .cl-leg-dot.m { background: linear-gradient(135deg, #FF8C00, #FFA500); }
@@ -519,10 +545,14 @@ body {
 .cl-hist-btn:hover { border-color: var(--border-l2); }
 .cl-hist-btn.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
 .cl-hist-left { display: flex; align-items: center; gap: 0.7rem; }
-.cl-hist-title { font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 700; color: var(--ink); }
+.cl-hist-title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.98rem; font-weight: 700; color: var(--ink);
+}
 .cl-hist-count {
   background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr);
-  font-family: 'DM Mono', monospace; font-size: 0.54rem; font-weight: 500;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.54rem; font-weight: 500;
   padding: 0.12rem 0.52rem; border-radius: 99px;
 }
 .cl-chevron { font-size: 0.68rem; color: var(--ink-3); transition: transform 0.25s; }
@@ -537,7 +567,8 @@ body {
 .cl-hist-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .cl-htable { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 460px; }
 .cl-htable thead th {
-  background: rgba(212,160,23,0.07); font-family: 'DM Mono', monospace;
+  background: rgba(212,160,23,0.07);
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 0.53rem; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--ink-3); padding: 0.7rem 1rem; text-align: left;
   border-bottom: 1px solid var(--border-l); white-space: nowrap;
@@ -548,14 +579,17 @@ body {
 .cl-htable tbody tr:hover td { background: rgba(212,160,23,0.05); }
 [data-theme="dark"] .cl-htable tbody tr:hover td { background: rgba(240,192,64,0.04); }
 .r-pill {
-  display: inline-block; font-family: 'Playfair Display', serif;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 0.88rem; font-weight: 700; color: var(--gold);
   background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.25);
   padding: 0.06rem 0.52rem; border-radius: 6px;
 }
 [data-theme="dark"] .r-pill { background: rgba(240,192,64,0.10); border-color: rgba(240,192,64,0.25); color: var(--gold); }
 .q-pill {
-  display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.52rem;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.52rem;
   font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
   padding: 0.12rem 0.52rem; border-radius: 99px; white-space: nowrap;
 }
@@ -573,7 +607,8 @@ body {
   animation: fade-up 0.5s ease both;
 }
 .cl-refresh-label {
-  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.58rem;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--ink-3); display: flex; align-items: center; gap: 0.35rem;
 }
@@ -734,8 +769,8 @@ body {
           <div class="allot-icon">✓</div>
           <div>
             <div class="allot-tag">Seat Allotted</div>
-            <div class="allot-name" id="allotmentNameVal">{% if allotment %}{{ student.full_name | upper }} — {% if allotment.quota == 'government' %}Government Quota{% else %}Management Quota{% endif %}{% endif %}</div>
-            <div class="allot-time" id="allotmentTimeVal">{% if allotment %}{{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }} IST{% endif %}</div>
+            <div class="allot-name" id="allotmentNameVal">{% if allotment %}{{ student.full_name | upper }} — {% if allotment.quota == 'government' %}Regular Seat{% else %}Payment Seat{% endif %}{% endif %}</div>
+            <div class="allot-time" id="allotmentTimeVal">{% if allotment %}{{ allotment.allotted_at.strftime('%d %b %Y at %I:%M %p') }}{% endif %}</div>
           </div>
         </div>
         <div class="allot-box pending" id="allotBoxPending" {% if allotment %}style="display:none"{% endif %}>
@@ -792,7 +827,7 @@ body {
 
   {% if govt_seats_list %}
   <div class="cl-quota-bar">
-    <span class="cl-quota-badge govt">🏛 Government Quota</span>
+    <span class="cl-quota-badge govt">🏛 Regular Seats</span>
     <span class="cl-quota-line"></span>
   </div>
   <div class="cl-seats-grid">
@@ -821,7 +856,7 @@ body {
 
   {% if mgmt_seats_list %}
   <div class="cl-quota-bar" style="margin-top:1.75rem;">
-    <span class="cl-quota-badge mgmt">🏢 Management Quota</span>
+    <span class="cl-quota-badge mgmt">🏢 Payment Seats</span>
     <span class="cl-quota-line"></span>
   </div>
   <div class="cl-seats-grid">
@@ -848,11 +883,11 @@ body {
   </div>
   {% endif %}
 
-   <!-- Visual Seat Maps - Government & Management Separate -->
+   <!-- Visual Seat Maps - Regular & Payment Separate -->
   {% if govt_seats_list %}
   <div class="cl-smap">
     <div class="cl-smap-top">
-      <div class="cl-smap-title">🏛 Government Quota — Seat Map</div>
+      <div class="cl-smap-title">🏛 Regular Seats — Seat Map</div>
       <div class="cl-smap-legend">
         <div class="cl-leg"><div class="cl-leg-dot g"></div>Allotted (Blue)</div>
         <div class="cl-leg"><div class="cl-leg-dot e"></div>Not Allotted</div>
@@ -877,7 +912,7 @@ body {
   {% if mgmt_seats_list %}
   <div class="cl-smap">
     <div class="cl-smap-top">
-      <div class="cl-smap-title">🏢 Management Quota — Seat Map</div>
+      <div class="cl-smap-title">🏢 Payment Seats — Seat Map</div>
       <div class="cl-smap-legend">
         <div class="cl-leg"><div class="cl-leg-dot m"></div>Allotted (Orange)</div>
         <div class="cl-leg"><div class="cl-leg-dot e"></div>Not Allotted</div>
@@ -927,7 +962,7 @@ body {
               <td><span class="r-pill">#{{ h.rank }}</span></td>
               <td style="font-weight:600;color:var(--ink);">{{ h.name | upper }}</td>
               <td style="font-size:.79rem;">{{ h.category }}</td>
-              <td><span class="q-pill {{ h.quota }}">{{ h.quota|title }}</span></td>
+              <td><span class="q-pill {{ h.quota }}">{% if h.quota == 'government' %}Regular{% elif h.quota == 'management' %}Payment{% else %}{{ h.quota|title }}{% endif %}</span></td>
               <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">{{ h.allotted_at }}</td>
             </tr>
             {% endfor %}
@@ -1040,7 +1075,6 @@ async function refreshLiveNumbers(){
     if (!res.ok) return;
     const data = await res.json();
 
-    // If status mode changed (e.g. stopped→running, or rank appeared for first time), reload once
     const hasRankNow = data.current_rank !== null && data.current_rank !== undefined;
     if (data.status !== INITIAL_STATUS || hasRankNow !== INITIAL_HAS_RANK){
       window.location.reload();
@@ -1049,20 +1083,17 @@ async function refreshLiveNumbers(){
 
     updateStatusPill(data.status);
 
-    // Update rank display
     const rankHero = document.getElementById('currentRankHero');
     const rankStat = document.getElementById('currentRankStat');
     const rankVal  = data.current_rank ?? '—';
     if (rankHero) rankHero.innerHTML = `<sup>#</sup>${rankVal}`;
     if (rankStat) rankStat.textContent = rankVal;
 
-    // Update stats
     const totalRanked  = document.getElementById('totalRankedNum');
     const totalAllotted = document.getElementById('totalAllottedNum');
     if (totalRanked)   totalRanked.textContent   = data.total_ranked   ?? '—';
     if (totalAllotted) totalAllotted.textContent = data.total_allotted ?? '—';
 
-    // Update student details
     if (data.student){
       const nameEl     = document.getElementById('studentNameVal');
       const rankEl     = document.getElementById('studentRankVal');
@@ -1074,15 +1105,14 @@ async function refreshLiveNumbers(){
       if (percentEl)  percentEl.textContent  = fmtPercent(data.student.percent_12);
       if (categoryEl) categoryEl.textContent = data.student.category_name || '—';
 
-      // Update allotment box
       const successBox = document.getElementById('allotBoxSuccess');
       const pendingBox = document.getElementById('allotBoxPending');
       const allotName  = document.getElementById('allotmentNameVal');
       const allotTime  = document.getElementById('allotmentTimeVal');
       if (data.allotment){
-        const quota = data.allotment.quota === 'government' ? 'Government Quota' : 'Management Quota';
+        const quota = data.allotment.quota === 'government' ? 'Regular Seat' : 'Payment Seat';
         if (allotName) allotName.textContent = `${name.toUpperCase()} — ${quota}`;
-        if (allotTime) allotTime.textContent = `${data.allotment.allotted_at} IST`;
+        if (allotTime) allotTime.textContent = `${data.allotment.allotted_at}`;
         if (successBox) successBox.style.display = '';
         if (pendingBox) pendingBox.style.display  = 'none';
       } else {
@@ -1091,18 +1121,13 @@ async function refreshLiveNumbers(){
       }
     }
 
-    // Update seat cards
     updateSeatCards('government', data.govt_seats_list || []);
     updateSeatCards('management', data.mgmt_seats_list || []);
-
-    // Update visual seat map
     updateSeatMap(data.govt_seats_list || [], data.mgmt_seats_list || []);
-
-    // Update allotment history
     updateAllotmentHistory(data.allotment_history || []);
 
   } catch(e){
-    // Silent fail — keep last rendered values
+    // Silent fail
   }
 }
 
@@ -1127,7 +1152,6 @@ const timer = setInterval(async () => {
 }, 1000);
 
 function updateSeatMap(govtSeats, mgmtSeats) {
-  // Update Government Quota Seat Map
   const govtGrid = document.getElementById('govtSeatGrid');
   if (govtGrid) {
     govtGrid.innerHTML = '';
@@ -1144,7 +1168,6 @@ function updateSeatMap(govtSeats, mgmtSeats) {
     });
   }
 
-  // Update Management Quota Seat Map
   const mgmtGrid = document.getElementById('mgmtSeatGrid');
   if (mgmtGrid) {
     mgmtGrid.innerHTML = '';
@@ -1173,12 +1196,17 @@ function updateAllotmentHistory(history) {
   }
   let rows = '';
   history.forEach(function(h, i) {
+    let quotaDisplay = '';
+    if (h.quota === 'government') quotaDisplay = 'Regular';
+    else if (h.quota === 'management') quotaDisplay = 'Payment';
+    else quotaDisplay = h.quota.charAt(0).toUpperCase() + h.quota.slice(1);
+    
     rows += `<tr>
       <td style="color:var(--ink-3);font-size:.74rem;">${i + 1}</td>
       <td><span class="r-pill">#${h.rank}</span></td>
       <td style="font-weight:600;color:var(--ink);">${h.name.toUpperCase()}</td>
       <td style="font-size:.79rem;">${h.category}</td>
-      <td><span class="q-pill ${h.quota}">${h.quota.charAt(0).toUpperCase() + h.quota.slice(1)}</span></td>
+      <td><span class="q-pill ${h.quota}">${quotaDisplay}</span></td>
       <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">${h.allotted_at}</td>
     </tr>`;
   });
@@ -1194,7 +1222,6 @@ function updateAllotmentHistory(history) {
     </div>`;
 }
 
-// Also run once on load to sync immediately
 refreshLiveNumbers();
 </script>
 {% endblock %}
