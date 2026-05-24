@@ -281,6 +281,21 @@ def counselling_live_status_api():
         else:
             govt_seats_list.append(entry)
 
+    all_allotments = SeatAllotment.query.order_by(SeatAllotment.allotted_at.asc()).all()
+    allotment_history = []
+    for a in all_allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+        allotment_history.append({
+            'rank':        appl.rank or '—',
+            'name':        appl.full_name,
+            'category':    appl.category_name or '—',
+            'quota':       a.quota,
+            'allotted_at': fmt_ist(a.allotted_at, '%d %b %Y at %I:%M %p'),
+        })
+    allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
+
     return jsonify({
         'status': cs.status,
         'current_rank': cs.current_rank,
@@ -297,6 +312,7 @@ def counselling_live_status_api():
         'allotment': allotment,
         'govt_seats_list': govt_seats_list,
         'mgmt_seats_list': mgmt_seats_list,
+        'allotment_history': allotment_history,
     })
 
 

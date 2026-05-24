@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+/* Using system fonts — no Google import needed */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -68,7 +68,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: var(--off-white);
   color: var(--ink);
   min-height: 100vh;
@@ -499,7 +499,7 @@ body {
 @keyframes seat-pop { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
 .cl-sseat:hover { transform: scale(1.7) translateY(-2px); z-index: 20; position: relative; }
 .cl-sseat.g { background: linear-gradient(135deg, var(--blue), #60A5FA); box-shadow: 0 0 5px rgba(26,95,180,0.35); }
-.cl-sseat.m { background: linear-gradient(135deg, var(--gold-deep), var(--gold-light)); box-shadow: 0 0 5px var(--gold-glow); }
+.cl-sseat.m { background: linear-gradient(135deg, #FF8C00, #FFA500); box-shadow: 0 0 5px rgba(255, 140, 0, 0.35); }
 .cl-sseat.e { background: var(--border-l); border: 1px solid var(--border-l2); }
 
 /* ══════════════════════════════════════
@@ -845,43 +845,57 @@ body {
   </div>
   {% endif %}
 
-  <!-- Visual Seat Map -->
-  {% set all_seats = govt_seats_list + mgmt_seats_list %}
-  {% if all_seats %}
+   <!-- Visual Seat Maps - Government & Management Separate -->
+  {% if govt_seats_list %}
   <div class="cl-smap">
     <div class="cl-smap-top">
-      <div class="cl-smap-title">Visual Seat Map</div>
+      <div class="cl-smap-title">🏛 Government Quota — Seat Map</div>
       <div class="cl-smap-legend">
-        <div class="cl-leg"><div class="cl-leg-dot g"></div>Govt Filled</div>
-        <div class="cl-leg"><div class="cl-leg-dot m"></div>Mgmt Filled</div>
-        <div class="cl-leg"><div class="cl-leg-dot e"></div>Free</div>
+        <div class="cl-leg"><div class="cl-leg-dot g"></div>Allotted (Blue)</div>
+        <div class="cl-leg"><div class="cl-leg-dot e"></div>Not Allotted</div>
       </div>
     </div>
-    <div class="cl-seat-grid">
+    <div class="cl-seat-grid" id="govtSeatGrid">
       {% set ns = namespace(idx=0) %}
       {% for item in govt_seats_list %}
         {% for i in range(item.total) %}
           {% set ns.idx = ns.idx + 1 %}
           {% if i < item.filled %}
-            <div class="cl-sseat g" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
+            <div class="cl-sseat g" title="Seat {{ ns.idx }} · {{ item.category }} · Allotted" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% else %}
-            <div class="cl-sseat e" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-      {% for item in mgmt_seats_list %}
-        {% for i in range(item.total) %}
-          {% set ns.idx = ns.idx + 1 %}
-          {% if i < item.filled %}
-            <div class="cl-sseat m" title="Seat {{ ns.idx }} · {{ item.category }}" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
-          {% else %}
-            <div class="cl-sseat e" title="{{ item.category }} (free)" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
+            <div class="cl-sseat e" title="Seat {{ ns.idx }} · {{ item.category }} · Not Allotted" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
           {% endif %}
         {% endfor %}
       {% endfor %}
     </div>
   </div>
   {% endif %}
+
+  {% if mgmt_seats_list %}
+  <div class="cl-smap">
+    <div class="cl-smap-top">
+      <div class="cl-smap-title">🏢 Management Quota — Seat Map</div>
+      <div class="cl-smap-legend">
+        <div class="cl-leg"><div class="cl-leg-dot m"></div>Allotted (Orange)</div>
+        <div class="cl-leg"><div class="cl-leg-dot e"></div>Not Allotted</div>
+      </div>
+    </div>
+    <div class="cl-seat-grid" id="mgmtSeatGrid">
+      {% set ns = namespace(idx=0) %}
+      {% for item in mgmt_seats_list %}
+        {% for i in range(item.total) %}
+          {% set ns.idx = ns.idx + 1 %}
+          {% if i < item.filled %}
+            <div class="cl-sseat m" title="Seat {{ ns.idx }} · {{ item.category }} · Allotted" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
+          {% else %}
+            <div class="cl-sseat e" title="Seat {{ ns.idx }} · {{ item.category }} · Not Allotted" style="animation-delay:{{ (ns.idx * 0.008)|round(3) }}s"></div>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
 
   <!-- Allotment History -->
   <div class="cl-hist-wrap">
@@ -1078,6 +1092,12 @@ async function refreshLiveNumbers(){
     updateSeatCards('government', data.govt_seats_list || []);
     updateSeatCards('management', data.mgmt_seats_list || []);
 
+    // Update visual seat map
+    updateSeatMap(data.govt_seats_list || [], data.mgmt_seats_list || []);
+
+    // Update allotment history
+    updateAllotmentHistory(data.allotment_history || []);
+
   } catch(e){
     // Silent fail — keep last rendered values
   }
@@ -1102,6 +1122,74 @@ const timer = setInterval(async () => {
     }
   }
 }, 1000);
+
+function updateSeatMap(govtSeats, mgmtSeats) {
+  // Update Government Quota Seat Map
+  const govtGrid = document.getElementById('govtSeatGrid');
+  if (govtGrid) {
+    govtGrid.innerHTML = '';
+    govtSeats.forEach(function(item) {
+      for (let i = 0; i < item.total; i++) {
+        const div = document.createElement('div');
+        const filled = i < item.filled;
+        div.className = 'cl-sseat ' + (filled ? 'g' : 'e');
+        div.title = filled
+          ? `Seat ${i + 1} · ${item.category} · Allotted`
+          : `Seat ${i + 1} · ${item.category} · Not Allotted`;
+        govtGrid.appendChild(div);
+      }
+    });
+  }
+
+  // Update Management Quota Seat Map
+  const mgmtGrid = document.getElementById('mgmtSeatGrid');
+  if (mgmtGrid) {
+    mgmtGrid.innerHTML = '';
+    mgmtSeats.forEach(function(item) {
+      for (let i = 0; i < item.total; i++) {
+        const div = document.createElement('div');
+        const filled = i < item.filled;
+        div.className = 'cl-sseat ' + (filled ? 'm' : 'e');
+        div.title = filled
+          ? `Seat ${i + 1} · ${item.category} · Allotted`
+          : `Seat ${i + 1} · ${item.category} · Not Allotted`;
+        mgmtGrid.appendChild(div);
+      }
+    });
+  }
+}
+
+function updateAllotmentHistory(history) {
+  const panel = document.getElementById('histPanel');
+  const countEl = document.querySelector('.cl-hist-count');
+  if (countEl) countEl.textContent = history.length;
+  if (!panel) return;
+  if (!history.length) {
+    panel.innerHTML = '<div class="cl-hist-empty">No seats allotted yet.</div>';
+    return;
+  }
+  let rows = '';
+  history.forEach(function(h, i) {
+    rows += `<tr>
+      <td style="color:var(--ink-3);font-size:.74rem;">${i + 1}</td>
+      <td><span class="r-pill">#${h.rank}</span></td>
+      <td style="font-weight:600;color:var(--ink);">${h.name.toUpperCase()}</td>
+      <td style="font-size:.79rem;">${h.category}</td>
+      <td><span class="q-pill ${h.quota}">${h.quota.charAt(0).toUpperCase() + h.quota.slice(1)}</span></td>
+      <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">${h.allotted_at}</td>
+    </tr>`;
+  });
+  panel.innerHTML = `
+    <div class="cl-hist-scroll">
+      <table class="cl-htable">
+        <thead><tr>
+          <th>#</th><th>Rank</th><th>Student Name</th>
+          <th>Category</th><th>Quota</th><th>Allotted At (IST)</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
 
 // Also run once on load to sync immediately
 refreshLiveNumbers();

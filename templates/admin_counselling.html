@@ -85,6 +85,7 @@
 
   .cl-right { display: flex; flex-direction: column; gap: 1rem; }
   .search-sticky { position: sticky; top: 1rem; z-index: 10; }
+@media (max-width: 900px) { .search-sticky { position: static; } }
   .search-bar { display: flex; align-items: center; gap: .65rem; background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: .65rem 1rem; transition: border-color .2s; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
   .search-bar:focus-within { border-color: #c9a03d; }
   .search-bar i { color: #8a9ab0; flex-shrink: 0; }
