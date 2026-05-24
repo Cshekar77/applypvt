@@ -181,12 +181,7 @@ def counselling_live():
             is_verified=True
         ).first()
         if student:
-            a = SeatAllotment.query.filter_by(application_id=student.id).first()
-            if a:
-                allotment = {
-                    'quota':       a.quota,
-                    'allotted_at': utc_to_ist(a.allotted_at),
-                }
+            pass  # Currently called student is always shown as pending on the live page
 
     admit_categories = AdmitCategory.query.filter_by(is_active=True)\
         .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
@@ -228,6 +223,60 @@ def counselling_live():
                            govt_seats_list=govt_seats_list,
                            mgmt_seats_list=mgmt_seats_list,
                            allotment_history=allotment_history)
+
+
+@main.route('/live/status')
+def counselling_live_status_api():
+    cs = CounsellingSettings.get()
+
+    total_ranked   = StudentApplication.query.filter(
+        StudentApplication.rank.isnot(None)).count()
+    total_allotted = SeatAllotment.query.count()
+
+    student   = None
+    allotment = None
+    if cs.current_rank:
+        student = StudentApplication.query.filter_by(
+            rank=cs.current_rank,
+            is_verified=True
+        ).first()
+        if student:
+            pass  # Currently called student is always pending on the live page
+
+    admit_categories = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+
+    govt_seats_list = []
+    mgmt_seats_list = []
+    for ac in admit_categories:
+        entry = {
+            'category': ac.name,
+            'total': ac.total_seats,
+            'filled': ac.seats_used,
+            'remaining': ac.seats_remaining,
+        }
+        if ac.name.upper().endswith('-PY'):
+            mgmt_seats_list.append(entry)
+        else:
+            govt_seats_list.append(entry)
+
+    return jsonify({
+        'status': cs.status,
+        'current_rank': cs.current_rank,
+        'message': cs.message,
+        'total_ranked': total_ranked,
+        'total_allotted': total_allotted,
+        'student': {
+            'full_name': student.full_name if student else None,
+            'rank': student.rank if student else None,
+            'percent_12': student.percent_12 if student else None,
+            'category_name': student.category_name if student else None,
+            'quota': None,
+        },
+        'allotment': allotment,
+        'govt_seats_list': govt_seats_list,
+        'mgmt_seats_list': mgmt_seats_list,
+    })
 
 
 # ─────────────────────────────────────────
@@ -1761,48 +1810,7 @@ def admin_counselling():
     cat_seats      = {cat.id: CategorySeats.get_for_category(cat.id) for cat in categories}
     fee_categories = FeeCategory.query.filter_by(is_active=True).order_by(FeeCategory.name).all()
 
-    search_q  = request.args.get('q', '').strip()
-    query     = StudentApplication.query.filter_by(is_verified=True)\
-                    .filter(StudentApplication.rank.isnot(None))
-
-    if search_q:
-        if search_q.isdigit():
-            query = query.filter(StudentApplication.rank == int(search_q))
-        else:
-            like  = f'%{search_q}%'
-            query = query.filter(
-                StudentApplication.candidate_name.ilike(like)
-            )
-
-    students = query.order_by(StudentApplication.rank.asc()).all()
-    allotments = {a.application_id: a for a in SeatAllotment.query.all()}
-
-    seat_counts = dict(
-        db.session.query(
-            SeatAllotment.admit_category_id,
-            sqlfunc.count(SeatAllotment.id)
-        ).group_by(SeatAllotment.admit_category_id).all()
-    )
-
-    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
-        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
-    admit_categories = []
-    for ac in admit_categories_raw:
-        used      = seat_counts.get(ac.id, 0)
-        remaining = max(0, ac.total_seats - used)
-        admit_categories.append({
-            'id':              ac.id,
-            'name':            ac.name,
-            'total_seats':     ac.total_seats,
-            'seats_used':      used,
-            'seats_remaining': remaining,
-            'is_active':       ac.is_active,
-        })
-
-    # NEW: document status map for counselling allotment popup color coding
-    doc_categories_all = DocumentCategory.query.filter_by(is_active=True)\
-        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
-
+    search_q  = request.args.get('q', ''
     student_ids = [s.id for s in students]
     counselling_doc_map = {}
     if student_ids:
@@ -1872,6 +1880,42 @@ def counselling_student_modal(app_id):
                            appl_docs=appl_docs,
                            admit_categories=admit_categories,
                            fee_categories=fee_categories)
+rue)\
+        .order_by(DocumentCategory.sort_order, DocumentCategory.id).all()
+    student_docs   = StudentDocument.query.filter_by(application_id=appl.id).all()
+    appl_docs      = {d.doc_category_id: {'status': d.status or 'not_given',
+                                           'is_approved': d.is_approved} for d in student_docs}
+
+    admit_categories_raw = AdmitCategory.query.filter_by(is_active=True)\
+        .order_by(AdmitCategory.sort_order.asc(), AdmitCategory.name.asc()).all()
+    seat_counts = dict(
+        db.session.query(SeatAllotment.admit_category_id,
+                         db.func.count(SeatAllotment.id))
+        .group_by(SeatAllotment.admit_category_id).all()
+    )
+    admit_categories = []
+    for ac in admit_categories_raw:
+        used      = seat_counts.get(ac.id, 0)
+        remaining = max(0, ac.total_seats - used)
+        admit_categories.append({
+            'id': ac.id, 'name': ac.name,
+            'total_seats': ac.total_seats,
+            'seats_used': used,
+            'seats_remaining': remaining,
+            'is_active': ac.is_active,
+        })
+
+    fee_categories = FeeCategory.query.filter_by(is_active=True)\
+        .order_by(FeeCategory.name).all()
+
+    return render_template('_counselling_student_modal.html',
+                           appl=appl,
+                           allotment=allotment,
+                           sf=sf,
+                           doc_categories=doc_categories,
+                           appl_docs=appl_docs,
+                           admit_categories=admit_categories,
+                           fee_categories=fee_categories)
 
 # ─────────────────────────────────────────
 #  Admin — Allotment Acknowledgement PDF
@@ -1881,23 +1925,7 @@ def counselling_student_modal(app_id):
 @main.route('/admin/counselling/acknowledgement/<int:app_id>')
 @admin_required
 def allotment_acknowledgement(app_id):
-    """
-    Generates a printable A4 PDF acknowledgement for seat allotment.
-    Top half = Student Copy, Bottom half = College Copy.
-    Both halves contain: University logo, University name, student details,
-    rank, category, admit category, total fees, issuer signature box.
-    Set UNIVERSITY_LOGO_PATH in config to the path of your logo image.
-    Set UNIVERSITY_NAME in config (default: 'University').
-    """
-    import io
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.units import cm
-    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
-                                    Table, TableStyle, HRFlowable, Image)
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-
+    """Render print-ready acknowledgement page in A4 landscape with two copies."""
     appl = StudentApplication.query.get_or_404(app_id)
     allotment = SeatAllotment.query.filter_by(application_id=appl.id).first()
     if not allotment:
@@ -1910,134 +1938,29 @@ def allotment_acknowledgement(app_id):
         if ac:
             admit_cat_name = ac.name
 
-    fees_obj  = StudentFees.query.filter_by(application_id=appl.id).first()
-    total_fees = f"Rs {fees_obj.total_fees:,.2f}" if fees_obj and fees_obj.total_fees else '—'
+    fees_obj = StudentFees.query.filter_by(application_id=appl.id).first()
+    fee_to_be_paid = f"Rs {fees_obj.total_fees:,.2f}" if fees_obj and fees_obj.total_fees else '—'
 
-    allotted_str = fmt_ist(allotment.allotted_at)
+    admission_date = fmt_ist(allotment.allotted_at, '%d/%m/%Y').replace(' IST', '')
+    admission_type = (allotment.quota or '—').title()
+    app_number = appl.application_number or f'BCA{str(appl.id).zfill(5)}'
 
-    university_name = current_app.config.get('UNIVERSITY_NAME', 'University')
-    # Set UNIVERSITY_LOGO_PATH in your config/.env to the absolute path of logo image
-    logo_path = current_app.config.get('UNIVERSITY_LOGO_PATH', None)
+    university_name = current_app.config.get('UNIVERSITY_NAME', 'UNIVERSITY').upper()
+    course_year = current_app.config.get('ACK_COURSE_YEAR', '2025 - 2026')
+    ack = {
+        'university_name': university_name,
+        'course_year': course_year,
+        'name': appl.full_name or '—',
+        'category': appl.category_name or '—',
+        'application_number': app_number,
+        'rank_number': str(appl.rank or '—'),
+        'admit_category': admit_cat_name,
+        'admission_type': admission_type,
+        'date_of_admission': admission_date,
+        'fee_to_be_paid': fee_to_be_paid,
+    }
 
-    buffer = io.BytesIO()
-    page_w, page_h = A4
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        leftMargin=1.5*cm, rightMargin=1.5*cm,
-        topMargin=1*cm,    bottomMargin=1*cm,
-    )
-
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('title', fontSize=13, fontName='Helvetica-Bold',
-                                 alignment=TA_CENTER, spaceAfter=2)
-    sub_style   = ParagraphStyle('sub',   fontSize=9,  fontName='Helvetica',
-                                 alignment=TA_CENTER, spaceAfter=2)
-    label_style = ParagraphStyle('label', fontSize=9,  fontName='Helvetica-Bold',
-                                 alignment=TA_LEFT)
-    value_style = ParagraphStyle('value', fontSize=9,  fontName='Helvetica',
-                                 alignment=TA_LEFT)
-    copy_style  = ParagraphStyle('copy',  fontSize=8,  fontName='Helvetica-Bold',
-                                 alignment=TA_CENTER, textColor=colors.grey)
-    sign_style  = ParagraphStyle('sign',  fontSize=8,  fontName='Helvetica',
-                                 alignment=TA_RIGHT)
-    wm_style    = ParagraphStyle('wm',    fontSize=28, fontName='Helvetica-Bold',
-                                 textColor=colors.Color(0.85, 0.85, 0.85),
-                                 alignment=TA_CENTER)
-
-    def _half_content(copy_label):
-        """Build content for one half (student or college copy)."""
-        elems = []
-
-        # Watermark placeholder — replace text with Image if you have a logo
-        # WATERMARK: set UNIVERSITY_WATERMARK_TEXT in config, or use an image
-        wm_text = current_app.config.get('UNIVERSITY_WATERMARK_TEXT', university_name.upper())
-        elems.append(Paragraph(wm_text, wm_style))  # ← change this to your watermark image
-
-        # Header row: logo left, university name centre
-        header_data = [[]]
-        if logo_path and os.path.exists(logo_path):
-            header_data = [[Image(logo_path, width=2*cm, height=2*cm),
-                            Paragraph(f'<b>{university_name}</b><br/>'
-                                      f'<font size=8>BCA Admissions {datetime.now().year}</font>',
-                                      title_style),
-                            '']]
-            header_tbl = Table(header_data, colWidths=[2.5*cm, page_w - 7*cm, 2.5*cm])
-        else:
-            header_data = [['',
-                            Paragraph(f'<b>{university_name}</b><br/>'
-                                      f'<font size=8>BCA Admissions {datetime.now().year}</font>',
-                                      title_style),
-                            '']]
-            header_tbl = Table(header_data, colWidths=[2.5*cm, page_w - 7*cm, 2.5*cm])
-
-        header_tbl.setStyle(TableStyle([
-            ('VALIGN',      (0,0), (-1,-1), 'MIDDLE'),
-            ('ALIGN',       (1,0), (1,0),   'CENTER'),
-            ('BOTTOMPADDING',(0,0),(-1,-1),  4),
-        ]))
-        elems.append(header_tbl)
-        elems.append(HRFlowable(width='100%', thickness=1.5, color=colors.darkblue))
-        elems.append(Spacer(1, 0.2*cm))
-
-        elems.append(Paragraph('SEAT ALLOTMENT ACKNOWLEDGEMENT', title_style))
-        elems.append(Paragraph(copy_label, copy_style))
-        elems.append(Spacer(1, 0.3*cm))
-
-        # Details table
-        details = [
-            ['Student Name',    appl.full_name,          'Rank',          str(appl.rank or '—')],
-            ['Caste Category',  appl.category_name or '—', 'Gender',       appl.gender or '—'],
-            ['Admit Category',  admit_cat_name,           'Quota',         (allotment.quota or '—').title()],
-            ['Allotted At',     allotted_str,             'Seat No',       str(allotment.admit_seat_number or '—')],
-            ['Total Fees',      total_fees,               'Academic Year', '2026-2027'],
-        ]
-
-        detail_tbl = Table(
-            [[Paragraph(str(r[0]), label_style), Paragraph(str(r[1]), value_style),
-              Paragraph(str(r[2]), label_style), Paragraph(str(r[3]), value_style)]
-             for r in details],
-            colWidths=[3.5*cm, 6*cm, 3.5*cm, 4*cm]
-        )
-        detail_tbl.setStyle(TableStyle([
-            ('GRID',        (0,0), (-1,-1), 0.4, colors.lightgrey),
-            ('BACKGROUND',  (0,0), (0,-1),  colors.Color(0.93, 0.96, 1.0)),
-            ('BACKGROUND',  (2,0), (2,-1),  colors.Color(0.93, 0.96, 1.0)),
-            ('PADDING',     (0,0), (-1,-1), 5),
-            ('ROWBACKGROUNDS', (0,0), (-1,-1),
-             [colors.white, colors.Color(0.97, 0.97, 1.0)]),
-        ]))
-        elems.append(detail_tbl)
-        elems.append(Spacer(1, 1.2*cm))
-
-        # Signature row
-        # Signature row
-        sig_tbl = Table(
-            [[Paragraph('Date: _______________', value_style),
-              Paragraph('Signature of Issuing Authority<br/><br/><br/>___________________________<br/>'
-                        '<font size=7>(Name &amp; Designation)</font>', sign_style)]],
-            colWidths=[9*cm, 8*cm]
-        )
-        sig_tbl.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'BOTTOM')]))
-        elems.append(sig_tbl)
-
-        return elems
-
-    story = []
-    story += _half_content('— STUDENT COPY —')
-    story.append(Spacer(1, 0.3*cm))
-    story.append(HRFlowable(width='100%', thickness=1, color=colors.grey,
-                             dash=[3, 3]))
-    story.append(Spacer(1, 0.3*cm))
-    story += _half_content('— COLLEGE COPY —')
-
-    doc.build(story)
-    buffer.seek(0)
-
-    safe_name = re.sub(r'[^a-zA-Z0-9_]', '_', appl.full_name)
-    filename  = f'allotment_acknowledgement_{safe_name}_rank{appl.rank}.pdf'
-    return send_file(buffer, mimetype='application/pdf',
-                     as_attachment=False, download_name=filename)
+    return render_template('admission_acknowledgement_print.html', ack=ack)
 
 
 def _generate_document_acknowledgement_pdf(app_id):
