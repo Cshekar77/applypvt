@@ -210,7 +210,7 @@
       </tr>
       <tr>
         <td colspan="2"><span class="label">Admit Category:</span> <span class="value">{{ ack.admit_category }}</span></td>
-        <td><span class="label">Admission Type:</span> <span class="value">{{ ack.admission_type }}</span></td>
+        <td colspan="2"><span class="label">Admission Type:</span> <span class="value">{% if ack.admission_type == 'Government' %}Regular Seat{% elif ack.admission_type == 'Management' %}Payment Seat{% else %}{{ ack.admission_type }}{% endif %}</span></td>
       </tr>
       <tr>
         <td colspan="2"><span class="label">Date of Admission:</span> <span class="value">{{ ack.date_of_admission }}</span></td>
