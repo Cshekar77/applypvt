@@ -598,29 +598,7 @@ body {
 [data-theme="dark"] .q-pill.management { color: var(--gold); border-color: rgba(240,192,64,0.3); background: rgba(240,192,64,0.10); }
 .cl-hist-empty { text-align: center; padding: 2.5rem; color: var(--ink-3); font-size: 0.87rem; }
 
-/* ══════════════════════════════════════
-   REFRESH BAR
-══════════════════════════════════════ */
-.cl-refresh {
-  margin: 2rem 1.1rem 4rem;
-  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
-  animation: fade-up 0.5s ease both;
-}
-.cl-refresh-label {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-3); display: flex; align-items: center; gap: 0.35rem;
-}
-.cl-refresh-count { color: var(--teal); font-weight: 600; }
-.cl-refresh-track { width: 180px; height: 3px; background: var(--border-l); border-radius: 99px; overflow: hidden; }
-.cl-refresh-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-deep), var(--gold-light));
-  border-radius: 99px; transform-origin: left;
-  animation: drain 30s linear forwards;
-}
-@keyframes drain { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+
 
 /* ══════════════════════════════════════
    ANIMATIONS
@@ -687,7 +665,7 @@ body {
       <span class="cl-hero-line"></span>
     </div>
     <h1 class="cl-hero-h1">Seat<br><em>Allotment</em></h1>
-    <p class="cl-hero-sub">Public · No login required · Auto-refreshes every 30s</p>
+    <p class="cl-hero-sub">Public</p>
   </div>
 
   <!-- STOPPED -->
@@ -975,11 +953,7 @@ body {
     </div>
   </div>
 
-  <!-- Refresh Bar -->
-  <div class="cl-refresh">
-    <div class="cl-refresh-label">Auto-refresh in <span class="cl-refresh-count" id="cd">30</span>s</div>
-    <div class="cl-refresh-track"><div class="cl-refresh-fill"></div></div>
-  </div>
+  
 
 </div><!-- /cl-page -->
 {% endblock %}
@@ -1132,22 +1106,13 @@ async function refreshLiveNumbers(){
 }
 
 /* ── COUNTDOWN + AJAX REFRESH ── */
-let s = 30;
-const cdEl = document.getElementById('cd');
-const rfEl = document.querySelector('.cl-refresh-fill');
+let s = 60;
 
 const timer = setInterval(async () => {
   s--;
-  if (cdEl) cdEl.textContent = s;
   if (s <= 0){
     await refreshLiveNumbers();
-    s = 30;
-    if (cdEl) cdEl.textContent = s;
-    if (rfEl){
-      rfEl.style.animation = 'none';
-      void rfEl.offsetHeight;
-      rfEl.style.animation = 'drain 30s linear forwards';
-    }
+    s = 60;
   }
 }, 1000);
 

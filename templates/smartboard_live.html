@@ -454,7 +454,7 @@
   let lastTs = null;
   let pauseTimer = null;
   let trackHalfW = 0;
-  let countdown = 30;
+  let countdown = 10;
   let refreshTimer;
   const SPEED = 28;
   const PAUSE_MS = 5000;
@@ -650,7 +650,7 @@ function refreshTickerContent() {
     refreshTimer = setInterval(() => {
       countdown--;
       if (countdown <= 0) {
-        countdown = 30;
+        countdown = 10;
         fetchData();
       }
     }, 1000);
