@@ -591,7 +591,21 @@
       startScroll();
     });
   }
-
+// ADD this new helper — updates ticker content without resetting position
+function refreshTickerContent() {
+  if (tickerState === 'regular-scroll' && regularSeats.length) {
+    const newHTML = buildTrackHTML(regularSeats, 'regular-h', '▶ REGULAR SEATS');
+    track.innerHTML = newHTML;
+    // Recalculate half-width after DOM update, keep current position
+    trackHalfW = track.scrollWidth / 2;
+    if (tickerPos >= trackHalfW) tickerPos = 0;
+  } else if (tickerState === 'payment-scroll' && paymentSeats.length) {
+    const newHTML = buildTrackHTML(paymentSeats, 'payment-h', '▶ PAYMENT SEATS');
+    track.innerHTML = newHTML;
+    trackHalfW = track.scrollWidth / 2;
+    if (tickerPos >= trackHalfW) tickerPos = 0;
+  }
+}
   // Fetch Data
   async function fetchData() {
     try {
@@ -622,6 +636,8 @@
 
       renderSeatCards('regularGrid', regularSeats);
       renderSeatCards('paymentGrid', paymentSeats);
+      refreshTickerContent(); // ← ADD HERE
+
 
     } catch (error) {
       console.error('Fetch error:', error);
