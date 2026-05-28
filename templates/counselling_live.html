@@ -6,9 +6,6 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ══════════════════════════════════════
-   THEME VARIABLES
-══════════════════════════════════════ */
 :root {
   --gold:       #D4A017;
   --gold-light: #F5C842;
@@ -77,74 +74,47 @@ body {
 .navbar, .site-main { padding: 0 !important; max-width: 100% !important; }
 .navbar { display: none !important; }
 
-/* ══════════════════════════════════════
-   BACKGROUND
-══════════════════════════════════════ */
-.cl-bg {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-}
-
+/* ══ BACKGROUND ══ */
+.cl-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 [data-theme="light"] .cl-bg::before {
-  content: '';
-  position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(ellipse 70% 50% at 10% 0%, rgba(212,160,23,0.14) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 90% 100%, rgba(212,160,23,0.10) 0%, transparent 60%),
     radial-gradient(ellipse 40% 40% at 50% 50%, rgba(245,200,66,0.06) 0%, transparent 70%);
 }
-
 [data-theme="dark"] .cl-bg::before {
-  content: '';
-  position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0;
   background:
     radial-gradient(ellipse 70% 50% at 10% 0%, rgba(240,192,64,0.12) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 90% 100%, rgba(240,192,64,0.08) 0%, transparent 60%),
     radial-gradient(ellipse 40% 40% at 50% 50%, rgba(20,15,5,0.8) 0%, transparent 70%);
 }
 
-/* ══════════════════════════════════════
-   TOP NAV
-══════════════════════════════════════ */
+/* ══ TOP NAV ══ */
 .cl-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  height: 58px;
-  display: flex; align-items: center; justify-content: space-between;
+  height: 58px; display: flex; align-items: center; justify-content: space-between;
   padding: 0 1.25rem;
-  background: var(--card-l);
-  border-bottom: 1px solid var(--border-l);
+  background: var(--card-l); border-bottom: 1px solid var(--border-l);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   transition: background 0.4s, border-color 0.4s;
 }
-.cl-nav-brand {
-  display: flex; align-items: center; gap: 0.65rem;
-}
+.cl-nav-brand { display: flex; align-items: center; gap: 0.65rem; }
 .cl-nav-icon {
   width: 32px; height: 32px; border-radius: 8px;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; flex-shrink: 0;
-  box-shadow: 0 2px 10px var(--gold-glow);
+  font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 10px var(--gold-glow);
 }
-.cl-nav-name {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.92rem; font-weight: 700;
-  color: var(--ink); letter-spacing: 0.01em;
-  line-height: 1.1;
-}
-.cl-nav-sub {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.5rem;
-  letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3);
-}
+.cl-nav-name { font-size: 0.92rem; font-weight: 700; color: var(--ink); letter-spacing: 0.01em; line-height: 1.1; }
+.cl-nav-sub { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); }
 .cl-nav-right { display: flex; align-items: center; gap: 0.65rem; }
 
-/* Status pill */
 .status-pill {
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.3rem 0.8rem; border-radius: 99px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.58rem;
-  font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 0.58rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
 }
 .status-pill.running { background: var(--teal-bg); border: 1px solid var(--teal-bdr); color: var(--teal); }
 .status-pill.paused  { background: rgba(212,160,23,0.12); border: 1px solid rgba(212,160,23,0.3); color: var(--gold-deep); }
@@ -155,223 +125,191 @@ body {
 .pulse.running { background: var(--teal); animation: pulse-anim 1.4s ease-in-out infinite; }
 .pulse.paused  { background: var(--gold); }
 .pulse.stopped { background: var(--red); }
-@keyframes pulse-anim {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
-  50% { opacity: 0.6; box-shadow: 0 0 0 5px transparent; }
-}
+@keyframes pulse-anim { 0%,100%{opacity:1} 50%{opacity:0.6} }
 
-/* Theme toggle */
 .theme-btn {
   width: 48px; height: 26px; border-radius: 99px;
-  border: 1.5px solid var(--border-l2);
-  background: var(--card-l); cursor: pointer;
-  position: relative; padding: 0; outline: none;
-  transition: background 0.3s, border-color 0.3s;
-  display: flex; align-items: center;
+  border: 1.5px solid var(--border-l2); background: var(--card-l);
+  cursor: pointer; position: relative; padding: 0; outline: none;
+  transition: background 0.3s, border-color 0.3s; display: flex; align-items: center;
 }
 .theme-knob {
-  position: absolute; top: 2px;
-  width: 18px; height: 18px; border-radius: 50%;
+  position: absolute; top: 2px; width: 18px; height: 18px; border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   box-shadow: 0 2px 8px var(--gold-glow);
   transition: left 0.3s cubic-bezier(.4,0,.2,1);
-  font-size: 0.55rem;
-  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem; display: flex; align-items: center; justify-content: center;
 }
 [data-theme="light"] .theme-knob { left: 2px; }
 [data-theme="dark"]  .theme-knob { left: 24px; }
 .theme-icons {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 4px; pointer-events: none;
+  position: absolute; inset: 0; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 4px; pointer-events: none;
   font-size: 0.58rem; opacity: 0.5;
 }
 
-/* ══════════════════════════════════════
-   PAGE WRAPPER
-══════════════════════════════════════ */
+/* ══ PAGE ══ */
 .cl-page { position: relative; z-index: 10; padding-top: 58px; }
 .cl-wrap { max-width: 860px; margin: 0 auto; padding: 0 1.1rem; }
 
-/* ══════════════════════════════════════
-   HERO BANNER
-══════════════════════════════════════ */
+/* ══ COMPLETION BANNER ══ */
+.cl-complete-banner {
+  margin: 1.5rem 1.1rem 0;
+  border-radius: 20px; overflow: hidden;
+  background: linear-gradient(135deg, rgba(212,160,23,0.18) 0%, rgba(212,160,23,0.06) 100%);
+  border: 1px solid var(--border-l2);
+  box-shadow: var(--shadow-l2);
+  animation: fade-up 0.6s ease both;
+  position: relative;
+}
+[data-theme="dark"] .cl-complete-banner {
+  background: linear-gradient(135deg, rgba(240,192,64,0.14) 0%, rgba(240,192,64,0.04) 100%);
+}
+.cl-complete-banner-deco {
+  position: absolute; right: -60px; top: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  border: 1px solid var(--border-l2); opacity: 0.3; pointer-events: none;
+}
+.cl-complete-banner-deco2 {
+  position: absolute; right: -100px; top: -100px;
+  width: 380px; height: 380px; border-radius: 50%;
+  border: 1px solid var(--border-l); opacity: 0.15; pointer-events: none;
+}
+.cl-complete-banner-inner {
+  padding: 2.2rem 2rem; position: relative; z-index: 1;
+}
+.cl-complete-check {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; margin-bottom: 1.2rem;
+  box-shadow: 0 4px 20px var(--gold-glow);
+}
+.cl-complete-eyebrow {
+  font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: 0.5rem;
+}
+[data-theme="dark"] .cl-complete-eyebrow { color: var(--gold); opacity: 0.8; }
+.cl-complete-title {
+  font-size: clamp(1.5rem, 5vw, 2.4rem); font-weight: 900;
+  line-height: 1.1; letter-spacing: -0.02em; color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+[data-theme="dark"] .cl-complete-title { color: #fff; }
+.cl-complete-title em { font-style: normal; color: var(--gold); }
+[data-theme="dark"] .cl-complete-title em { text-shadow: 0 0 20px var(--gold-glow); }
+.cl-complete-date {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--teal-bg); border: 1px solid var(--teal-bdr);
+  color: var(--teal); padding: 0.35rem 1rem; border-radius: 99px;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 1.2rem;
+}
+.cl-complete-msg {
+  font-size: 0.93rem; color: var(--ink-2); line-height: 1.75;
+  max-width: 620px;
+}
+.cl-complete-msg strong { color: var(--gold-deep); }
+[data-theme="dark"] .cl-complete-msg strong { color: var(--gold); }
+.cl-complete-divider {
+  margin: 1.4rem 0; height: 1px;
+  background: linear-gradient(90deg, var(--border-l2), transparent);
+}
+.cl-complete-note {
+  font-size: 0.78rem; color: var(--ink-3); line-height: 1.6;
+  display: flex; align-items: flex-start; gap: 0.5rem;
+}
+
+/* ══ HERO ══ */
 .cl-hero {
-  padding: 3rem 1.1rem 2.5rem;
-  text-align: center;
+  padding: 2.5rem 1.1rem 2rem; text-align: center;
   animation: fade-up 0.6s ease both;
 }
 .cl-hero-eyebrow {
   display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--gold-deep); margin-bottom: 1.2rem;
+  font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--gold-deep); margin-bottom: 1rem;
 }
 [data-theme="dark"] .cl-hero-eyebrow { color: var(--gold); }
 .cl-hero-line { width: 28px; height: 2px; background: var(--gold); border-radius: 2px; }
 .cl-hero-h1 {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: clamp(2.8rem, 10vw, 5.5rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.1rem;
+  font-size: clamp(2.8rem, 10vw, 5.5rem); font-weight: 900;
+  line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 1rem;
 }
 [data-theme="light"] .cl-hero-h1 { color: var(--ink); }
 [data-theme="dark"]  .cl-hero-h1 { color: #FFFFFF; }
+.cl-hero-h1 em { font-style: italic; color: var(--gold); -webkit-text-fill-color: var(--gold); }
+[data-theme="dark"] .cl-hero-h1 em { text-shadow: 0 0 30px var(--gold-glow); }
+.cl-hero-sub { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
 
-.cl-hero-h1 em {
-  font-style: italic;
-  color: var(--gold);
-  -webkit-text-fill-color: var(--gold);
-}
-[data-theme="dark"] .cl-hero-h1 em {
-  text-shadow: 0 0 30px var(--gold-glow);
-}
-.cl-hero-sub {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-/* ══════════════════════════════════════
-   CARD BASE
-══════════════════════════════════════ */
+/* ══ CARD BASE ══ */
 .cl-card {
-  background: var(--card-l);
-  border: 1px solid var(--border-l);
-  border-radius: 20px;
-  box-shadow: var(--shadow-l);
+  background: var(--card-l); border: 1px solid var(--border-l);
+  border-radius: 20px; box-shadow: var(--shadow-l);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  transition: background 0.4s, border-color 0.3s, box-shadow 0.3s;
-  overflow: hidden;
+  transition: background 0.4s, border-color 0.3s, box-shadow 0.3s; overflow: hidden;
 }
 
-/* ══════════════════════════════════════
-   STATE CARDS (stopped / paused / waiting)
-══════════════════════════════════════ */
-.cl-state {
-  padding: 0 1.1rem 2rem;
-  animation: fade-up 0.5s ease both;
-}
-.cl-state-inner {
-  padding: 3.5rem 1.5rem;
-  text-align: center;
-}
+/* ══ STATE CARDS ══ */
+.cl-state { padding: 0 1.1rem 2rem; animation: fade-up 0.5s ease both; }
+.cl-state-inner { padding: 3.5rem 1.5rem; text-align: center; }
 .cl-state-icon { font-size: 2.6rem; margin-bottom: 1.2rem; display: block; animation: float-icon 3.5s ease-in-out infinite; }
 @keyframes float-icon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-.cl-state-title {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1.7rem; font-weight: 700;
-  color: var(--ink); margin-bottom: 0.6rem;
-}
+.cl-state-title { font-size: 1.7rem; font-weight: 700; color: var(--ink); margin-bottom: 0.6rem; }
 .cl-state-body { font-size: 0.9rem; color: var(--ink-3); line-height: 1.75; }
 
-/* ══════════════════════════════════════
-   CURRENTLY CALLING — BIG RANK CARD
-══════════════════════════════════════ */
-.cl-rank-wrap {
-  padding: 0 1.1rem 1.25rem;
-  animation: fade-up 0.5s 0.05s ease both;
-}
+/* ══ RANK CARD ══ */
+.cl-rank-wrap { padding: 0 1.1rem 1.25rem; animation: fade-up 0.5s 0.05s ease both; }
 .cl-rank-top {
   padding: 2.2rem 1.75rem 1.75rem;
   background: linear-gradient(135deg, rgba(212,160,23,0.13) 0%, rgba(212,160,23,0.05) 100%);
-  border-bottom: 1px solid var(--border-l);
-  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border-l); position: relative; overflow: hidden;
 }
 [data-theme="dark"] .cl-rank-top {
   background: linear-gradient(135deg, rgba(240,192,64,0.12) 0%, rgba(240,192,64,0.04) 100%);
 }
-.cl-rank-deco {
-  position: absolute; right: -50px; top: -50px;
-  width: 200px; height: 200px; border-radius: 50%;
-  border: 1px solid var(--border-l2); opacity: 0.4;
-  pointer-events: none;
-}
-.cl-rank-deco2 {
-  position: absolute; right: -90px; top: -90px;
-  width: 300px; height: 300px; border-radius: 50%;
-  border: 1px solid var(--border-l); opacity: 0.2;
-  pointer-events: none;
-}
-.cl-rank-label {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--gold-deep); margin-bottom: 0.4rem;
-}
+.cl-rank-deco { position: absolute; right: -50px; top: -50px; width: 200px; height: 200px; border-radius: 50%; border: 1px solid var(--border-l2); opacity: 0.4; pointer-events: none; }
+.cl-rank-deco2 { position: absolute; right: -90px; top: -90px; width: 300px; height: 300px; border-radius: 50%; border: 1px solid var(--border-l); opacity: 0.2; pointer-events: none; }
+.cl-rank-label { font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 0.4rem; }
 [data-theme="dark"] .cl-rank-label { color: var(--gold); opacity: 0.7; }
 .cl-rank-row { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
 .cl-rank-num {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: clamp(4.5rem, 16vw, 7.5rem);
-  font-weight: 900; line-height: 0.88;
-  letter-spacing: -0.04em;
-  color: var(--gold);
+  font-size: clamp(4.5rem, 16vw, 7.5rem); font-weight: 900; line-height: 0.88;
+  letter-spacing: -0.04em; color: var(--gold);
 }
 [data-theme="dark"] .cl-rank-num { text-shadow: 0 0 40px var(--gold-glow); }
-.cl-rank-num sup {
-  font-size: 0.22em; font-family: Arial, Helvetica, sans-serif;
-  font-weight: 400; color: var(--ink-3); vertical-align: super; letter-spacing: 0;
-}
+.cl-rank-num sup { font-size: 0.22em; font-weight: 400; color: var(--ink-3); vertical-align: super; letter-spacing: 0; }
 .live-badge {
   align-self: flex-start; margin-top: 0.6rem;
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: var(--teal-bg); border: 1px solid var(--teal-bdr);
   color: var(--teal); padding: 0.32rem 0.85rem; border-radius: 99px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.56rem;
-  letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase;
 }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse-anim 1.2s infinite; }
 
 .cl-rank-body { padding: 1.75rem; }
-.cl-detail-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1.75rem;
-  margin-bottom: 1.5rem;
-}
+.cl-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1.75rem; margin-bottom: 1.5rem; }
 @media (max-width: 420px) { .cl-detail-grid { grid-template-columns: 1fr; gap: 1rem; } }
-.cl-dl {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 0.28rem;
-}
+.cl-dl { font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.28rem; }
 .cl-dv { font-size: 1rem; font-weight: 600; color: var(--ink); }
-.cl-dv.pct {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1.9rem; font-weight: 700; color: var(--gold); line-height: 1;
-}
+.cl-dv.pct { font-size: 1.9rem; font-weight: 700; color: var(--gold); line-height: 1; }
 [data-theme="dark"] .cl-dv.pct { text-shadow: 0 0 18px var(--gold-glow); }
 
-/* Allotment box */
-.allot-box {
-  border-radius: 14px; padding: 1rem 1.2rem;
-  display: flex; align-items: flex-start; gap: 1rem;
-}
+.allot-box { border-radius: 14px; padding: 1rem 1.2rem; display: flex; align-items: flex-start; gap: 1rem; }
 .allot-box.success { background: var(--teal-bg); border: 1px solid var(--teal-bdr); }
 .allot-box.pending { background: rgba(212,160,23,0.07); border: 1px solid rgba(212,160,23,0.2); }
-.allot-icon {
-  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
-}
+.allot-icon { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
 .allot-box.success .allot-icon { background: var(--teal); color: #fff; }
-.allot-box.pending  .allot-icon { background: rgba(212,160,23,0.15); color: var(--gold-deep); border: 1px solid var(--border-l2); }
+.allot-box.pending .allot-icon { background: rgba(212,160,23,0.15); color: var(--gold-deep); border: 1px solid var(--border-l2); }
 [data-theme="dark"] .allot-box.pending .allot-icon { color: var(--gold); }
-.allot-tag {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.54rem; letter-spacing: 0.14em;
-  text-transform: uppercase; margin-bottom: 0.22rem;
-}
+.allot-tag { font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.22rem; }
 .allot-box.success .allot-tag { color: var(--teal); }
-.allot-box.pending  .allot-tag { color: var(--gold-deep); }
+.allot-box.pending .allot-tag { color: var(--gold-deep); }
 [data-theme="dark"] .allot-box.pending .allot-tag { color: var(--gold); }
 .allot-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
 .allot-time { font-size: 0.72rem; color: var(--ink-3); margin-top: 0.12rem; }
 
-/* Admin message */
 .admin-msg {
   margin-top: 1rem; border-radius: 12px; padding: 0.85rem 1.1rem;
   background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.3);
@@ -379,16 +317,9 @@ body {
 }
 [data-theme="dark"] .admin-msg { color: var(--gold); background: rgba(240,192,64,0.08); border-color: rgba(240,192,64,0.2); }
 
-/* ══════════════════════════════════════
-   STATS ROW
-══════════════════════════════════════ */
-.cl-stats {
-  padding: 0 1.1rem 1.5rem;
-  animation: fade-up 0.5s 0.1s ease both;
-}
-.cl-stats-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
-}
+/* ══ STATS ══ */
+.cl-stats { padding: 0 1.1rem 1.5rem; animation: fade-up 0.5s 0.1s ease both; }
+.cl-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
 @media (max-width: 380px) {
   .cl-stats-grid { grid-template-columns: 1fr 1fr; }
   .cl-stats-grid .cl-stat:last-child { grid-column: span 2; }
@@ -400,86 +331,43 @@ body {
   cursor: default; box-shadow: var(--shadow-l);
 }
 .cl-stat:hover { transform: translateY(-4px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
-.cl-stat-num {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 2.1rem; font-weight: 700;
-  line-height: 1; margin-bottom: 0.28rem; letter-spacing: -0.03em; color: var(--ink);
-}
+.cl-stat-num { font-size: 2.1rem; font-weight: 700; line-height: 1; margin-bottom: 0.28rem; letter-spacing: -0.03em; color: var(--ink); }
 .cl-stat-num.gold { color: var(--gold); }
 [data-theme="dark"] .cl-stat-num.gold { text-shadow: 0 0 16px var(--gold-glow); }
 .cl-stat-num.teal { color: var(--teal); }
-.cl-stat-lbl {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.53rem;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
-}
+.cl-stat-lbl { font-size: 0.53rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 
-/* ══════════════════════════════════════
-   SECTION HEADINGS
-══════════════════════════════════════ */
-.cl-sec-head {
-  display: flex; align-items: center; gap: 0.85rem;
-  margin: 2rem 0 1rem; padding: 0 1.1rem;
-}
-.cl-sec-title {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1rem; font-weight: 700;
-  color: var(--ink-2); white-space: nowrap;
-}
+/* ══ SECTION HEADINGS ══ */
+.cl-sec-head { display: flex; align-items: center; gap: 0.85rem; margin: 2rem 0 1rem; padding: 0 1.1rem; }
+.cl-sec-title { font-size: 1rem; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
 .cl-sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-l2), transparent); }
 
-.cl-quota-bar {
-  display: flex; align-items: center; gap: 0.75rem;
-  margin: 1.5rem 1.1rem 0.9rem; padding: 0;
-}
-.cl-quota-badge {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.56rem; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 0.28rem 0.9rem; border-radius: 99px; white-space: nowrap;
-}
+.cl-quota-bar { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem 1.1rem 0.9rem; }
+.cl-quota-badge { font-size: 0.56rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.28rem 0.9rem; border-radius: 99px; white-space: nowrap; }
 .cl-quota-badge.govt { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
 .cl-quota-badge.mgmt { background: rgba(212,160,23,0.12); color: var(--gold-deep); border: 1px solid rgba(212,160,23,0.35); }
 [data-theme="dark"] .cl-quota-badge.mgmt { color: var(--gold); border-color: rgba(240,192,64,0.35); background: rgba(240,192,64,0.10); }
 .cl-quota-line { flex: 1; height: 1px; background: var(--border-l); }
 
-/* ══════════════════════════════════════
-   SEAT CARDS GRID
-══════════════════════════════════════ */
-.cl-seats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-  gap: 0.75rem; padding: 0 1.1rem;
-}
+/* ══ SEAT CARDS ══ */
+.cl-seats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 0.75rem; padding: 0 1.1rem; }
 @media (max-width: 480px) { .cl-seats-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 340px) { .cl-seats-grid { grid-template-columns: 1fr; } }
 
 .cl-seat-card {
   background: var(--card-l); border: 1px solid var(--border-l);
-  border-radius: 16px; padding: 1.1rem 1.1rem;
+  border-radius: 16px; padding: 1.1rem;
   box-shadow: var(--shadow-l);
   transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
   animation: fade-up 0.4s ease both;
 }
 .cl-seat-card:hover { transform: translateY(-3px); border-color: var(--border-l2); box-shadow: var(--shadow-l2); }
-.cl-sc-name {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.95rem; font-weight: 700;
-  color: var(--ink); margin-bottom: 0.8rem; padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--border-l);
-}
+.cl-sc-name { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-l); }
 .cl-sc-row { display: flex; align-items: center; justify-content: space-between; }
-.cl-sc-lbl {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-3);
-}
+.cl-sc-lbl { font-size: 0.53rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
 .cl-sc-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .cl-sc-frac { font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
-.cl-sc-tag {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.52rem; font-weight: 500;
-  padding: 0.12rem 0.52rem; border-radius: 6px; white-space: nowrap;
-}
+.cl-sc-tag { font-size: 0.52rem; font-weight: 500; padding: 0.12rem 0.52rem; border-radius: 6px; white-space: nowrap; }
 .cl-sc-tag.avail { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
 .cl-sc-tag.full  { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-bdr); }
 .cl-sc-bar { height: 5px; background: var(--border-l); border-radius: 99px; overflow: hidden; margin-top: 0.6rem; }
@@ -488,56 +376,180 @@ body {
 .cl-sc-fill.mgmt { background: linear-gradient(90deg, var(--gold-deep), var(--gold-light)); }
 .cl-sc-fill.full { background: linear-gradient(90deg, var(--red), #FF8A80); }
 
-/* ══════════════════════════════════════
-   VISUAL SEAT MAP
-══════════════════════════════════════ */
+/* ══ ADMIT CATEGORY MAP BUTTON ══ */
+.cl-admit-map-bar {
+  margin: 2rem 1.1rem 0;
+  display: flex; align-items: center; gap: 0.85rem;
+}
+.cl-admit-map-btn {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--gold-deep), var(--gold));
+  color: #fff; border: none; border-radius: 12px;
+  padding: 0.7rem 1.4rem; cursor: pointer; outline: none;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  box-shadow: 0 4px 18px var(--gold-glow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+[data-theme="dark"] .cl-admit-map-btn {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--ink);
+}
+.cl-admit-map-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--gold-glow); }
+.cl-admit-map-btn:active { transform: translateY(0); }
+.cl-admit-map-btn-icon { font-size: 1rem; }
+.cl-admit-map-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-l2), transparent); }
+
+/* ══ ADMIT CATEGORY MAP MODAL ══ */
+.cl-modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  padding: 1rem;
+}
+[data-theme="dark"] .cl-modal-overlay { background: rgba(0,0,0,0.78); }
+.cl-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.cl-modal {
+  width: 100%; max-width: 960px;
+  max-height: 90vh; overflow-y: auto;
+  background: var(--off-white);
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+.cl-modal-overlay.open .cl-modal { transform: translateY(0) scale(1); }
+
+/* sticky header with close top-right */
+.cl-modal-header {
+  position: sticky; top: 0; z-index: 10;
+  padding: 1.25rem 1.5rem;
+  background: var(--off-white);
+  border-bottom: 1px solid var(--border-l);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+.cl-modal-title-wrap { display: flex; flex-direction: column; gap: 0.15rem; }
+.cl-modal-title { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+.cl-modal-subtitle { font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.cl-modal-close {
+  flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--red-bg); border: 1.5px solid var(--red-bdr);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: var(--red); outline: none;
+  transition: background 0.2s, transform 0.15s;
+  font-weight: 700;
+}
+.cl-modal-close:hover { background: var(--red); color: #fff; transform: scale(1.08); }
+.cl-modal-close:active { transform: scale(0.95); }
+
+.cl-modal-body { padding: 1.4rem 1.5rem 2rem; }
+
+/* quota section headers inside modal */
+.cl-modal-quota-head {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 1.6rem 0 1rem;
+}
+.cl-modal-quota-head:first-of-type { margin-top: 0; }
+.cl-modal-quota-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 0.3rem 1rem;
+  border-radius: 99px; white-space: nowrap;
+}
+.cl-modal-quota-label.govt { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
+.cl-modal-quota-label.mgmt { background: rgba(212,160,23,0.12); color: var(--gold-deep); border: 1px solid rgba(212,160,23,0.35); }
+[data-theme="dark"] .cl-modal-quota-label.mgmt { color: var(--gold); border-color: rgba(240,192,64,0.35); }
+.cl-modal-quota-line { flex: 1; height: 1px; background: var(--border-l); }
+
+/* ── Admit category seat-map rows ── */
+/* Each category gets a labelled row of coloured seat dots */
+.cl-ac-section { margin-bottom: 1.1rem; }
+.cl-ac-row-head {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+.cl-ac-color-chip {
+  width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0;
+}
+.cl-ac-row-name {
+  font-size: 0.72rem; font-weight: 700; color: var(--ink);
+  white-space: nowrap; letter-spacing: 0.01em;
+}
+.cl-ac-row-stats {
+  font-size: 0.58rem; color: var(--ink-3);
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.cl-ac-row-frac { font-weight: 600; color: var(--ink-2); }
+.cl-ac-status-tag {
+  font-size: 0.5rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.1rem 0.5rem;
+  border-radius: 6px; white-space: nowrap;
+}
+.cl-ac-status-tag.full  { background: rgba(255,68,68,0.15);  color: #D00000; border: 1px solid rgba(255,68,68,0.35); }
+.cl-ac-status-tag.avail { background: rgba(5,150,105,0.12);  color: #047857; border: 1px solid rgba(5,150,105,0.3); }
+[data-theme="dark"] .cl-ac-status-tag.avail { color: #34D399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.10); }
+[data-theme="dark"] .cl-ac-status-tag.full  { color: #FF6B6B; border-color: rgba(255,107,107,0.35); }
+
+.cl-ac-dots { display: flex; flex-wrap: wrap; gap: 4px; }
+.cl-ac-dot {
+  width: 16px; height: 16px; border-radius: 4px;
+  cursor: default; transition: transform 0.18s;
+  animation: seat-pop 0.25s ease both;
+  flex-shrink: 0;
+}
+.cl-ac-dot:hover { transform: scale(1.8) translateY(-2px); z-index: 5; position: relative; }
+.cl-ac-dot.filled { /* colour set inline via style */ }
+.cl-ac-dot.empty  { background: var(--border-l); border: 1px solid var(--border-l2); }
+
+/* legend row at bottom */
+.cl-modal-legend {
+  display: flex; flex-wrap: wrap; gap: 0.55rem 1.1rem;
+  margin-top: 1.5rem; padding-top: 1rem;
+  border-top: 1px solid var(--border-l);
+}
+.cl-modal-leg { display: flex; align-items: center; gap: 0.4rem; font-size: 0.56rem; color: var(--ink-3); }
+.cl-modal-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.cl-modal-leg-dot.filled-ex { background: linear-gradient(135deg, #6366F1, #818CF8); }
+.cl-modal-leg-dot.empty-ex  { background: var(--border-l); border: 1px solid var(--border-l2); }
+
+/* ══ VISUAL SEAT MAPS ══ */
 .cl-smap {
-  margin: 1.5rem 1.1rem 0;
-  padding: 1.4rem;
+  margin: 1.5rem 1.1rem 0; padding: 1.4rem;
   background: var(--card-l); border: 1px solid var(--border-l);
   border-radius: 20px; box-shadow: var(--shadow-l);
   animation: fade-up 0.5s ease both;
 }
-.cl-smap-top {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.1rem;
-}
-.cl-smap-title {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3);
-}
+.cl-smap-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.1rem; }
+.cl-smap-title { font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-3); }
 .cl-smap-legend { display: flex; gap: 0.9rem; flex-wrap: wrap; }
-.cl-leg {
-  display: flex; align-items: center; gap: 0.35rem;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.53rem; color: var(--ink-3);
-}
+.cl-leg { display: flex; align-items: center; gap: 0.35rem; font-size: 0.53rem; color: var(--ink-3); }
 .cl-leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .cl-leg-dot.g { background: linear-gradient(135deg, var(--blue), #60A5FA); }
 .cl-leg-dot.m { background: linear-gradient(135deg, #FF8C00, #FFA500); }
 .cl-leg-dot.e { background: var(--border-l); border: 1px solid var(--border-l2); }
 .cl-seat-grid { display: flex; flex-wrap: wrap; gap: 5px; }
 .cl-sseat {
-  width: 18px; height: 18px; border-radius: 4px;
-  cursor: default; transition: transform 0.2s;
-  animation: seat-pop 0.3s ease both;
+  width: 18px; height: 18px; border-radius: 4px; cursor: default;
+  transition: transform 0.2s; animation: seat-pop 0.3s ease both;
 }
 @keyframes seat-pop { from{opacity:0;transform:scale(0)} to{opacity:1;transform:scale(1)} }
 .cl-sseat:hover { transform: scale(1.7) translateY(-2px); z-index: 20; position: relative; }
 .cl-sseat.g { background: linear-gradient(135deg, var(--blue), #60A5FA); box-shadow: 0 0 5px rgba(26,95,180,0.35); }
-.cl-sseat.m { background: linear-gradient(135deg, #FF8C00, #FFA500); box-shadow: 0 0 5px rgba(255, 140, 0, 0.35); }
+.cl-sseat.m { background: linear-gradient(135deg, #FF8C00, #FFA500); box-shadow: 0 0 5px rgba(255,140,0,0.35); }
 .cl-sseat.e { background: var(--border-l); border: 1px solid var(--border-l2); }
 
-/* ══════════════════════════════════════
-   ALLOTMENT HISTORY
-══════════════════════════════════════ */
+/* ══ ALLOTMENT HISTORY ══ */
 .cl-hist-wrap { margin: 1.5rem 1.1rem 0; }
 .cl-hist-btn {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
   background: var(--card-l); border: 1px solid var(--border-l);
-  border-radius: 16px; padding: 1rem 1.2rem;
-  cursor: pointer; outline: none;
+  border-radius: 16px; padding: 1rem 1.2rem; cursor: pointer; outline: none;
   box-shadow: var(--shadow-l);
   transition: background 0.25s, border-color 0.25s, border-radius 0.2s;
   animation: fade-up 0.5s ease both;
@@ -545,30 +557,20 @@ body {
 .cl-hist-btn:hover { border-color: var(--border-l2); }
 .cl-hist-btn.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
 .cl-hist-left { display: flex; align-items: center; gap: 0.7rem; }
-.cl-hist-title {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.98rem; font-weight: 700; color: var(--ink);
-}
-.cl-hist-count {
-  background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.54rem; font-weight: 500;
-  padding: 0.12rem 0.52rem; border-radius: 99px;
-}
+.cl-hist-title { font-size: 0.98rem; font-weight: 700; color: var(--ink); }
+.cl-hist-count { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); font-size: 0.54rem; font-weight: 500; padding: 0.12rem 0.52rem; border-radius: 99px; }
 .cl-chevron { font-size: 0.68rem; color: var(--ink-3); transition: transform 0.25s; }
 .cl-hist-btn.open .cl-chevron { transform: rotate(180deg); }
 .cl-hist-panel {
-  display: none;
-  background: var(--card-l); border: 1px solid var(--border-l);
+  display: none; background: var(--card-l); border: 1px solid var(--border-l);
   border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
   overflow: hidden; box-shadow: var(--shadow-l);
 }
 .cl-hist-panel.open { display: block; }
 .cl-hist-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.cl-htable { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 460px; }
+.cl-htable { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 520px; }
 .cl-htable thead th {
   background: rgba(212,160,23,0.07);
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 0.53rem; letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--ink-3); padding: 0.7rem 1rem; text-align: left;
   border-bottom: 1px solid var(--border-l); white-space: nowrap;
@@ -578,39 +580,45 @@ body {
 .cl-htable tbody tr:last-child td { border-bottom: none; }
 .cl-htable tbody tr:hover td { background: rgba(212,160,23,0.05); }
 [data-theme="dark"] .cl-htable tbody tr:hover td { background: rgba(240,192,64,0.04); }
-.r-pill {
-  display: inline-block;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.88rem; font-weight: 700; color: var(--gold);
-  background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.25);
-  padding: 0.06rem 0.52rem; border-radius: 6px;
-}
-[data-theme="dark"] .r-pill { background: rgba(240,192,64,0.10); border-color: rgba(240,192,64,0.25); color: var(--gold); }
-.q-pill {
-  display: inline-block;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.52rem;
-  font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
-  padding: 0.12rem 0.52rem; border-radius: 99px; white-space: nowrap;
-}
+
+.r-pill { display: inline-block; font-size: 0.88rem; font-weight: 700; color: var(--gold); background: rgba(212,160,23,0.10); border: 1px solid rgba(212,160,23,0.25); padding: 0.06rem 0.52rem; border-radius: 6px; }
+[data-theme="dark"] .r-pill { background: rgba(240,192,64,0.10); border-color: rgba(240,192,64,0.25); }
+.q-pill { display: inline-block; font-size: 0.52rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.12rem 0.52rem; border-radius: 99px; white-space: nowrap; }
 .q-pill.government { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
 .q-pill.management { background: rgba(212,160,23,0.12); color: var(--gold-deep); border: 1px solid rgba(212,160,23,0.3); }
 [data-theme="dark"] .q-pill.management { color: var(--gold); border-color: rgba(240,192,64,0.3); background: rgba(240,192,64,0.10); }
+
+/* Admit category pill in history */
+.ac-pill {
+  display: inline-block; font-size: 0.52rem; font-weight: 700;
+  letter-spacing: 0.06em; padding: 0.14rem 0.6rem; border-radius: 8px;
+  white-space: nowrap; background: var(--teal-bg); color: var(--teal);
+  border: 1px solid var(--teal-bdr);
+}
+.ac-pill.mgmt {
+  background: rgba(255,140,0,0.12); color: #B45A00;
+  border-color: rgba(255,140,0,0.3);
+}
+[data-theme="dark"] .ac-pill.mgmt { color: #FFA040; border-color: rgba(255,160,64,0.3); background: rgba(255,160,64,0.10); }
+
 .cl-hist-empty { text-align: center; padding: 2.5rem; color: var(--ink-3); font-size: 0.87rem; }
 
-
-
-/* ══════════════════════════════════════
-   ANIMATIONS
-══════════════════════════════════════ */
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ══ REFRESH BAR ══ */
+.cl-refresh {
+  margin: 2rem 1.1rem 4rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  animation: fade-up 0.5s ease both;
 }
+.cl-refresh-label { font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); display: flex; align-items: center; gap: 0.35rem; }
+.cl-refresh-count { color: var(--teal); font-weight: 600; }
+.cl-refresh-track { width: 180px; height: 3px; background: var(--border-l); border-radius: 99px; overflow: hidden; }
+.cl-refresh-fill { height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold-light)); border-radius: 99px; transform-origin: left; animation: drain 30s linear forwards; }
+@keyframes drain { from{transform:scaleX(1)} to{transform:scaleX(0)} }
 
-/* ══════════════════════════════════════
-   MOBILE OVERRIDES
-══════════════════════════════════════ */
+/* ══ ANIMATIONS ══ */
+@keyframes fade-up { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══ MOBILE ══ */
 @media (max-width: 480px) {
   .cl-hero { padding: 2.2rem 1.1rem 2rem; }
   .cl-rank-top { padding: 1.75rem 1.25rem 1.5rem; }
@@ -619,6 +627,8 @@ body {
   .cl-smap, .cl-hist-wrap { margin-left: 1.1rem; margin-right: 1.1rem; }
   .cl-sc-frac { white-space: nowrap; font-size: 0.75rem; }
   .cl-sc-tag { font-size: 0.48rem; white-space: nowrap; }
+  .cl-complete-banner-inner { padding: 1.6rem 1.25rem; }
+  .cl-modal-body { padding: 1rem 1.1rem 2rem; }
 }
 @media (max-width: 360px) {
   .cl-hero-h1 { font-size: 2.5rem; }
@@ -646,7 +656,7 @@ body {
     {% elif cs.status == 'paused' %}
       <span class="status-pill paused"><span class="pulse paused"></span>Paused</span>
     {% else %}
-      <span class="status-pill stopped"><span class="pulse stopped"></span>Not Started</span>
+      <span class="status-pill stopped"><span class="pulse stopped"></span>Completed</span>
     {% endif %}
     <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
       <span class="theme-icons"><span>☀️</span><span>🌙</span></span>
@@ -655,22 +665,159 @@ body {
   </div>
 </nav>
 
+<!-- Admit Category Map Modal -->
+<div class="cl-modal-overlay" id="admitMapOverlay" onclick="closeAdmitMap(event)">
+  <div class="cl-modal" id="admitMapModal">
+    <div class="cl-modal-header">
+      <div class="cl-modal-title-wrap">
+        <div class="cl-modal-title">🗺️ Admit Category — Seat Map</div>
+        <div class="cl-modal-subtitle">Each dot = one seat · Colour = admit category · Hover for details</div>
+      </div>
+      <button class="cl-modal-close" onclick="closeAdmitMapDirect()" title="Close">✕</button>
+    </div>
+    <div class="cl-modal-body">
+
+      {% if govt_seats_list %}
+      <div class="cl-modal-quota-head">
+        <span class="cl-modal-quota-label govt">🏛 Regular Seats</span>
+        <span class="cl-modal-quota-line"></span>
+      </div>
+      <div id="admitGridGovt">
+        {% set bright_colours = [
+          ('#6366F1','#818CF8'), ('#0EA5E9','#38BDF8'), ('#10B981','#34D399'),
+          ('#F59E0B','#FCD34D'), ('#EF4444','#F87171'), ('#8B5CF6','#A78BFA'),
+          ('#EC4899','#F472B6'), ('#14B8A6','#2DD4BF'), ('#F97316','#FB923C'),
+          ('#84CC16','#A3E635'), ('#06B6D4','#22D3EE'), ('#D946EF','#E879F9')
+        ] %}
+        {% for item in govt_seats_list %}
+          {% set ci = loop.index0 % bright_colours|length %}
+          {% set col_from = bright_colours[ci][0] %}
+          {% set col_to   = bright_colours[ci][1] %}
+          <div class="cl-ac-section">
+            <div class="cl-ac-row-head">
+              <div class="cl-ac-color-chip" style="background:linear-gradient(135deg,{{ col_from }},{{ col_to }})"></div>
+              <span class="cl-ac-row-name">{{ item.category }}</span>
+              <div class="cl-ac-row-stats">
+                <span class="cl-ac-row-frac">{{ item.filled }} / {{ item.total }}</span>
+                {% if item.remaining == 0 %}
+                  <span class="cl-ac-status-tag full">Full</span>
+                {% else %}
+                  <span class="cl-ac-status-tag avail">{{ item.remaining }} left</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="cl-ac-dots">
+              {% for i in range(item.total) %}
+                {% if i < item.filled %}
+                  <div class="cl-ac-dot filled"
+                       style="background:linear-gradient(135deg,{{ col_from }},{{ col_to }});box-shadow:0 0 5px {{ col_from }}88"
+                       title="{{ item.category }} · Seat {{ i+1 }} · Allotted"
+                       data-delay="{{ (loop.index0 * 0.006)|round(3) }}"></div>
+                {% else %}
+                  <div class="cl-ac-dot empty"
+                       title="{{ item.category }} · Seat {{ i+1 }} · Available"></div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if mgmt_seats_list %}
+      <div class="cl-modal-quota-head">
+        <span class="cl-modal-quota-label mgmt">🏢 Payment Seats</span>
+        <span class="cl-modal-quota-line"></span>
+      </div>
+      <div id="admitGridMgmt">
+        {% set mgmt_colours = [
+          ('#FF8C00','#FFA040'), ('#E11D48','#FB7185'), ('#7C3AED','#A78BFA'),
+          ('#0284C7','#38BDF8'), ('#059669','#6EE7B7'), ('#D97706','#FDE68A'),
+          ('#BE185D','#F9A8D4'), ('#0891B2','#67E8F9'), ('#16A34A','#86EFAC'),
+          ('#9333EA','#C084FC'), ('#DC2626','#FCA5A5'), ('#CA8A04','#FDE047')
+        ] %}
+        {% for item in mgmt_seats_list %}
+          {% set ci = loop.index0 % mgmt_colours|length %}
+          {% set col_from = mgmt_colours[ci][0] %}
+          {% set col_to   = mgmt_colours[ci][1] %}
+          <div class="cl-ac-section">
+            <div class="cl-ac-row-head">
+              <div class="cl-ac-color-chip" style="background:linear-gradient(135deg,{{ col_from }},{{ col_to }})"></div>
+              <span class="cl-ac-row-name">{{ item.category }}</span>
+              <div class="cl-ac-row-stats">
+                <span class="cl-ac-row-frac">{{ item.filled }} / {{ item.total }}</span>
+                {% if item.remaining == 0 %}
+                  <span class="cl-ac-status-tag full">Full</span>
+                {% else %}
+                  <span class="cl-ac-status-tag avail">{{ item.remaining }} left</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="cl-ac-dots">
+              {% for i in range(item.total) %}
+                {% if i < item.filled %}
+                  <div class="cl-ac-dot filled"
+                       style="background:linear-gradient(135deg,{{ col_from }},{{ col_to }});box-shadow:0 0 5px {{ col_from }}88"
+                       title="{{ item.category }} · Seat {{ i+1 }} · Allotted"></div>
+                {% else %}
+                  <div class="cl-ac-dot empty"
+                       title="{{ item.category }} · Seat {{ i+1 }} · Available"></div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="cl-modal-legend">
+        <div class="cl-modal-leg"><div class="cl-modal-leg-dot filled-ex"></div>Allotted seat (unique colour per category)</div>
+        <div class="cl-modal-leg"><div class="cl-modal-leg-dot empty-ex"></div>Available / not yet allotted</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="cl-page">
 
   <!-- Hero -->
   <div class="cl-hero">
     <div class="cl-hero-eyebrow">
       <span class="cl-hero-line"></span>
-      Live Counselling Session
+      Counselling Session 2026
       <span class="cl-hero-line"></span>
     </div>
     <h1 class="cl-hero-h1">Seat<br><em>Allotment</em></h1>
-    <p class="cl-hero-sub">Public</p>
+    <p class="cl-hero-sub">Public · No login required · Results viewable below</p>
   </div>
 
-  <!-- STOPPED -->
-  {% if cs.status == 'stopped' %}
-  <div class="cl-state">
+  <!-- ═══════════════════════════════════════
+       COMPLETION BANNER — always shown
+  ════════════════════════════════════════ -->
+  <div class="cl-complete-banner">
+    <div class="cl-complete-banner-deco"></div>
+    <div class="cl-complete-banner-deco2"></div>
+    <div class="cl-complete-banner-inner">
+      <div class="cl-complete-check">✓</div>
+      <div class="cl-complete-eyebrow">BCA Admissions 2026–27</div>
+      <div class="cl-complete-title">Counselling <em>Successfully</em> Concluded</div>
+      <div class="cl-complete-date">
+        <span>📅</span> Held on 25th May 2026
+      </div>
+      <div class="cl-complete-msg">
+        The BCA Admissions Counselling for the academic year 2026–27 was held officially on <strong>25th May 2026</strong> and has been successfully completed. We extend our heartfelt gratitude to everyone who made this possible — from the dedicated administrative staff and custodians who maintained the venue, to the faculty members who guided each student, and the officials who diligently allotted every seat. Your collective effort ensured a smooth and transparent admission process.
+      </div>
+      <div class="cl-complete-divider"></div>
+      <div class="cl-complete-note">
+        <span>ℹ️</span>
+        <span>The allotment history and seat maps below reflect the final results of the counselling. For any queries, please contact the admissions office.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN: Counselling not started (kept in code, not displayed) -->
+  {% if false and cs.status == 'stopped' %}
+  <div class="cl-state" style="display:none">
     <div class="cl-card">
       <div class="cl-state-inner">
         <span class="cl-state-icon">🎓</span>
@@ -679,10 +826,11 @@ body {
       </div>
     </div>
   </div>
+  {% endif %}
 
   <!-- PAUSED -->
-  {% elif cs.status == 'paused' %}
-  <div class="cl-state">
+  {% if cs.status == 'paused' %}
+  <div class="cl-state" style="margin-top:1.5rem;">
     <div class="cl-card">
       <div class="cl-state-inner">
         <span class="cl-state-icon">⏸</span>
@@ -697,7 +845,7 @@ body {
 
   <!-- WAITING -->
   {% elif cs.status == 'running' and not cs.current_rank %}
-  <div class="cl-state">
+  <div class="cl-state" style="margin-top:1.5rem;">
     <div class="cl-card">
       <div class="cl-state-inner">
         <span class="cl-state-icon">⏳</span>
@@ -708,10 +856,10 @@ body {
   </div>
 
   <!-- ACTIVE -->
-  {% else %}
+  {% elif cs.status == 'running' and cs.current_rank %}
 
   <!-- Currently Calling -->
-  <div class="cl-rank-wrap">
+  <div class="cl-rank-wrap" style="margin-top:1.5rem;">
     <div class="cl-card">
       <div class="cl-rank-top">
         <div class="cl-rank-deco"></div>
@@ -758,7 +906,6 @@ body {
             <div class="allot-name" style="font-weight:400;color:var(--ink-3);">Seat not yet allotted for this rank</div>
           </div>
         </div>
-
         {% else %}
         <div class="allot-box pending">
           <div class="allot-icon">ℹ</div>
@@ -768,7 +915,6 @@ body {
           </div>
         </div>
         {% endif %}
-
         {% if cs.message %}
         <div class="admin-msg"><span>📢</span><span>{{ cs.message }}</span></div>
         {% endif %}
@@ -777,7 +923,7 @@ body {
   </div>
 
   <!-- Stats -->
-  <div class="cl-stats">
+  <div class="cl-stats" style="margin-top:1.25rem;">
     <div class="cl-stats-grid">
       <div class="cl-stat">
         <div class="cl-stat-num" id="totalRankedNum">{{ total_ranked }}</div>
@@ -792,6 +938,17 @@ body {
         <div class="cl-stat-lbl">Seats Allotted</div>
       </div>
     </div>
+  </div>
+  {% endif %}
+
+  <!-- ═══════════════════ ADMIT CATEGORY MAP BUTTON ═══════════════════ -->
+  {% if govt_seats_list or mgmt_seats_list %}
+  <div class="cl-admit-map-bar">
+    <button class="cl-admit-map-btn" onclick="openAdmitMap()">
+      <span class="cl-admit-map-btn-icon">🗺️</span>
+      View Admit Category Seat Map
+    </button>
+    <span class="cl-admit-map-line"></span>
   </div>
   {% endif %}
 
@@ -861,7 +1018,7 @@ body {
   </div>
   {% endif %}
 
-   <!-- Visual Seat Maps - Regular & Payment Separate -->
+  <!-- Visual Seat Maps -->
   {% if govt_seats_list %}
   <div class="cl-smap">
     <div class="cl-smap-top">
@@ -888,7 +1045,7 @@ body {
   {% endif %}
 
   {% if mgmt_seats_list %}
-  <div class="cl-smap">
+  <div class="cl-smap" style="margin-top:1rem;">
     <div class="cl-smap-top">
       <div class="cl-smap-title">🏢 Payment Seats — Seat Map</div>
       <div class="cl-smap-legend">
@@ -912,7 +1069,6 @@ body {
   </div>
   {% endif %}
 
-
   <!-- Allotment History -->
   <div class="cl-hist-wrap">
     <button class="cl-hist-btn" id="histBtn" onclick="toggleHist()">
@@ -930,7 +1086,7 @@ body {
           <thead>
             <tr>
               <th>#</th><th>Rank</th><th>Student Name</th>
-              <th>Category</th><th>Quota</th><th>Allotted At (IST)</th>
+              <th>Category</th><th>Admit Category</th><th>Quota</th><th>Allotted At (IST)</th>
             </tr>
           </thead>
           <tbody>
@@ -940,6 +1096,13 @@ body {
               <td><span class="r-pill">#{{ h.rank }}</span></td>
               <td style="font-weight:600;color:var(--ink);">{{ h.name | upper }}</td>
               <td style="font-size:.79rem;">{{ h.category }}</td>
+              <td>
+                {% if h.admit_category %}
+                  <span class="ac-pill {% if h.quota == 'management' %}mgmt{% endif %}">{{ h.admit_category }}</span>
+                {% else %}
+                  <span style="color:var(--ink-3);font-size:.76rem;">—</span>
+                {% endif %}
+              </td>
               <td><span class="q-pill {{ h.quota }}">{% if h.quota == 'government' %}Regular{% elif h.quota == 'management' %}Payment{% else %}{{ h.quota|title }}{% endif %}</span></td>
               <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">{{ h.allotted_at }}</td>
             </tr>
@@ -953,7 +1116,11 @@ body {
     </div>
   </div>
 
-  
+  <!-- Refresh Bar -->
+  <div class="cl-refresh">
+    <div class="cl-refresh-label">Auto-refresh in <span class="cl-refresh-count" id="cd">30</span>s</div>
+    <div class="cl-refresh-track"><div class="cl-refresh-fill"></div></div>
+  </div>
 
 </div><!-- /cl-page -->
 {% endblock %}
@@ -964,12 +1131,11 @@ const LIVE_STATUS_API = "{{ url_for('main.counselling_live_status_api') }}";
 const INITIAL_STATUS  = "{{ cs.status }}";
 const INITIAL_HAS_RANK = {{ 'true' if cs.current_rank else 'false' }};
 
-/* ── THEME INIT ── */
+/* ── THEME ── */
 (function(){
   const saved = localStorage.getItem('cl-theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 })();
-
 function toggleTheme(){
   const html = document.documentElement;
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -982,6 +1148,22 @@ function toggleHist(){
   document.getElementById('histBtn').classList.toggle('open');
   document.getElementById('histPanel').classList.toggle('open');
 }
+
+/* ── ADMIT MAP MODAL ── */
+function openAdmitMap(){
+  document.getElementById('admitMapOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAdmitMapDirect(){
+  document.getElementById('admitMapOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeAdmitMap(e){
+  if (e.target === document.getElementById('admitMapOverlay')) closeAdmitMapDirect();
+}
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeAdmitMapDirect();
+});
 
 /* ── GENTLE FLOATING SEATS ── */
 (function(){
@@ -1008,7 +1190,7 @@ function fmtPercent(v){
 function updateStatusPill(status){
   const pill = document.querySelector('.status-pill');
   if (!pill) return;
-  pill.classList.remove('running', 'paused', 'stopped');
+  pill.classList.remove('running','paused','stopped');
   pill.classList.add(status);
   const pulse = pill.querySelector('.pulse');
   if (pulse){ pulse.classList.remove('running','paused','stopped'); pulse.classList.add(status); }
@@ -1016,8 +1198,64 @@ function updateStatusPill(status){
   if (text && text.nodeType === 3){
     if (status === 'running') text.textContent = 'Live';
     else if (status === 'paused') text.textContent = 'Paused';
-    else text.textContent = 'Not Started';
+    else text.textContent = 'Completed';
   }
+}
+
+
+/* Bright colour palettes matching Jinja template */
+const GOVT_COLOURS = [
+  ['#6366F1','#818CF8'], ['#0EA5E9','#38BDF8'], ['#10B981','#34D399'],
+  ['#F59E0B','#FCD34D'], ['#EF4444','#F87171'], ['#8B5CF6','#A78BFA'],
+  ['#EC4899','#F472B6'], ['#14B8A6','#2DD4BF'], ['#F97316','#FB923C'],
+  ['#84CC16','#A3E635'], ['#06B6D4','#22D3EE'], ['#D946EF','#E879F9']
+];
+const MGMT_COLOURS = [
+  ['#FF8C00','#FFA040'], ['#E11D48','#FB7185'], ['#7C3AED','#A78BFA'],
+  ['#0284C7','#38BDF8'], ['#059669','#6EE7B7'], ['#D97706','#FDE68A'],
+  ['#BE185D','#F9A8D4'], ['#0891B2','#67E8F9'], ['#16A34A','#86EFAC'],
+  ['#9333EA','#C084FC'], ['#DC2626','#FCA5A5'], ['#CA8A04','#FDE047']
+];
+
+function updateAdmitGrid(gridId, seats){
+  const grid = document.getElementById(gridId);
+  if (!grid || !seats.length) return;
+  const palette = gridId === 'admitGridMgmt' ? MGMT_COLOURS : GOVT_COLOURS;
+  grid.innerHTML = '';
+  seats.forEach(function(item, idx){
+    const [colFrom, colTo] = palette[idx % palette.length];
+    const isFull = item.remaining === 0;
+    const tagHtml = isFull
+      ? `<span class="cl-ac-status-tag full">Full</span>`
+      : `<span class="cl-ac-status-tag avail">${item.remaining} left</span>`;
+
+    const section = document.createElement('div');
+    section.className = 'cl-ac-section';
+
+    let dotsHtml = '';
+    for (let i = 0; i < item.total; i++){
+      const filled = i < item.filled;
+      if (filled){
+        dotsHtml += `<div class="cl-ac-dot filled"
+          style="background:linear-gradient(135deg,${colFrom},${colTo});box-shadow:0 0 5px ${colFrom}88"
+          title="${item.category} · Seat ${i+1} · Allotted"></div>`;
+      } else {
+        dotsHtml += `<div class="cl-ac-dot empty" title="${item.category} · Seat ${i+1} · Available"></div>`;
+      }
+    }
+
+    section.innerHTML = `
+      <div class="cl-ac-row-head">
+        <div class="cl-ac-color-chip" style="background:linear-gradient(135deg,${colFrom},${colTo})"></div>
+        <span class="cl-ac-row-name">${item.category}</span>
+        <div class="cl-ac-row-stats">
+          <span class="cl-ac-row-frac">${item.filled} / ${item.total}</span>
+          ${tagHtml}
+        </div>
+      </div>
+      <div class="cl-ac-dots">${dotsHtml}</div>`;
+    grid.appendChild(section);
+  });
 }
 
 function updateSeatCards(quota, seats){
@@ -1036,11 +1274,80 @@ function updateSeatCards(quota, seats){
       tag.classList.toggle('avail', !isFull);
     }
     if (fill){
-      const width = Number(item.total) > 0 ? Math.floor((Number(item.filled) / Number(item.total)) * 100) : 0;
-      fill.style.width = `${Math.max(0, Math.min(100, width))}%`;
+      const width = Number(item.total) > 0 ? Math.floor((Number(item.filled)/Number(item.total))*100) : 0;
+      fill.style.width = `${Math.max(0,Math.min(100,width))}%`;
       fill.classList.toggle('full', Number(item.remaining) === 0);
     }
   });
+}
+
+function updateSeatMap(govtSeats, mgmtSeats){
+  const govtGrid = document.getElementById('govtSeatGrid');
+  if (govtGrid){
+    govtGrid.innerHTML = '';
+    govtSeats.forEach(function(item){
+      for (let i = 0; i < item.total; i++){
+        const div = document.createElement('div');
+        const filled = i < item.filled;
+        div.className = 'cl-sseat ' + (filled ? 'g' : 'e');
+        div.title = `${filled ? 'Allotted' : 'Available'} · ${item.category}`;
+        govtGrid.appendChild(div);
+      }
+    });
+  }
+  const mgmtGrid = document.getElementById('mgmtSeatGrid');
+  if (mgmtGrid){
+    mgmtGrid.innerHTML = '';
+    mgmtSeats.forEach(function(item){
+      for (let i = 0; i < item.total; i++){
+        const div = document.createElement('div');
+        const filled = i < item.filled;
+        div.className = 'cl-sseat ' + (filled ? 'm' : 'e');
+        div.title = `${filled ? 'Allotted' : 'Available'} · ${item.category}`;
+        mgmtGrid.appendChild(div);
+      }
+    });
+  }
+}
+
+function updateAllotmentHistory(history){
+  const panel   = document.getElementById('histPanel');
+  const countEl = document.querySelector('.cl-hist-count');
+  if (countEl) countEl.textContent = history.length;
+  if (!panel) return;
+  if (!history.length){
+    panel.innerHTML = '<div class="cl-hist-empty">No seats allotted yet.</div>';
+    return;
+  }
+  let rows = '';
+  history.forEach(function(h, i){
+    let quotaDisplay = h.quota === 'government' ? 'Regular' : h.quota === 'management' ? 'Payment' : (h.quota.charAt(0).toUpperCase() + h.quota.slice(1));
+    const isMgmt = h.quota === 'management';
+    const acHtml = h.admit_category
+      ? `<span class="ac-pill${isMgmt ? ' mgmt' : ''}">${h.admit_category}</span>`
+      : `<span style="color:var(--ink-3);font-size:.76rem;">—</span>`;
+    rows += `<tr>
+      <td style="color:var(--ink-3);font-size:.74rem;">${i+1}</td>
+      <td><span class="r-pill">#${h.rank}</span></td>
+      <td style="font-weight:600;color:var(--ink);">${h.name.toUpperCase()}</td>
+      <td style="font-size:.79rem;">${h.category}</td>
+      <td>${acHtml}</td>
+      <td><span class="q-pill ${h.quota}">${quotaDisplay}</span></td>
+      <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">${h.allotted_at}</td>
+    </tr>`;
+  });
+  const isOpen = document.getElementById('histPanel').classList.contains('open');
+  panel.innerHTML = `
+    <div class="cl-hist-scroll">
+      <table class="cl-htable">
+        <thead><tr>
+          <th>#</th><th>Rank</th><th>Student Name</th>
+          <th>Category</th><th>Admit Category</th><th>Quota</th><th>Allotted At (IST)</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  if (isOpen) panel.classList.add('open');
 }
 
 async function refreshLiveNumbers(){
@@ -1051,8 +1358,7 @@ async function refreshLiveNumbers(){
 
     const hasRankNow = data.current_rank !== null && data.current_rank !== undefined;
     if (data.status !== INITIAL_STATUS || hasRankNow !== INITIAL_HAS_RANK){
-      window.location.reload();
-      return;
+      window.location.reload(); return;
     }
 
     updateStatusPill(data.status);
@@ -1063,7 +1369,7 @@ async function refreshLiveNumbers(){
     if (rankHero) rankHero.innerHTML = `<sup>#</sup>${rankVal}`;
     if (rankStat) rankStat.textContent = rankVal;
 
-    const totalRanked  = document.getElementById('totalRankedNum');
+    const totalRanked   = document.getElementById('totalRankedNum');
     const totalAllotted = document.getElementById('totalAllottedNum');
     if (totalRanked)   totalRanked.textContent   = data.total_ranked   ?? '—';
     if (totalAllotted) totalAllotted.textContent = data.total_allotted ?? '—';
@@ -1098,94 +1404,31 @@ async function refreshLiveNumbers(){
     updateSeatCards('government', data.govt_seats_list || []);
     updateSeatCards('management', data.mgmt_seats_list || []);
     updateSeatMap(data.govt_seats_list || [], data.mgmt_seats_list || []);
+    updateAdmitGrid('admitGridGovt', data.govt_seats_list || []);
+    updateAdmitGrid('admitGridMgmt', data.mgmt_seats_list || []);
     updateAllotmentHistory(data.allotment_history || []);
 
-  } catch(e){
-    // Silent fail
-  }
+  } catch(e){ /* silent */ }
 }
 
-/* ── COUNTDOWN + AJAX REFRESH ── */
-let s = 60;
-
+/* ── COUNTDOWN ── */
+let s = 30;
+const cdEl = document.getElementById('cd');
+const rfEl = document.querySelector('.cl-refresh-fill');
 const timer = setInterval(async () => {
   s--;
+  if (cdEl) cdEl.textContent = s;
   if (s <= 0){
     await refreshLiveNumbers();
-    s = 60;
+    s = 30;
+    if (cdEl) cdEl.textContent = s;
+    if (rfEl){
+      rfEl.style.animation = 'none';
+      void rfEl.offsetHeight;
+      rfEl.style.animation = 'drain 30s linear forwards';
+    }
   }
 }, 1000);
-
-function updateSeatMap(govtSeats, mgmtSeats) {
-  const govtGrid = document.getElementById('govtSeatGrid');
-  if (govtGrid) {
-    govtGrid.innerHTML = '';
-    govtSeats.forEach(function(item) {
-      for (let i = 0; i < item.total; i++) {
-        const div = document.createElement('div');
-        const filled = i < item.filled;
-        div.className = 'cl-sseat ' + (filled ? 'g' : 'e');
-        div.title = filled
-          ? `Seat ${i + 1} · ${item.category} · Allotted`
-          : `Seat ${i + 1} · ${item.category} · Not Allotted`;
-        govtGrid.appendChild(div);
-      }
-    });
-  }
-
-  const mgmtGrid = document.getElementById('mgmtSeatGrid');
-  if (mgmtGrid) {
-    mgmtGrid.innerHTML = '';
-    mgmtSeats.forEach(function(item) {
-      for (let i = 0; i < item.total; i++) {
-        const div = document.createElement('div');
-        const filled = i < item.filled;
-        div.className = 'cl-sseat ' + (filled ? 'm' : 'e');
-        div.title = filled
-          ? `Seat ${i + 1} · ${item.category} · Allotted`
-          : `Seat ${i + 1} · ${item.category} · Not Allotted`;
-        mgmtGrid.appendChild(div);
-      }
-    });
-  }
-}
-
-function updateAllotmentHistory(history) {
-  const panel = document.getElementById('histPanel');
-  const countEl = document.querySelector('.cl-hist-count');
-  if (countEl) countEl.textContent = history.length;
-  if (!panel) return;
-  if (!history.length) {
-    panel.innerHTML = '<div class="cl-hist-empty">No seats allotted yet.</div>';
-    return;
-  }
-  let rows = '';
-  history.forEach(function(h, i) {
-    let quotaDisplay = '';
-    if (h.quota === 'government') quotaDisplay = 'Regular';
-    else if (h.quota === 'management') quotaDisplay = 'Payment';
-    else quotaDisplay = h.quota.charAt(0).toUpperCase() + h.quota.slice(1);
-    
-    rows += `<tr>
-      <td style="color:var(--ink-3);font-size:.74rem;">${i + 1}</td>
-      <td><span class="r-pill">#${h.rank}</span></td>
-      <td style="font-weight:600;color:var(--ink);">${h.name.toUpperCase()}</td>
-      <td style="font-size:.79rem;">${h.category}</td>
-      <td><span class="q-pill ${h.quota}">${quotaDisplay}</span></td>
-      <td style="font-size:.73rem;white-space:nowrap;color:var(--ink-3);">${h.allotted_at}</td>
-    </tr>`;
-  });
-  panel.innerHTML = `
-    <div class="cl-hist-scroll">
-      <table class="cl-htable">
-        <thead><tr>
-          <th>#</th><th>Rank</th><th>Student Name</th>
-          <th>Category</th><th>Quota</th><th>Allotted At (IST)</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-}
 
 refreshLiveNumbers();
 </script>

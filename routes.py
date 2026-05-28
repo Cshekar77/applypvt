@@ -221,12 +221,18 @@ def counselling_live():
         appl = StudentApplication.query.get(a.application_id)
         if not appl:
             continue
+        admit_cat_name = None
+        if a.admit_category_id:
+            ac_obj = AdmitCategory.query.get(a.admit_category_id)
+            if ac_obj:
+                admit_cat_name = ac_obj.name
         allotment_history.append({
-            'rank':        appl.rank or '—',
-            'name':        appl.full_name,
-            'category':    appl.category_name or '—',
-            'quota':       a.quota,
-            'allotted_at': fmt_ist(a.allotted_at),
+            'rank':           appl.rank or '—',
+            'name':           appl.full_name,
+            'category':       appl.category_name or '—',
+            'admit_category': admit_cat_name,
+            'quota':          a.quota,
+            'allotted_at':    fmt_ist(a.allotted_at),
         })
     allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
 
@@ -287,12 +293,18 @@ def counselling_live_status_api():
         appl = StudentApplication.query.get(a.application_id)
         if not appl:
             continue
+        admit_cat_name = None
+        if a.admit_category_id:
+            ac_obj = AdmitCategory.query.get(a.admit_category_id)
+            if ac_obj:
+                admit_cat_name = ac_obj.name
         allotment_history.append({
-            'rank':        appl.rank or '—',
-            'name':        appl.full_name,
-            'category':    appl.category_name or '—',
-            'quota':       a.quota,
-            'allotted_at': fmt_ist(a.allotted_at, '%d %b %Y at %I:%M %p'),
+            'rank':           appl.rank or '—',
+            'name':           appl.full_name,
+            'category':       appl.category_name or '—',
+            'admit_category': admit_cat_name,
+            'quota':          a.quota,
+            'allotted_at':    fmt_ist(a.allotted_at, '%d %b %Y at %I:%M %p'),
         })
     allotment_history.sort(key=lambda x: (x['rank'] if isinstance(x['rank'], int) else 9999))
 
