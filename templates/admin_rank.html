@@ -3,212 +3,215 @@
 {% block navbar_auth %}{% endblock %}
 {% block content %}
 <style>
-  .admin-table {
+  /* ── PAGE LAYOUT ── */
+  .rank-page-wrap {
     width: 100%;
+    max-width: 100%;
+    padding: 1.25rem 1.5rem;
+    box-sizing: border-box;
+  }
+  .rank-page-header {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap;
+    gap: .75rem; margin-bottom: .75rem;
+  }
+  .rank-page-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem; color: #0a1f44; margin: 0;
+  }
+  .rank-text-muted {
+    color: #5a6e82; margin-bottom: 1rem; font-size: .82rem;
+  }
+
+  /* ── TABLE ── */
+  .rank-table-wrap {
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  }
+  .rank-admin-table {
+    width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    min-width: 780px;
   }
-  .admin-table th {
+
+  /* 8 columns — widths sum to 100% */
+  .rank-admin-table th:nth-child(1) { width: 8%; }   /* Rank */
+  .rank-admin-table th:nth-child(2) { width: 16%; }  /* Name */
+  .rank-admin-table th:nth-child(3) { width: 20%; }  /* Email */
+  .rank-admin-table th:nth-child(4) { width: 9%; }   /* 12th % */
+  .rank-admin-table th:nth-child(5) { width: 9%; }   /* 10th % */
+  .rank-admin-table th:nth-child(6) { width: 11%; }  /* Stream */
+  .rank-admin-table th:nth-child(7) { width: 18%; }  /* Category */
+  .rank-admin-table th:nth-child(8) { width: 9%; }   /* Assign */
+
+  .rank-admin-table th {
     background: #0a1f44;
     color: white;
-    padding: .85rem 1rem;
+    padding: .7rem .65rem;
     text-align: left;
     font-weight: 600;
-    font-size: .82rem;
+    font-size: .78rem;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .admin-table td {
-    padding: .75rem 1rem;
+  .rank-admin-table td {
+    padding: .65rem .65rem;
     border-bottom: 1px solid #eef2f8;
     color: #1a2c3e;
     vertical-align: middle;
-    font-size: .875rem;
+    font-size: .8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .admin-table tr:last-child td { border-bottom: none; }
-  .admin-table tr:hover { background: #f8f9fa; }
+  .rank-admin-table td:nth-child(2) { white-space: normal; word-break: break-word; }
+  .rank-admin-table td:nth-child(3) { white-space: normal; word-break: break-all; font-size: .74rem; color: #5a6e82; }
 
+  .rank-admin-table tr:last-child td { border-bottom: none; }
+  .rank-admin-table tr:hover { background: #f8f9fa; }
+
+  /* ── BADGES ── */
   .rank-badge {
     background: #c9a03d; color: #0a1f44;
-    padding: .2rem .6rem; border-radius: 20px;
-    font-size: .8rem; font-weight: 700;
-    display: inline-block; text-align: center; min-width: 40px;
-    white-space: nowrap;
+    padding: .18rem .5rem; border-radius: 20px;
+    font-size: .74rem; font-weight: 700;
+    display: inline-block; text-align: center;
   }
   .rank-badge-empty {
     background: #eef2f8; color: #8a92a0;
-    padding: .2rem .6rem; border-radius: 20px;
-    font-size: .75rem; display: inline-block; white-space: nowrap;
-  }
-  .specialization-badge {
-    background: #eef2ff; color: #0a1f44;
-    padding: .2rem .5rem; border-radius: 12px;
-    font-size: .7rem; display: inline-block; white-space: nowrap;
+    padding: .18rem .5rem; border-radius: 20px;
+    font-size: .72rem; display: inline-block;
   }
   .category-badge {
     background: #e8f5e9; color: #2e7d32;
-    padding: .2rem .5rem; border-radius: 12px;
-    font-size: .7rem; display: inline-block; white-space: nowrap;
+    padding: .18rem .45rem; border-radius: 10px;
+    font-size: .7rem; display: inline-block;
+    max-width: 100%; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
   }
+  .percent-highlight { font-weight: 700; color: #c9a03d; }
+
+  /* ── RANK INPUT ── */
   .rank-input {
-    width: 80px; padding: 7px 8px;
-    border: 2px solid #e2e8f0; border-radius: 12px;
-    font-size: .88rem; text-align: center;
+    width: 100%; max-width: 64px;
+    padding: 5px 4px;
+    border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: .82rem; text-align: center;
     font-weight: 600; box-sizing: border-box;
     transition: border-color .2s;
   }
   .rank-input:focus { outline: none; border-color: #c9a03d; }
   .rank-input::placeholder { color: #aaa; font-weight: normal; }
 
-  .percent-highlight { font-weight: 700; color: #c9a03d; font-size: 1rem; }
-
-  .btn-primary {
+  /* ── BUTTONS ── */
+  .rank-btn-primary {
     background: #c9a03d; color: #0a1f44;
-    border: none; padding: .75rem 2rem;
+    border: none; padding: .65rem 1.75rem;
     border-radius: 40px; font-weight: 600;
-    cursor: pointer; font-size: .95rem;
-    display: inline-flex; align-items: center; gap: .5rem;
-    transition: background .2s, transform .15s;
-    white-space: nowrap;
+    cursor: pointer; font-size: .9rem;
+    display: inline-flex; align-items: center; gap: .45rem;
+    transition: background .2s, transform .15s; white-space: nowrap;
   }
-  .btn-primary:hover { background: #b58c2e; transform: translateY(-2px); }
+  .rank-btn-primary:hover { background: #b58c2e; transform: translateY(-2px); }
 
-  .btn-outline {
+  .rank-btn-outline {
     background: transparent; border: 1px solid #c9a03d;
-    color: #c9a03d; padding: .4rem .8rem;
-    border-radius: 20px; font-size: .8rem; cursor: pointer;
+    color: #c9a03d; padding: .35rem .75rem;
+    border-radius: 20px; font-size: .78rem; cursor: pointer;
     text-decoration: none; display: inline-flex;
-    align-items: center; gap: .35rem; white-space: nowrap;
+    align-items: center; gap: .3rem; white-space: nowrap;
     transition: background .2s, color .2s;
   }
-  .btn-outline:hover { background: #c9a03d; color: white; }
-  .btn-sm { font-size: .8rem; padding: .3rem .8rem; }
-
-  .page-header-inner {
-    display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap;
-    gap: 1rem; margin-bottom: 1rem;
-  }
-  .page-header-inner h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem; color: #0a1f44; margin: 0;
-  }
-  .text-muted { color: #5a6e82; margin-bottom: 1.5rem; font-size: .88rem; }
+  .rank-btn-outline:hover { background: #c9a03d; color: white; }
 
   .rank-actions {
-    display: flex; gap: .85rem; align-items: center;
-    flex-wrap: wrap; margin-top: 1.25rem;
+    display: flex; gap: .75rem; align-items: center;
+    flex-wrap: wrap; margin-top: 1rem;
   }
 
-  .hod-btn {
-    background: #1a237e; color: white; border: none;
-    padding: .7rem 1.4rem; border-radius: 40px;
-    font-weight: 600; cursor: pointer; font-size: .9rem;
-    display: inline-flex; align-items: center; gap: .5rem;
-    transition: background .2s, transform .15s;
-    white-space: nowrap;
-  }
-  .hod-btn:hover { background: #283593; transform: translateY(-2px); }
-
-  .hod-badge {
-    background: #c9a03d; color: #0a1f44;
-    font-size: .62rem; font-weight: 700;
-    padding: .1rem .45rem; border-radius: 20px;
-    letter-spacing: .05em; text-transform: uppercase;
-  }
-
-  .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 16px;
-  }
-
-  /* ── TOAST NOTIFICATION ── */
+  /* ── TOAST ── */
   .rank-toast {
     position: fixed; bottom: 1.5rem; left: 50%;
     transform: translateX(-50%) translateY(80px);
     background: #0a1f44; color: white;
-    padding: .75rem 1.5rem; border-radius: 30px;
-    font-size: .88rem; font-weight: 600;
+    padding: .7rem 1.4rem; border-radius: 30px;
+    font-size: .85rem; font-weight: 600;
     box-shadow: 0 8px 24px rgba(10,31,68,.3);
     z-index: 9999; transition: transform .3s ease, opacity .3s ease;
-    opacity: 0; display: flex; align-items: center; gap: .6rem;
+    opacity: 0; display: flex; align-items: center; gap: .55rem;
     white-space: nowrap;
   }
   .rank-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .rank-toast.success { background: #065f46; }
-  .rank-toast.info    { background: #0a1f44; }
 
   /* ── DARK MODE ── */
-  body.dark .page-header-inner h2 { color: #eef2ff; }
-  body.dark .text-muted { color: #b9c8e8; }
-  body.dark .admin-table { background: #1a2538; }
-  body.dark .admin-table td { color: #eef2ff; border-bottom-color: #2d3e54; }
-  body.dark .admin-table tr:hover { background: #2d3e54; }
-  body.dark .admin-table tr:last-child td { border-bottom: none; }
+  body.dark .rank-page-header h2 { color: #eef2ff; }
+  body.dark .rank-text-muted { color: #b9c8e8; }
+  body.dark .rank-admin-table { background: #1a2538; }
+  body.dark .rank-admin-table td { color: #eef2ff; border-bottom-color: #2d3e54; }
+  body.dark .rank-admin-table td:nth-child(3) { color: #b9c8e8; }
+  body.dark .rank-admin-table tr:hover { background: #2d3e54; }
   body.dark .rank-badge { background: #c9a03d; color: #0a1f44; }
   body.dark .rank-badge-empty { background: #2d3e54; color: #b9c8e8; }
-  body.dark .specialization-badge { background: #2d3e54; color: #eef2ff; }
   body.dark .category-badge { background: #1e3a2f; color: #81c784; }
   body.dark .rank-input { background: #0f1a24; border-color: #2d3e54; color: #eef2ff; }
   body.dark .rank-input:focus { border-color: #c9a03d; }
   body.dark .percent-highlight { color: #c9a03d; }
-  body.dark .btn-primary { background: #c9a03d; color: #0a1f44; }
-  body.dark .btn-primary:hover { background: #b58c2e; }
-  body.dark .rank-toast { box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+  body.dark .rank-btn-primary { background: #c9a03d; color: #0a1f44; }
+  body.dark .rank-btn-primary:hover { background: #b58c2e; }
 
   /* ── RESPONSIVE ── */
-  @media (max-width: 640px) {
-    .page-header-inner h2 { font-size: 1.4rem; }
-    .rank-actions { flex-direction: column; align-items: stretch; }
-    .rank-actions .btn-primary,
-    .rank-actions .hod-btn,
-    .rank-actions .btn-outline { width: 100%; justify-content: center; }
-    .rank-toast { width: calc(100% - 2rem); text-align: center; white-space: normal; justify-content: center; }
+  @media (max-width: 900px) {
+    .rank-admin-table th,
+    .rank-admin-table td { font-size: .7rem; padding: .5rem .45rem; }
+    .rank-input { max-width: 52px; }
   }
-
-  @media (max-width: 480px) {
-    .admin-table td, .admin-table th { padding: .55rem .65rem; font-size: .75rem; }
-    .rank-input { width: 60px; padding: 5px 4px; font-size: .8rem; }
-    .specialization-badge, .category-badge { font-size: .65rem; }
+  @media (max-width: 640px) {
+    .rank-page-wrap { padding: .75rem; }
+    .rank-page-header h2 { font-size: 1.25rem; }
+    .rank-actions { flex-direction: column; align-items: stretch; }
+    .rank-actions .rank-btn-primary,
+    .rank-actions .rank-btn-outline { width: 100%; justify-content: center; }
+    .rank-table-wrap { overflow-x: auto; }
+    .rank-toast { width: calc(100% - 1.5rem); white-space: normal; justify-content: center; }
   }
 </style>
 
-<div class="page-wrap">
-  <div class="page-header-inner">
+<div class="rank-page-wrap">
+  <div class="rank-page-header">
     <h2><i class="fas fa-chart-line"></i> Rank Management</h2>
-    <a href="{{ url_for('main.admin_dashboard') }}" class="btn-outline btn-sm">
+    <a href="{{ url_for('main.admin_dashboard') }}" class="rank-btn-outline">
       <i class="fas fa-arrow-left"></i> Dashboard
     </a>
   </div>
 
-  <p class="text-muted">
+  <p class="rank-text-muted">
     <i class="fas fa-info-circle"></i>
     {% if students and students[0].rank %}
-      Currently sorted by rank. Use HOD button to reorder by 12th percentage.
+      Currently sorted by rank. Assign ranks manually using the input fields below.
     {% else %}
-      Click HOD button to auto-generate ranks based on Grade 12 percentage.
+      Assign ranks manually using the input fields below, then click Save Ranks.
     {% endif %}
   </p>
 
   <form method="POST" action="{{ url_for('main.save_ranks') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-    <div class="table-wrap">
-      <table class="admin-table" id="rank-table">
+    <div class="rank-table-wrap">
+      <table class="rank-admin-table" id="rank-table">
         <thead>
           <tr>
-            <th>Current Rank</th>
+            <th>Rank</th>
             <th>Name</th>
             <th>Email</th>
             <th>12th %</th>
             <th>10th %</th>
             <th>Stream</th>
-            <th>Specialization</th>
             <th>Category</th>
-            <th>Assign Rank</th>
+            <th>Assign</th>
           </tr>
         </thead>
         <tbody>
@@ -218,25 +221,14 @@
               {% if s.rank %}
                 <span class="rank-badge">#{{ s.rank }}</span>
               {% else %}
-                <span class="rank-badge-empty">Not ranked</span>
+                <span class="rank-badge-empty">—</span>
               {% endif %}
             </td>
             <td><strong>{{ s.full_name }}</strong></td>
-            <td style="font-size:.8rem;color:#5a6e82">{{ s.email }}</td>
+            <td>{{ s.email }}</td>
             <td><span class="percent-highlight">{{ "%.2f"|format(s.percent_12) if s.percent_12 else '—' }}{% if s.percent_12 %}%{% endif %}</span></td>
             <td>{{ "%.2f"|format(s.percent_10) if s.percent_10 else '—' }}{% if s.percent_10 %}%{% endif %}</td>
             <td>{{ s.stream_12 or '—' }}</td>
-            <td>
-              {% if s.specialization %}
-                {% if s.specialization == 'Other' and s.specialization_other %}
-                  <span class="specialization-badge" title="{{ s.specialization_other }}">
-                    <i class="fas fa-code"></i> {{ s.specialization_other[:22] }}{% if s.specialization_other|length > 22 %}…{% endif %}
-                  </span>
-                {% else %}
-                  <span class="specialization-badge"><i class="fas fa-code"></i> {{ s.specialization }}</span>
-                {% endif %}
-              {% else %}—{% endif %}
-            </td>
             <td>
               {% if s.category %}
                 <span class="category-badge"><i class="fas fa-tag"></i> {{ s.category.name }}</span>
@@ -246,14 +238,14 @@
               <input type="number"
                 name="rank_{{ s.id }}"
                 value="{{ s.rank or '' }}"
-                placeholder="Rank"
+                placeholder="#"
                 min="1"
                 class="rank-input">
             </td>
           </tr>
           {% else %}
           <tr>
-            <td colspan="9" style="text-align:center;padding:3rem;color:#888">
+            <td colspan="8" style="text-align:center;padding:3rem;color:#888">
               <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:.5rem;display:block"></i>
               No verified students to rank. Please verify students first.
             </td>
@@ -265,14 +257,16 @@
 
     {% if students %}
     <div class="rank-actions">
-      <button type="submit" class="btn-primary">
+      <button type="submit" class="rank-btn-primary">
         <i class="fas fa-save"></i> Save Ranks
       </button>
-      <button type="button" class="hod-btn" onclick="hodAutoRank()">
+      <!-- HOD Auto-Generate Ranks button removed as per admin request -->
+      <!--
+      <button type="button" onclick="hodAutoRank()">
         <i class="fas fa-magic"></i> Auto-Generate Ranks
-        <span class="hod-badge">HOD</span>
       </button>
-      <a href="{{ url_for('main.admin_verified') }}" class="btn-outline btn-sm">
+      -->
+      <a href="{{ url_for('main.admin_verified') }}" class="rank-btn-outline">
         <i class="fas fa-users"></i> View Verified
       </a>
     </div>
@@ -280,7 +274,6 @@
   </form>
 </div>
 
-{# Toast notification element #}
 <div class="rank-toast" id="rank-toast"></div>
 
 {% endblock %}
@@ -291,34 +284,31 @@
     var toast = document.getElementById('rank-toast');
     toast.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'info-circle') + '"></i> ' + msg;
     toast.className = 'rank-toast ' + (type || 'info') + ' show';
-    setTimeout(function() {
-      toast.classList.remove('show');
-    }, 3200);
+    setTimeout(function() { toast.classList.remove('show'); }, 3200);
   }
 
+  /* HOD auto-rank — commented out, no longer triggered from UI */
+  /*
   function hodAutoRank() {
-  if (!confirm('Auto-generate ranks based on 12th % (tiebreaker: 10th %)?\nThis will overwrite existing rank inputs.')) return;
-
-  var tbody = document.querySelector('#rank-table tbody');
-  var rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
-
-  rows.sort(function(a, b) {
-    var p12a = parseFloat(a.dataset.percent12) || 0;
-    var p12b = parseFloat(b.dataset.percent12) || 0;
-    if (p12b !== p12a) return p12b - p12a;          // primary: 12th % desc
-    var p10a = parseFloat(a.dataset.percent10) || 0;
-    var p10b = parseFloat(b.dataset.percent10) || 0;
-    return p10b - p10a;                              // tiebreaker: 10th % desc
-  });
-
-  tbody.innerHTML = '';
-  rows.forEach(function(row, index) {
-    var input = row.querySelector('input[name^="rank_"]');
-    if (input) input.value = index + 1;
-    tbody.appendChild(row);
-  });
-
-  showToast('Ranks auto-generated! Click "Save Ranks" to save.', 'success');
-}
+    if (!confirm('Auto-generate ranks based on 12th % (tiebreaker: 10th %)?\nThis will overwrite existing rank inputs.')) return;
+    var tbody = document.querySelector('#rank-table tbody');
+    var rows  = Array.from(tbody.querySelectorAll('tr[data-percent12]'));
+    rows.sort(function(a, b) {
+      var p12a = parseFloat(a.dataset.percent12) || 0;
+      var p12b = parseFloat(b.dataset.percent12) || 0;
+      if (p12b !== p12a) return p12b - p12a;
+      var p10a = parseFloat(a.dataset.percent10) || 0;
+      var p10b = parseFloat(b.dataset.percent10) || 0;
+      return p10b - p10a;
+    });
+    tbody.innerHTML = '';
+    rows.forEach(function(row, index) {
+      var input = row.querySelector('input[name^="rank_"]');
+      if (input) input.value = index + 1;
+      tbody.appendChild(row);
+    });
+    showToast('Ranks auto-generated! Click Save Ranks to save.', 'success');
+  }
+  */
 </script>
 {% endblock %}
