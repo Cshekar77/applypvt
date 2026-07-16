@@ -1688,6 +1688,92 @@ def export_admitted_students():
 
 
 # ─────────────────────────────────────────
+#  Admin — Export: Allotted Students (Simple) Excel
+# ─────────────────────────────────────────
+@main.route('/admin/export/allotted-students-simple')
+@admin_required
+def export_allotted_students_simple():
+    import io
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+
+    allotments = SeatAllotment.query.all()
+    rows = []
+    for a in allotments:
+        appl = StudentApplication.query.get(a.application_id)
+        if not appl:
+            continue
+
+        admit_cat_name = ''
+        if a.admit_category_id:
+            ac = AdmitCategory.query.get(a.admit_category_id)
+            if ac:
+                admit_cat_name = ac.name
+
+        rows.append({
+            'Application Number':         appl.id,          # plain digit, no BCA prefix
+            'Rank':                       appl.rank or '',
+            'Name':                       appl.full_name,
+            'Caste Category':             appl.category_name or '',
+            'Admit Category':             admit_cat_name,
+            'Seat Type':                  a.quota.title() if a.quota else '',
+            'Date and Time of Allotment': fmt_ist(a.allotted_at),
+        })
+
+    rows.sort(key=lambda x: (x['Rank'] if isinstance(x['Rank'], int) else 9999))
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Allotted Students'
+
+    header_fill = PatternFill('solid', fgColor='1F3864')
+    header_font = Font(color='FFFFFF', bold=True, size=11)
+    thin_border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'),  bottom=Side(style='thin')
+    )
+
+    headers = list(rows[0].keys()) if rows else [
+        'Application Number', 'Rank', 'Name', 'Caste Category',
+        'Admit Category', 'Seat Type', 'Date and Time of Allotment'
+    ]
+
+    for col_idx, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        cell.font      = header_font
+        cell.fill      = header_fill
+        cell.border    = thin_border
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws.row_dimensions[1].height = 28
+
+    alt_fill = PatternFill('solid', fgColor='EAF0FB')
+    for row_idx, row_data in enumerate(rows, 2):
+        fill = alt_fill if row_idx % 2 == 0 else None
+        for col_idx, key in enumerate(headers, 1):
+            cell        = ws.cell(row=row_idx, column=col_idx, value=row_data.get(key, ''))
+            cell.border = thin_border
+            cell.alignment = Alignment(vertical='center')
+            if fill:
+                cell.fill = fill
+
+    for col_idx, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_idx)
+        max_len    = len(str(header))
+        for row in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
+            for cell in row:
+                if cell.value:
+                    max_len = max(max_len, len(str(cell.value)))
+        ws.column_dimensions[col_letter].width = min(max_len + 3, 35)
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return send_file(output,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     as_attachment=True, download_name='allotted_students.xlsx')
+
+# ─────────────────────────────────────────
 #  Admin — Counselling Management
 # ─────────────────────────────────────────
 @main.route('/admin/counselling', methods=['GET', 'POST'])
