@@ -50,10 +50,7 @@ SETUP INSTRUCTIONS
 ADMIN ACCESS
 ------------
   URL:      http://127.0.0.1:5000/admin/login
-  Username: admin
-  Password: admin@bca2026
-
-  To change: set environment variables:
+  set environment variables:
     ADMIN_USERNAME=yourusername
     ADMIN_PASSWORD=yourpassword
 
